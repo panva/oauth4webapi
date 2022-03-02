@@ -1,0 +1,29 @@
+[@panva/oauth4webapi](../README.md) / deviceCodeGrantRequest
+
+# Function: deviceCodeGrantRequest
+
+▸ **deviceCodeGrantRequest**(`as`, `client`, `deviceCode`, `options?`): `Promise`<`Response`\>
+
+Performs a Device Authorization Grant request at the
+[`as.token_endpoint`](../interfaces/AuthorizationServer.md#token_endpoint).
+
+**`see`** [RFC 8628 - OAuth 2.0 Device Authorization Grant](https://www.rfc-editor.org/rfc/rfc8628.html#section-3.4)
+
+**`see`** [draft-ietf-oauth-dpop-06 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)](https://www.ietf.org/archive/id/draft-ietf-oauth-dpop-06.html#name-dpop-access-token-request)
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata |
+| `client` | [`Client`](../interfaces/Client.md) | Client Metadata |
+| `deviceCode` | `string` | [`device_code`](../interfaces/DeviceAuthorizationResponse.md#device_code) |
+| `options?` | [`TokenEndpointRequestOptions`](../interfaces/TokenEndpointRequestOptions.md) | - |
+
+#### Returns
+
+`Promise`<`Response`\>
+
+Resolves with
+[Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)'s
+[Response](https://developer.mozilla.org/en-US/docs/Web/API/Response)
