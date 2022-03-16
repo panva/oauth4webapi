@@ -26,6 +26,16 @@ This is a collection of bits and pieces upon which a more streamlined Client mod
 
 ## [Examples](./examples/README.md)
 
+**`example`** ESM import
+```js
+import * as oauth2 from '@panva/oauth4webapi'
+```
+
+**`example`** Deno import
+```js
+import * as oauth2 from 'https://deno.land/x/doauth/src/index.ts'
+```
+
 - Authorization Code Flow - OpenID Connect [source](./examples/code.ts), or plain OAuth 2.0 [source](./examples/oauth.ts)
 - Private Key JWT Client Authentication - [source](./examples/private_key_jwt.ts) | [diff from code flow](./examples/private_key_jwt.diff)
 - DPoP - [source](./examples/dpop.ts) | [diff from code flow](./examples/dpop.diff)
@@ -58,6 +68,7 @@ Pending runtime support
 
 ## Out of scope
 
+- CommonJS
 - OAuth 2.0 & OpenID Connect Implicit Flows
 - OAuth 2.0 Resource Owner Password Credentials
 - OpenID Connect Hybrid Flows
