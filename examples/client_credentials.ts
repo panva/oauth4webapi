@@ -12,7 +12,7 @@ const client: lib.Client = {
   token_endpoint_auth_method: 'client_secret_basic',
 }
 
-const response = await lib.clientCredentialsGrantRequest(...setup)
+const response = await lib.clientCredentialsGrantRequest(as, client)
 
 let challenges: lib.WWWAuthenticateChallenge[] | undefined
 if ((challenges = lib.parseWwwAuthenticateChallenges(response))) {
