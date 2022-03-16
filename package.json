@@ -19,10 +19,12 @@
     "build/index.d.ts"
   ],
   "scripts": {
+    "_format": "find src test examples -type f -name '*.ts' | xargs prettier",
     "build": "tsc && tsc --declaration true --emitDeclarationOnly true --removeComments false && tsc -p examples",
     "coverage": "c8 ava",
     "docs": "typedoc",
-    "format": "find src test examples -type f -name '*.ts' | xargs prettier --write",
+    "format": "npm run _format -- --write",
+    "format-check": "npm run _format -- --check",
     "prepack": "npm run test && npm run build",
     "test": "ava"
   },
