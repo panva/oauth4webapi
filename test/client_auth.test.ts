@@ -99,7 +99,7 @@ test('private_key_jwt', async (t) => {
     },
     'token',
     {
-      clientPrivateKey: { key: <CryptoKey>t.context.ES256.privateKey },
+      clientPrivateKey: { key: t.context.ES256.privateKey },
     },
   )
   await t.throwsAsync(
@@ -111,7 +111,7 @@ test('private_key_jwt', async (t) => {
       },
       'token',
       {
-        clientPrivateKey: { key: <CryptoKey>t.context.ES256.publicKey },
+        clientPrivateKey: { key: t.context.ES256.publicKey },
       },
     ),
     { message: '"options.clientPrivateKey" must be a private CryptoKey' },
@@ -121,15 +121,14 @@ test('private_key_jwt', async (t) => {
 
 for (const alg of ['RS', 'ES', 'PS'].map((s) => [`${s}256`, `${s}384`, `${s}512`]).flat()) {
   test(`private_key_jwt using ${alg}`, async (t) => {
+    let assertion!: string
     t.context
       .intercept({
         path: `/test-${alg}`,
         method: 'POST',
         body(body) {
-          return (
-            jose.decodeProtectedHeader(new URLSearchParams(body).get('client_assertion')!).alg ===
-            alg
-          )
+          assertion = new URLSearchParams(body).get('client_assertion')!
+          return jose.decodeProtectedHeader(assertion).alg === alg
         },
       })
       .reply(200, '')
@@ -142,9 +141,101 @@ for (const alg of ['RS', 'ES', 'PS'].map((s) => [`${s}256`, `${s}384`, `${s}512`
       },
       'token',
       {
-        clientPrivateKey: { key: <CryptoKey>t.context[alg].privateKey },
+        clientPrivateKey: { key: t.context[alg].privateKey },
       },
     )
+    await jose.compactVerify(assertion, t.context[alg].publicKey)
+    t.pass()
+  })
+}
+
+test('client_secret_jwt', async (t) => {
+  const tIssuer: lib.AuthorizationServer = {
+    ...issuer,
+    revocation_endpoint: endpoint('test-csjwt'),
+    token_endpoint: endpoint('token'),
+    token_endpoint_auth_signing_alg_values_supported: ['HS512', 'HS384', 'HS256'],
+  }
+
+  t.context
+    .intercept({
+      path: '/test-csjwt',
+      method: 'POST',
+      body(body) {
+        const params = new URLSearchParams(body)
+        t.false(params.has('client_secret'))
+        t.true(params.has('client_assertion'))
+        t.is(params.get('client_id'), client.client_id)
+        t.is(
+          params.get('client_assertion_type'),
+          'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
+        )
+
+        const { alg } = jose.decodeProtectedHeader(params.get('client_assertion')!)
+        t.is(alg, 'HS512')
+        const assertion = jose.decodeJwt(params.get('client_assertion')!)
+        t.deepEqual(assertion.aud, [tIssuer.issuer, tIssuer.token_endpoint])
+        t.is(assertion.iss, client.client_id)
+        t.is(assertion.sub, client.client_id)
+        t.is(typeof assertion.exp, 'number')
+        t.is(typeof assertion.iat, 'number')
+        t.is(typeof assertion.nbf, 'number')
+        t.is(typeof assertion.jti, 'string')
+
+        return true
+      },
+    })
+    .reply(200, '')
+
+  await lib.revocationRequest(
+    tIssuer,
+    {
+      ...client,
+      client_secret: 'foo',
+      token_endpoint_auth_method: 'client_secret_jwt',
+    },
+    'token',
+  )
+  await t.throwsAsync(
+    lib.revocationRequest(
+      { ...issuer, revocation_endpoint: endpoint('test-csjwt') },
+      {
+        ...client,
+        token_endpoint_auth_method: 'client_secret_jwt',
+      },
+      'token',
+    ),
+    { message: '"client.client_secret" property must be a non-empty string' },
+  )
+  t.pass()
+})
+
+for (const alg of ['HS256', 'HS384', 'HS512']) {
+  test(`client_secret_jwt using ${alg}`, async (t) => {
+    let assertion!: string
+    t.context
+      .intercept({
+        path: `/test-${alg}`,
+        method: 'POST',
+        body(body) {
+          assertion = new URLSearchParams(body).get('client_assertion')!
+          return jose.decodeProtectedHeader(assertion).alg === alg
+        },
+      })
+      .reply(200, '')
+
+    await lib.revocationRequest(
+      { ...issuer, revocation_endpoint: endpoint(`test-${alg}`) },
+      {
+        ...client,
+        client_secret: 'foo',
+        token_endpoint_auth_signing_alg: alg,
+        token_endpoint_auth_method: 'client_secret_jwt',
+      },
+      'token',
+    )
+
+    await jose.compactVerify(assertion, new TextEncoder().encode('foo'))
     t.pass()
   })
 }

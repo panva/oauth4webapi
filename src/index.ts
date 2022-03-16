@@ -64,6 +64,11 @@ export interface PrivateKey {
  * The `client_assertion` is signed using a private key supplied
  * as an {@link AuthenticatedRequestOptions.clientPrivateKey options parameter}.
  *
+ * - **`client_secret_jwt`** uses the HTTP request body to send
+ * {@link Client.client_id `client_id`}, `client_assertion_type`, and `client_assertion`
+ * as `application/x-www-form-urlencoded` body parameters.
+ * The `client_assertion` is signed using the {@link Client.client_secret `client_secret`}.
+ *
  * - **`none`** (public client) uses the HTTP request body to send only
  * {@link Client.client_id `client_id`}
  * as `application/x-www-form-urlencoded` body parameter.
@@ -76,6 +81,7 @@ export interface PrivateKey {
 export type TokenEndpointAuthMethod =
   | 'client_secret_basic'
   | 'client_secret_post'
+  | 'client_secret_jwt'
   | 'private_key_jwt'
   | 'none'
 
@@ -546,6 +552,12 @@ export interface Client {
    * Default Maximum Authentication Age.
    */
   default_max_age?: number
+  /**
+   * JWS "alg" algorithm for `client_secret_jwt`
+   * {@link TokenEndpointAuthMethod authentication method}. It is ignored
+   * for every other method.
+   */
+  token_endpoint_auth_signing_alg?: 'HS256' | 'HS384' | 'HS512' | string
 
   [parameter: string]: unknown
 }
@@ -1096,6 +1108,37 @@ async function privateKeyJwt(
   )
 }
 
+function isHmac(alg: unknown): alg is 'HS256' | 'HS384' | 'HS512' {
+  return alg === 'HS256' || alg === 'HS384' || alg === 'HS512'
+}
+
+/**
+ * Generates a unique client assertion to be used in `client_secret_jwt`
+ * authenticated requests.
+ */
+async function clientSecretJwt(as: AuthorizationServer, client: Client, secret: string) {
+  const alg =
+    client.token_endpoint_auth_signing_alg ??
+    (Array.isArray(as.token_endpoint_auth_signing_alg_values_supported) &&
+      as.token_endpoint_auth_signing_alg_values_supported.find(isHmac))
+
+  if (!isHmac(alg)) {
+    throw new OPE(
+      'could not determine client_secret_jwt JWS "alg" algorithm, client.token_endpoint_auth_signing_alg must be configured',
+    )
+  }
+
+  const key = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(secret),
+    { name: 'HMAC', hash: `SHA-${alg.slice(-3)}` },
+    false,
+    ['sign'],
+  )
+
+  return jwt({ alg }, clientAssertion(as, client), key)
+}
+
 function assertIssuer(metadata: AuthorizationServer): metadata is AuthorizationServer {
   if (typeof metadata !== 'object' || metadata === null) {
     throw new TypeError('"issuer" must be an object')
@@ -1167,6 +1210,16 @@ async function clientAuthentication(
       assertNoClientPrivateKey('client_secret_post')
       body.set('client_id', client.client_id)
       body.set('client_secret', assertClientSecret(client.client_secret))
+      break
+    }
+    case 'client_secret_jwt': {
+      assertNoClientPrivateKey('client_secret_jwt')
+      body.set('client_id', client.client_id)
+      body.set('client_assertion_type', 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer')
+      body.set(
+        'client_assertion',
+        await clientSecretJwt(as, client, assertClientSecret(client.client_secret)),
+      )
       break
     }
     case 'private_key_jwt': {

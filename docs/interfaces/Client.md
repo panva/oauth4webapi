@@ -102,6 +102,16 @@ client's authenticated requests.
 
 ___
 
+### token\_endpoint\_auth\_signing\_alg
+
+• `Optional` **token\_endpoint\_auth\_signing\_alg**: `string`
+
+JWS "alg" algorithm for `client_secret_jwt`
+[authentication method](../types/TokenEndpointAuthMethod.md). It is ignored
+for every other method.
+
+___
+
 ### userinfo\_signed\_response\_alg
 
 • `Optional` **userinfo\_signed\_response\_alg**: `string`
