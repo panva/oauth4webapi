@@ -48,7 +48,6 @@ test('deviceAuthorizationRequest()', async (t) => {
       method: 'POST',
       headers: {
         accept: 'application/json',
-        'user-agent': 'uatbd',
       },
       body(body) {
         return new URLSearchParams(body).get('client_id') === client.client_id
@@ -209,7 +208,6 @@ test('deviceCodeGrantRequest()', async (t) => {
       method: 'POST',
       headers: {
         accept: 'application/json',
-        'user-agent': 'uatbd',
       },
       body(body) {
         const params = new URLSearchParams(body)

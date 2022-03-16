@@ -15,7 +15,6 @@ test('protectedResource()', async (t) => {
       method: 'GET',
       headers: {
         authorization: 'Bearer token',
-        'user-agent': 'uatbd',
       },
     })
     .reply(200, '')

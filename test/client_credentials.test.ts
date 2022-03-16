@@ -27,7 +27,6 @@ test('clientCredentialsGrantRequest()', async (t) => {
       method: 'POST',
       headers: {
         accept: 'application/json',
-        'user-agent': 'uatbd',
       },
       body(body) {
         const params = new URLSearchParams(body)

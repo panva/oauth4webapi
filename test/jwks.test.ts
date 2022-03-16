@@ -16,7 +16,6 @@ test('jwksRequest()', async (t) => {
       method: 'GET',
       headers: {
         accept: 'application/json, application/jwk-set+json',
-        'user-agent': 'uatbd',
       },
     })
     .reply(200, data)

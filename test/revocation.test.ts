@@ -30,7 +30,6 @@ test('revocationRequest()', async (t) => {
       method: 'POST',
       headers: {
         accept: '*/*',
-        'user-agent': 'uatbd',
       },
       body(body) {
         return new URLSearchParams(body).get('token') === 'token'

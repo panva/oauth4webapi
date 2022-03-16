@@ -16,7 +16,6 @@ test('discoveryRequest()', async (t) => {
       method: 'GET',
       headers: {
         accept: 'application/json',
-        'user-agent': 'uatbd',
       },
     })
     .reply(200, data)

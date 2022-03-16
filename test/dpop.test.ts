@@ -31,7 +31,6 @@ test('dpop()', async (t) => {
           t.is(ath, crypto.createHash('sha256').update('token').digest('base64url'))
           return true
         },
-        'user-agent': 'uatbd',
       },
     })
     .reply(200, '')

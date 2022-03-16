@@ -1,3 +1,8 @@
+const NAME = 'oauth4webapi'
+const VERSION = 'v0.0.1' // TODO: bump during standard-version prerelease
+const HOMEPAGE = 'https://github.com/panva/oauth4webapi'
+const USER_AGENT = `${NAME}/${VERSION} (${HOMEPAGE})`
+
 /**
  * Interface to pass an asymmetric public key and, optionally, its associated
  * JWK Key ID to be added as a `kid` JOSE Header Parameter.
@@ -775,7 +780,7 @@ export async function discoveryRequest(
   }
 
   return fetch(url.href, {
-    headers: new Headers({ accept: 'application/json', 'user-agent': 'uatbd' }),
+    headers: new Headers({ accept: 'application/json', 'user-agent': USER_AGENT }),
     method: 'GET',
     redirect: 'manual',
     signal: options?.signal,
@@ -1656,7 +1661,7 @@ export async function protectedResourceRequest(
     headers.set('authorization', `DPoP ${accessToken}`)
   }
 
-  headers.set('user-agent', 'uatbd')
+  headers.set('user-agent', USER_AGENT)
 
   return fetch(url.href, {
     body,
@@ -2021,7 +2026,7 @@ async function authenticatedRequest(
   headers: Headers,
   options?: SignalledRequestOptions & AuthenticatedRequestOptions,
 ) {
-  headers.set('user-agent', 'uatbd')
+  headers.set('user-agent', USER_AGENT)
 
   await clientAuthentication(as, client, body, headers, options?.clientPrivateKey)
 
@@ -3072,7 +3077,7 @@ export async function jwksRequest(
   const headers = new Headers()
   headers.set('accept', 'application/json')
   headers.append('accept', 'application/jwk-set+json')
-  headers.set('user-agent', 'uatbd')
+  headers.set('user-agent', USER_AGENT)
 
   return fetch(url.href, {
     headers,

@@ -31,7 +31,6 @@ test('pushedAuthorizationRequest()', async (t) => {
       method: 'POST',
       headers: {
         accept: 'application/json',
-        'user-agent': 'uatbd',
       },
       body(body) {
         return new URLSearchParams(body).get('client_id') === client.client_id
@@ -54,7 +53,6 @@ test('pushedAuthorizationRequest() w/ DPoP', async (t) => {
       method: 'POST',
       headers: {
         accept: 'application/json',
-        'user-agent': 'uatbd',
         dpop: /.+/,
       },
       body(body) {
@@ -81,7 +79,6 @@ test('pushedAuthorizationRequest() w/ Request Object', async (t) => {
       method: 'POST',
       headers: {
         accept: 'application/json',
-        'user-agent': 'uatbd',
       },
       body(body) {
         const params = new URLSearchParams(body)

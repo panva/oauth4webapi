@@ -34,7 +34,6 @@ test('userInfoRequest()', async (t) => {
       method: 'GET',
       headers: {
         accept: 'application/json, application/jwt',
-        'user-agent': 'uatbd',
       },
     })
     .reply(200, data)
@@ -53,7 +52,6 @@ test('userInfoRequest() w/ jwt signal', async (t) => {
       method: 'GET',
       headers: {
         accept: 'application/jwt',
-        'user-agent': 'uatbd',
       },
     })
     .reply(200, data)

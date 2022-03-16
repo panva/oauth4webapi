@@ -20,7 +20,6 @@ test('client_secret_basic', async (t) => {
       path: '/test-basic',
       method: 'POST',
       headers: {
-        'user-agent': 'uatbd',
         authorization: (header) => header.startsWith('Basic '),
       },
       body(body) {
@@ -155,9 +154,6 @@ test('none', async (t) => {
     .intercept({
       path: '/test-none',
       method: 'POST',
-      headers: {
-        'user-agent': 'uatbd',
-      },
       body(body) {
         const params = new URLSearchParams(body)
         return params.has('client_id') && !params.has('client_secret')

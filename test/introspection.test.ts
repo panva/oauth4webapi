@@ -48,7 +48,6 @@ test('introspectionRequest()', async (t) => {
       method: 'POST',
       headers: {
         accept: 'application/json',
-        'user-agent': 'uatbd',
       },
       body(body) {
         return new URLSearchParams(body).get('token') === 'token'
@@ -94,7 +93,6 @@ test('introspectionRequest() forced jwt', async (t) => {
       method: 'POST',
       headers: {
         accept: 'application/token-introspection+jwt',
-        'user-agent': 'uatbd',
       },
       body(body) {
         return new URLSearchParams(body).get('token') === 'token'
@@ -119,7 +117,6 @@ test('introspectionRequest() jwt through client metadata', async (t) => {
       method: 'POST',
       headers: {
         accept: 'application/token-introspection+jwt',
-        'user-agent': 'uatbd',
       },
       body(body) {
         return new URLSearchParams(body).get('token') === 'token'
@@ -148,7 +145,6 @@ test('introspectionRequest() forced json', async (t) => {
       method: 'POST',
       headers: {
         accept: 'application/json',
-        'user-agent': 'uatbd',
       },
       body(body) {
         return new URLSearchParams(body).get('token') === 'token'
