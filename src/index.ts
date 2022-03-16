@@ -514,21 +514,21 @@ export interface Client {
    * Client {@link TokenEndpointAuthMethod authentication method} for the
    * client's authenticated requests.
    */
-  token_endpoint_auth_method?: TokenEndpointAuthMethod
+  token_endpoint_auth_method?: TokenEndpointAuthMethod | string
   /**
    * JWS "alg" algorithm required for signing the ID Token issued to this
    * Client.
    */
-  id_token_signed_response_alg?: JWSAlgorithm
+  id_token_signed_response_alg?: JWSAlgorithm | string
   /**
    * JWS "alg" algorithm required for signing authorization responses.
    */
-  authorization_signed_response_alg?: JWSAlgorithm
+  authorization_signed_response_alg?: JWSAlgorithm | string
   /**
    * JWE "enc" algorithm the RP is declaring that it may use for encrypting
    * Request Objects sent to the authorization server.
    */
-  request_object_encryption_enc?: ContentEncryptionAlgorithm
+  request_object_encryption_enc?: ContentEncryptionAlgorithm | string
   /**
    * Boolean value specifying whether the {@link IDToken.auth_time auth_time}
    * Claim in the ID Token is REQUIRED.
@@ -537,11 +537,11 @@ export interface Client {
   /**
    * JWS "alg" algorithm REQUIRED for signing UserInfo Responses.
    */
-  userinfo_signed_response_alg?: JWSAlgorithm
+  userinfo_signed_response_alg?: JWSAlgorithm | string
   /**
    * JWS "alg" algorithm REQUIRED for signed introspection responses.
    */
-  introspection_signed_response_alg?: JWSAlgorithm
+  introspection_signed_response_alg?: JWSAlgorithm | string
   /**
    * Default Maximum Authentication Age.
    */

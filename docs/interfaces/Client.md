@@ -21,13 +21,14 @@ Recognized Client Metadata that have an effect on the exposed functionality.
 - [request\_object\_encryption\_enc](Client.md#request_object_encryption_enc)
 - [require\_auth\_time](Client.md#require_auth_time)
 - [token\_endpoint\_auth\_method](Client.md#token_endpoint_auth_method)
+- [token\_endpoint\_auth\_signing\_alg](Client.md#token_endpoint_auth_signing_alg)
 - [userinfo\_signed\_response\_alg](Client.md#userinfo_signed_response_alg)
 
 ## Properties
 
 ### authorization\_signed\_response\_alg
 
-• `Optional` **authorization\_signed\_response\_alg**: [`JWSAlgorithm`](../types/JWSAlgorithm.md)
+• `Optional` **authorization\_signed\_response\_alg**: `string`
 
 JWS "alg" algorithm required for signing authorization responses.
 
@@ -59,7 +60,7 @@ ___
 
 ### id\_token\_signed\_response\_alg
 
-• `Optional` **id\_token\_signed\_response\_alg**: [`JWSAlgorithm`](../types/JWSAlgorithm.md)
+• `Optional` **id\_token\_signed\_response\_alg**: `string`
 
 JWS "alg" algorithm required for signing the ID Token issued to this
 Client.
@@ -68,7 +69,7 @@ ___
 
 ### introspection\_signed\_response\_alg
 
-• `Optional` **introspection\_signed\_response\_alg**: [`JWSAlgorithm`](../types/JWSAlgorithm.md)
+• `Optional` **introspection\_signed\_response\_alg**: `string`
 
 JWS "alg" algorithm REQUIRED for signed introspection responses.
 
@@ -76,7 +77,7 @@ ___
 
 ### request\_object\_encryption\_enc
 
-• `Optional` **request\_object\_encryption\_enc**: [`ContentEncryptionAlgorithm`](../types/ContentEncryptionAlgorithm.md)
+• `Optional` **request\_object\_encryption\_enc**: `string`
 
 JWE "enc" algorithm the RP is declaring that it may use for encrypting
 Request Objects sent to the authorization server.
@@ -94,7 +95,7 @@ ___
 
 ### token\_endpoint\_auth\_method
 
-• `Optional` **token\_endpoint\_auth\_method**: [`TokenEndpointAuthMethod`](../types/TokenEndpointAuthMethod.md)
+• `Optional` **token\_endpoint\_auth\_method**: `string`
 
 Client [authentication method](../types/TokenEndpointAuthMethod.md) for the
 client's authenticated requests.
@@ -103,6 +104,6 @@ ___
 
 ### userinfo\_signed\_response\_alg
 
-• `Optional` **userinfo\_signed\_response\_alg**: [`JWSAlgorithm`](../types/JWSAlgorithm.md)
+• `Optional` **userinfo\_signed\_response\_alg**: `string`
 
 JWS "alg" algorithm REQUIRED for signing UserInfo Responses.
