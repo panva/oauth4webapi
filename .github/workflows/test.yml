@@ -12,8 +12,9 @@ jobs:
         uses: actions/setup-node@v3
       - name: Install dependencies
         run: npx panva/npm-install-retry
-      - name: Test
-        run: npm run format-check
+      - run: npm run format-check
+      - run: ./examples/.update-diffs.mjs
+      - run: git diff --quiet
 
   test:
     runs-on: ubuntu-latest
