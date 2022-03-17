@@ -2,11 +2,10 @@ import type QUnit from 'qunit'
 import * as lib from '../src/index.js'
 import * as jose from 'jose'
 
-const algs: lib.JWSAlgorithm[] = ['RS256', 'ES256', 'PS256']
 const issuer = { issuer: 'https://op.example.com' }
 const client = { client_id: 'client_id' }
 
-const keys = {
+const keys: Record<string, CryptoKeyPair> = {
   RS256: await lib.generateKeyPair('RS256'),
   PS256: await lib.generateKeyPair('PS256'),
   ES256: await lib.generateKeyPair('ES256'),
@@ -59,7 +58,7 @@ export default (QUnit: QUnit) => {
     t.propEqual(resource, ['urn:example:resource', 'urn:example:resource-2'])
   })
 
-  for (const alg of algs) {
+  for (const alg of Object.keys(keys)) {
     test(`issueRequestObject() signed using ${alg}`, async (t) => {
       const kp = keys[alg]
       const jwt = await lib.issueRequestObject(issuer, client, new URLSearchParams(), {

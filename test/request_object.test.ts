@@ -6,7 +6,7 @@ import * as lib from '../src/index.js'
 
 const test = anyTest as TestFn<{ [alg: string]: CryptoKeyPair }>
 
-const algs: lib.JWSAlgorithm[] = ['RS256', 'ES256', 'PS256']
+const algs: lib.JWSAlgorithm[] = ['RS256', 'ES256', 'PS256', 'EdDSA']
 
 test.before(async (t) => {
   for (const alg of algs) {

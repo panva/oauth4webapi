@@ -17,7 +17,7 @@ const test = anyTest as TestFn<Context & { [alg: string]: CryptoKeyPair }>
 test.before(setup)
 test.after(teardown)
 
-const algs: lib.JWSAlgorithm[] = ['RS256', 'ES256', 'PS256']
+const algs: lib.JWSAlgorithm[] = ['RS256', 'ES256', 'PS256', 'EdDSA']
 
 test.before(async (t) => {
   const keys = []
@@ -634,6 +634,9 @@ for (const alg of algs) {
       case 'PS256':
       case 'ES256':
         at_hash = 'xsZZrUssMXjL3FBlzoSh2g'
+        break
+      case 'EdDSA':
+        at_hash = 'p2LHG4H-8pYDc0hyVOo3iIHvZJUqe9tbj3jESOuXbkY'
         break
       default:
         throw new Error('not implemented')

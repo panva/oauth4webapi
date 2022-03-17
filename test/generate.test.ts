@@ -18,7 +18,7 @@ test('unknown algorithm', async (t) => {
   await t.throwsAsync(() => lib.generateKeyPair(<any>'foo'), { name: 'UnsupportedOperationError' })
 })
 
-for (const alg of <lib.JWSAlgorithm[]>['RS256', 'PS256', 'ES256']) {
+for (const alg of <lib.JWSAlgorithm[]>['RS256', 'PS256', 'ES256', 'EdDSA']) {
   test(`${alg} defaults`, async (t) => {
     const { publicKey, privateKey } = await lib.generateKeyPair(alg)
     t.deepEqual(publicKey.usages, ['verify'])
