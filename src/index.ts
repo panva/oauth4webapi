@@ -3271,10 +3271,10 @@ async function validateJws(
  *
  * @param as Authorization Server Metadata
  * @param client Client Metadata
- * @param parameters TODO
+ * @param parameters JARM authorization response
  * @param expectedState Expected "state" parameter value
  *
- * @returns TODO
+ * @returns Validated Authorization Response parameters or Authorization Error Response.
  */
 export async function validateJwtAuthResponse(
   as: AuthorizationServer,
@@ -3406,14 +3406,16 @@ export const expectNoState = Symbol()
 class CallbackParameters extends URLSearchParams {}
 
 /**
- * TODO
+ * Validates an OAuth 2.0 Authorization Response or Authorization Error Response
+ * message returned from the authorization server's {@link
+ * AuthorizationServer.authorization_endpoint `as.authorization_endpoint`}.
  *
  * @param as Authorization Server Metadata
  * @param client Client Metadata
- * @param parameters TODO
+ * @param parameters Authorization response
  * @param expectedState Expected "state" parameter value
  *
- * @returns TODO
+ * @returns Validated Authorization Response parameters or Authorization Error Response.
  */
 export function validateAuthResponse(
   as: AuthorizationServer,

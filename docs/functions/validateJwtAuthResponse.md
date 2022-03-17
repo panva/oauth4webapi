@@ -14,7 +14,7 @@ Same as [validateAuthResponse](validateAuthResponse.md) but for signed JARM resp
 | :------ | :------ | :------ |
 | `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata |
 | `client` | [`Client`](../interfaces/Client.md) | Client Metadata |
-| `parameters` | `URL` \| `URLSearchParams` | TODO |
+| `parameters` | `URL` \| `URLSearchParams` | JARM authorization response |
 | `expectedState` | `string` \| typeof [`expectNoState`](../variables/expectNoState.md) \| typeof [`skipStateCheck`](../variables/skipStateCheck.md) | Expected "state" parameter value |
 | `options?` | [`SignalledRequestOptions`](../interfaces/SignalledRequestOptions.md) | - |
 
@@ -22,4 +22,4 @@ Same as [validateAuthResponse](validateAuthResponse.md) but for signed JARM resp
 
 `Promise`<`CallbackParameters` \| [`OAuth2Error`](../interfaces/OAuth2Error.md)\>
 
-TODO
+Validated Authorization Response parameters or Authorization Error Response.
