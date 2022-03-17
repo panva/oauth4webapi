@@ -55,7 +55,7 @@ The supported javascript runtimes include ones that
 
 Other than browsers the supported runtimes are
 
-- Deno (v1.20.0 and newer)
+- Deno (v1.20.1 and newer)
 - Cloudflare Workers
 - Vercel Edge Functions
 - Next.js Middlewares

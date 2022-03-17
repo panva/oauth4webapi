@@ -30,3 +30,25 @@ jobs:
           node-version: 17
       - run: npm clean-install
       - run: npm run test
+
+  deno:
+    continue-on-error: ${{ matrix.experimental || false }}
+    strategy:
+      fail-fast: false
+      matrix:
+        deno-version:
+          - v1.20.1
+          - v1
+        include:
+          - experimental: true
+            deno-version: canary
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - uses: denoland/setup-deno@v1
+        with:
+          deno-version: ${{ matrix.deno-version }}
+      - name: Test Deno Definitions
+        run: deno run src/index.ts
