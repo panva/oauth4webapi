@@ -53,9 +53,9 @@ The supported javascript runtimes include ones that
    - [Fetch API][] and its related globals [fetch][], [Response][], [Headers][]
    - [Web Crypto API][] and its related globals [crypto][], [CryptoKey][]
    - [Encoding API][] and its related globals [TextEncoder][], [TextDecoder][]
+   - [URL API][] and its related globals [URL][], [URLSearchParams][]
    - [atob][] and [btoa][]
    - [Uint8Array][]
-   - [URLSearchParams][]
 
 Other than browsers the supported runtimes are
 
@@ -101,3 +101,5 @@ Pending runtime support
 [CryptoKey]: https://developer.mozilla.org/en-US/docs/Web/API/CryptoKey
 [URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams
 [Encoding API]: https://developer.mozilla.org/en-US/docs/Web/API/Encoding_API
+[URL API]: https://developer.mozilla.org/en-US/docs/Web/API/URL_API
+[URL]: https://developer.mozilla.org/en-US/docs/Web/API/URL
