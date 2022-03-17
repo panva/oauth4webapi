@@ -22,6 +22,8 @@ This is a collection of bits and pieces upon which a more streamlined Client mod
 - JWT UserInfo Responses
 - Protected Resource Requests (Bearer and DPoP)
 
+## Dependencies: 0
+
 ## [Documentation](./docs/README.md)
 
 ## [Examples](./examples/README.md)
