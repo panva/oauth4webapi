@@ -50,8 +50,11 @@ The supported javascript runtimes include ones that
 
 - are reasonably up to date ECMAScript (targets ES2020, but may be further transpiled for compatibility)
 - support required Web APIs
-   - [fetch][] and its associated globals
-   - [Web Crypto API][] and its associated globals
+   - [fetch][] and its associated globals [Response][], [Headers][]
+   - [Web Crypto API][] and its associated globals [crypto][], [CryptoKey][]
+   - [TextEncoder][] and [TextDecoder][]
+   - [atob][] and [btoa][]
+   - [Uint8Array][]
 
 Other than browsers the supported runtimes are
 
@@ -85,3 +88,12 @@ Pending runtime support
 [fetch]: https://developer.mozilla.org/en-US/docs/Web/API/fetch
 [OpenID Connect Discovery 1.0]: https://openid.net/specs/openid-connect-discovery-1_0.html
 [OAuth 2.0 Authorization Server Metadata]: https://www.rfc-editor.org/rfc/rfc8414.html
+[TextDecoder]: https://developer.mozilla.org/en-US/docs/Web/API/TextDecoder
+[TextEncoder]: https://developer.mozilla.org/en-US/docs/Web/API/TextEncoder
+[btoa]: https://developer.mozilla.org/en-US/docs/Web/API/btoa
+[atob]: https://developer.mozilla.org/en-US/docs/Web/API/atob
+[Uint8Array]: https://developer.mozilla.org/en-US/docs/Web/API/Uint8Array
+[Response]: https://developer.mozilla.org/en-US/docs/Web/API/Response
+[Headers]: https://developer.mozilla.org/en-US/docs/Web/API/Headers
+[crypto]: https://developer.mozilla.org/en-US/docs/Web/API/crypto
+[CryptoKey]: https://developer.mozilla.org/en-US/docs/Web/API/CryptoKey
