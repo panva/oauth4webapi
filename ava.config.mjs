@@ -9,8 +9,6 @@ export default {
   ],
   nodeArguments: [
     '--loader=ts-node/esm',
-    '--experimental-fetch',
-    '--experimental-global-webcrypto',
     '--enable-source-maps',
     '--no-warnings',
     '--conditions=browser',
