@@ -3440,7 +3440,7 @@ export function validateAuthResponse(
 
   if (getURLSearchParameter(parameters, 'response')) {
     throw new OPE(
-      '"parameters" contains a JARM response, use validateJwtAuthResponse() first, then validateAuthResponse()',
+      '"parameters" contains a JARM response, use validateJwtAuthResponse() instead of validateAuthResponse()',
     )
   }
 

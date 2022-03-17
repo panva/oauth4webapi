@@ -59,7 +59,7 @@ test('validateAuthResponse() error conditions', (t) => {
       ),
     {
       message:
-        '"parameters" contains a JARM response, use validateJwtAuthResponse() first, then validateAuthResponse()',
+        '"parameters" contains a JARM response, use validateJwtAuthResponse() instead of validateAuthResponse()',
     },
   )
   t.throws(
