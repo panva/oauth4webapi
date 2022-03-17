@@ -49,9 +49,9 @@ import * as oauth2 from 'https://deno.land/x/doauth/src/index.ts'
 The supported javascript runtimes include ones that
 
 - are reasonably up to date ECMAScript (targets ES2020, but may be further transpiled for compatibility)
-- support required Web APIs
-   - [Fetch API][] and its associated globals [fetch][], [Response][], [Headers][]
-   - [Web Crypto API][] and its associated globals [crypto][], [CryptoKey][]
+- support required Web API globals
+   - [Fetch API][] and its related globals [fetch][], [Response][], [Headers][]
+   - [Web Crypto API][] and its related globals [crypto][], [CryptoKey][]
    - [TextEncoder][] and [TextDecoder][]
    - [atob][] and [btoa][]
    - [Uint8Array][]
