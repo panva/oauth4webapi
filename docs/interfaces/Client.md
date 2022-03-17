@@ -4,6 +4,8 @@
 
 Recognized Client Metadata that have an effect on the exposed functionality.
 
+**`see`** [IANA OAuth Client Registration Metadata registry](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#client-metadata)
+
 ## Indexable
 
 ▪ [parameter: `string`]: `unknown`

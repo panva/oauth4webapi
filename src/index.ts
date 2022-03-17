@@ -140,6 +140,8 @@ export interface JWK {
 
 /**
  * Authorization Server Metadata
+ *
+ * @see {@link https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#authorization-server-metadata IANA OAuth Authorization Server Metadata registry}
  */
 export interface AuthorizationServer {
   /**
@@ -506,6 +508,8 @@ export interface AuthorizationServer {
 
 /**
  * Recognized Client Metadata that have an effect on the exposed functionality.
+ *
+ * @see {@link https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#client-metadata IANA OAuth Client Registration Metadata registry}
  */
 export interface Client {
   /**
