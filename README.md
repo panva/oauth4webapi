@@ -50,7 +50,7 @@ The supported javascript runtimes include ones that
 
 - are reasonably up to date ECMAScript (targets ES2020, but may be further transpiled for compatibility)
 - support required Web APIs
-   - [fetch][] and its associated globals [Response][], [Headers][]
+   - [Fetch API][] and its associated globals [fetch][], [Response][], [Headers][]
    - [Web Crypto API][] and its associated globals [crypto][], [CryptoKey][]
    - [TextEncoder][] and [TextDecoder][]
    - [atob][] and [btoa][]
@@ -85,6 +85,7 @@ Pending runtime support
 - JWE Direct Encryption with a Shared Symmetric Key
 
 [Web Crypto API]: https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API
+[Fetch API]: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API
 [fetch]: https://developer.mozilla.org/en-US/docs/Web/API/fetch
 [OpenID Connect Discovery 1.0]: https://openid.net/specs/openid-connect-discovery-1_0.html
 [OAuth 2.0 Authorization Server Metadata]: https://www.rfc-editor.org/rfc/rfc8414.html
