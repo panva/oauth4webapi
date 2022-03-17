@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.0.5](https://github.com/panva/oauth4webapi/compare/v0.0.4...v0.0.5) (2022-03-17)
+
+
+### Fixes
+
+* **jarm:** correct message when jarm response is passed to validateAuthResponse ([9ef7ce8](https://github.com/panva/oauth4webapi/commit/9ef7ce8526ef45e5944881f57353495681249c19))
+
 ## [0.0.4](https://github.com/panva/oauth4webapi/compare/v0.0.3...v0.0.4) (2022-03-17)
 
 ## [0.0.3](https://github.com/panva/oauth4webapi/compare/v0.0.2...v0.0.3) (2022-03-16)
