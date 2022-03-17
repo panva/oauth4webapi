@@ -55,6 +55,7 @@ The supported javascript runtimes include ones that
    - [TextEncoder][] and [TextDecoder][]
    - [atob][] and [btoa][]
    - [Uint8Array][]
+   - [URLSearchParams][]
 
 Other than browsers the supported runtimes are
 
@@ -98,3 +99,4 @@ Pending runtime support
 [Headers]: https://developer.mozilla.org/en-US/docs/Web/API/Headers
 [crypto]: https://developer.mozilla.org/en-US/docs/Web/API/crypto
 [CryptoKey]: https://developer.mozilla.org/en-US/docs/Web/API/CryptoKey
+[URLSearchParams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams
