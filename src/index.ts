@@ -3676,14 +3676,18 @@ function lengthAndInput(input: Uint8Array) {
   return concat(uint32be(input.length), input)
 }
 
-function deriveBitsLength(namedCurve: string) {
-  switch (namedCurve) {
-    case 'P-256':
-      return 256
-    case 'P-384':
-      return 384
-    case 'P-521':
-      return 528
+function deriveBitsLength(algorithm: KeyAlgorithm) {
+  switch (algorithm.name) {
+    case 'ECDH': {
+      switch ((<EcKeyAlgorithm>algorithm).namedCurve) {
+        case 'P-256':
+          return 256
+        case 'P-384':
+          return 384
+        case 'P-521':
+          return 528
+      }
+    }
     default:
       throw new UnsupportedOperationError()
   }
@@ -3697,7 +3701,7 @@ async function ecdhEs(publicKey: CryptoKey, privateKey: CryptoKey, enc: string) 
         public: publicKey,
       },
       privateKey,
-      deriveBitsLength((<EcKeyAlgorithm>privateKey.algorithm).namedCurve),
+      deriveBitsLength(publicKey.algorithm),
     ),
   )
   const keydatalen = cekBitLength(enc)
