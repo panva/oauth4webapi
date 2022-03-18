@@ -163,7 +163,6 @@ export type TokenEndpointAuthMethod =
  *   namedCurve: 'P-521'
  * }
  * ```
- *
  */
 export type JWSAlgorithm =
   | 'PS256'
