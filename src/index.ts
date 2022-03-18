@@ -91,6 +91,79 @@ export type TokenEndpointAuthMethod =
  * Compatibility notes:
  * - ES512 is not supported Safari 14 and older
  * - ES512 is not supported iOS/iPadOS 14 and older
+ *
+ * @example PS256 CryptoKey algorithm
+ * ```ts
+ * interface Ps256Algorithm extends RsaHashedKeyAlgorithm {
+ *   name: 'RSA-PSS'
+ *   hash: { name: 'SHA-256' }
+ * }
+ * ```
+ *
+ * @example PS384 CryptoKey algorithm
+ * ```ts
+ * interface Ps384Algorithm extends RsaHashedKeyAlgorithm {
+ *   name: 'RSA-PSS'
+ *   hash: { name: 'SHA-384' }
+ * }
+ * ```
+ *
+ * @example PS512 CryptoKey algorithm
+ * ```ts
+ * interface Ps512Algorithm extends RsaHashedKeyAlgorithm {
+ *   name: 'RSA-PSS'
+ *   hash: { name: 'SHA-512' }
+ * }
+ * ```
+ *
+ * @example RS256 CryptoKey algorithm
+ * ```ts
+ * interface Rs256Algorithm extends RsaHashedKeyAlgorithm {
+ *   name: 'RSASSA-PKCS1-v1_5'
+ *   hash: { name: 'SHA-256' }
+ * }
+ * ```
+ *
+ * @example RS384 CryptoKey algorithm
+ * ```ts
+ * interface Rs384Algorithm extends RsaHashedKeyAlgorithm {
+ *   name: 'RSASSA-PKCS1-v1_5'
+ *   hash: { name: 'SHA-384' }
+ * }
+ * ```
+ *
+ * @example RS512 CryptoKey algorithm
+ * ```ts
+ * interface Rs512Algorithm extends RsaHashedKeyAlgorithm {
+ *   name: 'RSASSA-PKCS1-v1_5'
+ *   hash: { name: 'SHA-512' }
+ * }
+ * ```
+ *
+ * @example ES256 CryptoKey algorithm
+ * ```ts
+ * interface Es256Algorithm extends EcKeyAlgorithm {
+ *   name: 'ECDSA'
+ *   namedCurve: 'P-256'
+ * }
+ * ```
+ *
+ * @example ES384 CryptoKey algorithm
+ * ```ts
+ * interface Es384Algorithm extends EcKeyAlgorithm {
+ *   name: 'ECDSA'
+ *   namedCurve: 'P-384'
+ * }
+ * ```
+ *
+ * @example ES512 CryptoKey algorithm
+ * ```ts
+ * interface Es512Algorithm extends EcKeyAlgorithm {
+ *   name: 'ECDSA'
+ *   namedCurve: 'P-521'
+ * }
+ * ```
+ *
  */
 export type JWSAlgorithm =
   | 'PS256'
@@ -124,6 +197,46 @@ export type ContentEncryptionAlgorithm =
  * Compatibility notes:
  * - ECDH-ES using NIST curve P-521 is not supported Safari 14 and older
  * - ECDH-ES using NIST curve P-521 is not supported iOS/iPadOS 14 and older
+ *
+ * @example RSA-OAEP CryptoKey algorithm
+ * ```ts
+ * interface RsaOaepAlgorithm extends RsaHashedKeyAlgorithm {
+ *   name: 'RSA-OAEP'
+ *   hash: { name: 'SHA-1' }
+ * }
+ * ```
+ *
+ * @example RSA-OAEP-256 CryptoKey algorithm
+ * ```ts
+ * interface RsaOaep256Algorithm extends RsaHashedKeyAlgorithm {
+ *   name: 'RSA-OAEP'
+ *   hash: { name: 'SHA-256' }
+ * }
+ * ```
+ *
+ * @example RSA-OAEP-384 CryptoKey algorithm
+ * ```ts
+ * interface RsaOaep384Algorithm extends RsaHashedKeyAlgorithm {
+ *   name: 'RSA-OAEP'
+ *   hash: { name: 'SHA-384' }
+ * }
+ * ```
+ *
+ * @example RSA-OAEP-512 CryptoKey algorithm
+ * ```ts
+ * interface RsaOaep512Algorithm extends RsaHashedKeyAlgorithm {
+ *   name: 'RSA-OAEP'
+ *   hash: { name: 'SHA-512' }
+ * }
+ * ```
+ *
+ * @example ECDH-ES CryptoKey algorithm
+ * ```ts
+ * interface EcdhEsAlgorithm extends EcKeyAlgorithm {
+ *   name: 'ECDH'
+ *   namedCurve: 'P-256' | 'P-384' | 'P-521'
+ * }
+ * ```
  */
 export type KeyManagementAlgorithm =
   | 'ECDH-ES'
