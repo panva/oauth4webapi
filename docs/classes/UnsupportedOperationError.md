@@ -1,12 +1,4 @@
-[@panva/oauth4webapi](../README.md) / UnsupportedOperationError
-
 # Class: UnsupportedOperationError
-
-## Hierarchy
-
-- `Error`
-
-  ↳ **`UnsupportedOperationError`**
 
 ## Table of contents
 

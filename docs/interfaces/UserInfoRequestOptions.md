@@ -1,12 +1,4 @@
-[@panva/oauth4webapi](../README.md) / UserInfoRequestOptions
-
 # Interface: UserInfoRequestOptions
-
-## Hierarchy
-
-- [`ProtectedResourceRequestOptions`](ProtectedResourceRequestOptions.md)
-
-  ↳ **`UserInfoRequestOptions`**
 
 ## Table of contents
 
@@ -23,10 +15,6 @@
 
 DPoP-related options.
 
-#### Inherited from
-
-[ProtectedResourceRequestOptions](ProtectedResourceRequestOptions.md).[DPoP](ProtectedResourceRequestOptions.md#dpop)
-
 ___
 
 ### signal
@@ -40,7 +28,3 @@ instance to abort the underlying fetch requests.
 ```js
 const signal = AbortSignal.timeout(5_000) // Note: AbortSignal.timeout may not yet be available in all runtimes.
 ```
-
-#### Inherited from
-
-[ProtectedResourceRequestOptions](ProtectedResourceRequestOptions.md).[signal](ProtectedResourceRequestOptions.md#signal)

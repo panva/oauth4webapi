@@ -1,10 +1,4 @@
-[@panva/oauth4webapi](../README.md) / TokenEndpointResponse
-
 # Interface: TokenEndpointResponse
-
-## Indexable
-
-▪ [claim: `string`]: `unknown`
 
 ## Table of contents
 

@@ -1,5 +1,3 @@
-[@panva/oauth4webapi](../README.md) / parseWwwAuthenticateChallenges
-
 # Function: parseWwwAuthenticateChallenges
 
 ▸ **parseWwwAuthenticateChallenges**(`response`): [`WWWAuthenticateChallenge`](../interfaces/WWWAuthenticateChallenge.md)[] \| `undefined`

@@ -1,5 +1,3 @@
-[@panva/oauth4webapi](../README.md) / JsonWebKeySet
-
 # Interface: JsonWebKeySet
 
 ## Table of contents

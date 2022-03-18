@@ -1,10 +1,4 @@
-[@panva/oauth4webapi](../README.md) / IntrospectionResponse
-
 # Interface: IntrospectionResponse
-
-## Indexable
-
-▪ [claim: `string`]: `unknown`
 
 ## Table of contents
 

@@ -1,5 +1,3 @@
-[@panva/oauth4webapi](../README.md) / WWWAuthenticateChallenge
-
 # Interface: WWWAuthenticateChallenge
 
 ## Table of contents

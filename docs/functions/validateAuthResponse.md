@@ -1,5 +1,3 @@
-[@panva/oauth4webapi](../README.md) / validateAuthResponse
-
 # Function: validateAuthResponse
 
 ▸ **validateAuthResponse**(`as`, `client`, `parameters`, `expectedState?`): `CallbackParameters` \| [`OAuth2Error`](../interfaces/OAuth2Error.md)

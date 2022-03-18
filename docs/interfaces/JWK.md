@@ -1,10 +1,4 @@
-[@panva/oauth4webapi](../README.md) / JWK
-
 # Interface: JWK
-
-## Indexable
-
-▪ [propName: `string`]: `unknown`
 
 ## Table of contents
 

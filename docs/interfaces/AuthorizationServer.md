@@ -1,14 +1,8 @@
-[@panva/oauth4webapi](../README.md) / AuthorizationServer
-
 # Interface: AuthorizationServer
 
 Authorization Server Metadata
 
 **`see`** [IANA OAuth Authorization Server Metadata registry](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#authorization-server-metadata)
-
-## Indexable
-
-▪ [parameter: `string`]: `unknown`
 
 ## Table of contents
 

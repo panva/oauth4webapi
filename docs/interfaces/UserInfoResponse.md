@@ -1,10 +1,4 @@
-[@panva/oauth4webapi](../README.md) / UserInfoResponse
-
 # Interface: UserInfoResponse
-
-## Indexable
-
-▪ [claim: `string`]: `unknown`
 
 ## Table of contents
 

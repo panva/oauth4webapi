@@ -1,5 +1,3 @@
-[@panva/oauth4webapi](../README.md) / authorizationCodeGrantRequest
-
 # Function: authorizationCodeGrantRequest
 
 ▸ **authorizationCodeGrantRequest**(`as`, `client`, `callbackParameters`, `redirectUri`, `codeVerifier`, `options?`): `Promise`<`Response`\>

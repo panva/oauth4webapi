@@ -1,5 +1,3 @@
-[@panva/oauth4webapi](../README.md) / processDeviceAuthorizationResponse
-
 # Function: processDeviceAuthorizationResponse
 
 ▸ **processDeviceAuthorizationResponse**(`as`, `client`, `response`): `Promise`<[`DeviceAuthorizationResponse`](../interfaces/DeviceAuthorizationResponse.md) \| [`OAuth2Error`](../interfaces/OAuth2Error.md)\>

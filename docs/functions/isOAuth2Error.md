@@ -1,5 +1,3 @@
-[@panva/oauth4webapi](../README.md) / isOAuth2Error
-
 # Function: isOAuth2Error
 
 ▸ **isOAuth2Error**(`input?`): input is OAuth2Error

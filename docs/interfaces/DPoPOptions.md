@@ -1,12 +1,4 @@
-[@panva/oauth4webapi](../README.md) / DPoPOptions
-
 # Interface: DPoPOptions
-
-## Hierarchy
-
-- `CryptoKeyPair`
-
-  ↳ **`DPoPOptions`**
 
 ## Table of contents
 

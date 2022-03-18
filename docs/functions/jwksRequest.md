@@ -1,5 +1,3 @@
-[@panva/oauth4webapi](../README.md) / jwksRequest
-
 # Function: jwksRequest
 
 ▸ **jwksRequest**(`as`, `options?`): `Promise`<`Response`\>

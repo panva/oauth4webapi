@@ -1,5 +1,3 @@
-[@panva/oauth4webapi](../README.md) / expectNoState
-
 # Variable: expectNoState
 
 • `Const` **expectNoState**: typeof [`expectNoState`](expectNoState.md)

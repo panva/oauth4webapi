@@ -1,5 +1,3 @@
-[@panva/oauth4webapi](../README.md) / issueRequestObject
-
 # Function: issueRequestObject
 
 ▸ **issueRequestObject**(`as`, `client`, `parameters`, `privateKey`, `publicKey?`): `Promise`<`string`\>

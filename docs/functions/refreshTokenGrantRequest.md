@@ -1,5 +1,3 @@
-[@panva/oauth4webapi](../README.md) / refreshTokenGrantRequest
-
 # Function: refreshTokenGrantRequest
 
 ▸ **refreshTokenGrantRequest**(`as`, `client`, `refreshToken`, `options?`): `Promise`<`Response`\>

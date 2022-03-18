@@ -1,5 +1,3 @@
-[@panva/oauth4webapi](../README.md) / revocationRequest
-
 # Function: revocationRequest
 
 ▸ **revocationRequest**(`as`, `client`, `token`, `options?`): `Promise`<`Response`\>

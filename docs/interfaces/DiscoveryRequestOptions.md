@@ -1,12 +1,4 @@
-[@panva/oauth4webapi](../README.md) / DiscoveryRequestOptions
-
 # Interface: DiscoveryRequestOptions
-
-## Hierarchy
-
-- [`SignalledRequestOptions`](SignalledRequestOptions.md)
-
-  ↳ **`DiscoveryRequestOptions`**
 
 ## Table of contents
 
@@ -36,7 +28,3 @@ instance to abort the underlying fetch requests.
 ```js
 const signal = AbortSignal.timeout(5_000) // Note: AbortSignal.timeout may not yet be available in all runtimes.
 ```
-
-#### Inherited from
-
-[SignalledRequestOptions](SignalledRequestOptions.md).[signal](SignalledRequestOptions.md#signal)

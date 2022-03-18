@@ -1,5 +1,3 @@
-[@panva/oauth4webapi](../README.md) / pushedAuthorizationRequest
-
 # Function: pushedAuthorizationRequest
 
 ▸ **pushedAuthorizationRequest**(`as`, `client`, `parameters`, `options?`): `Promise`<`Response`\>

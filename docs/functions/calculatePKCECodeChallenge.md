@@ -1,5 +1,3 @@
-[@panva/oauth4webapi](../README.md) / calculatePKCECodeChallenge
-
 # Function: calculatePKCECodeChallenge
 
 ▸ **calculatePKCECodeChallenge**(`codeVerifier`): `Promise`<`string`\>

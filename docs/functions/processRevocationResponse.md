@@ -1,5 +1,3 @@
-[@panva/oauth4webapi](../README.md) / processRevocationResponse
-
 # Function: processRevocationResponse
 
 ▸ **processRevocationResponse**(`response`): `Promise`<`undefined` \| [`OAuth2Error`](../interfaces/OAuth2Error.md)\>

@@ -1,5 +1,3 @@
-[@panva/oauth4webapi](../README.md) / clientCredentialsGrantRequest
-
 # Function: clientCredentialsGrantRequest
 
 ▸ **clientCredentialsGrantRequest**(`as`, `client`, `options?`): `Promise`<`Response`\>

@@ -1,5 +1,3 @@
-[@panva/oauth4webapi](../README.md) / deviceCodeGrantRequest
-
 # Function: deviceCodeGrantRequest
 
 ▸ **deviceCodeGrantRequest**(`as`, `client`, `deviceCode`, `options?`): `Promise`<`Response`\>

@@ -1,5 +1,3 @@
-[@panva/oauth4webapi](../README.md) / skipAuthTimeCheck
-
 # Variable: skipAuthTimeCheck
 
 • `Const` **skipAuthTimeCheck**: typeof [`skipAuthTimeCheck`](skipAuthTimeCheck.md)

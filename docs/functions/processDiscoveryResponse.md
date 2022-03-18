@@ -1,5 +1,3 @@
-[@panva/oauth4webapi](../README.md) / processDiscoveryResponse
-
 # Function: processDiscoveryResponse
 
 ▸ **processDiscoveryResponse**(`expectedIssuerIdentifier`, `response`): `Promise`<[`AuthorizationServer`](../interfaces/AuthorizationServer.md)\>

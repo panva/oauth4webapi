@@ -1,10 +1,4 @@
-[@panva/oauth4webapi](../README.md) / PushedAuthorizationResponse
-
 # Interface: PushedAuthorizationResponse
-
-## Indexable
-
-▪ [parameter: `string`]: `unknown`
 
 ## Table of contents
 

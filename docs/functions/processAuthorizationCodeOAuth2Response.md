@@ -1,5 +1,3 @@
-[@panva/oauth4webapi](../README.md) / processAuthorizationCodeOAuth2Response
-
 # Function: processAuthorizationCodeOAuth2Response
 
 ▸ **processAuthorizationCodeOAuth2Response**(`as`, `client`, `response`): `Promise`<[`OAuth2TokenEndpointResponse`](../interfaces/OAuth2TokenEndpointResponse.md) \| [`OAuth2Error`](../interfaces/OAuth2Error.md)\>

@@ -1,5 +1,3 @@
-[@panva/oauth4webapi](../README.md) / processJwksResponse
-
 # Function: processJwksResponse
 
 ▸ **processJwksResponse**(`response`): `Promise`<[`JsonWebKeySet`](../interfaces/JsonWebKeySet.md)\>

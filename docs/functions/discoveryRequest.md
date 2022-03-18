@@ -1,5 +1,3 @@
-[@panva/oauth4webapi](../README.md) / discoveryRequest
-
 # Function: discoveryRequest
 
 ▸ **discoveryRequest**(`issuerIdentifier`, `options?`): `Promise`<`Response`\>

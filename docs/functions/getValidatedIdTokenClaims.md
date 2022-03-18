@@ -1,5 +1,3 @@
-[@panva/oauth4webapi](../README.md) / getValidatedIdTokenClaims
-
 # Function: getValidatedIdTokenClaims
 
 ▸ **getValidatedIdTokenClaims**(`ref`): [`IDToken`](../interfaces/IDToken.md) \| `undefined`

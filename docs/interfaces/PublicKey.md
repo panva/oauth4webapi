@@ -1,5 +1,3 @@
-[@panva/oauth4webapi](../README.md) / PublicKey
-
 # Interface: PublicKey
 
 Interface to pass an asymmetric public key and, optionally, its associated

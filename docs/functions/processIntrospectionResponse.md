@@ -1,5 +1,3 @@
-[@panva/oauth4webapi](../README.md) / processIntrospectionResponse
-
 # Function: processIntrospectionResponse
 
 ▸ **processIntrospectionResponse**(`as`, `client`, `response`, `options?`): `Promise`<[`IntrospectionResponse`](../interfaces/IntrospectionResponse.md) \| [`OAuth2Error`](../interfaces/OAuth2Error.md)\>

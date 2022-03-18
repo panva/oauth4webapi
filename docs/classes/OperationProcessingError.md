@@ -1,12 +1,4 @@
-[@panva/oauth4webapi](../README.md) / OperationProcessingError
-
 # Class: OperationProcessingError
-
-## Hierarchy
-
-- `Error`
-
-  ↳ **`OperationProcessingError`**
 
 ## Table of contents
 

@@ -1,5 +1,3 @@
-[@panva/oauth4webapi](../README.md) / protectedResourceRequest
-
 # Function: protectedResourceRequest
 
 ▸ **protectedResourceRequest**(`accessToken`, `method`, `url`, `headers`, `body`, `options?`): `Promise`<`Response`\>

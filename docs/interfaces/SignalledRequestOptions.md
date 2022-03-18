@@ -1,26 +1,4 @@
-[@panva/oauth4webapi](../README.md) / SignalledRequestOptions
-
 # Interface: SignalledRequestOptions
-
-## Hierarchy
-
-- **`SignalledRequestOptions`**
-
-  ↳ [`DiscoveryRequestOptions`](DiscoveryRequestOptions.md)
-
-  ↳ [`PushedAuthorizationRequestOptions`](PushedAuthorizationRequestOptions.md)
-
-  ↳ [`ProtectedResourceRequestOptions`](ProtectedResourceRequestOptions.md)
-
-  ↳ [`TokenEndpointRequestOptions`](TokenEndpointRequestOptions.md)
-
-  ↳ [`RevocationRequestOptions`](RevocationRequestOptions.md)
-
-  ↳ [`IntrospectionRequestOptions`](IntrospectionRequestOptions.md)
-
-  ↳ [`JwksRequestOptions`](JwksRequestOptions.md)
-
-  ↳ [`DeviceAuthorizationRequestOptions`](DeviceAuthorizationRequestOptions.md)
 
 ## Table of contents
 

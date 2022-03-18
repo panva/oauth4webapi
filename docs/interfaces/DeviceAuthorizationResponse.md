@@ -1,10 +1,4 @@
-[@panva/oauth4webapi](../README.md) / DeviceAuthorizationResponse
-
 # Interface: DeviceAuthorizationResponse
-
-## Indexable
-
-▪ [parameter: `string`]: `unknown`
 
 ## Table of contents
 

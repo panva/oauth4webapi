@@ -1,10 +1,4 @@
-[@panva/oauth4webapi](../README.md) / OAuth2Error
-
 # Interface: OAuth2Error
-
-## Indexable
-
-▪ [parameter: `string`]: `unknown`
 
 ## Table of contents
 

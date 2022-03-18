@@ -1,5 +1,3 @@
-[@panva/oauth4webapi](../README.md) / TokenEndpointAuthMethod
-
 # Type alias: TokenEndpointAuthMethod
 
 Ƭ **TokenEndpointAuthMethod**: ``"client_secret_basic"`` \| ``"client_secret_post"`` \| ``"client_secret_jwt"`` \| ``"private_key_jwt"`` \| ``"none"``

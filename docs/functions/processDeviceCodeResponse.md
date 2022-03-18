@@ -1,5 +1,3 @@
-[@panva/oauth4webapi](../README.md) / processDeviceCodeResponse
-
 # Function: processDeviceCodeResponse
 
 ▸ **processDeviceCodeResponse**(`as`, `client`, `response`, `options?`): `Promise`<[`TokenEndpointResponse`](../interfaces/TokenEndpointResponse.md) \| [`OAuth2Error`](../interfaces/OAuth2Error.md)\>

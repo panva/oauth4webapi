@@ -2,6 +2,7 @@
   "$schema": "https://typedoc.org/schema.json",
   "allReflectionsHaveOwnDocument": true,
   "disableSources": true,
+  "hideBreadcrumbs": true,
   "entryPoints": [
     "src/index.ts"
   ],

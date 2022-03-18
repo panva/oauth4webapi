@@ -1,14 +1,4 @@
-[@panva/oauth4webapi](../README.md) / RevocationRequestOptions
-
 # Interface: RevocationRequestOptions
-
-## Hierarchy
-
-- [`SignalledRequestOptions`](SignalledRequestOptions.md)
-
-- [`AuthenticatedRequestOptions`](AuthenticatedRequestOptions.md)
-
-  ↳ **`RevocationRequestOptions`**
 
 ## Table of contents
 
@@ -36,10 +26,6 @@ ___
 Private key to use for `private_key_jwt`
 [client authentication](../types/TokenEndpointAuthMethod.md).
 
-#### Inherited from
-
-[AuthenticatedRequestOptions](AuthenticatedRequestOptions.md).[clientPrivateKey](AuthenticatedRequestOptions.md#clientprivatekey)
-
 ___
 
 ### signal
@@ -53,7 +39,3 @@ instance to abort the underlying fetch requests.
 ```js
 const signal = AbortSignal.timeout(5_000) // Note: AbortSignal.timeout may not yet be available in all runtimes.
 ```
-
-#### Inherited from
-
-[SignalledRequestOptions](SignalledRequestOptions.md).[signal](SignalledRequestOptions.md#signal)

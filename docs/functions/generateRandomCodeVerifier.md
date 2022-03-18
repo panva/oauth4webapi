@@ -1,5 +1,3 @@
-[@panva/oauth4webapi](../README.md) / generateRandomCodeVerifier
-
 # Function: generateRandomCodeVerifier
 
 ▸ **generateRandomCodeVerifier**(): `string`

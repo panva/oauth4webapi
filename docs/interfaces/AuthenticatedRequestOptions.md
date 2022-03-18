@@ -1,20 +1,4 @@
-[@panva/oauth4webapi](../README.md) / AuthenticatedRequestOptions
-
 # Interface: AuthenticatedRequestOptions
-
-## Hierarchy
-
-- **`AuthenticatedRequestOptions`**
-
-  ↳ [`PushedAuthorizationRequestOptions`](PushedAuthorizationRequestOptions.md)
-
-  ↳ [`TokenEndpointRequestOptions`](TokenEndpointRequestOptions.md)
-
-  ↳ [`RevocationRequestOptions`](RevocationRequestOptions.md)
-
-  ↳ [`IntrospectionRequestOptions`](IntrospectionRequestOptions.md)
-
-  ↳ [`DeviceAuthorizationRequestOptions`](DeviceAuthorizationRequestOptions.md)
 
 ## Table of contents
 

@@ -1,12 +1,4 @@
-[@panva/oauth4webapi](../README.md) / IDToken
-
 # Interface: IDToken
-
-## Hierarchy
-
-- `JWTPayload`
-
-  ↳ **`IDToken`**
 
 ## Table of contents
 
@@ -81,19 +73,11 @@ ___
 
 • `Optional` `Readonly` **jti**: `string`
 
-#### Inherited from
-
-JWTPayload.jti
-
 ___
 
 ### nbf
 
 • `Optional` `Readonly` **nbf**: `number`
-
-#### Inherited from
-
-JWTPayload.nbf
 
 ___
 

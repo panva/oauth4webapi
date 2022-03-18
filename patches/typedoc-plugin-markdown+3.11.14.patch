@@ -1,0 +1,92 @@
+diff --git a/node_modules/typedoc-plugin-markdown/dist/resources/helpers/toc.js b/node_modules/typedoc-plugin-markdown/dist/resources/helpers/toc.js
+index dda9e9e..0f64a79 100644
+--- a/node_modules/typedoc-plugin-markdown/dist/resources/helpers/toc.js
++++ b/node_modules/typedoc-plugin-markdown/dist/resources/helpers/toc.js
+@@ -17,7 +17,15 @@ function default_1(theme) {
+                 md.push(`## Table of contents\n\n`);
+             }
+             const headingLevel = hideInPageTOC ? `##` : `###`;
+-            (_b = this.groups) === null || _b === void 0 ? void 0 : _b.forEach((group) => {
++            function functionsFirst(ary) {
++                const idx = ary.findIndex((group) => group.title === 'Functions')
++                if (idx) {
++                    const [functions] = ary.splice(idx, 1)
++                    ary.unshift(functions)
++                }
++                return ary
++            }
++            (_b = this.groups) === null || _b === void 0 ? void 0 : functionsFirst(_b).forEach((group) => {
+                 const groupTitle = group.title;
+                 if (group.categories) {
+                     group.categories.forEach((category) => {
+diff --git a/node_modules/typedoc-plugin-markdown/dist/resources/partials/member.sources.hbs b/node_modules/typedoc-plugin-markdown/dist/resources/partials/member.sources.hbs
+index a999ee8..b084fc3 100755
+--- a/node_modules/typedoc-plugin-markdown/dist/resources/partials/member.sources.hbs
++++ b/node_modules/typedoc-plugin-markdown/dist/resources/partials/member.sources.hbs
+@@ -10,18 +10,6 @@
+ 
+ {{/if}}
+ 
+-{{#if inheritedFrom}}
+-
+-#### Inherited from
+-
+-{{#with inheritedFrom}}
+-
+-{{{typeAndParent}}}
+-
+-{{/with}}
+-
+-{{/if}}
+-
+ {{#if overwrites}}
+ 
+ #### Overrides
+diff --git a/node_modules/typedoc-plugin-markdown/dist/resources/templates/reflection.hbs b/node_modules/typedoc-plugin-markdown/dist/resources/templates/reflection.hbs
+index ce29bc5..5485fb2 100755
+--- a/node_modules/typedoc-plugin-markdown/dist/resources/templates/reflection.hbs
++++ b/node_modules/typedoc-plugin-markdown/dist/resources/templates/reflection.hbs
+@@ -24,18 +24,6 @@
+ 
+ {{/if}}
+ 
+-{{#ifShowTypeHierarchy}}
+-
+-## Hierarchy
+-
+-{{#with model.typeHierarchy}}
+-
+-{{{hierarchy 0}}}
+-
+-{{/with}}
+-
+-{{/ifShowTypeHierarchy}}
+-
+ {{#if model.implementedTypes}}
+ 
+ ## Implements
+@@ -74,24 +62,6 @@
+ 
+ {{/if}}
+ 
+-{{#if model.indexSignature}}
+-
+-## Indexable
+-
+-{{#with model}}
+-
+-{{#with indexSignature}}
+-
+-{{{indexSignatureTitle}}}
+-
+-{{> comment}}
+-
+-{{/with}}
+-
+-{{/with}}
+-
+-{{/if}}
+-
+ {{#with model}}
+ 
+ {{> main}}

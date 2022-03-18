@@ -1,5 +1,3 @@
-[@panva/oauth4webapi](../README.md) / introspectionRequest
-
 # Function: introspectionRequest
 
 ▸ **introspectionRequest**(`as`, `client`, `token`, `options?`): `Promise`<`Response`\>

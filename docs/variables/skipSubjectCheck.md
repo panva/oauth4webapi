@@ -1,5 +1,3 @@
-[@panva/oauth4webapi](../README.md) / skipSubjectCheck
-
 # Variable: skipSubjectCheck
 
 • `Const` **skipSubjectCheck**: typeof [`skipSubjectCheck`](skipSubjectCheck.md)

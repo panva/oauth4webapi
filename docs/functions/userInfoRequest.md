@@ -1,5 +1,3 @@
-[@panva/oauth4webapi](../README.md) / userInfoRequest
-
 # Function: userInfoRequest
 
 ▸ **userInfoRequest**(`as`, `client`, `accessToken`, `options?`): `Promise`<`Response`\>

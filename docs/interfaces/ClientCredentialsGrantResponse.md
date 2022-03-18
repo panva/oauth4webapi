@@ -1,10 +1,4 @@
-[@panva/oauth4webapi](../README.md) / ClientCredentialsGrantResponse
-
 # Interface: ClientCredentialsGrantResponse
-
-## Indexable
-
-▪ [claim: `string`]: `unknown`
 
 ## Table of contents
 

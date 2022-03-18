@@ -1,5 +1,3 @@
-[@panva/oauth4webapi](../README.md) / deviceAuthorizationRequest
-
 # Function: deviceAuthorizationRequest
 
 ▸ **deviceAuthorizationRequest**(`as`, `client`, `parameters`, `options?`): `Promise`<`Response`\>

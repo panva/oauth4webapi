@@ -1,5 +1,3 @@
-[@panva/oauth4webapi](../README.md) / processUserInfoResponse
-
 # Function: processUserInfoResponse
 
 ▸ **processUserInfoResponse**(`as`, `client`, `expectedSubject`, `response`, `options?`): `Promise`<[`UserInfoResponse`](../interfaces/UserInfoResponse.md)\>

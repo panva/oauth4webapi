@@ -1,5 +1,3 @@
-[@panva/oauth4webapi](../README.md) / processClientCredentialsResponse
-
 # Function: processClientCredentialsResponse
 
 ▸ **processClientCredentialsResponse**(`as`, `client`, `response`): `Promise`<[`ClientCredentialsGrantResponse`](../interfaces/ClientCredentialsGrantResponse.md) \| [`OAuth2Error`](../interfaces/OAuth2Error.md)\>
