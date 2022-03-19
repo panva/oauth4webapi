@@ -2395,7 +2395,7 @@ async function processGenericAccessTokenResponse(
         throw new TypeError('"issuer.jwks_uri" must be a string')
       }
 
-      const { header: header, claims } = await validateJws(
+      const { header, claims } = await validateJws(
         json.id_token,
         getPublicSigKeyFromIssuerJwksUri.bind(undefined, as, options?.signal),
       )
