@@ -3538,6 +3538,10 @@ class CallbackParameters extends URLSearchParams {}
  * message returned from the authorization server's {@link
  * AuthorizationServer.authorization_endpoint `as.authorization_endpoint`}.
  *
+ * @see {@link https://www.rfc-editor.org/rfc/rfc6749.html#section-4.1.2 RFC 6749 - The OAuth 2.0 Authorization Framework}
+ * @see {@link https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication OpenID Connect Core 1.0}
+ * @see {@link https://www.rfc-editor.org/rfc/rfc9207.html RFC 9207 - OAuth 2.0 Authorization Server Issuer Identification}
+ *
  * @param as Authorization Server Metadata
  * @param client Client Metadata
  * @param parameters Authorization response

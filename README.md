@@ -21,6 +21,7 @@ This is a collection of bits and pieces upon which a more streamlined Client mod
 - UserInfo Requests (Bearer and DPoP)
 - JWT UserInfo Responses
 - Protected Resource Requests (Bearer and DPoP)
+- Authorization Server Issuer Identification
 
 ## Dependencies: 0
 
