@@ -1,6 +1,6 @@
 # Type alias: JWSAlgorithm
 
-Ƭ **JWSAlgorithm**: ``"PS256"`` \| ``"PS384"`` \| ``"PS512"`` \| ``"RS256"`` \| ``"RS384"`` \| ``"RS512"`` \| ``"ES256"`` \| ``"ES384"`` \| ``"ES512"``
+Ƭ **JWSAlgorithm**: ``"PS256"`` \| ``"ES256"`` \| ``"RS256"`` \| ``"PS384"`` \| ``"ES384"`` \| ``"RS384"`` \| ``"PS512"`` \| ``"ES512"`` \| ``"RS512"``
 
 Supported JWS "alg" Algorithm identifiers.
 
@@ -16,10 +16,42 @@ interface Ps256Algorithm extends RsaHashedKeyAlgorithm {
 }
 ```
 
+**`example`** ES256 CryptoKey algorithm
+```ts
+interface Es256Algorithm extends EcKeyAlgorithm {
+  name: 'ECDSA'
+  namedCurve: 'P-256'
+}
+```
+
+**`example`** RS256 CryptoKey algorithm
+```ts
+interface Rs256Algorithm extends RsaHashedKeyAlgorithm {
+  name: 'RSASSA-PKCS1-v1_5'
+  hash: { name: 'SHA-256' }
+}
+```
+
 **`example`** PS384 CryptoKey algorithm
 ```ts
 interface Ps384Algorithm extends RsaHashedKeyAlgorithm {
   name: 'RSA-PSS'
+  hash: { name: 'SHA-384' }
+}
+```
+
+**`example`** ES384 CryptoKey algorithm
+```ts
+interface Es384Algorithm extends EcKeyAlgorithm {
+  name: 'ECDSA'
+  namedCurve: 'P-384'
+}
+```
+
+**`example`** RS384 CryptoKey algorithm
+```ts
+interface Rs384Algorithm extends RsaHashedKeyAlgorithm {
+  name: 'RSASSA-PKCS1-v1_5'
   hash: { name: 'SHA-384' }
 }
 ```
@@ -32,19 +64,11 @@ interface Ps512Algorithm extends RsaHashedKeyAlgorithm {
 }
 ```
 
-**`example`** RS256 CryptoKey algorithm
+**`example`** ES512 CryptoKey algorithm
 ```ts
-interface Rs256Algorithm extends RsaHashedKeyAlgorithm {
-  name: 'RSASSA-PKCS1-v1_5'
-  hash: { name: 'SHA-256' }
-}
-```
-
-**`example`** RS384 CryptoKey algorithm
-```ts
-interface Rs384Algorithm extends RsaHashedKeyAlgorithm {
-  name: 'RSASSA-PKCS1-v1_5'
-  hash: { name: 'SHA-384' }
+interface Es512Algorithm extends EcKeyAlgorithm {
+  name: 'ECDSA'
+  namedCurve: 'P-521'
 }
 ```
 
@@ -53,29 +77,5 @@ interface Rs384Algorithm extends RsaHashedKeyAlgorithm {
 interface Rs512Algorithm extends RsaHashedKeyAlgorithm {
   name: 'RSASSA-PKCS1-v1_5'
   hash: { name: 'SHA-512' }
-}
-```
-
-**`example`** ES256 CryptoKey algorithm
-```ts
-interface Es256Algorithm extends EcKeyAlgorithm {
-  name: 'ECDSA'
-  namedCurve: 'P-256'
-}
-```
-
-**`example`** ES384 CryptoKey algorithm
-```ts
-interface Es384Algorithm extends EcKeyAlgorithm {
-  name: 'ECDSA'
-  namedCurve: 'P-384'
-}
-```
-
-**`example`** ES512 CryptoKey algorithm
-```ts
-interface Es512Algorithm extends EcKeyAlgorithm {
-  name: 'ECDSA'
-  namedCurve: 'P-521'
 }
 ```

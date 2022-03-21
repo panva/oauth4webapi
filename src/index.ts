@@ -100,10 +100,42 @@ export type TokenEndpointAuthMethod =
  * }
  * ```
  *
+ * @example ES256 CryptoKey algorithm
+ * ```ts
+ * interface Es256Algorithm extends EcKeyAlgorithm {
+ *   name: 'ECDSA'
+ *   namedCurve: 'P-256'
+ * }
+ * ```
+ *
+ * @example RS256 CryptoKey algorithm
+ * ```ts
+ * interface Rs256Algorithm extends RsaHashedKeyAlgorithm {
+ *   name: 'RSASSA-PKCS1-v1_5'
+ *   hash: { name: 'SHA-256' }
+ * }
+ * ```
+ *
  * @example PS384 CryptoKey algorithm
  * ```ts
  * interface Ps384Algorithm extends RsaHashedKeyAlgorithm {
  *   name: 'RSA-PSS'
+ *   hash: { name: 'SHA-384' }
+ * }
+ * ```
+ *
+ * @example ES384 CryptoKey algorithm
+ * ```ts
+ * interface Es384Algorithm extends EcKeyAlgorithm {
+ *   name: 'ECDSA'
+ *   namedCurve: 'P-384'
+ * }
+ * ```
+ *
+ * @example RS384 CryptoKey algorithm
+ * ```ts
+ * interface Rs384Algorithm extends RsaHashedKeyAlgorithm {
+ *   name: 'RSASSA-PKCS1-v1_5'
  *   hash: { name: 'SHA-384' }
  * }
  * ```
@@ -116,19 +148,11 @@ export type TokenEndpointAuthMethod =
  * }
  * ```
  *
- * @example RS256 CryptoKey algorithm
+ * @example ES512 CryptoKey algorithm
  * ```ts
- * interface Rs256Algorithm extends RsaHashedKeyAlgorithm {
- *   name: 'RSASSA-PKCS1-v1_5'
- *   hash: { name: 'SHA-256' }
- * }
- * ```
- *
- * @example RS384 CryptoKey algorithm
- * ```ts
- * interface Rs384Algorithm extends RsaHashedKeyAlgorithm {
- *   name: 'RSASSA-PKCS1-v1_5'
- *   hash: { name: 'SHA-384' }
+ * interface Es512Algorithm extends EcKeyAlgorithm {
+ *   name: 'ECDSA'
+ *   namedCurve: 'P-521'
  * }
  * ```
  *
@@ -139,41 +163,17 @@ export type TokenEndpointAuthMethod =
  *   hash: { name: 'SHA-512' }
  * }
  * ```
- *
- * @example ES256 CryptoKey algorithm
- * ```ts
- * interface Es256Algorithm extends EcKeyAlgorithm {
- *   name: 'ECDSA'
- *   namedCurve: 'P-256'
- * }
- * ```
- *
- * @example ES384 CryptoKey algorithm
- * ```ts
- * interface Es384Algorithm extends EcKeyAlgorithm {
- *   name: 'ECDSA'
- *   namedCurve: 'P-384'
- * }
- * ```
- *
- * @example ES512 CryptoKey algorithm
- * ```ts
- * interface Es512Algorithm extends EcKeyAlgorithm {
- *   name: 'ECDSA'
- *   namedCurve: 'P-521'
- * }
- * ```
  */
 export type JWSAlgorithm =
   | 'PS256'
-  | 'PS384'
-  | 'PS512'
-  | 'RS256'
-  | 'RS384'
-  | 'RS512'
   | 'ES256'
+  | 'RS256'
+  | 'PS384'
   | 'ES384'
+  | 'RS384'
+  | 'PS512'
   | 'ES512'
+  | 'RS512'
 
 /**
  * Supported JWE "enc" Content Encryption Algorithm identifiers.
@@ -196,6 +196,14 @@ export type ContentEncryptionAlgorithm =
  * Compatibility notes:
  * - ECDH-ES using NIST curve P-521 is not supported Safari 14 and older
  * - ECDH-ES using NIST curve P-521 is not supported iOS/iPadOS 14 and older
+ *
+ * @example ECDH-ES CryptoKey algorithm
+ * ```ts
+ * interface EcdhEsAlgorithm extends EcKeyAlgorithm {
+ *   name: 'ECDH'
+ *   namedCurve: 'P-256' | 'P-384' | 'P-521'
+ * }
+ * ```
  *
  * @example RSA-OAEP CryptoKey algorithm
  * ```ts
@@ -226,14 +234,6 @@ export type ContentEncryptionAlgorithm =
  * interface RsaOaep512Algorithm extends RsaHashedKeyAlgorithm {
  *   name: 'RSA-OAEP'
  *   hash: { name: 'SHA-512' }
- * }
- * ```
- *
- * @example ECDH-ES CryptoKey algorithm
- * ```ts
- * interface EcdhEsAlgorithm extends EcKeyAlgorithm {
- *   name: 'ECDH'
- *   namedCurve: 'P-256' | 'P-384' | 'P-521'
  * }
  * ```
  */

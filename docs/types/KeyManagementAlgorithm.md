@@ -8,6 +8,14 @@ Compatibility notes:
 - ECDH-ES using NIST curve P-521 is not supported Safari 14 and older
 - ECDH-ES using NIST curve P-521 is not supported iOS/iPadOS 14 and older
 
+**`example`** ECDH-ES CryptoKey algorithm
+```ts
+interface EcdhEsAlgorithm extends EcKeyAlgorithm {
+  name: 'ECDH'
+  namedCurve: 'P-256' | 'P-384' | 'P-521'
+}
+```
+
 **`example`** RSA-OAEP CryptoKey algorithm
 ```ts
 interface RsaOaepAlgorithm extends RsaHashedKeyAlgorithm {
@@ -37,13 +45,5 @@ interface RsaOaep384Algorithm extends RsaHashedKeyAlgorithm {
 interface RsaOaep512Algorithm extends RsaHashedKeyAlgorithm {
   name: 'RSA-OAEP'
   hash: { name: 'SHA-512' }
-}
-```
-
-**`example`** ECDH-ES CryptoKey algorithm
-```ts
-interface EcdhEsAlgorithm extends EcKeyAlgorithm {
-  name: 'ECDH'
-  namedCurve: 'P-256' | 'P-384' | 'P-521'
 }
 ```
