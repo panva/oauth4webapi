@@ -731,8 +731,12 @@ class LRU<T1, T2> {
   }
 
   delete(key: T1) {
-    if (this.cache.has(key)) return this.cache.delete(key)
-    if (this._cache.has(key)) return this._cache.delete(key)
+    if (this.cache.has(key)) {
+      return this.cache.delete(key)
+    }
+    if (this._cache.has(key)) {
+      return this._cache.delete(key)
+    }
     return false
   }
 
