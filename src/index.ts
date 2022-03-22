@@ -23,6 +23,7 @@ export interface PublicKey {
    */
   kid?: string
 }
+
 /**
  * Interface to pass an asymmetric private key and, optionally, its associated
  * JWK Key ID to be added as a `kid` JOSE Header Parameter.
