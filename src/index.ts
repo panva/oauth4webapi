@@ -1395,18 +1395,9 @@ async function jwt(
   const input = `${encodeBase64Url(encoder.encode(JSON.stringify(header)))}.${encodeBase64Url(
     encoder.encode(JSON.stringify(claimsSet)),
   )}`
-  const digest = parseInt(header.alg.slice(-3), 10)
   const signature = encodeBase64Url(
     new Uint8Array(
-      await crypto.subtle.sign(
-        {
-          ...key.algorithm,
-          hash: `SHA-${digest}`,
-          saltLength: key.algorithm.name === 'RSA-PSS' ? digest >> 3 : undefined,
-        },
-        key,
-        encoder.encode(input),
-      ),
+      await crypto.subtle.sign(subtleAlgorithm(header.alg, key), key, encoder.encode(input)),
     ),
   )
   return `${input}.${signature}`
@@ -3364,6 +3355,23 @@ function checkSupportedJwsAlg(alg: unknown): string {
   return <string>alg
 }
 
+function subtleAlgorithm(
+  alg: string,
+  key: CryptoKey,
+): AlgorithmIdentifier | RsaPssParams | EcdsaParams {
+  switch (key.algorithm.name) {
+    case 'ECDSA':
+      return <EcdsaParams>{ ...key.algorithm, hash: `SHA-${alg.slice(-3)}` }
+    case 'RSA-PSS':
+      return <RsaPssParams>{
+        ...key.algorithm,
+        saltLength: parseInt(alg.slice(-3), 10) >> 3,
+      }
+    default:
+      return <AlgorithmIdentifier>{ ...key.algorithm }
+  }
+}
+
 /**
  * Minimal JWS verify() implementation.
  */
@@ -3383,9 +3391,8 @@ async function validateJws(
   )
   const key = await getKey(header)
   const input = `${protectedHeader}.${payload}`
-  const digest = parseInt(checkSupportedJwsAlg(header.alg).slice(-3), 10)
   const verified = await crypto.subtle.verify(
-    { ...key.algorithm, hash: `SHA-${digest}`, saltLength: digest >> 3 },
+    subtleAlgorithm(header.alg, key),
     key,
     decodeBase64Url(signature),
     encoder.encode(input),
