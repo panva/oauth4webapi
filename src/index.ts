@@ -1388,7 +1388,7 @@ const JAR = 'oauth-authz-req+jwt'
  * Minimal JWT sign() implementation.
  */
 async function jwt(
-  header: CompactJWSHeaderParameters,
+  header: CompactJWSHeaderParameters | ClientSecretJWTHeaderParameters,
   claimsSet: Record<string, unknown>,
   key: CryptoKey,
 ) {
@@ -2583,17 +2583,28 @@ export interface IDToken extends JWTPayload {
   readonly azp?: string
 }
 
-interface CompactJWSHeaderParameters {
-  alg: string
-  kid?: string
-  typ?: string
-
-  [parameter: string]: unknown
+interface ClientSecretJWTHeaderParameters {
+  alg: 'HS256' | 'HS384' | 'HS512'
 }
 
-interface CompactJWEHeaderParameters extends CompactJWSHeaderParameters {
-  enc: string
+interface CompactJWSHeaderParameters {
+  alg: JWSAlgorithm
+  kid?: string
+  typ?: string
+  crit?: string[]
+  jwk?: JWK
+}
+
+interface CompactJWEHeaderParameters {
+  alg: KeyManagementAlgorithm
+  enc: ContentEncryptionAlgorithm
   cty?: string
+  kid?: string
+  typ?: string
+  iss: string
+  sub: string
+  aud: string
+  epk?: JWK
 }
 
 interface CompactVerifyResult {
@@ -3334,25 +3345,25 @@ async function handleOAuthBodyError(response: Response) {
   }
 }
 
-function checkSupportedJweEnc(enc: unknown): string {
+function checkSupportedJweEnc(enc: unknown) {
   if (SUPPORTED_JWE_ENCS.includes(<any>enc) === false) {
     throw new UnsupportedOperationError('unsupported JWE "enc" identifier')
   }
-  return <string>enc
+  return <ContentEncryptionAlgorithm>enc
 }
 
-function checkSupportedJweAlg(alg: unknown): string {
+function checkSupportedJweAlg(alg: unknown) {
   if (SUPPORTED_JWE_ALGS.includes(<any>alg) === false) {
     throw new UnsupportedOperationError('unsupported JWE "alg" identifier')
   }
-  return <string>alg
+  return <KeyManagementAlgorithm>alg
 }
 
-function checkSupportedJwsAlg(alg: unknown): string {
+function checkSupportedJwsAlg(alg: unknown) {
   if (SUPPORTED_JWS_ALGS.includes(<any>alg) === false) {
     throw new UnsupportedOperationError('unsupported JWS "alg" identifier')
   }
-  return <string>alg
+  return <JWSAlgorithm>alg
 }
 
 function subtleAlgorithm(
