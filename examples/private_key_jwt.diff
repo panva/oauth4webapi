@@ -1,9 +1,9 @@
 diff --git a/examples/code.ts b/examples/private_key_jwt.ts
-index 66a88e8..50ca386 100644
+index f619d7d..b028efe 100644
 --- a/examples/code.ts
 +++ b/examples/private_key_jwt.ts
 @@ -1,5 +1,11 @@
- import * as lib from '../src/index.js'
+ import * as oauth from '../src/index.js'
  
 +// a random key is generated here for the example's sake, you would however
 +// use crypto.subtle.importKey to import your private key that is pre-registered on the AS
@@ -12,11 +12,11 @@ index 66a88e8..50ca386 100644
 +const keyID = 'a52faab2-f688-44b6-bde8-f493aeb526fb' // the `kid` your authorization server expects, or undefined if not applicable
 +
  const issuer = new URL('https://op.panva.cz')
- const as = await lib
+ const as = await oauth
    .discoveryRequest(issuer)
-@@ -7,9 +13,7 @@ const as = await lib
+@@ -7,9 +13,7 @@ const as = await oauth
  
- const client: lib.Client = {
+ const client: oauth.Client = {
    client_id: 'abc4ba37-4ab8-49b5-99d4-9441ba35d428',
 -  client_secret:
 -    'ddce41c3d7618bb30e8a5e5e423fce223427426265ebc96fd9dd5713a6d4fc58bc523c45af42274c210ab18d4a93b5b7169edf6236ed2657f6be64ec41b72f87',
@@ -26,7 +26,7 @@ index 66a88e8..50ca386 100644
  
  const redirect_uri = 'https://rp.example.com/cb'
 @@ -50,6 +54,12 @@ let access_token: string
-     parameters,
+     params,
      redirect_uri,
      code_verifier,
 +    {
@@ -37,4 +37,4 @@ index 66a88e8..50ca386 100644
 +    },
    )
  
-   let challenges: lib.WWWAuthenticateChallenge[] | undefined
+   let challenges: oauth.WWWAuthenticateChallenge[] | undefined

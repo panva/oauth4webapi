@@ -1,11 +1,11 @@
-import * as lib from '../src/index.js'
+import * as oauth from '../src/index.js'
 
 const issuer = new URL('https://op.panva.cz')
-const as = await lib
+const as = await oauth
   .discoveryRequest(issuer)
-  .then((response) => lib.processDiscoveryResponse(issuer, response))
+  .then((response) => oauth.processDiscoveryResponse(issuer, response))
 
-const client: lib.Client = {
+const client: oauth.Client = {
   client_id: 'abc4ba37-4ab8-49b5-99d4-9441ba35d428',
   token_endpoint_auth_method: 'none',
 }
@@ -17,21 +17,21 @@ let user_code: string
 let verification_uri_complete: string | undefined
 
 {
-  const response = await lib.deviceAuthorizationRequest(
+  const response = await oauth.deviceAuthorizationRequest(
     as,
     client,
     new URLSearchParams({ scope: 'openid email' }),
   )
-  let challenges: lib.WWWAuthenticateChallenge[] | undefined
-  if ((challenges = lib.parseWwwAuthenticateChallenges(response))) {
+  let challenges: oauth.WWWAuthenticateChallenge[] | undefined
+  if ((challenges = oauth.parseWwwAuthenticateChallenges(response))) {
     for (const challenge of challenges) {
       console.log('challenge', challenge)
     }
     throw new Error() // Handle www-authenticate challenges as needed
   }
 
-  const result = await lib.processDeviceAuthorizationResponse(as, client, response)
-  if (lib.isOAuth2Error(result)) {
+  const result = await oauth.processDeviceAuthorizationResponse(as, client, response)
+  if (oauth.isOAuth2Error(result)) {
     console.log('error', result)
     throw new Error() // Handle OAuth 2.0 response body error
   }
@@ -49,26 +49,26 @@ function wait() {
   })
 }
 
-let success: lib.TokenEndpointResponse | undefined = undefined
+let success: oauth.TokenEndpointResponse | undefined = undefined
 
 while (success === undefined) {
   await wait()
-  const response = await lib.deviceCodeGrantRequest(as, client, device_code)
-  let challenges: lib.WWWAuthenticateChallenge[] | undefined
-  if ((challenges = lib.parseWwwAuthenticateChallenges(response))) {
+  const response = await oauth.deviceCodeGrantRequest(as, client, device_code)
+  let challenges: oauth.WWWAuthenticateChallenge[] | undefined
+  if ((challenges = oauth.parseWwwAuthenticateChallenges(response))) {
     for (const challenge of challenges) {
       console.log('challenge', challenge)
     }
     throw new Error() // Handle www-authenticate challenges as needed
   }
 
-  const result = await lib.processDeviceCodeResponse(as, client, response)
-  if (lib.isOAuth2Error(result)) {
+  const result = await oauth.processDeviceCodeResponse(as, client, response)
+  if (oauth.isOAuth2Error(result)) {
     console.log('error', result)
     throw new Error() // Handle OAuth 2.0 response body error
   }
 
-  if (lib.isOAuth2Error(result)) {
+  if (oauth.isOAuth2Error(result)) {
     // response is oauth style error object
     switch (result.error) {
       case 'slow_down':
@@ -87,5 +87,5 @@ while (success === undefined) {
 console.log('result', success)
 
 if (success.id_token) {
-  console.log('ID Token Claims', lib.getValidatedIdTokenClaims(success))
+  console.log('ID Token Claims', oauth.getValidatedIdTokenClaims(success))
 }
