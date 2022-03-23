@@ -3361,14 +3361,14 @@ function subtleAlgorithm(
 ): AlgorithmIdentifier | RsaPssParams | EcdsaParams {
   switch (key.algorithm.name) {
     case 'ECDSA':
-      return <EcdsaParams>{ ...key.algorithm, hash: `SHA-${alg.slice(-3)}` }
+      return <EcdsaParams>{ name: key.algorithm.name, hash: `SHA-${alg.slice(-3)}` }
     case 'RSA-PSS':
       return <RsaPssParams>{
-        ...key.algorithm,
+        name: key.algorithm.name,
         saltLength: parseInt(alg.slice(-3), 10) >> 3,
       }
     default:
-      return <AlgorithmIdentifier>{ ...key.algorithm }
+      return <AlgorithmIdentifier>{ name: key.algorithm.name }
   }
 }
 
