@@ -5,5 +5,5 @@
 Supported JWE "enc" Content Encryption Algorithm identifiers.
 
 Compatibility notes:
-- A192GCM is not supported in Chromium-based runtimes
-- A192CBC-HS384 is not supported in Chromium-based runtimes
+- A192GCM is not supported in Chromium-based runtimes (03/2022)
+- A192CBC-HS384 is not supported in Chromium-based runtimes (03/2022)

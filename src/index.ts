@@ -90,8 +90,8 @@ export type TokenEndpointAuthMethod =
  * Supported JWS "alg" Algorithm identifiers.
  *
  * Compatibility notes:
- * - ES512 is not supported Safari 14 and older
- * - ES512 is not supported iOS/iPadOS 14 and older
+ * - ES512 is not supported Safari 14 and older (03/2022)
+ * - ES512 is not supported iOS/iPadOS 14 and older (03/2022)
  *
  * @example PS256 CryptoKey algorithm
  * ```ts
@@ -180,8 +180,8 @@ export type JWSAlgorithm =
  * Supported JWE "enc" Content Encryption Algorithm identifiers.
  *
  * Compatibility notes:
- * - A192GCM is not supported in Chromium-based runtimes
- * - A192CBC-HS384 is not supported in Chromium-based runtimes
+ * - A192GCM is not supported in Chromium-based runtimes (03/2022)
+ * - A192CBC-HS384 is not supported in Chromium-based runtimes (03/2022)
  */
 export type ContentEncryptionAlgorithm =
   | 'A128GCM'
@@ -195,8 +195,8 @@ export type ContentEncryptionAlgorithm =
  * Supported JWE "alg" Key Management Algorithm identifier.
  *
  * Compatibility notes:
- * - ECDH-ES using NIST curve P-521 is not supported Safari 14 and older
- * - ECDH-ES using NIST curve P-521 is not supported iOS/iPadOS 14 and older
+ * - ECDH-ES using NIST curve P-521 is not supported Safari 14 and older (03/2022)
+ * - ECDH-ES using NIST curve P-521 is not supported iOS/iPadOS 14 and older (03/2022)
  *
  * @example ECDH-ES CryptoKey algorithm
  * ```ts

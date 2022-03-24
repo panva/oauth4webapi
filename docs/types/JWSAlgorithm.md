@@ -5,8 +5,8 @@
 Supported JWS "alg" Algorithm identifiers.
 
 Compatibility notes:
-- ES512 is not supported Safari 14 and older
-- ES512 is not supported iOS/iPadOS 14 and older
+- ES512 is not supported Safari 14 and older (03/2022)
+- ES512 is not supported iOS/iPadOS 14 and older (03/2022)
 
 **`example`** PS256 CryptoKey algorithm
 ```ts

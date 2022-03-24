@@ -5,8 +5,8 @@
 Supported JWE "alg" Key Management Algorithm identifier.
 
 Compatibility notes:
-- ECDH-ES using NIST curve P-521 is not supported Safari 14 and older
-- ECDH-ES using NIST curve P-521 is not supported iOS/iPadOS 14 and older
+- ECDH-ES using NIST curve P-521 is not supported Safari 14 and older (03/2022)
+- ECDH-ES using NIST curve P-521 is not supported iOS/iPadOS 14 and older (03/2022)
 
 **`example`** ECDH-ES CryptoKey algorithm
 ```ts
