@@ -1,6 +1,6 @@
 {
   "name": "@panva/oauth4webapi",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "OAuth 2 / OpenID Connect Client for Web API runtimes",
   "keywords": [],
   "homepage": "https://github.com/panva/oauth4webapi",
