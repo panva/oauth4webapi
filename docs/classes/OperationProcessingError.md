@@ -17,7 +17,3 @@
 | Name | Type |
 | :------ | :------ |
 | `message` | `string` |
-
-#### Overrides
-
-Error.constructor

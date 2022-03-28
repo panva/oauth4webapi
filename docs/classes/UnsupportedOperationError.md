@@ -17,7 +17,3 @@
 | Name | Type | Default value |
 | :------ | :------ | :------ |
 | `message` | `string` | `'operation not supported'` |
-
-#### Overrides
-
-Error.constructor

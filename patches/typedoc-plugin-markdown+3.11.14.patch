@@ -20,10 +20,10 @@ index dda9e9e..0f64a79 100644
                  if (group.categories) {
                      group.categories.forEach((category) => {
 diff --git a/node_modules/typedoc-plugin-markdown/dist/resources/partials/member.sources.hbs b/node_modules/typedoc-plugin-markdown/dist/resources/partials/member.sources.hbs
-index a999ee8..b084fc3 100755
+index a999ee8..da9983b 100755
 --- a/node_modules/typedoc-plugin-markdown/dist/resources/partials/member.sources.hbs
 +++ b/node_modules/typedoc-plugin-markdown/dist/resources/partials/member.sources.hbs
-@@ -10,18 +10,6 @@
+@@ -10,30 +10,6 @@
  
  {{/if}}
  
@@ -39,11 +39,23 @@ index a999ee8..b084fc3 100755
 -
 -{{/if}}
 -
- {{#if overwrites}}
+-{{#if overwrites}}
+-
+-#### Overrides
+-
+-{{#with overwrites}}
+-
+-{{typeAndParent}}
+-
+-{{/with}}
+-
+-{{/if}}
+-
+ {{#if sources}}
  
- #### Overrides
+ #### Defined in
 diff --git a/node_modules/typedoc-plugin-markdown/dist/resources/templates/reflection.hbs b/node_modules/typedoc-plugin-markdown/dist/resources/templates/reflection.hbs
-index ce29bc5..5485fb2 100755
+index ce29bc5..9bd8dad 100755
 --- a/node_modules/typedoc-plugin-markdown/dist/resources/templates/reflection.hbs
 +++ b/node_modules/typedoc-plugin-markdown/dist/resources/templates/reflection.hbs
 @@ -24,18 +24,6 @@

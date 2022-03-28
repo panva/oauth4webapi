@@ -21,10 +21,6 @@
 
 • `Readonly` **aud**: `string` \| `string`[]
 
-#### Overrides
-
-JWTPayload.aud
-
 ___
 
 ### auth\_time
@@ -43,29 +39,17 @@ ___
 
 • `Readonly` **exp**: `number`
 
-#### Overrides
-
-JWTPayload.exp
-
 ___
 
 ### iat
 
 • `Readonly` **iat**: `number`
 
-#### Overrides
-
-JWTPayload.iat
-
 ___
 
 ### iss
 
 • `Readonly` **iss**: `string`
-
-#### Overrides
-
-JWTPayload.iss
 
 ___
 
@@ -90,7 +74,3 @@ ___
 ### sub
 
 • `Readonly` **sub**: `string`
-
-#### Overrides
-
-JWTPayload.sub

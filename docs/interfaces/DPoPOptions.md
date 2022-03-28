@@ -31,10 +31,6 @@ instance to sign the DPoP Proof JWT with.
 Its algorithm must be compatible with a supported
 [JWS "alg" Algorithm](../types/JWSAlgorithm.md).
 
-#### Overrides
-
-CryptoKeyPair.privateKey
-
 ___
 
 ### publicKey
@@ -42,7 +38,3 @@ ___
 • **publicKey**: `CryptoKey`
 
 The public key corresponding to [DPoPOptions.privateKey](DPoPOptions.md#privatekey)
-
-#### Overrides
-
-CryptoKeyPair.publicKey
