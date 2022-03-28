@@ -4,14 +4,15 @@ import * as jose from 'jose'
 import * as lib from '../src/index.js'
 
 const j = JSON.stringify
-const test = anyTest as TestFn<Context & { es256: CryptoKeyPair; rs256: CryptoKeyPair }>
+const test = anyTest as TestFn<Context & { [alg: string]: CryptoKeyPair }>
 
 test.before(setup)
 test.after(teardown)
 
 test.before(async (t) => {
-  t.context.es256 = <CryptoKeyPair>await jose.generateKeyPair('ES256')
-  t.context.rs256 = <CryptoKeyPair>await jose.generateKeyPair('RS256')
+  for (const alg of ['RS', 'ES', 'PS'].map((s) => [`${s}256`, `${s}384`, `${s}512`]).flat()) {
+    t.context[alg] = <CryptoKeyPair>await jose.generateKeyPair(alg)
+  }
 
   t.context
     .intercept({
@@ -19,10 +20,19 @@ test.before(async (t) => {
       method: 'GET',
     })
     .reply(200, {
-      keys: [
-        await jose.exportJWK(t.context.es256.publicKey),
-        await jose.exportJWK(t.context.rs256.publicKey),
-      ],
+      keys: await Promise.all(
+        ['RS', 'ES', 'PS']
+          .map((s) => [`${s}256`, `${s}384`, `${s}512`])
+          .flat()
+          .map((alg) =>
+            jose.exportJWK(t.context[alg].publicKey).then((jwk) => {
+              if (alg.startsWith('RS') || alg.startsWith('PS')) {
+                jwk.alg = alg
+              }
+              return jwk
+            }),
+          ),
+      ),
     })
 })
 
@@ -178,7 +188,7 @@ test('authorizationCodeGrantRequest() w/ DPoP', async (t) => {
     })
     .reply(200, { access_token: 'token', token_type: 'DPoP' })
 
-  const DPoP = t.context.es256
+  const DPoP = t.context.ES256
   await t.notThrowsAsync(
     lib.authorizationCodeGrantRequest(
       tIssuer,
@@ -354,7 +364,7 @@ test('processAuthorizationCodeOpenIDResponse() with an ID Token (alg signalled)'
             .setAudience(client.client_id)
             .setExpirationTime('5m')
             .setIssuedAt()
-            .sign(t.context.es256.privateKey),
+            .sign(t.context.ES256.privateKey),
         }),
       ),
     ),
@@ -379,7 +389,7 @@ test('processAuthorizationCodeOpenIDResponse() with an ID Token (alg specified)'
             .setAudience(client.client_id)
             .setExpirationTime('5m')
             .setIssuedAt()
-            .sign(t.context.es256.privateKey),
+            .sign(t.context.ES256.privateKey),
         }),
       ),
     ),
@@ -404,12 +414,65 @@ test('processAuthorizationCodeOpenIDResponse() with an ID Token (alg default)', 
             .setAudience(client.client_id)
             .setExpirationTime('5m')
             .setIssuedAt()
-            .sign(t.context.rs256.privateKey),
+            .sign(t.context.RS256.privateKey),
         }),
       ),
     ),
   )
 })
+
+for (const alg of ['RS', 'ES', 'PS'].map((s) => [`${s}256`, `${s}384`, `${s}512`]).flat()) {
+  test(`processAuthorizationCodeOpenIDResponse() with an ${alg} ID Token`, async (t) => {
+    const tIssuer: lib.AuthorizationServer = {
+      ...issuer,
+      id_token_signing_alg_values_supported: [alg],
+      jwks_uri: endpoint('jwks'),
+    }
+
+    let at_hash: string
+    switch (alg) {
+      case 'RS256':
+      case 'PS256':
+      case 'ES256':
+        at_hash = 'xsZZrUssMXjL3FBlzoSh2g'
+        break
+      case 'RS384':
+      case 'PS384':
+      case 'ES384':
+        at_hash = 'adt46pcdiB-l6eTNifgoVM-5AIJAxq84'
+        break
+      case 'RS512':
+      case 'PS512':
+      case 'ES512':
+        at_hash = 'p2LHG4H-8pYDc0hyVOo3iIHvZJUqe9tbj3jESOuXbkY'
+        break
+      default:
+        throw new Error('not implemented')
+    }
+
+    await t.notThrowsAsync(
+      lib.processAuthorizationCodeOpenIDResponse(
+        tIssuer,
+        client,
+        getResponse(
+          j({
+            access_token:
+              'YmJiZTAwYmYtMzgyOC00NzhkLTkyOTItNjJjNDM3MGYzOWIy9sFhvH8K_x8UIHj1osisS57f5DduL',
+            token_type: 'Bearer',
+            id_token: await new jose.SignJWT({ at_hash })
+              .setProtectedHeader({ alg })
+              .setIssuer(issuer.issuer)
+              .setSubject('urn:example:subject')
+              .setAudience(client.client_id)
+              .setExpirationTime('5m')
+              .setIssuedAt()
+              .sign(t.context[alg].privateKey),
+          }),
+        ),
+      ),
+    )
+  })
+}
 
 test('processAuthorizationCodeOpenIDResponse() with an ID Token w/ at_hash', async (t) => {
   const tIssuer: lib.AuthorizationServer = { ...issuer, jwks_uri: endpoint('jwks') }
@@ -432,7 +495,7 @@ test('processAuthorizationCodeOpenIDResponse() with an ID Token w/ at_hash', asy
             .setAudience(client.client_id)
             .setExpirationTime('5m')
             .setIssuedAt()
-            .sign(t.context.rs256.privateKey),
+            .sign(t.context.RS256.privateKey),
         }),
       ),
     ),
@@ -456,7 +519,7 @@ test('processAuthorizationCodeOpenIDResponse() with an ID Token w/ at_hash', asy
             .setAudience(client.client_id)
             .setExpirationTime('5m')
             .setIssuedAt()
-            .sign(t.context.rs256.privateKey),
+            .sign(t.context.RS256.privateKey),
         }),
       ),
     ),
