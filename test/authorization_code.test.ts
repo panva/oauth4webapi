@@ -421,6 +421,56 @@ test('processAuthorizationCodeOpenIDResponse() with an ID Token (alg default)', 
   )
 })
 
+test('processAuthorizationCodeOpenIDResponse() with an ID Token typ: "JWT"', async (t) => {
+  const tIssuer: lib.AuthorizationServer = { ...issuer, jwks_uri: endpoint('jwks') }
+
+  await t.notThrowsAsync(
+    lib.processAuthorizationCodeOpenIDResponse(
+      tIssuer,
+      client,
+      getResponse(
+        j({
+          access_token: 'token',
+          token_type: 'Bearer',
+          id_token: await new jose.SignJWT({})
+            .setProtectedHeader({ alg: 'RS256', typ: 'JWT' })
+            .setIssuer(issuer.issuer)
+            .setSubject('urn:example:subject')
+            .setAudience(client.client_id)
+            .setExpirationTime('5m')
+            .setIssuedAt()
+            .sign(t.context.RS256.privateKey),
+        }),
+      ),
+    ),
+  )
+})
+
+test('processAuthorizationCodeOpenIDResponse() with an ID Token typ: "application/jwt"', async (t) => {
+  const tIssuer: lib.AuthorizationServer = { ...issuer, jwks_uri: endpoint('jwks') }
+
+  await t.notThrowsAsync(
+    lib.processAuthorizationCodeOpenIDResponse(
+      tIssuer,
+      client,
+      getResponse(
+        j({
+          access_token: 'token',
+          token_type: 'Bearer',
+          id_token: await new jose.SignJWT({})
+            .setProtectedHeader({ alg: 'RS256', typ: 'application/jwt' })
+            .setIssuer(issuer.issuer)
+            .setSubject('urn:example:subject')
+            .setAudience(client.client_id)
+            .setExpirationTime('5m')
+            .setIssuedAt()
+            .sign(t.context.RS256.privateKey),
+        }),
+      ),
+    ),
+  )
+})
+
 for (const alg of ['RS', 'ES', 'PS'].map((s) => [`${s}256`, `${s}384`, `${s}512`]).flat()) {
   test(`processAuthorizationCodeOpenIDResponse() with an ${alg} ID Token`, async (t) => {
     const tIssuer: lib.AuthorizationServer = {

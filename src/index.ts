@@ -2887,7 +2887,7 @@ function checkJwtType(
   }
 
   if (expected) {
-    if (result.header.typ !== expected) {
+    if (typeof result.header.typ !== 'string' || normalizeTyp(result.header.typ) !== expected) {
       throw new OPE('unexpected JWT "typ" header parameter value')
     }
     return result

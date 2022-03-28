@@ -294,3 +294,30 @@ test('processIntrospectionResponse() - alg default', async (t) => {
     ),
   )
 })
+
+test('processIntrospectionResponse() - typ w/ application/ prefix', async (t) => {
+  const tIssuer: lib.AuthorizationServer = {
+    ...issuer,
+    jwks_uri: endpoint('jwks'),
+  }
+
+  await t.notThrowsAsync(
+    lib.processIntrospectionResponse(
+      tIssuer,
+      client,
+      getResponse(
+        await new jose.SignJWT({ token_introspection: { active: false } })
+          .setProtectedHeader({ alg: 'RS256', typ: 'application/token-introspection+jwt' })
+          .setIssuer(issuer.issuer)
+          .setAudience(client.client_id)
+          .setIssuedAt()
+          .sign(t.context.rs256.privateKey),
+        {
+          headers: new Headers({
+            'content-type': 'application/token-introspection+jwt',
+          }),
+        },
+      ),
+    ),
+  )
+})
