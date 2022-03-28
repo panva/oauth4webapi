@@ -3855,7 +3855,7 @@ async function ecdhEs(publicKey: CryptoKey, privateKey: CryptoKey, enc: string) 
   const Z = new Uint8Array(
     await crypto.subtle.deriveBits(
       {
-        name: 'ECDH',
+        name: publicKey.algorithm.name,
         public: publicKey,
       },
       privateKey,
