@@ -1193,7 +1193,14 @@ function oaepAlg(key: CryptoKey) {
 function jweAlg(key: CryptoKey) {
   switch (key.algorithm.name) {
     case 'ECDH':
-      return 'ECDH-ES'
+      switch ((<EcKeyAlgorithm>key.algorithm).namedCurve) {
+        case 'P-256':
+        case 'P-384':
+        case 'P-521':
+          return 'ECDH-ES'
+        default:
+          throw new UnsupportedOperationError('unsupported EcKeyAlgorithm namedCurve')
+      }
     case 'RSA-OAEP':
       return oaepAlg(key)
     default:
