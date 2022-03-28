@@ -10,8 +10,13 @@ test.before(async (t) => {
   for (const alg of ['RS', 'ES', 'PS']
     .map((s) => [`${s}256`, `${s}384`, `${s}512`])
     .flat()
-    .concat(['RSA-OAEP', 'RSA-OAEP-256', 'RSA-OAEP-384', 'RSA-OAEP-512', 'ECDH-ES'])) {
+    .concat(['RSA-OAEP', 'RSA-OAEP-256', 'RSA-OAEP-384', 'RSA-OAEP-512'])) {
     t.context[alg] = <CryptoKeyPair>await jose.generateKeyPair(alg)
+  }
+  for (const namedCurve of ['P-256', 'P-384', 'P-521']) {
+    t.context[`ECDH-ES+${namedCurve}`] = <CryptoKeyPair>(
+      await jose.generateKeyPair('ECDH-ES', { crv: namedCurve })
+    )
   }
 })
 
@@ -99,7 +104,6 @@ for (const alg of <lib.KeyManagementAlgorithm[]>[
   'RSA-OAEP-256',
   'RSA-OAEP-384',
   'RSA-OAEP-512',
-  'ECDH-ES',
 ]) {
   for (const enc of <lib.ContentEncryptionAlgorithm[]>[
     'A128GCM',
@@ -121,6 +125,32 @@ for (const alg of <lib.KeyManagementAlgorithm[]>[
       )
       const protectedHeader = jose.decodeProtectedHeader(jwe)
       t.is(protectedHeader.alg, alg)
+      await t.notThrowsAsync(jose.compactDecrypt(jwe, encrypt.privateKey))
+    })
+  }
+}
+
+for (const namedCurve of ['P-256', 'P-384', 'P-521']) {
+  for (const enc of <lib.ContentEncryptionAlgorithm[]>[
+    'A128GCM',
+    'A192GCM',
+    'A256GCM',
+    'A128CBC-HS256',
+    'A192CBC-HS384',
+    'A256CBC-HS512',
+  ]) {
+    test(`issueRequestObject() encrypted using alg: ECDH-ES, crv: ${namedCurve}, enc: ${enc}`, async (t) => {
+      const sign = t.context.ES256
+      const encrypt = t.context[`ECDH-ES+${namedCurve}`]
+      const jwe = await lib.issueRequestObject(
+        issuer,
+        { ...client, request_object_encryption_enc: enc },
+        new URLSearchParams(),
+        { key: sign.privateKey },
+        { key: encrypt.publicKey },
+      )
+      const protectedHeader = jose.decodeProtectedHeader(jwe)
+      t.is(protectedHeader.alg, 'ECDH-ES')
       await t.notThrowsAsync(jose.compactDecrypt(jwe, encrypt.privateKey))
     })
   }
