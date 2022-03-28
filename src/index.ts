@@ -260,7 +260,7 @@ export interface JWK {
   readonly x?: string
   readonly y?: string
 
-  readonly [propName: string]: unknown
+  readonly [parameter: string]: unknown
 }
 
 /**
@@ -421,7 +421,7 @@ export interface AuthorizationServer {
      */
     readonly pushed_authorization_request_endpoint?: string
 
-    readonly [parameter: string]: unknown
+    readonly [metadata: string]: unknown
   }
   /**
    * URL of the authorization server's UserInfo Endpoint.
@@ -628,7 +628,7 @@ export interface AuthorizationServer {
    */
   readonly backchannel_logout_supported?: boolean
 
-  readonly [parameter: string]: unknown
+  readonly [metadata: string]: unknown
 }
 
 /**
@@ -688,7 +688,7 @@ export interface Client {
    */
   token_endpoint_auth_signing_alg?: 'HS256' | 'HS384' | 'HS512' | string
 
-  [parameter: string]: unknown
+  [metadata: string]: unknown
 }
 
 const encoder = new TextEncoder()
@@ -1927,7 +1927,7 @@ export interface UserInfoResponse {
 }
 
 const jwksCache = new LRU<string, { jwks: JsonWebKeySet; iat: number; stale: boolean }>(20)
-const cryptoKeyCaches: { [alg: string]: WeakMap<JWK, CryptoKey> } = {}
+const cryptoKeyCaches: Record<string, WeakMap<JWK, CryptoKey>> = {}
 
 async function getPublicSigKeyFromIssuerJwksUri(
   as: AuthorizationServer,
@@ -2697,7 +2697,7 @@ export interface TokenEndpointResponse {
   readonly id_token?: string
   readonly scope?: string
 
-  readonly [claim: string]: unknown
+  readonly [parameter: string]: unknown
 }
 
 export interface OpenIDTokenEndpointResponse {
@@ -2711,7 +2711,7 @@ export interface OpenIDTokenEndpointResponse {
   readonly id_token: string
   readonly scope?: string
 
-  readonly [claim: string]: unknown
+  readonly [parameter: string]: unknown
 }
 
 export interface OAuth2TokenEndpointResponse {
@@ -2724,7 +2724,7 @@ export interface OAuth2TokenEndpointResponse {
   readonly expires_in?: number
   readonly scope?: string
 
-  readonly [claim: string]: unknown
+  readonly [parameter: string]: unknown
 }
 
 export interface ClientCredentialsGrantResponse {
@@ -2736,7 +2736,7 @@ export interface ClientCredentialsGrantResponse {
   readonly expires_in?: number
   readonly scope?: string
 
-  readonly [claim: string]: unknown
+  readonly [parameter: string]: unknown
 }
 
 /**

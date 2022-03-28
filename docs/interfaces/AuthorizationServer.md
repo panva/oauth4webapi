@@ -408,7 +408,7 @@ conventional endpoints.
 
 #### Index signature
 
-▪ [parameter: `string`]: `unknown`
+▪ [metadata: `string`]: `unknown`
 
 #### Type declaration
 
