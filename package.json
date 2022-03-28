@@ -19,7 +19,7 @@
     "build/index.d.ts"
   ],
   "scripts": {
-    "_format": "find src test examples -type f -name '*.ts' | xargs prettier",
+    "_format": "find src test examples -type f -name '*.ts' -o -name '*.mjs' | xargs prettier",
     "build": "tsc && tsc --declaration true --emitDeclarationOnly true --removeComments false && tsc -p examples",
     "coverage": "c8 ava",
     "docs": "npx patch-package && typedoc",
