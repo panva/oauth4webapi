@@ -23,7 +23,8 @@ test('client_secret_basic', async (t) => {
         authorization: (header) => header.startsWith('Basic '),
       },
       body(body) {
-        return !new URLSearchParams(body).has('client_id')
+        const params = new URLSearchParams(body)
+        return !params.has('client_id') && !params.has('client_secret')
       },
     })
     .reply(200, '')
@@ -41,6 +42,9 @@ test('client_secret_post', async (t) => {
     .intercept({
       path: '/test-post',
       method: 'POST',
+      headers(headers) {
+        return !('authorization' in headers)
+      },
       body(body) {
         const params = new URLSearchParams(body)
         return params.get('client_id') === client.client_id && params.get('client_secret') === 'foo'
@@ -67,6 +71,9 @@ test('private_key_jwt', async (t) => {
     .intercept({
       path: '/test-pkjwt',
       method: 'POST',
+      headers(headers) {
+        return !('authorization' in headers)
+      },
       body(body) {
         const params = new URLSearchParams(body)
         t.false(params.has('client_secret'))
@@ -161,6 +168,9 @@ test('client_secret_jwt', async (t) => {
     .intercept({
       path: '/test-csjwt',
       method: 'POST',
+      headers(headers) {
+        return !('authorization' in headers)
+      },
       body(body) {
         const params = new URLSearchParams(body)
         t.false(params.has('client_secret'))
@@ -245,6 +255,9 @@ test('none', async (t) => {
     .intercept({
       path: '/test-none',
       method: 'POST',
+      headers(headers) {
+        return !('authorization' in headers)
+      },
       body(body) {
         const params = new URLSearchParams(body)
         return params.has('client_id') && !params.has('client_secret')
