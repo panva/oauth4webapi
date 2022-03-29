@@ -2105,7 +2105,7 @@ export async function processUserInfoResponse(
           'RS256',
         ),
       )
-      .then(checkJwtType.bind(undefined, undefined, 'jwt'))
+      .then(checkJwtCrit)
       .then(parsePayload)
       .then(validateClaimTypesAndTimestamps)
       .then(validateOptionalAudience.bind(undefined, as.issuer))
@@ -2410,7 +2410,7 @@ async function processGenericAccessTokenResponse(
             'RS256',
           ),
         )
-        .then(checkJwtType.bind(undefined, undefined, 'jwt'))
+        .then(checkJwtCrit)
         .then(parsePayload)
         .then(
           validatePresence.bind(undefined, [
@@ -2877,33 +2877,20 @@ export async function processAuthorizationCodeOAuth2Response(
   return <OAuth2TokenEndpointResponse>result
 }
 
-function checkJwtType(
-  expected: string | undefined,
-  optional: string | undefined,
-  result: CompactVerifyResult,
-) {
+function checkJwtType(expected: string, result: CompactVerifyResult) {
+  if (typeof result.header.typ !== 'string' || normalizeTyp(result.header.typ) !== expected) {
+    throw new OPE('unexpected JWT "typ" header parameter value')
+  }
+
+  return result
+}
+
+function checkJwtCrit(result: CompactVerifyResult) {
   if (result.header.crit !== undefined) {
     throw new OPE('unexpected JWT "crit" header parameter')
   }
 
-  if (expected) {
-    if (typeof result.header.typ !== 'string' || normalizeTyp(result.header.typ) !== expected) {
-      throw new OPE('unexpected JWT "typ" header parameter value')
-    }
-    return result
-  }
-
-  if (optional) {
-    if (
-      result.header.typ !== undefined &&
-      (typeof result.header.typ !== 'string' || normalizeTyp(result.header.typ) !== optional)
-    ) {
-      throw new OPE('unexpected JWT "typ" header parameter value')
-    }
-    return result
-  }
-
-  throw new TypeError()
+  return result
 }
 
 /**
@@ -3205,7 +3192,8 @@ export async function processIntrospectionResponse(
           'RS256',
         ),
       )
-      .then(checkJwtType.bind(undefined, 'token-introspection+jwt', undefined))
+      .then(checkJwtCrit)
+      .then(checkJwtType.bind(undefined, 'token-introspection+jwt'))
       .then(parsePayload)
       .then(
         validatePresence.bind(undefined, [
@@ -3473,7 +3461,7 @@ export async function validateJwtAuthResponse(
         'RS256',
       ),
     )
-    .then(checkJwtType.bind(undefined, undefined, 'jwt'))
+    .then(checkJwtCrit)
     .then(parsePayload)
     .then(
       validatePresence.bind(undefined, [
