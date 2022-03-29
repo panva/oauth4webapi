@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.0.10](https://github.com/panva/oauth4webapi/compare/v0.0.9...v0.0.10) (2022-03-29)
+
+
+### Fixes
+
+* remove off-spec "default optional JWT typ" checks ([34e524a](https://github.com/panva/oauth4webapi/commit/34e524a8df08e9dfce5bce724ff7061aacd8a095))
+
 ## [0.0.9](https://github.com/panva/oauth4webapi/compare/v0.0.8...v0.0.9) (2022-03-28)
 
 
