@@ -1371,7 +1371,7 @@ async function clientAuthentication(
       }
       const { key, kid } = getKeyAndKid(clientPrivateKey)
       if (!isPrivateKey(key)) {
-        throw new TypeError('"options.clientPrivateKey" must be a private CryptoKey')
+        throw new TypeError('"options.clientPrivateKey.key" must be a private CryptoKey')
       }
       body.set('client_id', client.client_id)
       body.set('client_assertion_type', 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer')
@@ -1437,7 +1437,7 @@ export async function issueRequestObject(
 
   const { key, kid } = getKeyAndKid(privateKey)
   if (!isPrivateKey(key)) {
-    throw new TypeError('"privateKey" must be a private CryptoKey')
+    throw new TypeError('"privateKey.key" must be a private CryptoKey')
   }
 
   parameters.set('client_id', client.client_id)
@@ -1476,7 +1476,7 @@ export async function issueRequestObject(
   if (publicKey !== undefined) {
     const { key, kid } = getKeyAndKid(publicKey)
     if (!isPublicKey(key)) {
-      throw new TypeError('"publicKey" must be a public CryptoKey')
+      throw new TypeError('"publicKey.key" must be a public CryptoKey')
     }
     request = await jwe(
       {

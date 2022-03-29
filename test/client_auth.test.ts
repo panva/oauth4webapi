@@ -114,7 +114,7 @@ test('private_key_jwt', async (t) => {
         clientPrivateKey: { key: t.context.ES256.publicKey },
       },
     ),
-    { message: '"options.clientPrivateKey" must be a private CryptoKey' },
+    { message: '"options.clientPrivateKey.key" must be a private CryptoKey' },
   )
   t.pass()
 })
