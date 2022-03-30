@@ -1,7 +1,5 @@
 {
-  "files": [
-    "src/index.ts"
-  ],
+  "files": ["src/index.ts"],
   "compilerOptions": {
     "target": "ES2020",
     "module": "ES2020",
@@ -10,6 +8,7 @@
     "removeComments": true,
     "outDir": "build",
     "noUnusedLocals": true,
-    "noUnusedParameters": true
+    "noUnusedParameters": true,
+    "noImplicitAny": true
   }
 }

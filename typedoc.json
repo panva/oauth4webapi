@@ -3,21 +3,14 @@
   "allReflectionsHaveOwnDocument": true,
   "disableSources": true,
   "hideBreadcrumbs": true,
-  "entryPoints": [
-    "src/index.ts"
-  ],
+  "entryPoints": ["src/index.ts"],
   "excludeExternals": true,
   "excludePrivate": true,
   "excludeProtected": true,
   "gitRevision": "main",
   "hideGenerator": true,
-  "intentionallyNotExported": [
-    "ReturnTypes",
-    "CallbackParameters"
-  ],
+  "intentionallyNotExported": ["ReturnTypes", "CallbackParameters"],
   "out": "docs",
-  "plugin": [
-    "typedoc-plugin-markdown"
-  ],
+  "plugin": ["typedoc-plugin-markdown"],
   "readme": "none"
 }

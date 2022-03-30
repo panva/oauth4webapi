@@ -1,6 +1,3 @@
 {
-  "reporter": [
-    "lcov",
-    "text-summary"
-  ]
+  "reporter": ["lcov", "text-summary"]
 }

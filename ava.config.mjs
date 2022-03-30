@@ -1,12 +1,10 @@
 export default {
   extensions: {
     ts: 'module',
+    mjs: true,
   },
-  require: './test/_pre.ts',
-  files: [
-    'test/**/*.ts',
-    '!test/**/_*.ts'
-  ],
+  require: './test/_pre.mjs',
+  files: ['test/**/*.ts', '!test/**/_*.ts'],
   nodeArguments: [
     '--loader=ts-node/esm',
     '--enable-source-maps',
