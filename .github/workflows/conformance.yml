@@ -1,0 +1,126 @@
+name: Conformance Checks
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: 0 12 * * 1-5
+  workflow_dispatch:
+
+jobs:
+  build-conformance-suite:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+      - name: Set Conformance Suite Version
+        run: |
+          export VERSION=($(curl --silent "https://gitlab.com/api/v4/projects/4175605/releases" | jq -r '.[0].tag_name'))
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+      - name: Load Cached Conformance Suite Build
+        uses: actions/cache@v2
+        id: cache
+        with:
+          path: ./conformance-suite
+          key: suite-${{ hashFiles('.github/workflows/test.yml') }}-${{ env.VERSION }}
+      - name: Conformance Suite Checkout
+        if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+        run: git clone --depth 1 --single-branch --branch ${{ env.VERSION }} https://gitlab.com/openid/conformance-suite.git
+      - name: Conformance Suite Build
+        working-directory: ./conformance-suite
+        if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+        env:
+          MAVEN_CACHE: ./m2
+        run: |
+          sed -i -e 's/localhost/localhost.emobix.co.uk/g' src/main/resources/application.properties
+          sed -i -e 's/-B clean/-B -DskipTests=true/g' builder-compose.yml
+          docker-compose -f builder-compose.yml run builder
+
+  conformance-suite:
+    runs-on: ubuntu-latest
+    needs:
+      - build-conformance-suite
+    env:
+      NODE_TLS_REJECT_UNAUTHORIZED: 0
+      SUITE_BASE_URL: https://localhost.emobix.co.uk:8443
+      PLAN_NAME: ${{ matrix.setup.plan }}
+      VARIANT: ${{ toJSON(matrix.setup) }}
+      JWS_ALGORITHM: ${{ matrix.setup.algorithm || 'RS256' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        setup:
+          # Core 1.0 Basic
+          - plan: oidcc-client-basic-certification-test-plan
+
+          # client_secret_basic
+          - client_auth_type: client_secret_basic
+            plan: oidcc-client-test-plan
+
+          # client_secret_post
+          - client_auth_type: client_secret_post
+            plan: oidcc-client-test-plan
+
+          # client_secret_jwt
+          - client_auth_type: client_secret_jwt
+            plan: oidcc-client-test-plan
+
+          # request_object
+          - request_type: request_object
+            plan: oidcc-client-test-plan
+
+          # private_key_jwt
+          - client_auth_type: private_key_jwt
+            plan: oidcc-client-test-plan
+
+          # none
+          - client_auth_type: none
+            plan: oidcc-client-test-plan
+
+          # ES256
+          - algorithm: ES256
+            plan: oidcc-client-test-plan
+            request_type: request_object
+            client_auth_type: private_key_jwt
+
+          # RS256
+          - algorithm: RS256
+            plan: oidcc-client-test-plan
+            request_type: request_object
+            client_auth_type: private_key_jwt
+
+          # PS256
+          - algorithm: PS256
+            plan: oidcc-client-test-plan
+            request_type: request_object
+            client_auth_type: private_key_jwt
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+      - name: Set Conformance Suite Version
+        run: |
+          export VERSION=($(curl --silent "https://gitlab.com/api/v4/projects/4175605/releases" | jq -r '.[0].tag_name'))
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+      - name: Load Cached Conformance Suite Build
+        uses: actions/cache@v2
+        id: cache
+        with:
+          path: ./conformance-suite
+          key: suite-${{ hashFiles('.github/workflows/test.yml') }}-${{ env.VERSION }}
+      - name: Abort if Conformance Suite version changed during the CI run.
+        if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+        uses: actions/github-script@v6
+        with:
+          script: |
+              core.setFailed('Conformance Suite version changed during the CI run')
+      - name: Run Conformance Suite
+        working-directory: ./conformance-suite
+        run: |
+          docker-compose -f docker-compose-dev.yml up -d
+          while ! curl -skfail https://localhost.emobix.co.uk:8443/api/runner/available >/dev/null; do sleep 2; done
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 18
+      - run: npm clean-install
+      - run: npm run conformance

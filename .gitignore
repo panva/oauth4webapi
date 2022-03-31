@@ -127,3 +127,4 @@ dist-browser-tests
 .npmrc
 
 examples/*.js
+conformance/*.js
