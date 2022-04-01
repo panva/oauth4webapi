@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.2.0](https://github.com/panva/oauth4webapi/compare/v0.1.0...v0.2.0) (2022-04-01)
+
+
+### ⚠ BREAKING CHANGES
+
+* ensure 2048 RSA keys are used for RSA-OAEP too
+
+### Fixes
+
+* ensure 2048 RSA keys are used for RSA-OAEP too ([f4eda79](https://github.com/panva/oauth4webapi/commit/f4eda799b6e461c121f365af213de8bc1379dadf))
+
 ## [0.1.0](https://github.com/panva/oauth4webapi/compare/v0.0.11...v0.1.0) (2022-04-01)
 
 
