@@ -1202,6 +1202,7 @@ function jweAlg(key: CryptoKey) {
           throw new UnsupportedOperationError('unsupported EcKeyAlgorithm namedCurve')
       }
     case 'RSA-OAEP':
+      checkRsaKeyAlgorithm(<RsaKeyAlgorithm>key.algorithm)
       return oaepAlg(key)
     default:
       throw new UnsupportedOperationError('unsupported CryptoKey algorithm name')
