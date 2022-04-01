@@ -909,7 +909,7 @@ export async function discoveryRequest(
   const url = new URL(issuerIdentifier.href)
 
   switch (options?.algorithm) {
-    case undefined:
+    case undefined: // Fall through
     case 'oidc':
       url.pathname = `${url.pathname}/.well-known/openid-configuration`.replace('//', '/')
       break
@@ -1194,8 +1194,8 @@ function jweAlg(key: CryptoKey) {
   switch (key.algorithm.name) {
     case 'ECDH':
       switch ((<EcKeyAlgorithm>key.algorithm).namedCurve) {
-        case 'P-256':
-        case 'P-384':
+        case 'P-256': // Fall through
+        case 'P-384': // Fall through
         case 'P-521':
           return 'ECDH-ES'
         default:
@@ -1337,7 +1337,7 @@ async function clientAuthentication(
   clientPrivateKey?: PrivateKey,
 ) {
   switch (client.token_endpoint_auth_method) {
-    case undefined:
+    case undefined: // Fall through
     case 'client_secret_basic': {
       assertNoClientPrivateKey('client_secret_basic')
       headers.set(
@@ -1945,7 +1945,7 @@ async function getPublicSigKeyFromIssuerJwksUri(
   checkSupportedJwsAlg(alg)
   let kty: string
   switch (alg[0]) {
-    case 'R':
+    case 'R': // Fall through
     case 'P':
       kty = 'RSA'
       break
@@ -2172,18 +2172,18 @@ async function timingSafeEqual(a: Uint8Array, b: Uint8Array) {
 async function idTokenHash(jwsAlg: string, data: string) {
   let algorithm: string
   switch (jwsAlg) {
-    case 'RS256':
-    case 'PS256':
+    case 'RS256': // Fall through
+    case 'PS256': // Fall through
     case 'ES256':
       algorithm = 'SHA-256'
       break
-    case 'RS384':
-    case 'PS384':
+    case 'RS384': // Fall through
+    case 'PS384': // Fall through
     case 'ES384':
       algorithm = 'SHA-384'
       break
-    case 'RS512':
-    case 'PS512':
+    case 'RS512': // Fall through
+    case 'PS512': // Fall through
     case 'ES512':
       algorithm = 'SHA-512'
       break
@@ -3382,6 +3382,7 @@ function subtleAlgorithm(
       }
     case 'RSASSA-PKCS1-v1_5':
       checkRsaKeyAlgorithm(<RsaKeyAlgorithm>key.algorithm)
+    // Fall through
     default:
       return <AlgorithmIdentifier>{ name: key.algorithm.name }
   }
@@ -3666,7 +3667,7 @@ function cekBitLength(enc: string) {
       return 128
     case 'A192GCM':
       return 192
-    case 'A256GCM':
+    case 'A256GCM': // Fall through
     case 'A128CBC-HS256':
       return 256
     case 'A192CBC-HS384':
@@ -3684,13 +3685,13 @@ function randomCek(enc: string) {
 function randomIv(enc: string) {
   let bitLength: number
   switch (enc) {
-    case 'A128GCM':
-    case 'A192GCM':
+    case 'A128GCM': // Fall through
+    case 'A192GCM': // Fall through
     case 'A256GCM':
       bitLength = 96
       break
-    case 'A128CBC-HS256':
-    case 'A192CBC-HS384':
+    case 'A128CBC-HS256': // Fall through
+    case 'A192CBC-HS384': // Fall through
     case 'A256CBC-HS512':
       bitLength = 128
       break
@@ -3808,12 +3809,12 @@ async function encrypt(
   aad: Uint8Array,
 ) {
   switch (enc) {
-    case 'A128CBC-HS256':
-    case 'A192CBC-HS384':
+    case 'A128CBC-HS256': // Fall through
+    case 'A192CBC-HS384': // Fall through
     case 'A256CBC-HS512':
       return cbc(enc, plaintext, cek, iv, aad)
-    case 'A128GCM':
-    case 'A192GCM':
+    case 'A128GCM': // Fall through
+    case 'A192GCM': // Fall through
     case 'A256GCM':
       return gcm(plaintext, cek, iv, aad)
     default:
@@ -3902,9 +3903,9 @@ async function jwe(header: CompactJWEHeaderParameters, plaintext: Uint8Array, ke
       encryptedKey = new Uint8Array()
       break
     }
-    case 'RSA-OAEP':
-    case 'RSA-OAEP-256':
-    case 'RSA-OAEP-384':
+    case 'RSA-OAEP': // Fall through
+    case 'RSA-OAEP-256': // Fall through
+    case 'RSA-OAEP-384': // Fall through
     case 'RSA-OAEP-512': {
       cek = randomCek(header.enc)
       encryptedKey = await oaepWrap(cek, key)
@@ -3931,13 +3932,13 @@ async function importJwk(jwk: JWK) {
   let algorithm: RsaHashedImportParams | EcKeyImportParams
 
   switch (alg) {
-    case 'PS256':
-    case 'PS384':
+    case 'PS256': // Fall through
+    case 'PS384': // Fall through
     case 'PS512':
       algorithm = { name: 'RSA-PSS', hash: `SHA-${alg.slice(-3)}` }
       break
-    case 'RS256':
-    case 'RS384':
+    case 'RS256': // Fall through
+    case 'RS384': // Fall through
     case 'RS512':
       algorithm = { name: 'RSASSA-PKCS1-v1_5', hash: `SHA-${alg.slice(-3)}` }
       break
