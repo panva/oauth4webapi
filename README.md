@@ -25,9 +25,9 @@ This is a collection of bits and pieces upon which a more streamlined Client mod
 
 ## Dependencies: 0
 
-## [Documentation](./docs/README.md)
+## [Documentation](docs/README.md)
 
-## [Examples](./examples/README.md)
+## [Examples](examples/README.md)
 
 **`example`** ESM import
 ```js
@@ -39,13 +39,13 @@ import * as oauth2 from '@panva/oauth4webapi'
 import * as oauth2 from 'https://deno.land/x/doauth/src/index.ts'
 ```
 
-- Authorization Code Flow - OpenID Connect [source](./examples/code.ts), or plain OAuth 2.0 [source](./examples/oauth.ts)
-- Private Key JWT Client Authentication - [source](./examples/private_key_jwt.ts) | [diff from code flow](./examples/private_key_jwt.diff)
-- DPoP - [source](./examples/dpop.ts) | [diff from code flow](./examples/dpop.diff)
-- Pushed Authorization Request (PAR) - [source](./examples/par.ts) | [diff from code flow](./examples/par.diff)
-- JWT Authorization Response Mode (JARM) - [source](./examples/jarm.ts) | [diff from code flow](./examples/jarm.diff)
-- Client Credentials Grant - [source](./examples/client_credentials.ts)
-- Device Authorization Grant - [source](./examples/device_authorization_grant.ts)
+- Authorization Code Flow - OpenID Connect [source](examples/code.ts), or plain OAuth 2.0 [source](examples/oauth.ts)
+- Private Key JWT Client Authentication - [source](examples/private_key_jwt.ts) | [diff from code flow](examples/private_key_jwt.diff)
+- DPoP - [source](examples/dpop.ts) | [diff from code flow](examples/dpop.diff)
+- Pushed Authorization Request (PAR) - [source](examples/par.ts) | [diff from code flow](examples/par.diff)
+- JWT Authorization Response Mode (JARM) - [source](examples/jarm.ts) | [diff from code flow](examples/jarm.diff)
+- Client Credentials Grant - [source](examples/client_credentials.ts)
+- Device Authorization Grant - [source](examples/device_authorization_grant.ts)
 
 ## Runtime requirements
 
