@@ -3871,20 +3871,15 @@ async function ecdhEs(publicKey: CryptoKey, privateKey: CryptoKey, enc: string) 
   const OtherInfo = concat(AlgorithmID, PartyUInfo, PartyVInfo, SuppPubInfo, SuppPrivInfo)
 
   const iterations = Math.ceil(keydatalen / 256)
-  let res!: Uint8Array
-  for (let counter = 1; counter <= iterations; counter++) {
+  const res = new Uint8Array(iterations * 32)
+  for (let counter = 0; counter < iterations; counter++) {
     const input = new Uint8Array(4 + Z.byteLength + OtherInfo.byteLength)
-    input.set(uint32be(counter))
+    input.set(uint32be(counter + 1))
     input.set(Z, 4)
     input.set(OtherInfo, 4 + Z.byteLength)
-    if (!res) {
-      res = new Uint8Array(await crypto.subtle.digest('SHA-256', input))
-    } else {
-      res = concat(res, new Uint8Array(await crypto.subtle.digest('SHA-256', input)))
-    }
+    res.set(new Uint8Array(await crypto.subtle.digest('SHA-256', input)), counter * 32)
   }
-  res = res.slice(0, keydatalen >> 3)
-  return res
+  return res.slice(0, keydatalen >> 3)
 }
 
 /**
