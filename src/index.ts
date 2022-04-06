@@ -1020,11 +1020,7 @@ export async function calculatePKCECodeChallenge(codeVerifier: string) {
 }
 
 function getKeyAndKid(input: PublicKey | PrivateKey | undefined) {
-  if (typeof input !== 'object' || input === null) {
-    return { key: undefined, kid: undefined }
-  }
-
-  if (!(input.key instanceof CryptoKey)) {
+  if (!(input?.key instanceof CryptoKey)) {
     return { key: undefined, kid: undefined }
   }
 
