@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.2.2](https://github.com/panva/oauth4webapi/compare/v0.2.1...v0.2.2) (2022-04-07)
+
+
+### Features
+
+* add generateRandomNonce ([ad60b2c](https://github.com/panva/oauth4webapi/commit/ad60b2c32b856b08b105372a201127669e344b74))
+* add generateRandomState ([a39cc6b](https://github.com/panva/oauth4webapi/commit/a39cc6b2946c7824a7fbe169d49899e3ecaf5ec0))
+
 ## [0.2.1](https://github.com/panva/oauth4webapi/compare/v0.2.0...v0.2.1) (2022-04-05)
 
 ## [0.2.0](https://github.com/panva/oauth4webapi/compare/v0.1.0...v0.2.0) (2022-04-01)
