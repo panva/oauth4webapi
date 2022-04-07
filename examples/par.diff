@@ -1,8 +1,8 @@
 diff --git a/examples/code.ts b/examples/par.ts
-index f619d7d..26501e2 100644
+index 29f6b64..584de73 100644
 --- a/examples/code.ts
 +++ b/examples/par.ts
-@@ -18,6 +18,35 @@ const code_verifier = oauth.generateRandomCodeVerifier()
+@@ -24,6 +24,35 @@ const code_verifier = oauth.generateRandomCodeVerifier()
  const code_challenge = await oauth.calculatePKCECodeChallenge(code_verifier)
  const code_challenge_method = 'S256'
  
@@ -38,7 +38,7 @@ index f619d7d..26501e2 100644
  {
    // redirect user to as.authorization_endpoint
  
-@@ -25,11 +54,7 @@ const code_challenge_method = 'S256'
+@@ -31,11 +60,7 @@ const code_challenge_method = 'S256'
  
    const authorizationUrl = new URL(as.authorization_endpoint)
    authorizationUrl.searchParams.set('client_id', client.client_id)

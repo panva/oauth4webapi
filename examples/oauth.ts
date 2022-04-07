@@ -14,6 +14,12 @@ const client: oauth.Client = {
 
 const redirect_uri = 'https://rp.example.com/cb'
 
+if (as.code_challenge_methods_supported?.includes?.('S256') !== true) {
+  // This example assumes S256 PKCE is supported and signalled to be supported
+  // If it isn't supported, random `state` should be used for CSRF protection.
+  throw new Error()
+}
+
 const code_verifier = oauth.generateRandomCodeVerifier()
 const code_challenge = await oauth.calculatePKCECodeChallenge(code_verifier)
 const code_challenge_method = 'S256'

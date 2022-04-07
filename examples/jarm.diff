@@ -1,8 +1,8 @@
 diff --git a/examples/code.ts b/examples/jarm.ts
-index f619d7d..1cc7845 100644
+index 29f6b64..e98ca74 100644
 --- a/examples/code.ts
 +++ b/examples/jarm.ts
-@@ -30,6 +30,7 @@ const code_challenge_method = 'S256'
+@@ -36,6 +36,7 @@ const code_challenge_method = 'S256'
    authorizationUrl.searchParams.set('redirect_uri', redirect_uri)
    authorizationUrl.searchParams.set('response_type', 'code')
    authorizationUrl.searchParams.set('scope', 'openid email')
@@ -10,7 +10,7 @@ index f619d7d..1cc7845 100644
  }
  
  // one eternity later, the user lands back on the redirect_uri
-@@ -38,7 +39,7 @@ let access_token: string
+@@ -44,7 +45,7 @@ let access_token: string
  {
    // @ts-ignore
    const currentUrl: URL = getCurrentUrl()
