@@ -1000,6 +1000,15 @@ export function generateRandomCodeVerifier() {
 }
 
 /**
+ * Generate random `state` value.
+ *
+ * @see {@link https://www.rfc-editor.org/rfc/rfc6749.html#section-4.1.1 RFC 6749 - The OAuth 2.0 Authorization Framework}
+ */
+export function generateRandomState() {
+  return randomBytes()
+}
+
+/**
  * Generate random `nonce` value.
  *
  * @see {@link https://openid.net/specs/openid-connect-core-1_0.html#IDToken OpenID Connect Core 1.0}
