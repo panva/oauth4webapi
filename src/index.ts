@@ -991,7 +991,7 @@ function randomBytes() {
 }
 
 /**
- * Generate random `code_verifier` value encoded as base64url.
+ * Generate random `code_verifier` value.
  *
  * @see {@link https://www.rfc-editor.org/rfc/rfc7636.html#section-4 RFC 7636 - Proof Key for Code Exchange by OAuth Public Clients (PKCE)}
  */
