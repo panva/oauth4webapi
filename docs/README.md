@@ -11,6 +11,7 @@
 - [deviceCodeGrantRequest](functions/deviceCodeGrantRequest.md)
 - [discoveryRequest](functions/discoveryRequest.md)
 - [generateRandomCodeVerifier](functions/generateRandomCodeVerifier.md)
+- [generateRandomNonce](functions/generateRandomNonce.md)
 - [getValidatedIdTokenClaims](functions/getValidatedIdTokenClaims.md)
 - [introspectionRequest](functions/introspectionRequest.md)
 - [isOAuth2Error](functions/isOAuth2Error.md)

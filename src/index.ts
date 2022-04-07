@@ -1000,6 +1000,15 @@ export function generateRandomCodeVerifier() {
 }
 
 /**
+ * Generate random `nonce` value.
+ *
+ * @see {@link https://openid.net/specs/openid-connect-core-1_0.html#IDToken OpenID Connect Core 1.0}
+ */
+export function generateRandomNonce() {
+  return randomBytes()
+}
+
+/**
  *
  * Calculates the PKCE `code_verifier` value to send with an authorization
  * request using the S256 PKCE Code Challenge Method transformation.
