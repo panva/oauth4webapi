@@ -39,7 +39,7 @@ export const client = <Client>{
 
 declare module 'stream' {
   export namespace Readable {
-    function toWeb(streamReadable: NodeJS.ReadableStream): ReadableStream
+    function toWeb(streamReadable: Readable): ReadableStream
   }
 }
 
