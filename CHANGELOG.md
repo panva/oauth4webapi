@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.3.0](https://github.com/panva/oauth4webapi/compare/v0.2.2...v0.3.0) (2022-04-10)
+
+
+### ⚠ BREAKING CHANGES
+
+* **types:** force types without string defaults
+
+### Refactor
+
+* **types:** force types without string defaults ([188b252](https://github.com/panva/oauth4webapi/commit/188b25240a542a40044373f2696c0a2ef49964fa))
+
 ## [0.2.2](https://github.com/panva/oauth4webapi/compare/v0.2.1...v0.2.2) (2022-04-07)
 
 
