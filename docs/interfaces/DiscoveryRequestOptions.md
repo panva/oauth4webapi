@@ -11,7 +11,7 @@
 
 ### algorithm
 
-• `Optional` **algorithm**: `string`
+• `Optional` **algorithm**: [`ProcessingMode`](../types/ProcessingMode.md)
 
 The issuer transformation algorithm to use.
 

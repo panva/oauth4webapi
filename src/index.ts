@@ -631,6 +631,8 @@ export interface AuthorizationServer {
   readonly [metadata: string]: unknown
 }
 
+export type HMACAlgorithms = 'HS256' | 'HS384' | 'HS512'
+
 /**
  * Recognized Client Metadata that have an effect on the exposed functionality.
  *
@@ -649,21 +651,21 @@ export interface Client {
    * Client {@link TokenEndpointAuthMethod authentication method} for the
    * client's authenticated requests.
    */
-  token_endpoint_auth_method?: TokenEndpointAuthMethod | string
+  token_endpoint_auth_method?: TokenEndpointAuthMethod
   /**
    * JWS "alg" algorithm required for signing the ID Token issued to this
    * Client.
    */
-  id_token_signed_response_alg?: JWSAlgorithm | string
+  id_token_signed_response_alg?: JWSAlgorithm
   /**
    * JWS "alg" algorithm required for signing authorization responses.
    */
-  authorization_signed_response_alg?: JWSAlgorithm | string
+  authorization_signed_response_alg?: JWSAlgorithm
   /**
    * JWE "enc" algorithm the RP is declaring that it may use for encrypting
    * Request Objects sent to the authorization server.
    */
-  request_object_encryption_enc?: ContentEncryptionAlgorithm | string
+  request_object_encryption_enc?: ContentEncryptionAlgorithm
   /**
    * Boolean value specifying whether the {@link IDToken.auth_time auth_time}
    * Claim in the ID Token is REQUIRED.
@@ -672,21 +674,23 @@ export interface Client {
   /**
    * JWS "alg" algorithm REQUIRED for signing UserInfo Responses.
    */
-  userinfo_signed_response_alg?: JWSAlgorithm | string
+  userinfo_signed_response_alg?: JWSAlgorithm
   /**
    * JWS "alg" algorithm REQUIRED for signed introspection responses.
    */
-  introspection_signed_response_alg?: JWSAlgorithm | string
+  introspection_signed_response_alg?: JWSAlgorithm
   /**
    * Default Maximum Authentication Age.
    */
   default_max_age?: number
   /**
-   * JWS "alg" algorithm for `client_secret_jwt`
-   * {@link TokenEndpointAuthMethod authentication method}. It is ignored
-   * for every other method.
+   * Symmetric JWS "alg" Algorithm for `client_secret_jwt`
+   * {@link TokenEndpointAuthMethod authentication method}. It is not used
+   * for `private_key_jwt` due to use of
+   * {@link https://developer.mozilla.org/en-US/docs/Web/API/CryptoKey CryptoKey}
+   * instances that can have a particular "alg" inferred.
    */
-  token_endpoint_auth_signing_alg?: 'HS256' | 'HS384' | 'HS512' | string
+  token_endpoint_auth_signing_alg?: HMACAlgorithms
 
   [metadata: string]: unknown
 }
@@ -833,7 +837,7 @@ export interface DiscoveryRequestOptions extends SignalledRequestOptions {
   /**
    * The issuer transformation algorithm to use.
    */
-  algorithm?: ProcessingMode | string
+  algorithm?: ProcessingMode
 }
 
 function preserveBodyStream(response: Response) {

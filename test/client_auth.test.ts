@@ -220,7 +220,7 @@ test('client_secret_jwt', async (t) => {
   t.pass()
 })
 
-for (const alg of ['HS256', 'HS384', 'HS512']) {
+for (const alg of <lib.HMACAlgorithms[]>['HS256', 'HS384', 'HS512']) {
   test(`client_secret_jwt using ${alg}`, async (t) => {
     let assertion!: string
     t.context

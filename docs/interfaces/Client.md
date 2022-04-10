@@ -24,7 +24,7 @@ Recognized Client Metadata that have an effect on the exposed functionality.
 
 ### authorization\_signed\_response\_alg
 
-• `Optional` **authorization\_signed\_response\_alg**: `string`
+• `Optional` **authorization\_signed\_response\_alg**: [`JWSAlgorithm`](../types/JWSAlgorithm.md)
 
 JWS "alg" algorithm required for signing authorization responses.
 
@@ -56,7 +56,7 @@ ___
 
 ### id\_token\_signed\_response\_alg
 
-• `Optional` **id\_token\_signed\_response\_alg**: `string`
+• `Optional` **id\_token\_signed\_response\_alg**: [`JWSAlgorithm`](../types/JWSAlgorithm.md)
 
 JWS "alg" algorithm required for signing the ID Token issued to this
 Client.
@@ -65,7 +65,7 @@ ___
 
 ### introspection\_signed\_response\_alg
 
-• `Optional` **introspection\_signed\_response\_alg**: `string`
+• `Optional` **introspection\_signed\_response\_alg**: [`JWSAlgorithm`](../types/JWSAlgorithm.md)
 
 JWS "alg" algorithm REQUIRED for signed introspection responses.
 
@@ -73,7 +73,7 @@ ___
 
 ### request\_object\_encryption\_enc
 
-• `Optional` **request\_object\_encryption\_enc**: `string`
+• `Optional` **request\_object\_encryption\_enc**: [`ContentEncryptionAlgorithm`](../types/ContentEncryptionAlgorithm.md)
 
 JWE "enc" algorithm the RP is declaring that it may use for encrypting
 Request Objects sent to the authorization server.
@@ -91,7 +91,7 @@ ___
 
 ### token\_endpoint\_auth\_method
 
-• `Optional` **token\_endpoint\_auth\_method**: `string`
+• `Optional` **token\_endpoint\_auth\_method**: [`TokenEndpointAuthMethod`](../types/TokenEndpointAuthMethod.md)
 
 Client [authentication method](../types/TokenEndpointAuthMethod.md) for the
 client's authenticated requests.
@@ -100,16 +100,18 @@ ___
 
 ### token\_endpoint\_auth\_signing\_alg
 
-• `Optional` **token\_endpoint\_auth\_signing\_alg**: `string`
+• `Optional` **token\_endpoint\_auth\_signing\_alg**: [`HMACAlgorithms`](../types/HMACAlgorithms.md)
 
-JWS "alg" algorithm for `client_secret_jwt`
-[authentication method](../types/TokenEndpointAuthMethod.md). It is ignored
-for every other method.
+Symmetric JWS "alg" Algorithm for `client_secret_jwt`
+[authentication method](../types/TokenEndpointAuthMethod.md). It is not used
+for `private_key_jwt` due to use of
+[CryptoKey](https://developer.mozilla.org/en-US/docs/Web/API/CryptoKey)
+instances that can have a particular "alg" inferred.
 
 ___
 
 ### userinfo\_signed\_response\_alg
 
-• `Optional` **userinfo\_signed\_response\_alg**: `string`
+• `Optional` **userinfo\_signed\_response\_alg**: [`JWSAlgorithm`](../types/JWSAlgorithm.md)
 
 JWS "alg" algorithm REQUIRED for signing UserInfo Responses.

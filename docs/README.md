@@ -80,6 +80,7 @@
 ### Type aliases
 
 - [ContentEncryptionAlgorithm](types/ContentEncryptionAlgorithm.md)
+- [HMACAlgorithms](types/HMACAlgorithms.md)
 - [JWSAlgorithm](types/JWSAlgorithm.md)
 - [KeyManagementAlgorithm](types/KeyManagementAlgorithm.md)
 - [ProcessingMode](types/ProcessingMode.md)
