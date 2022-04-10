@@ -2889,7 +2889,7 @@ export async function processAuthorizationCodeOAuth2Response(
 
   if (result.id_token !== undefined) {
     throw new OPE(
-      'Unexpected ID Token returned, use "options.mode" "oidc" for OpenID Connect callback processing',
+      'Unexpected ID Token returned, use processAuthorizationCodeOpenIDResponse() for OpenID Connect callback processing',
     )
   }
 
