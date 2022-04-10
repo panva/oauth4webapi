@@ -1,5 +1,5 @@
 diff --git a/node_modules/typedoc-plugin-markdown/dist/resources/helpers/toc.js b/node_modules/typedoc-plugin-markdown/dist/resources/helpers/toc.js
-index dda9e9e..0f64a79 100644
+index ca0cf27..95be471 100644
 --- a/node_modules/typedoc-plugin-markdown/dist/resources/helpers/toc.js
 +++ b/node_modules/typedoc-plugin-markdown/dist/resources/helpers/toc.js
 @@ -17,7 +17,15 @@ function default_1(theme) {
@@ -20,7 +20,7 @@ index dda9e9e..0f64a79 100644
                  if (group.categories) {
                      group.categories.forEach((category) => {
 diff --git a/node_modules/typedoc-plugin-markdown/dist/resources/partials/member.sources.hbs b/node_modules/typedoc-plugin-markdown/dist/resources/partials/member.sources.hbs
-index a999ee8..da9983b 100755
+index f642b49..3743b65 100644
 --- a/node_modules/typedoc-plugin-markdown/dist/resources/partials/member.sources.hbs
 +++ b/node_modules/typedoc-plugin-markdown/dist/resources/partials/member.sources.hbs
 @@ -10,30 +10,6 @@
@@ -55,7 +55,7 @@ index a999ee8..da9983b 100755
  
  #### Defined in
 diff --git a/node_modules/typedoc-plugin-markdown/dist/resources/templates/reflection.hbs b/node_modules/typedoc-plugin-markdown/dist/resources/templates/reflection.hbs
-index ce29bc5..9bd8dad 100755
+index 6a29bf7..f9dcbc4 100644
 --- a/node_modules/typedoc-plugin-markdown/dist/resources/templates/reflection.hbs
 +++ b/node_modules/typedoc-plugin-markdown/dist/resources/templates/reflection.hbs
 @@ -24,18 +24,6 @@

@@ -394,35 +394,7 @@ export interface AuthorizationServer {
    * client intending to do mutual TLS will use in preference to the
    * conventional endpoints.
    */
-  readonly mtls_endpoint_aliases?: {
-    /**
-     * URL of the authorization server's MTLS token endpoint.
-     */
-    readonly token_endpoint?: string
-    /**
-     * URL of the authorization server's MTLS revocation endpoint.
-     */
-    readonly revocation_endpoint?: string
-    /**
-     * URL of the authorization server's MTLS introspection endpoint.
-     */
-    readonly introspection_endpoint?: string
-    /**
-     * URL of the authorization server's MTLS device authorization endpoint.
-     */
-    readonly device_authorization_endpoint?: string
-    /**
-     * URL of the authorization server's MTLS UserInfo Endpoint.
-     */
-    readonly userinfo_endpoint?: string
-    /**
-     * URL of the authorization server's MTLS pushed authorization request
-     * endpoint.
-     */
-    readonly pushed_authorization_request_endpoint?: string
-
-    readonly [metadata: string]: unknown
-  }
+  readonly mtls_endpoint_aliases?: MTLSEndpointAliases
   /**
    * URL of the authorization server's UserInfo Endpoint.
    */
@@ -628,6 +600,19 @@ export interface AuthorizationServer {
    */
   readonly backchannel_logout_supported?: boolean
 
+  readonly [metadata: string]: unknown
+}
+
+export interface MTLSEndpointAliases
+  extends Pick<
+    AuthorizationServer,
+    | 'token_endpoint'
+    | 'revocation_endpoint'
+    | 'introspection_endpoint'
+    | 'device_authorization_endpoint'
+    | 'userinfo_endpoint'
+    | 'pushed_authorization_request_endpoint'
+  > {
   readonly [metadata: string]: unknown
 }
 

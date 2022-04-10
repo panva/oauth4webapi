@@ -400,26 +400,11 @@ ___
 
 ### mtls\_endpoint\_aliases
 
-• `Optional` `Readonly` **mtls\_endpoint\_aliases**: `Object`
+• `Optional` `Readonly` **mtls\_endpoint\_aliases**: [`MTLSEndpointAliases`](MTLSEndpointAliases.md)
 
 JSON object containing alternative authorization server endpoints, which a
 client intending to do mutual TLS will use in preference to the
 conventional endpoints.
-
-#### Index signature
-
-▪ [metadata: `string`]: `unknown`
-
-#### Type declaration
-
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `device_authorization_endpoint?` | `string` | URL of the authorization server's MTLS device authorization endpoint. |
-| `introspection_endpoint?` | `string` | URL of the authorization server's MTLS introspection endpoint. |
-| `pushed_authorization_request_endpoint?` | `string` | URL of the authorization server's MTLS pushed authorization request endpoint. |
-| `revocation_endpoint?` | `string` | URL of the authorization server's MTLS revocation endpoint. |
-| `token_endpoint?` | `string` | URL of the authorization server's MTLS token endpoint. |
-| `userinfo_endpoint?` | `string` | URL of the authorization server's MTLS UserInfo Endpoint. |
 
 ___
 

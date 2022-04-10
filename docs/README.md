@@ -61,6 +61,7 @@
 - [JWK](interfaces/JWK.md)
 - [JsonWebKeySet](interfaces/JsonWebKeySet.md)
 - [JwksRequestOptions](interfaces/JwksRequestOptions.md)
+- [MTLSEndpointAliases](interfaces/MTLSEndpointAliases.md)
 - [OAuth2Error](interfaces/OAuth2Error.md)
 - [OAuth2TokenEndpointResponse](interfaces/OAuth2TokenEndpointResponse.md)
 - [OpenIDTokenEndpointResponse](interfaces/OpenIDTokenEndpointResponse.md)
