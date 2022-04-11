@@ -14,8 +14,8 @@ signed and encrypted.
 | `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata |
 | `client` | [`Client`](../interfaces/Client.md) | Client Metadata |
 | `parameters` | `URLSearchParams` | - |
-| `privateKey` | [`PrivateKey`](../interfaces/PrivateKey.md) | Private key to sign the Request Object with. |
-| `publicKey?` | [`PublicKey`](../interfaces/PublicKey.md) | Public key to encrypt the Signed Request Object with. |
+| `privateKey` | `CryptoKey` \| [`PrivateKey`](../interfaces/PrivateKey.md) | Private key to sign the Request Object with. |
+| `publicKey?` | `CryptoKey` \| [`PublicKey`](../interfaces/PublicKey.md) | Public key to encrypt the Signed Request Object with. |
 
 #### Returns
 

@@ -1026,9 +1026,18 @@ export async function calculatePKCECodeChallenge(codeVerifier: string) {
   return encodeBase64Url(new Uint8Array(digest))
 }
 
-function getKeyAndKid(input: PublicKey | PrivateKey | undefined) {
+interface NormalizedKeyInput {
+  key?: CryptoKey
+  kid?: string
+}
+
+function getKeyAndKid(input: CryptoKey | PublicKey | PrivateKey | undefined): NormalizedKeyInput {
+  if (input instanceof CryptoKey) {
+    return { key: input }
+  }
+
   if (!(input?.key instanceof CryptoKey)) {
-    return { key: undefined, kid: undefined }
+    return {}
   }
 
   if (input.kid !== undefined && (typeof input.kid !== 'string' || input.kid.length === 0)) {
@@ -1074,7 +1083,7 @@ export interface AuthenticatedRequestOptions {
    * Private key to use for `private_key_jwt`
    * {@link TokenEndpointAuthMethod client authentication}.
    */
-  clientPrivateKey?: PrivateKey
+  clientPrivateKey?: CryptoKey | PrivateKey
 }
 
 export interface PushedAuthorizationRequestOptions
@@ -1338,7 +1347,7 @@ async function clientAuthentication(
   client: Client,
   body: URLSearchParams,
   headers: Headers,
-  clientPrivateKey?: PrivateKey,
+  clientPrivateKey?: CryptoKey | PrivateKey,
 ) {
   switch (client.token_endpoint_auth_method) {
     case undefined: // Fall through
@@ -1429,8 +1438,8 @@ export async function issueRequestObject(
   as: AuthorizationServer,
   client: Client,
   parameters: URLSearchParams,
-  privateKey: PrivateKey,
-  publicKey?: PublicKey,
+  privateKey: CryptoKey | PrivateKey,
+  publicKey?: CryptoKey | PublicKey,
 ) {
   assertIssuer(as)
   assertClient(client)

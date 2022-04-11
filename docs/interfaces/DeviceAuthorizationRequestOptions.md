@@ -11,7 +11,7 @@
 
 ### clientPrivateKey
 
-• `Optional` **clientPrivateKey**: [`PrivateKey`](PrivateKey.md)
+• `Optional` **clientPrivateKey**: `CryptoKey` \| [`PrivateKey`](PrivateKey.md)
 
 Private key to use for `private_key_jwt`
 [client authentication](../types/TokenEndpointAuthMethod.md).
