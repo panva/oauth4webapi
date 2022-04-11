@@ -250,6 +250,24 @@ for (const alg of <lib.HMACAlgorithms[]>['HS256', 'HS384', 'HS512']) {
   })
 }
 
+test(`client_secret_jwt needing token_endpoint_auth_signing_alg`, async (t) => {
+  await t.throwsAsync(
+    lib.revocationRequest(
+      { ...issuer, revocation_endpoint: endpoint(`test`) },
+      {
+        ...client,
+        client_secret: 'foo',
+        token_endpoint_auth_method: 'client_secret_jwt',
+      },
+      'token',
+    ),
+    {
+      message:
+        'could not determine client_secret_jwt JWS "alg" algorithm, client.token_endpoint_auth_signing_alg must be configured',
+    },
+  )
+})
+
 test('none', async (t) => {
   t.context
     .intercept({

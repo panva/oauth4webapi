@@ -19,8 +19,16 @@ test.before(async (t) => {
     })
     .reply(200, {
       keys: [
-        await jose.exportJWK(t.context.es256.publicKey),
-        await jose.exportJWK(t.context.rs256.publicKey),
+        {
+          kid: 'es256',
+          ...(await jose.exportJWK(t.context.es256.publicKey)),
+          use: 'sig',
+        },
+        {
+          kid: 'rs256',
+          ...(await jose.exportJWK(t.context.rs256.publicKey)),
+          key_ops: ['verify'],
+        },
       ],
     })
 })
@@ -56,7 +64,7 @@ test('validateJwtAuthResponse()', async (t) => {
     code: 'code',
   })
     .setExpirationTime('30s')
-    .setProtectedHeader({ alg: 'RS256' })
+    .setProtectedHeader({ alg: 'RS256', kid: 'rs256' })
     .sign(kp.privateKey)
   const params = new URLSearchParams({ response })
   await t.notThrowsAsync(async () => {
@@ -139,7 +147,7 @@ test('validateJwtAuthResponse() - alg signalled', async (t) => {
     aud: client.client_id,
   })
     .setExpirationTime('30s')
-    .setProtectedHeader({ alg: 'ES256' })
+    .setProtectedHeader({ alg: 'ES256', kid: 'es256' })
     .sign(kp.privateKey)
   const params = new URLSearchParams({ response })
   await t.notThrowsAsync(lib.validateJwtAuthResponse(tIssuer, client, params, lib.expectNoState))
