@@ -1516,31 +1516,29 @@ async function dpopProofJwt(
   htm: string,
   accessToken?: string,
 ) {
-  if (!isPrivateKey(options.privateKey)) {
+  const { privateKey, publicKey, nonce = dpopNonces.get(url.origin) } = options
+
+  if (!isPrivateKey(privateKey)) {
     throw new TypeError('"DPoP.privateKey" must be a private CryptoKey')
   }
 
-  if (!isPublicKey(options.publicKey)) {
+  if (!isPublicKey(publicKey)) {
     throw new TypeError('"DPoP.publicKey" must be a public CryptoKey')
   }
 
-  if (
-    options.nonce !== undefined &&
-    (typeof options.nonce !== 'string' || options.nonce.length === 0)
-  ) {
+  if (nonce !== undefined && (typeof nonce !== 'string' || nonce.length === 0)) {
     throw new TypeError('"DPoP.nonce" must be a non-empty string or undefined')
   }
 
-  if (options.publicKey.extractable !== true) {
+  if (publicKey.extractable !== true) {
     throw new TypeError('"DPoP.publicKey.extractable" must be true')
   }
 
-  const { nonce = dpopNonces.get(url.origin) } = options
   const proof = await jwt(
     {
-      alg: checkSupportedJwsAlg(determineJWSAlgorithm(options.privateKey)),
+      alg: checkSupportedJwsAlg(determineJWSAlgorithm(privateKey)),
       typ: 'dpop+jwt',
-      jwk: await publicJwk(options.publicKey),
+      jwk: await publicJwk(publicKey),
     },
     {
       iat: currentTimestamp(),
@@ -1554,7 +1552,7 @@ async function dpopProofJwt(
           )
         : undefined,
     },
-    options.privateKey,
+    privateKey,
   )
 
   headers.set('dpop', proof)
