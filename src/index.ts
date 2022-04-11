@@ -1402,8 +1402,6 @@ async function clientAuthentication(
   }
 }
 
-const JAR = 'oauth-authz-req+jwt'
-
 /**
  * Minimal JWT sign() implementation.
  */
@@ -1479,7 +1477,7 @@ export async function issueRequestObject(
   let request = await jwt(
     {
       alg: checkSupportedJwsAlg(determineJWSAlgorithm(key)),
-      typ: JAR,
+      typ: 'oauth-authz-req+jwt',
       kid,
     },
     claims,
@@ -1495,7 +1493,7 @@ export async function issueRequestObject(
       {
         alg: checkSupportedJweAlg(jweAlg(key)),
         enc: checkSupportedJweEnc(client.request_object_encryption_enc || 'A128CBC-HS256'),
-        cty: JAR,
+        cty: 'oauth-authz-req+jwt',
         kid,
         iss: client.client_id,
         sub: client.client_id,
