@@ -3963,31 +3963,23 @@ async function importJwk(jwk: JWK) {
 }
 
 const CHUNK_SIZE = 0x8000
-function encodeBase64(input: Uint8Array) {
+function encodeBase64Url(input: Uint8Array) {
   const arr = []
   for (let i = 0; i < input.byteLength; i += CHUNK_SIZE) {
     // @ts-expect-error
     arr.push(String.fromCharCode.apply(null, input.subarray(i, i + CHUNK_SIZE)))
   }
-  return btoa(arr.join(''))
-}
-
-function encodeBase64Url(input: Uint8Array) {
-  return encodeBase64(input).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_')
-}
-
-function decodeBase64(input: string): Uint8Array {
-  return new Uint8Array(
-    atob(input)
-      .split('')
-      .map((c) => c.charCodeAt(0)),
-  )
+  return btoa(arr.join('')).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_')
 }
 
 function decodeBase64Url(input: string) {
-  input = input.replace(/-/g, '+').replace(/_/g, '/').replace(/\s/g, '')
   try {
-    return decodeBase64(input)
+    const binary = atob(input.replace(/-/g, '+').replace(/_/g, '/').replace(/\s/g, ''))
+    const bytes = new Uint8Array(binary.length)
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i)
+    }
+    return bytes
   } catch {
     throw new TypeError('The input to be decoded is not correctly encoded.')
   }
