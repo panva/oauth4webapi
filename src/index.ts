@@ -705,6 +705,8 @@ class LRU<T1, T2> {
       this.update(key, v)
       return v
     }
+
+    return undefined
   }
 
   has(key: T1) {
@@ -3047,6 +3049,8 @@ export async function processRevocationResponse(
     }
     throw new OPE('"response" is not a conform Revocation Endpoint response')
   }
+
+  return undefined
 }
 
 export interface IntrospectionRequestOptions
@@ -3219,7 +3223,7 @@ export async function processIntrospectionResponse(
       .then(validateAudience.bind(undefined, client.client_id))
 
     json = claims.token_introspection
-    if (!isTopLevelObject<IntrospectionResponse>(claims.token_introspection)) {
+    if (!isTopLevelObject<IntrospectionResponse>(json)) {
       throw new OPE('JWT payload must be a top level object')
     }
   } else {
@@ -3350,6 +3354,7 @@ async function handleOAuthBodyError(response: Response) {
       }
     } catch {}
   }
+  return undefined
 }
 
 function checkSupportedJweEnc(enc: unknown) {
@@ -3394,10 +3399,11 @@ function subtleAlgorithm(
       }
     case 'RSASSA-PKCS1-v1_5':
       checkRsaKeyAlgorithm(<RsaKeyAlgorithm>key.algorithm)
-    // Fall through
-    default:
-      return <AlgorithmIdentifier>{ name: key.algorithm.name }
+      return { name: key.algorithm.name }
+    case 'HMAC':
+      return { name: key.algorithm.name }
   }
+  throw new UnsupportedOperationError()
 }
 
 /**
@@ -3855,6 +3861,7 @@ function deriveBitsLength(algorithm: KeyAlgorithm) {
         case 'P-521':
           return 528
       }
+      throw new UnsupportedOperationError()
     }
     default:
       throw new UnsupportedOperationError()

@@ -1,8 +1,8 @@
-import { type ExecutionContext } from 'ava'
+import type { ExecutionContext } from 'ava'
 import * as undici from 'undici'
 import { Readable } from 'node:stream'
 
-import { type AuthorizationServer, type Client } from '../src/index.js'
+import type { AuthorizationServer, Client } from '../src/index.js'
 
 export interface Context {
   mock: undici.MockAgent
