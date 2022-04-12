@@ -2837,12 +2837,12 @@ export async function processAuthorizationCodeOpenIDResponse(
   switch (expectedNonce) {
     case expectNoNonce:
       if (claims.nonce !== undefined) {
-        throw new OPE('unexpected ID Token "nonce" claim received')
+        throw new OPE('unexpected ID Token "nonce" claim value received')
       }
       break
     default:
       if (typeof expectedNonce !== 'string' || expectedNonce.length === 0) {
-        throw new OPE('"expectedNonce" must be a non-empty string')
+        throw new TypeError('"expectedNonce" must be a non-empty string')
       }
       if (claims.nonce === undefined) {
         throw new OPE('ID Token "nonce" claim missing')

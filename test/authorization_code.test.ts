@@ -576,3 +576,126 @@ test('processAuthorizationCodeOpenIDResponse() with an ID Token w/ at_hash', asy
     { message: 'invalid ID Token "at_hash"' },
   )
 })
+
+test('processAuthorizationCodeOpenIDResponse() nonce checks', async (t) => {
+  const tIssuer: lib.AuthorizationServer = { ...issuer, jwks_uri: endpoint('jwks') }
+
+  await t.throwsAsync(
+    lib.processAuthorizationCodeOpenIDResponse(
+      tIssuer,
+      client,
+      getResponse(
+        j({
+          access_token: 'token',
+          token_type: 'Bearer',
+          id_token: await new jose.SignJWT({
+            nonce: 'randomvalue',
+          })
+            .setProtectedHeader({ alg: 'RS256' })
+            .setIssuer(issuer.issuer)
+            .setSubject('urn:example:subject')
+            .setAudience(client.client_id)
+            .setExpirationTime('5m')
+            .setIssuedAt()
+            .sign(t.context.RS256.privateKey),
+        }),
+      ),
+    ),
+    { message: 'unexpected ID Token "nonce" claim value received' },
+  )
+
+  await t.throwsAsync(
+    lib.processAuthorizationCodeOpenIDResponse(
+      tIssuer,
+      client,
+      getResponse(
+        j({
+          access_token: 'token',
+          token_type: 'Bearer',
+          id_token: await new jose.SignJWT({
+            nonce: 'randomvalue',
+          })
+            .setProtectedHeader({ alg: 'RS256' })
+            .setIssuer(issuer.issuer)
+            .setSubject('urn:example:subject')
+            .setAudience(client.client_id)
+            .setExpirationTime('5m')
+            .setIssuedAt()
+            .sign(t.context.RS256.privateKey),
+        }),
+      ),
+      'anotherrandom-value',
+    ),
+    { message: 'unexpected ID Token "nonce" claim value received' },
+  )
+
+  await t.throwsAsync(
+    lib.processAuthorizationCodeOpenIDResponse(
+      tIssuer,
+      client,
+      getResponse(
+        j({
+          access_token: 'token',
+          token_type: 'Bearer',
+          id_token: await new jose.SignJWT({})
+            .setProtectedHeader({ alg: 'RS256' })
+            .setIssuer(issuer.issuer)
+            .setSubject('urn:example:subject')
+            .setAudience(client.client_id)
+            .setExpirationTime('5m')
+            .setIssuedAt()
+            .sign(t.context.RS256.privateKey),
+        }),
+      ),
+      'anotherrandom-value',
+    ),
+    { message: 'ID Token "nonce" claim missing' },
+  )
+
+  for (const nonce of [null, '']) {
+    await t.throwsAsync(
+      lib.processAuthorizationCodeOpenIDResponse(
+        tIssuer,
+        client,
+        getResponse(
+          j({
+            access_token: 'token',
+            token_type: 'Bearer',
+            id_token: await new jose.SignJWT({})
+              .setProtectedHeader({ alg: 'RS256' })
+              .setIssuer(issuer.issuer)
+              .setSubject('urn:example:subject')
+              .setAudience(client.client_id)
+              .setExpirationTime('5m')
+              .setIssuedAt()
+              .sign(t.context.RS256.privateKey),
+          }),
+        ),
+        <any>nonce,
+      ),
+      { message: '"expectedNonce" must be a non-empty string', instanceOf: TypeError },
+    )
+  }
+
+  await t.notThrowsAsync(
+    lib.processAuthorizationCodeOpenIDResponse(
+      tIssuer,
+      client,
+      getResponse(
+        j({
+          access_token: 'token',
+          token_type: 'Bearer',
+          id_token: await new jose.SignJWT({ nonce: 'random-value' })
+            .setProtectedHeader({ alg: 'RS256' })
+            .setIssuer(issuer.issuer)
+            .setSubject('urn:example:subject')
+            .setAudience(client.client_id)
+            .setExpirationTime('5m')
+            .setIssuedAt()
+            .sign(t.context.RS256.privateKey),
+        }),
+      ),
+      'random-value',
+    ),
+  )
+})
