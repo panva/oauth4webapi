@@ -2043,7 +2043,7 @@ async function getPublicSigKeyFromIssuerJwksUri(
 
   let key = cryptoKeyCaches[alg].get(jwk)
   if (!key) {
-    key = <CryptoKey>await importJwk({ ...jwk, alg, ext: false })
+    key = await importJwk({ ...jwk, alg })
     if (key.type !== 'public') {
       throw new OPE('jwks_uri must only contain public keys')
     }
