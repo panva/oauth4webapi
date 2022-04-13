@@ -683,6 +683,53 @@ export interface Client {
 const encoder = new TextEncoder()
 const decoder = new TextDecoder()
 
+function buf(input: string): Uint8Array
+function buf(input: Uint8Array): string
+function buf(input: string | Uint8Array) {
+  if (typeof input === 'string') {
+    return encoder.encode(input)
+  }
+
+  return decoder.decode(input)
+}
+
+const CHUNK_SIZE = 0x8000
+function encodeBase64Url(input: Uint8Array | ArrayBuffer) {
+  if (input instanceof ArrayBuffer) {
+    input = new Uint8Array(input)
+  }
+
+  const arr = []
+  for (let i = 0; i < input.byteLength; i += CHUNK_SIZE) {
+    // @ts-expect-error
+    arr.push(String.fromCharCode.apply(null, input.subarray(i, i + CHUNK_SIZE)))
+  }
+  return btoa(arr.join('')).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_')
+}
+
+function decodeBase64Url(input: string) {
+  try {
+    const binary = atob(input.replace(/-/g, '+').replace(/_/g, '/').replace(/\s/g, ''))
+    const bytes = new Uint8Array(binary.length)
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i)
+    }
+    return bytes
+  } catch {
+    throw new TypeError('The input to be decoded is not correctly encoded.')
+  }
+}
+
+function b64u(input: string): Uint8Array
+function b64u(input: Uint8Array | ArrayBuffer): string
+function b64u(input: string | Uint8Array | ArrayBuffer) {
+  if (typeof input === 'string') {
+    return decodeBase64Url(input)
+  }
+
+  return encodeBase64Url(input)
+}
+
 /**
  * simple LRU
  */
@@ -978,7 +1025,7 @@ export async function processDiscoveryResponse(
  * Generates 32 random bytes and encodes them using base64url.
  */
 function randomBytes() {
-  return encodeBase64Url(crypto.getRandomValues(new Uint8Array(32)))
+  return b64u(crypto.getRandomValues(new Uint8Array(32)))
 }
 
 /**
@@ -1023,9 +1070,7 @@ export async function calculatePKCECodeChallenge(codeVerifier: string) {
     throw new TypeError('"codeVerifier" must be a non-empty string')
   }
 
-  const digest = await crypto.subtle.digest('SHA-256', encoder.encode(codeVerifier))
-
-  return encodeBase64Url(new Uint8Array(digest))
+  return b64u(await crypto.subtle.digest('SHA-256', buf(codeVerifier)))
 }
 
 interface NormalizedKeyInput {
@@ -1285,7 +1330,7 @@ async function clientSecretJwt(as: AuthorizationServer, client: Client, secret: 
 
   const key = await crypto.subtle.importKey(
     'raw',
-    encoder.encode(secret),
+    buf(secret),
     { name: 'HMAC', hash: `SHA-${alg.slice(-3)}` },
     false,
     ['sign'],
@@ -1412,13 +1457,9 @@ async function jwt(
   claimsSet: Record<string, unknown>,
   key: CryptoKey,
 ) {
-  const input = `${encodeBase64Url(encoder.encode(JSON.stringify(header)))}.${encodeBase64Url(
-    encoder.encode(JSON.stringify(claimsSet)),
-  )}`
-  const signature = encodeBase64Url(
-    new Uint8Array(
-      await crypto.subtle.sign(subtleAlgorithm(header.alg, key), key, encoder.encode(input)),
-    ),
+  const input = `${b64u(buf(JSON.stringify(header)))}.${b64u(buf(JSON.stringify(claimsSet)))}`
+  const signature = b64u(
+    await crypto.subtle.sign(subtleAlgorithm(header.alg, key), key, buf(input)),
   )
   return `${input}.${signature}`
 }
@@ -1501,7 +1542,7 @@ export async function issueRequestObject(
         sub: client.client_id,
         aud: as.issuer,
       },
-      encoder.encode(request),
+      buf(request),
       key,
     )
   }
@@ -1548,11 +1589,7 @@ async function dpopProofJwt(
       htm,
       nonce,
       htu: `${url.origin}${url.pathname}`,
-      ath: accessToken
-        ? encodeBase64Url(
-            new Uint8Array(await crypto.subtle.digest('SHA-256', encoder.encode(accessToken))),
-          )
-        : undefined,
+      ath: accessToken ? b64u(await crypto.subtle.digest('SHA-256', buf(accessToken))) : undefined,
     },
     privateKey,
   )
@@ -2205,14 +2242,13 @@ async function idTokenHash(jwsAlg: string, data: string) {
       throw new UnsupportedOperationError()
   }
 
-  const digest = new Uint8Array(await crypto.subtle.digest(algorithm, encoder.encode(data)))
-  return encodeBase64Url(digest.slice(0, digest.length / 2))
+  const digest = await crypto.subtle.digest(algorithm, buf(data))
+  return b64u(digest.slice(0, digest.byteLength / 2))
 }
 
 async function idTokenHashMatches(jwsAlg: string, data: string, actual: string) {
   const expected = await idTokenHash(jwsAlg, data)
-  const encoder = new TextEncoder()
-  return timingSafeEqual(encoder.encode(actual), encoder.encode(expected))
+  return timingSafeEqual(buf(actual), buf(expected))
 }
 
 async function authenticatedRequest(
@@ -2642,7 +2678,7 @@ function parsePayload(result: CompactVerifyResult): ParsedJWT {
   const { header, payload } = result
   let claims: any
   try {
-    claims = JSON.parse(decoder.decode(payload))
+    claims = JSON.parse(buf(payload))
   } catch {}
 
   if (!isTopLevelObject<JWTPayload>(claims)) {
@@ -3420,22 +3456,20 @@ async function validateJws(
   if (length !== 3) {
     throw new OPE('Invalid JWT')
   }
-  const header: CompactJWSHeaderParameters = JSON.parse(
-    decoder.decode(decodeBase64Url(protectedHeader)),
-  )
+  const header: CompactJWSHeaderParameters = JSON.parse(buf(b64u(protectedHeader)))
   const key = await getKey(header)
   const input = `${protectedHeader}.${payload}`
   const verified = await crypto.subtle.verify(
     subtleAlgorithm(header.alg, key),
     key,
-    decodeBase64Url(signature),
-    encoder.encode(input),
+    b64u(signature),
+    buf(input),
   )
   if (verified !== true) {
     throw new OPE('JWT signature verification failed')
   }
 
-  return { header, payload: decodeBase64Url(payload) }
+  return { header, payload: b64u(payload) }
 }
 
 /**
@@ -3793,30 +3827,30 @@ async function cbc(
 
 function concat(...buffers: Uint8Array[]): Uint8Array {
   const size = buffers.reduce((acc, { length }) => acc + length, 0)
-  const buf = new Uint8Array(size)
+  const res = new Uint8Array(size)
   let i = 0
   buffers.forEach((buffer) => {
-    buf.set(buffer, i)
+    res.set(buffer, i)
     i += buffer.length
   })
-  return buf
+  return res
 }
 
-function writeUInt32BE(buf: Uint8Array, value: number, offset?: number) {
+function writeUInt32BE(buffer: Uint8Array, value: number, offset?: number) {
   if (value < 0 || value >= MAX_INT32) {
     throw new RangeError(`value must be >= 0 and <= ${MAX_INT32 - 1}. Received ${value}`)
   }
-  buf.set([value >>> 24, value >>> 16, value >>> 8, value & 0xff], offset)
+  buffer.set([value >>> 24, value >>> 16, value >>> 8, value & 0xff], offset)
 }
 
 const MAX_INT32 = 2 ** 32
 function uint64be(value: number) {
   const high = Math.floor(value / MAX_INT32)
   const low = value % MAX_INT32
-  const buf = new Uint8Array(8)
-  writeUInt32BE(buf, high, 0)
-  writeUInt32BE(buf, low, 4)
-  return buf
+  const buffer = new Uint8Array(8)
+  writeUInt32BE(buffer, high, 0)
+  writeUInt32BE(buffer, low, 4)
+  return buffer
 }
 
 async function encrypt(
@@ -3841,9 +3875,9 @@ async function encrypt(
 }
 
 function uint32be(value: number) {
-  const buf = new Uint8Array(4)
-  writeUInt32BE(buf, value)
-  return buf
+  const res = new Uint8Array(4)
+  writeUInt32BE(res, value)
+  return res
 }
 
 function lengthAndInput(input: Uint8Array) {
@@ -3877,7 +3911,7 @@ async function ecdhEs(publicKey: CryptoKey, privateKey: CryptoKey, enc: string) 
     ),
   )
   const keydatalen = cekBitLength(enc)
-  const AlgorithmID = lengthAndInput(encoder.encode(enc))
+  const AlgorithmID = lengthAndInput(buf(enc))
   const PartyUInfo = lengthAndInput(new Uint8Array())
   const PartyVInfo = lengthAndInput(new Uint8Array())
   const SuppPubInfo = uint32be(keydatalen)
@@ -3928,13 +3962,11 @@ async function jwe(header: CompactJWEHeaderParameters, plaintext: Uint8Array, ke
 
   const iv = randomIv(header.enc)
 
-  const protectedHeader = encoder.encode(JSON.stringify(header))
-  const aad = encoder.encode(encodeBase64Url(protectedHeader))
+  const protectedHeader = buf(JSON.stringify(header))
+  const aad = buf(b64u(protectedHeader))
   const { ciphertext, tag } = await encrypt(header.enc, plaintext, cek, iv, aad)
 
-  return [protectedHeader, encryptedKey, iv, ciphertext, tag]
-    .map((part) => encodeBase64Url(part))
-    .join('.')
+  return [protectedHeader, encryptedKey, iv, ciphertext, tag].map((part) => b64u(part)).join('.')
 }
 
 async function importJwk(jwk: JWK) {
@@ -3967,29 +3999,6 @@ async function importJwk(jwk: JWK) {
   }
 
   return crypto.subtle.importKey('jwk', key, algorithm, true, ['verify'])
-}
-
-const CHUNK_SIZE = 0x8000
-function encodeBase64Url(input: Uint8Array) {
-  const arr = []
-  for (let i = 0; i < input.byteLength; i += CHUNK_SIZE) {
-    // @ts-expect-error
-    arr.push(String.fromCharCode.apply(null, input.subarray(i, i + CHUNK_SIZE)))
-  }
-  return btoa(arr.join('')).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_')
-}
-
-function decodeBase64Url(input: string) {
-  try {
-    const binary = atob(input.replace(/-/g, '+').replace(/_/g, '/').replace(/\s/g, ''))
-    const bytes = new Uint8Array(binary.length)
-    for (let i = 0; i < binary.length; i++) {
-      bytes[i] = binary.charCodeAt(i)
-    }
-    return bytes
-  } catch {
-    throw new TypeError('The input to be decoded is not correctly encoded.')
-  }
 }
 
 export interface DeviceAuthorizationRequestOptions
