@@ -2144,21 +2144,16 @@ export async function processUserInfoResponse(
       throw new TypeError('"issuer.jwks_uri" must be a string')
     }
 
-    const { claims } = await validateJws(
+    const { claims } = await validateJwt(
       await preserveBodyStream(response).text(),
+      checkSigningAlgorithm.bind(
+        undefined,
+        client.userinfo_signed_response_alg,
+        as.userinfo_signing_alg_values_supported,
+        'RS256',
+      ),
       getPublicSigKeyFromIssuerJwksUri.bind(undefined, as, options?.signal),
     )
-      .then(
-        checkSigningAlgorithm.bind(
-          undefined,
-          client.userinfo_signed_response_alg,
-          as.userinfo_signing_alg_values_supported,
-          'RS256',
-        ),
-      )
-      .then(checkJwtCrit)
-      .then(parsePayload)
-      .then(validateClaimTypesAndTimestamps)
       .then(validateOptionalAudience.bind(undefined, as.issuer))
       .then(validateOptionalIssuer.bind(undefined, client.client_id))
 
@@ -2448,20 +2443,16 @@ async function processGenericAccessTokenResponse(
         throw new TypeError('"issuer.jwks_uri" must be a string')
       }
 
-      const { header, claims } = await validateJws(
+      const { header, claims } = await validateJwt(
         json.id_token,
+        checkSigningAlgorithm.bind(
+          undefined,
+          client.id_token_signed_response_alg,
+          as.id_token_signing_alg_values_supported,
+          'RS256',
+        ),
         getPublicSigKeyFromIssuerJwksUri.bind(undefined, as, options?.signal),
       )
-        .then(
-          checkSigningAlgorithm.bind(
-            undefined,
-            client.id_token_signed_response_alg,
-            as.id_token_signing_alg_values_supported,
-            'RS256',
-          ),
-        )
-        .then(checkJwtCrit)
-        .then(parsePayload)
         .then(
           validatePresence.bind(undefined, [
             ['iss', 'issuer'],
@@ -2471,7 +2462,6 @@ async function processGenericAccessTokenResponse(
             ['exp', 'expiration time'],
           ]),
         )
-        .then(validateClaimTypesAndTimestamps)
         .then(validateIssuer.bind(undefined, as.issuer))
         .then(validateAudience.bind(undefined, client.client_id))
 
@@ -2664,73 +2654,9 @@ interface CompactJWEHeaderParameters {
   epk?: JWK
 }
 
-interface CompactVerifyResult {
-  header: CompactJWSHeaderParameters
-  payload: Uint8Array
-}
-
 interface ParsedJWT {
   header: CompactJWSHeaderParameters
   claims: JWTPayload
-}
-
-function parsePayload(result: CompactVerifyResult): ParsedJWT {
-  const { header, payload } = result
-  let claims: any
-  try {
-    claims = JSON.parse(buf(payload))
-  } catch {}
-
-  if (!isTopLevelObject<JWTPayload>(claims)) {
-    throw new OPE('JWT Payload must be a top level object')
-  }
-  return { header, claims }
-}
-
-function validateClaimTypesAndTimestamps(result: ParsedJWT) {
-  const { claims } = result
-
-  const now = currentTimestamp()
-  const tolerance = 30 // TODO: tolerance config
-
-  if (claims.exp !== undefined) {
-    if (typeof claims.exp !== 'number') {
-      throw new OPE('invalid JWT "exp" (expiration time)')
-    }
-
-    if (claims.exp <= now - tolerance) {
-      throw new OPE('JWT "exp" (expiration time) timestamp is <= now()')
-    }
-  }
-
-  if (claims.iat !== undefined) {
-    if (typeof claims.iat !== 'number') {
-      throw new OPE('invalid JWT "iat" (issued at)')
-    }
-  }
-
-  if (claims.iss !== undefined) {
-    if (typeof claims.iss !== 'string') {
-      throw new OPE('invalid JWT "iss" (issuer)')
-    }
-  }
-
-  if (claims.nbf !== undefined) {
-    if (typeof claims.nbf !== 'number') {
-      throw new OPE('invalid JWT "nbf" (not before)')
-    }
-    if (claims.nbf > now + tolerance) {
-      throw new OPE('JWT "nbf" (not before) timestamp is > now()')
-    }
-  }
-
-  if (claims.aud !== undefined) {
-    if (typeof claims.aud !== 'string' && !Array.isArray(claims.aud)) {
-      throw new OPE('invalid JWT "aud" (audience)')
-    }
-  }
-
-  return result
 }
 
 type Entries = [string, string]
@@ -2927,17 +2853,9 @@ export async function processAuthorizationCodeOAuth2Response(
   return <OAuth2TokenEndpointResponse>result
 }
 
-function checkJwtType(expected: string, result: CompactVerifyResult) {
+function checkJwtType(expected: string, result: ParsedJWT) {
   if (typeof result.header.typ !== 'string' || normalizeTyp(result.header.typ) !== expected) {
     throw new OPE('unexpected JWT "typ" header parameter value')
-  }
-
-  return result
-}
-
-function checkJwtCrit(result: CompactVerifyResult) {
-  if (result.header.crit !== undefined) {
-    throw new OPE('unexpected JWT "crit" header parameter')
   }
 
   return result
@@ -3232,21 +3150,17 @@ export async function processIntrospectionResponse(
       throw new TypeError('"issuer.jwks_uri" must be a string')
     }
 
-    const { claims } = await validateJws(
+    const { claims } = await validateJwt(
       await preserveBodyStream(response).text(),
+      checkSigningAlgorithm.bind(
+        undefined,
+        client.introspection_signed_response_alg,
+        as.introspection_signing_alg_values_supported,
+        'RS256',
+      ),
       getPublicSigKeyFromIssuerJwksUri.bind(undefined, as, options?.signal),
     )
-      .then(
-        checkSigningAlgorithm.bind(
-          undefined,
-          client.introspection_signed_response_alg,
-          as.introspection_signing_alg_values_supported,
-          'RS256',
-        ),
-      )
-      .then(checkJwtCrit)
       .then(checkJwtType.bind(undefined, 'token-introspection+jwt'))
-      .then(parsePayload)
       .then(
         validatePresence.bind(undefined, [
           ['iss', 'issuer'],
@@ -3254,7 +3168,6 @@ export async function processIntrospectionResponse(
           ['iat', 'issued at'],
         ]),
       )
-      .then(validateClaimTypesAndTimestamps)
       .then(validateIssuer.bind(undefined, as.issuer))
       .then(validateAudience.bind(undefined, client.client_id))
 
@@ -3443,12 +3356,13 @@ function subtleAlgorithm(
 }
 
 /**
- * Minimal JWS verify() implementation.
+ * Minimal JWT validation implementation.
  */
-async function validateJws(
+async function validateJwt(
   jws: string,
+  checkAlg: (h: CompactJWSHeaderParameters) => void,
   getKey: (h: CompactJWSHeaderParameters) => Promise<CryptoKey>,
-): Promise<CompactVerifyResult> {
+): Promise<ParsedJWT> {
   const { 0: protectedHeader, 1: payload, 2: signature, length } = jws.split('.')
   if (length === 5) {
     throw new UnsupportedOperationError('JWE structure JWTs are not supported')
@@ -3457,6 +3371,10 @@ async function validateJws(
     throw new OPE('Invalid JWT')
   }
   const header: CompactJWSHeaderParameters = JSON.parse(buf(b64u(protectedHeader)))
+  checkAlg(header)
+  if (header.crit !== undefined) {
+    throw new OPE('unexpected JWT "crit" header parameter')
+  }
   const key = await getKey(header)
   const input = `${protectedHeader}.${payload}`
   const verified = await crypto.subtle.verify(
@@ -3469,7 +3387,56 @@ async function validateJws(
     throw new OPE('JWT signature verification failed')
   }
 
-  return { header, payload: b64u(payload) }
+  let claims: unknown
+  try {
+    claims = JSON.parse(buf(b64u(payload)))
+  } catch {}
+
+  if (!isTopLevelObject<JWTPayload>(claims)) {
+    throw new OPE('JWT Payload must be a top level object')
+  }
+
+  const now = currentTimestamp()
+  const tolerance = 30 // TODO: tolerance config
+
+  if (claims.exp !== undefined) {
+    if (typeof claims.exp !== 'number') {
+      throw new OPE('invalid JWT "exp" (expiration time)')
+    }
+
+    if (claims.exp <= now - tolerance) {
+      throw new OPE('JWT "exp" (expiration time) timestamp is <= now()')
+    }
+  }
+
+  if (claims.iat !== undefined) {
+    if (typeof claims.iat !== 'number') {
+      throw new OPE('invalid JWT "iat" (issued at)')
+    }
+  }
+
+  if (claims.iss !== undefined) {
+    if (typeof claims.iss !== 'string') {
+      throw new OPE('invalid JWT "iss" (issuer)')
+    }
+  }
+
+  if (claims.nbf !== undefined) {
+    if (typeof claims.nbf !== 'number') {
+      throw new OPE('invalid JWT "nbf" (not before)')
+    }
+    if (claims.nbf > now + tolerance) {
+      throw new OPE('JWT "nbf" (not before) timestamp is > now()')
+    }
+  }
+
+  if (claims.aud !== undefined) {
+    if (typeof claims.aud !== 'string' && !Array.isArray(claims.aud)) {
+      throw new OPE('invalid JWT "aud" (audience)')
+    }
+  }
+
+  return { header, claims }
 }
 
 /**
@@ -3511,20 +3478,16 @@ export async function validateJwtAuthResponse(
     throw new TypeError('"issuer.jwks_uri" must be a string')
   }
 
-  const { claims } = await validateJws(
+  const { claims } = await validateJwt(
     response,
+    checkSigningAlgorithm.bind(
+      undefined,
+      client.authorization_signed_response_alg,
+      as.authorization_signing_alg_values_supported,
+      'RS256',
+    ),
     getPublicSigKeyFromIssuerJwksUri.bind(undefined, as, options?.signal),
   )
-    .then(
-      checkSigningAlgorithm.bind(
-        undefined,
-        client.authorization_signed_response_alg,
-        as.authorization_signing_alg_values_supported,
-        'RS256',
-      ),
-    )
-    .then(checkJwtCrit)
-    .then(parsePayload)
     .then(
       validatePresence.bind(undefined, [
         ['iss', 'issuer'],
@@ -3532,7 +3495,6 @@ export async function validateJwtAuthResponse(
         ['exp', 'expiration time'],
       ]),
     )
-    .then(validateClaimTypesAndTimestamps)
     .then(validateIssuer.bind(undefined, as.issuer))
     .then(validateAudience.bind(undefined, client.client_id))
 
@@ -3556,28 +3518,27 @@ function checkSigningAlgorithm(
   client: string | undefined,
   issuer: string[] | undefined,
   fallback: string,
-  result: CompactVerifyResult,
+  header: CompactJWSHeaderParameters,
 ) {
   switch (true) {
     case client !== undefined: {
-      if (result.header.alg !== client) {
+      if (header.alg !== client) {
         throw new OPE('unexpected JWT "alg" header parameter')
       }
       break
     }
     case Array.isArray(issuer): {
-      if ((<string[]>issuer).includes(result.header.alg) === false) {
+      if ((<string[]>issuer).includes(header.alg) === false) {
         throw new OPE('unexpected JWT "alg" header parameter')
       }
       break
     }
     default: {
-      if (result.header.alg !== fallback) {
+      if (header.alg !== fallback) {
         throw new OPE('unexpected JWT "alg" header parameter')
       }
     }
   }
-  return result
 }
 
 /**
