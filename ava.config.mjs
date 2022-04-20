@@ -10,5 +10,6 @@ export default {
     '--enable-source-maps',
     '--no-warnings',
     '--conditions=browser',
+    '--no-experimental-fetch',
   ],
 }
