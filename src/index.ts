@@ -89,10 +89,6 @@ export type TokenEndpointAuthMethod =
 /**
  * Supported JWS "alg" Algorithm identifiers.
  *
- * Compatibility notes:
- * - ES512 is not supported Safari 14 and older (03/2022)
- * - ES512 is not supported iOS/iPadOS 14 and older (03/2022)
- *
  * @example PS256 CryptoKey algorithm
  * ```ts
  * interface Ps256Algorithm extends RsaHashedKeyAlgorithm {
@@ -116,93 +112,22 @@ export type TokenEndpointAuthMethod =
  *   hash: { name: 'SHA-256' }
  * }
  * ```
- *
- * @example PS384 CryptoKey algorithm
- * ```ts
- * interface Ps384Algorithm extends RsaHashedKeyAlgorithm {
- *   name: 'RSA-PSS'
- *   hash: { name: 'SHA-384' }
- * }
- * ```
- *
- * @example ES384 CryptoKey algorithm
- * ```ts
- * interface Es384Algorithm extends EcKeyAlgorithm {
- *   name: 'ECDSA'
- *   namedCurve: 'P-384'
- * }
- * ```
- *
- * @example RS384 CryptoKey algorithm
- * ```ts
- * interface Rs384Algorithm extends RsaHashedKeyAlgorithm {
- *   name: 'RSASSA-PKCS1-v1_5'
- *   hash: { name: 'SHA-384' }
- * }
- * ```
- *
- * @example PS512 CryptoKey algorithm
- * ```ts
- * interface Ps512Algorithm extends RsaHashedKeyAlgorithm {
- *   name: 'RSA-PSS'
- *   hash: { name: 'SHA-512' }
- * }
- * ```
- *
- * @example ES512 CryptoKey algorithm
- * ```ts
- * interface Es512Algorithm extends EcKeyAlgorithm {
- *   name: 'ECDSA'
- *   namedCurve: 'P-521'
- * }
- * ```
- *
- * @example RS512 CryptoKey algorithm
- * ```ts
- * interface Rs512Algorithm extends RsaHashedKeyAlgorithm {
- *   name: 'RSASSA-PKCS1-v1_5'
- *   hash: { name: 'SHA-512' }
- * }
- * ```
  */
-export type JWSAlgorithm =
-  | 'PS256'
-  | 'ES256'
-  | 'RS256'
-  | 'PS384'
-  | 'ES384'
-  | 'RS384'
-  | 'PS512'
-  | 'ES512'
-  | 'RS512'
+export type JWSAlgorithm = 'PS256' | 'ES256' | 'RS256'
 
 /**
  * Supported JWE "enc" Content Encryption Algorithm identifiers.
- *
- * Compatibility notes:
- * - A192GCM is not supported in Chromium-based runtimes (03/2022)
- * - A192CBC-HS384 is not supported in Chromium-based runtimes (03/2022)
  */
-export type ContentEncryptionAlgorithm =
-  | 'A128GCM'
-  | 'A192GCM'
-  | 'A256GCM'
-  | 'A128CBC-HS256'
-  | 'A192CBC-HS384'
-  | 'A256CBC-HS512'
+export type ContentEncryptionAlgorithm = 'A128GCM' | 'A256GCM' | 'A128CBC-HS256' | 'A256CBC-HS512'
 
 /**
  * Supported JWE "alg" Key Management Algorithm identifier.
- *
- * Compatibility notes:
- * - ECDH-ES using NIST curve P-521 is not supported Safari 14 and older (03/2022)
- * - ECDH-ES using NIST curve P-521 is not supported iOS/iPadOS 14 and older (03/2022)
  *
  * @example ECDH-ES CryptoKey algorithm
  * ```ts
  * interface EcdhEsAlgorithm extends EcKeyAlgorithm {
  *   name: 'ECDH'
- *   namedCurve: 'P-256' | 'P-384' | 'P-521'
+ *   namedCurve: 'P-256'
  * }
  * ```
  *
@@ -221,29 +146,8 @@ export type ContentEncryptionAlgorithm =
  *   hash: { name: 'SHA-256' }
  * }
  * ```
- *
- * @example RSA-OAEP-384 CryptoKey algorithm
- * ```ts
- * interface RsaOaep384Algorithm extends RsaHashedKeyAlgorithm {
- *   name: 'RSA-OAEP'
- *   hash: { name: 'SHA-384' }
- * }
- * ```
- *
- * @example RSA-OAEP-512 CryptoKey algorithm
- * ```ts
- * interface RsaOaep512Algorithm extends RsaHashedKeyAlgorithm {
- *   name: 'RSA-OAEP'
- *   hash: { name: 'SHA-512' }
- * }
- * ```
  */
-export type KeyManagementAlgorithm =
-  | 'ECDH-ES'
-  | 'RSA-OAEP'
-  | 'RSA-OAEP-256'
-  | 'RSA-OAEP-384'
-  | 'RSA-OAEP-512'
+export type KeyManagementAlgorithm = 'ECDH-ES' | 'RSA-OAEP' | 'RSA-OAEP-256'
 
 export interface JWK {
   // common
@@ -616,8 +520,6 @@ export interface MTLSEndpointAliases
   readonly [metadata: string]: unknown
 }
 
-export type HMACAlgorithms = 'HS256' | 'HS384' | 'HS512'
-
 /**
  * Recognized Client Metadata that have an effect on the exposed functionality.
  *
@@ -668,14 +570,6 @@ export interface Client {
    * Default Maximum Authentication Age.
    */
   default_max_age?: number
-  /**
-   * Symmetric JWS "alg" Algorithm for `client_secret_jwt`
-   * {@link TokenEndpointAuthMethod authentication method}. It is not used
-   * for `private_key_jwt` due to use of
-   * {@link https://developer.mozilla.org/en-US/docs/Web/API/CryptoKey CryptoKey}
-   * instances that can have a particular "alg" inferred.
-   */
-  token_endpoint_auth_signing_alg?: HMACAlgorithms
 
   [metadata: string]: unknown
 }
@@ -824,32 +718,14 @@ function isPublicKey(key: unknown): key is CryptoKey {
 
 export type ProcessingMode = 'oidc' | 'oauth2'
 
-const SUPPORTED_JWS_ALGS: JWSAlgorithm[] = [
-  'PS256',
-  'PS384',
-  'PS512',
-  'ES256',
-  'ES384',
-  'ES512',
-  'RS256',
-  'RS384',
-  'RS512',
-]
+const SUPPORTED_JWS_ALGS: JWSAlgorithm[] = ['PS256', 'ES256', 'RS256']
 
-const SUPPORTED_JWE_ALGS: KeyManagementAlgorithm[] = [
-  'ECDH-ES',
-  'RSA-OAEP',
-  'RSA-OAEP-256',
-  'RSA-OAEP-384',
-  'RSA-OAEP-512',
-]
+const SUPPORTED_JWE_ALGS: KeyManagementAlgorithm[] = ['ECDH-ES', 'RSA-OAEP', 'RSA-OAEP-256']
 
 const SUPPORTED_JWE_ENCS: ContentEncryptionAlgorithm[] = [
   'A128GCM',
-  'A192GCM',
   'A256GCM',
   'A128CBC-HS256',
-  'A192CBC-HS384',
   'A256CBC-HS512',
 ]
 
@@ -1167,10 +1043,6 @@ function rsaPssAlg(key: CryptoKey) {
   switch ((<RsaHashedKeyAlgorithm>key.algorithm).hash.name) {
     case 'SHA-256':
       return 'PS256'
-    case 'SHA-384':
-      return 'PS384'
-    case 'SHA-512':
-      return 'PS512'
     default:
       throw new UnsupportedOperationError('unsupported RsaHashedKeyAlgorithm hash name')
   }
@@ -1184,10 +1056,6 @@ function rsAlg(key: CryptoKey) {
   switch ((<RsaHashedKeyAlgorithm>key.algorithm).hash.name) {
     case 'SHA-256':
       return 'RS256'
-    case 'SHA-384':
-      return 'RS384'
-    case 'SHA-512':
-      return 'RS512'
     default:
       throw new UnsupportedOperationError('unsupported RsaHashedKeyAlgorithm hash name')
   }
@@ -1200,10 +1068,6 @@ function esAlg(key: CryptoKey) {
   switch ((<EcKeyAlgorithm>key.algorithm).namedCurve) {
     case 'P-256':
       return 'ES256'
-    case 'P-384':
-      return 'ES384'
-    case 'P-521':
-      return 'ES512'
     default:
       throw new UnsupportedOperationError('unsupported EcKeyAlgorithm namedCurve')
   }
@@ -1236,10 +1100,6 @@ function oaepAlg(key: CryptoKey) {
       return 'RSA-OAEP'
     case 'SHA-256':
       return 'RSA-OAEP-256'
-    case 'SHA-384':
-      return 'RSA-OAEP-384'
-    case 'SHA-512':
-      return 'RSA-OAEP-512'
     default:
       throw new UnsupportedOperationError('unsupported RsaHashedKeyAlgorithm hash name')
   }
@@ -1253,9 +1113,7 @@ function jweAlg(key: CryptoKey) {
   switch (key.algorithm.name) {
     case 'ECDH':
       switch ((<EcKeyAlgorithm>key.algorithm).namedCurve) {
-        case 'P-256': // Fall through
-        case 'P-384': // Fall through
-        case 'P-521':
+        case 'P-256':
           return 'ECDH-ES'
         default:
           throw new UnsupportedOperationError('unsupported EcKeyAlgorithm namedCurve')
@@ -1308,35 +1166,20 @@ async function privateKeyJwt(
   )
 }
 
-function isHmac(alg: unknown): alg is 'HS256' | 'HS384' | 'HS512' {
-  return alg === 'HS256' || alg === 'HS384' || alg === 'HS512'
-}
-
 /**
- * Generates a unique client assertion to be used in `client_secret_jwt`
+ * Generates a unique client assertion to be used in HS256 `client_secret_jwt`
  * authenticated requests.
  */
 async function clientSecretJwt(as: AuthorizationServer, client: Client, secret: string) {
-  const alg =
-    client.token_endpoint_auth_signing_alg ??
-    (Array.isArray(as.token_endpoint_auth_signing_alg_values_supported) &&
-      as.token_endpoint_auth_signing_alg_values_supported.find(isHmac))
-
-  if (!isHmac(alg)) {
-    throw new OPE(
-      'could not determine client_secret_jwt JWS "alg" algorithm, client.token_endpoint_auth_signing_alg must be configured',
-    )
-  }
-
   const key = await crypto.subtle.importKey(
     'raw',
     buf(secret),
-    { name: 'HMAC', hash: `SHA-${alg.slice(-3)}` },
+    { name: 'HMAC', hash: 'SHA-256' },
     false,
     ['sign'],
   )
 
-  return jwt({ alg }, clientAssertion(as, client), key)
+  return jwt({ alg: 'HS256' }, clientAssertion(as, client), key)
 }
 
 function assertIssuer(metadata: AuthorizationServer): metadata is AuthorizationServer {
@@ -1458,9 +1301,7 @@ async function jwt(
   key: CryptoKey,
 ) {
   const input = `${b64u(buf(JSON.stringify(header)))}.${b64u(buf(JSON.stringify(claimsSet)))}`
-  const signature = b64u(
-    await crypto.subtle.sign(subtleAlgorithm(header.alg, key), key, buf(input)),
-  )
+  const signature = b64u(await crypto.subtle.sign(subtleAlgorithm(key), key, buf(input)))
   return `${input}.${signature}`
 }
 
@@ -2050,12 +1891,6 @@ async function getPublicSigKeyFromIssuerJwksUri(
         case 'ES256':
           candidate = jwk.crv === 'P-256'
           break
-        case 'ES384':
-          candidate = jwk.crv === 'P-384'
-          break
-        case 'ES512':
-          candidate = jwk.crv === 'P-521'
-          break
       }
     }
 
@@ -2222,16 +2057,6 @@ async function idTokenHash(jwsAlg: string, data: string) {
     case 'PS256': // Fall through
     case 'ES256':
       algorithm = 'SHA-256'
-      break
-    case 'RS384': // Fall through
-    case 'PS384': // Fall through
-    case 'ES384':
-      algorithm = 'SHA-384'
-      break
-    case 'RS512': // Fall through
-    case 'PS512': // Fall through
-    case 'ES512':
-      algorithm = 'SHA-512'
       break
     default:
       throw new UnsupportedOperationError()
@@ -2631,7 +2456,7 @@ export interface IDToken extends JWTPayload {
 }
 
 interface ClientSecretJWTHeaderParameters {
-  alg: 'HS256' | 'HS384' | 'HS512'
+  alg: 'HS256'
 }
 
 interface CompactJWSHeaderParameters {
@@ -3333,18 +3158,15 @@ function checkRsaKeyAlgorithm(algorithm: RsaKeyAlgorithm) {
   }
 }
 
-function subtleAlgorithm(
-  alg: string,
-  key: CryptoKey,
-): AlgorithmIdentifier | RsaPssParams | EcdsaParams {
+function subtleAlgorithm(key: CryptoKey): AlgorithmIdentifier | RsaPssParams | EcdsaParams {
   switch (key.algorithm.name) {
     case 'ECDSA':
-      return <EcdsaParams>{ name: key.algorithm.name, hash: `SHA-${alg.slice(-3)}` }
+      return <EcdsaParams>{ name: key.algorithm.name, hash: 'SHA-256' }
     case 'RSA-PSS':
       checkRsaKeyAlgorithm(<RsaKeyAlgorithm>key.algorithm)
       return <RsaPssParams>{
         name: key.algorithm.name,
-        saltLength: parseInt(alg.slice(-3), 10) >> 3,
+        saltLength: 256 >> 3,
       }
     case 'RSASSA-PKCS1-v1_5':
       checkRsaKeyAlgorithm(<RsaKeyAlgorithm>key.algorithm)
@@ -3378,7 +3200,7 @@ async function validateJwt(
   const key = await getKey(header)
   const input = `${protectedHeader}.${payload}`
   const verified = await crypto.subtle.verify(
-    subtleAlgorithm(header.alg, key),
+    subtleAlgorithm(key),
     key,
     b64u(signature),
     buf(input),
@@ -3678,13 +3500,9 @@ function cekBitLength(enc: string) {
   switch (enc) {
     case 'A128GCM':
       return 128
-    case 'A192GCM':
-      return 192
     case 'A256GCM': // Fall through
     case 'A128CBC-HS256':
       return 256
-    case 'A192CBC-HS384':
-      return 384
     case 'A256CBC-HS512':
       return 512
     default:
@@ -3699,12 +3517,10 @@ function randomIv(enc: string) {
   let bitLength: number
   switch (enc) {
     case 'A128GCM': // Fall through
-    case 'A192GCM': // Fall through
     case 'A256GCM':
       bitLength = 96
       break
     case 'A128CBC-HS256': // Fall through
-    case 'A192CBC-HS384': // Fall through
     case 'A256CBC-HS512':
       bitLength = 128
       break
@@ -3823,11 +3639,9 @@ async function encrypt(
 ) {
   switch (enc) {
     case 'A128CBC-HS256': // Fall through
-    case 'A192CBC-HS384': // Fall through
     case 'A256CBC-HS512':
       return cbc(enc, plaintext, cek, iv, aad)
     case 'A128GCM': // Fall through
-    case 'A192GCM': // Fall through
     case 'A256GCM':
       return gcm(plaintext, cek, iv, aad)
     default:
@@ -3851,10 +3665,6 @@ function deriveBitsLength(algorithm: KeyAlgorithm) {
       switch ((<EcKeyAlgorithm>algorithm).namedCurve) {
         case 'P-256':
           return 256
-        case 'P-384':
-          return 384
-        case 'P-521':
-          return 528
       }
       throw new UnsupportedOperationError()
     }
@@ -3898,7 +3708,7 @@ async function ecdhEs(publicKey: CryptoKey, privateKey: CryptoKey, enc: string) 
 async function jwe(header: CompactJWEHeaderParameters, plaintext: Uint8Array, key: CryptoKey) {
   let cek: Uint8Array
   let encryptedKey: Uint8Array
-  switch (header.alg) {
+  switch (<KeyManagementAlgorithm>header.alg) {
     case 'ECDH-ES': {
       const epk = <CryptoKeyPair>(
         await crypto.subtle.generateKey(key.algorithm, false, ['deriveBits'])
@@ -3910,9 +3720,7 @@ async function jwe(header: CompactJWEHeaderParameters, plaintext: Uint8Array, ke
       break
     }
     case 'RSA-OAEP': // Fall through
-    case 'RSA-OAEP-256': // Fall through
-    case 'RSA-OAEP-384': // Fall through
-    case 'RSA-OAEP-512': {
+    case 'RSA-OAEP-256': {
       cek = randomCek(header.enc)
       encryptedKey = await oaepWrap(cek, key)
       break
@@ -3936,24 +3744,14 @@ async function importJwk(jwk: JWK) {
   let algorithm: RsaHashedImportParams | EcKeyImportParams
 
   switch (alg) {
-    case 'PS256': // Fall through
-    case 'PS384': // Fall through
-    case 'PS512':
-      algorithm = { name: 'RSA-PSS', hash: `SHA-${alg.slice(-3)}` }
+    case 'PS256':
+      algorithm = { name: 'RSA-PSS', hash: 'SHA-256' }
       break
-    case 'RS256': // Fall through
-    case 'RS384': // Fall through
-    case 'RS512':
-      algorithm = { name: 'RSASSA-PKCS1-v1_5', hash: `SHA-${alg.slice(-3)}` }
+    case 'RS256':
+      algorithm = { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }
       break
     case 'ES256':
       algorithm = { name: 'ECDSA', namedCurve: 'P-256' }
-      break
-    case 'ES384':
-      algorithm = { name: 'ECDSA', namedCurve: 'P-384' }
-      break
-    case 'ES512':
-      algorithm = { name: 'ECDSA', namedCurve: 'P-521' }
       break
     default:
       throw new UnsupportedOperationError()

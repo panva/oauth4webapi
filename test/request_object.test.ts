@@ -8,12 +8,12 @@ const test = anyTest as TestFn<{ [alg: string]: CryptoKeyPair }>
 
 test.before(async (t) => {
   for (const alg of ['RS', 'ES', 'PS']
-    .map((s) => [`${s}256`, `${s}384`, `${s}512`])
+    .map((s) => [`${s}256`])
     .flat()
-    .concat(['RSA-OAEP', 'RSA-OAEP-256', 'RSA-OAEP-384', 'RSA-OAEP-512'])) {
+    .concat(['RSA-OAEP', 'RSA-OAEP-256'])) {
     t.context[alg] = <CryptoKeyPair>await jose.generateKeyPair(alg)
   }
-  for (const namedCurve of ['P-256', 'P-384', 'P-521']) {
+  for (const namedCurve of ['P-256']) {
     t.context[`ECDH-ES+${namedCurve}`] = <CryptoKeyPair>(
       await jose.generateKeyPair('ECDH-ES', { crv: namedCurve })
     )
@@ -88,7 +88,7 @@ test('issueRequestObject() - multiple resource parameters', async (t) => {
   t.deepEqual(resource, ['urn:example:resource', 'urn:example:resource-2'])
 })
 
-for (const alg of ['RS', 'ES', 'PS'].map((s) => [`${s}256`, `${s}384`, `${s}512`]).flat()) {
+for (const alg of ['RS', 'ES', 'PS'].map((s) => [`${s}256`]).flat()) {
   test(`issueRequestObject() signed using ${alg}`, async (t) => {
     const sign = t.context[alg]
     const jwt = await lib.issueRequestObject(issuer, client, new URLSearchParams(), {
@@ -99,18 +99,11 @@ for (const alg of ['RS', 'ES', 'PS'].map((s) => [`${s}256`, `${s}384`, `${s}512`
   })
 }
 
-for (const alg of <lib.KeyManagementAlgorithm[]>[
-  'RSA-OAEP',
-  'RSA-OAEP-256',
-  'RSA-OAEP-384',
-  'RSA-OAEP-512',
-]) {
+for (const alg of <lib.KeyManagementAlgorithm[]>['RSA-OAEP', 'RSA-OAEP-256']) {
   for (const enc of <lib.ContentEncryptionAlgorithm[]>[
     'A128GCM',
-    'A192GCM',
     'A256GCM',
     'A128CBC-HS256',
-    'A192CBC-HS384',
     'A256CBC-HS512',
   ]) {
     test(`issueRequestObject() encrypted using alg: ${alg}, enc: ${enc}`, async (t) => {
@@ -130,13 +123,11 @@ for (const alg of <lib.KeyManagementAlgorithm[]>[
   }
 }
 
-for (const namedCurve of ['P-256', 'P-384', 'P-521']) {
+for (const namedCurve of ['P-256']) {
   for (const enc of <lib.ContentEncryptionAlgorithm[]>[
     'A128GCM',
-    'A192GCM',
     'A256GCM',
     'A128CBC-HS256',
-    'A192CBC-HS384',
     'A256CBC-HS512',
   ]) {
     test(`issueRequestObject() encrypted using alg: ECDH-ES, crv: ${namedCurve}, enc: ${enc}`, async (t) => {

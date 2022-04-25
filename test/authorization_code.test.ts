@@ -10,7 +10,7 @@ test.before(setup)
 test.after(teardown)
 
 test.before(async (t) => {
-  for (const alg of ['RS', 'ES', 'PS'].map((s) => [`${s}256`, `${s}384`, `${s}512`]).flat()) {
+  for (const alg of ['RS', 'ES', 'PS'].map((s) => [`${s}256`]).flat()) {
     t.context[alg] = <CryptoKeyPair>await jose.generateKeyPair(alg)
   }
 
@@ -22,7 +22,7 @@ test.before(async (t) => {
     .reply(200, {
       keys: await Promise.all(
         ['RS', 'ES', 'PS']
-          .map((s) => [`${s}256`, `${s}384`, `${s}512`])
+          .map((s) => [`${s}256`])
           .flat()
           .map((alg) =>
             jose.exportJWK(t.context[alg].publicKey).then((jwk) => {
@@ -471,7 +471,7 @@ test('processAuthorizationCodeOpenIDResponse() with an ID Token typ: "applicatio
   )
 })
 
-for (const alg of ['RS', 'ES', 'PS'].map((s) => [`${s}256`, `${s}384`, `${s}512`]).flat()) {
+for (const alg of ['RS', 'ES', 'PS'].map((s) => [`${s}256`]).flat()) {
   test(`processAuthorizationCodeOpenIDResponse() with an ${alg} ID Token`, async (t) => {
     const tIssuer: lib.AuthorizationServer = {
       ...issuer,
@@ -485,16 +485,6 @@ for (const alg of ['RS', 'ES', 'PS'].map((s) => [`${s}256`, `${s}384`, `${s}512`
       case 'PS256':
       case 'ES256':
         at_hash = 'xsZZrUssMXjL3FBlzoSh2g'
-        break
-      case 'RS384':
-      case 'PS384':
-      case 'ES384':
-        at_hash = 'adt46pcdiB-l6eTNifgoVM-5AIJAxq84'
-        break
-      case 'RS512':
-      case 'PS512':
-      case 'ES512':
-        at_hash = 'p2LHG4H-8pYDc0hyVOo3iIHvZJUqe9tbj3jESOuXbkY'
         break
       default:
         throw new Error('not implemented')

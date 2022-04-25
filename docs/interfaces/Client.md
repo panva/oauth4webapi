@@ -17,7 +17,6 @@ Recognized Client Metadata that have an effect on the exposed functionality.
 - [request\_object\_encryption\_enc](Client.md#request_object_encryption_enc)
 - [require\_auth\_time](Client.md#require_auth_time)
 - [token\_endpoint\_auth\_method](Client.md#token_endpoint_auth_method)
-- [token\_endpoint\_auth\_signing\_alg](Client.md#token_endpoint_auth_signing_alg)
 - [userinfo\_signed\_response\_alg](Client.md#userinfo_signed_response_alg)
 
 ## Properties
@@ -95,18 +94,6 @@ ___
 
 Client [authentication method](../types/TokenEndpointAuthMethod.md) for the
 client's authenticated requests.
-
-___
-
-### token\_endpoint\_auth\_signing\_alg
-
-• `Optional` **token\_endpoint\_auth\_signing\_alg**: [`HMACAlgorithms`](../types/HMACAlgorithms.md)
-
-Symmetric JWS "alg" Algorithm for `client_secret_jwt`
-[authentication method](../types/TokenEndpointAuthMethod.md). It is not used
-for `private_key_jwt` due to use of
-[CryptoKey](https://developer.mozilla.org/en-US/docs/Web/API/CryptoKey)
-instances that can have a particular "alg" inferred.
 
 ___
 
