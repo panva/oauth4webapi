@@ -1300,6 +1300,11 @@ async function jwt(
   claimsSet: Record<string, unknown>,
   key: CryptoKey,
 ) {
+  if (key.usages.includes('sign') === false) {
+    throw new TypeError(
+      'private CryptoKey instances used for signing assertions must include "sign" in their "usages"',
+    )
+  }
   const input = `${b64u(buf(JSON.stringify(header)))}.${b64u(buf(JSON.stringify(claimsSet)))}`
   const signature = b64u(await crypto.subtle.sign(subtleAlgorithm(key), key, buf(input)))
   return `${input}.${signature}`
