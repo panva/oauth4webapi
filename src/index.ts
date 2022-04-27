@@ -1,5 +1,5 @@
 const NAME = 'oauth4webapi'
-const VERSION = 'v0.5.0'
+const VERSION = 'v0.5.1'
 const HOMEPAGE = 'https://github.com/panva/oauth4webapi'
 const USER_AGENT = `${NAME}/${VERSION} (${HOMEPAGE})`
 

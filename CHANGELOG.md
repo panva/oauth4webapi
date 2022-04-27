@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.5.1](https://github.com/panva/oauth4webapi/compare/v0.5.0...v0.5.1) (2022-04-27)
+
+
+### Fixes
+
+* assert no client private key is provided unless needed ([ac6be64](https://github.com/panva/oauth4webapi/commit/ac6be64ee4160a8c8d77577a2deb02a9a0388654))
+* assert no client secret is provided unless needed ([604d8f3](https://github.com/panva/oauth4webapi/commit/604d8f36071912d064b1acacac38e5cf6bd6eb7c))
+* ensure issueRequestObject does not mutate input parameters ([7b62b82](https://github.com/panva/oauth4webapi/commit/7b62b8211cad052f79eba61391d61ed24af69a3b))
+
 ## [0.5.0](https://github.com/panva/oauth4webapi/compare/v0.4.0...v0.5.0) (2022-04-27)
 
 
