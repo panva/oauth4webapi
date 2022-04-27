@@ -1237,7 +1237,7 @@ function assertClientSecret(clientSecret: unknown) {
   return clientSecret
 }
 
-function assertNoClientPrivateKey(clientAuthMethod: string, clientPrivateKey?: unknown) {
+function assertNoClientPrivateKey(clientAuthMethod: string, clientPrivateKey: unknown) {
   if (clientPrivateKey !== undefined) {
     throw new TypeError(
       `"options.clientPrivateKey" property must not be provided when ${clientAuthMethod} client authentication method is used.`,
@@ -1271,7 +1271,7 @@ async function clientAuthentication(
   switch (client.token_endpoint_auth_method) {
     case undefined: // Fall through
     case 'client_secret_basic': {
-      assertNoClientPrivateKey('client_secret_basic')
+      assertNoClientPrivateKey('client_secret_basic', clientPrivateKey)
       headers.set(
         'authorization',
         clientSecretBasic(client.client_id, assertClientSecret(client.client_secret)),
@@ -1279,13 +1279,13 @@ async function clientAuthentication(
       break
     }
     case 'client_secret_post': {
-      assertNoClientPrivateKey('client_secret_post')
+      assertNoClientPrivateKey('client_secret_post', clientPrivateKey)
       body.set('client_id', client.client_id)
       body.set('client_secret', assertClientSecret(client.client_secret))
       break
     }
     case 'client_secret_jwt': {
-      assertNoClientPrivateKey('client_secret_jwt')
+      assertNoClientPrivateKey('client_secret_jwt', clientPrivateKey)
       body.set('client_id', client.client_id)
       body.set('client_assertion_type', 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer')
       body.set(
@@ -1312,7 +1312,7 @@ async function clientAuthentication(
     }
     case 'none': {
       assertNoClientSecret('none')
-      assertNoClientPrivateKey('none')
+      assertNoClientPrivateKey('none', clientPrivateKey)
       body.set('client_id', client.client_id)
       break
     }
