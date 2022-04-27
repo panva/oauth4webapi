@@ -1360,6 +1360,7 @@ export async function issueRequestObject(
   if (!(parameters instanceof URLSearchParams)) {
     throw new TypeError('"parameters" must be an instance of URLSearchParams')
   }
+  parameters = new URLSearchParams(parameters)
 
   const { key, kid } = getKeyAndKid(privateKey)
   if (!isPrivateKey(key)) {
