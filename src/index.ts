@@ -1265,6 +1265,9 @@ async function clientAuthentication(
   headers: Headers,
   clientPrivateKey?: CryptoKey | PrivateKey,
 ) {
+  body.delete('client_secret')
+  body.delete('client_assertion_type')
+  body.delete('client_assertion')
   switch (client.token_endpoint_auth_method) {
     case undefined: // Fall through
     case 'client_secret_basic': {
