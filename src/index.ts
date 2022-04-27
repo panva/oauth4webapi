@@ -1245,7 +1245,7 @@ function assertNoClientPrivateKey(clientAuthMethod: string, clientPrivateKey: un
   }
 }
 
-function assertNoClientSecret(clientAuthMethod: string, clientSecret?: unknown) {
+function assertNoClientSecret(clientAuthMethod: string, clientSecret: unknown) {
   if (clientSecret !== undefined) {
     throw new TypeError(
       `"client.client_secret" property must not be provided when ${clientAuthMethod} client authentication method is used.`,
@@ -1295,7 +1295,7 @@ async function clientAuthentication(
       break
     }
     case 'private_key_jwt': {
-      assertNoClientSecret('private_key_jwt')
+      assertNoClientSecret('private_key_jwt', client.client_secret)
       if (clientPrivateKey === undefined) {
         throw new TypeError(
           '"options.clientPrivateKey" must be provided when "client.token_endpoint_auth_method" is "private_key_jwt"',
@@ -1311,7 +1311,7 @@ async function clientAuthentication(
       break
     }
     case 'none': {
-      assertNoClientSecret('none')
+      assertNoClientSecret('none', client.client_secret)
       assertNoClientPrivateKey('none', clientPrivateKey)
       body.set('client_id', client.client_id)
       break
