@@ -1065,7 +1065,7 @@ function clientSecretBasic(clientId: string, clientSecret: string) {
  * Determines an RSASSA-PSS algorithm identifier from CryptoKey instance
  * properties.
  */
-function rsaPssAlg(key: CryptoKey) {
+function psAlg(key: CryptoKey) {
   switch ((<RsaHashedKeyAlgorithm>key.algorithm).hash.name) {
     case 'SHA-256':
       return 'PS256'
@@ -1106,7 +1106,7 @@ function esAlg(key: CryptoKey) {
 function determineJWSAlgorithm(key: CryptoKey) {
   switch (key.algorithm.name) {
     case 'RSA-PSS':
-      return rsaPssAlg(key)
+      return psAlg(key)
     case 'RSASSA-PKCS1-v1_5':
       return rsAlg(key)
     case 'ECDSA':
