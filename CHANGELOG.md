@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.5.0](https://github.com/panva/oauth4webapi/compare/v0.4.0...v0.5.0) (2022-04-27)
+
+
+### ⚠ BREAKING CHANGES
+
+* **deno:** support deno ^1.21.0 (removed 1.20.x from CI)
+* **types:** rename SignalledRequestOptions interface to HttpRequestOptions
+
+### Features
+
+* option to add headers to http requests ([94a2ecb](https://github.com/panva/oauth4webapi/commit/94a2ecb2a5f7c17c84ff3fa39bc855e2c48466d6))
+
+
+### Refactor
+
+* **deno:** support deno ^1.21.0 (removed 1.20.x from CI) ([764db58](https://github.com/panva/oauth4webapi/commit/764db587cb83e2be0a6a085f5d75d97e5841ad55))
+* **types:** rename SignalledRequestOptions interface to HttpRequestOptions ([e4058d8](https://github.com/panva/oauth4webapi/commit/e4058d82c79ca17216dbaabb306a8487211952c4))
+
 ## [0.4.0](https://github.com/panva/oauth4webapi/compare/v0.3.3...v0.4.0) (2022-04-25)
 
 
