@@ -16,7 +16,7 @@ to be one coming from the
 | `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata |
 | `client` | [`Client`](../interfaces/Client.md) | Client Metadata |
 | `response` | `Response` | resolved value from [deviceCodeGrantRequest](deviceCodeGrantRequest.md) |
-| `options?` | [`SignalledRequestOptions`](../interfaces/SignalledRequestOptions.md) | - |
+| `options?` | [`HttpRequestOptions`](../interfaces/HttpRequestOptions.md) | - |
 
 #### Returns
 

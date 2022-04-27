@@ -14,7 +14,7 @@ Same as [validateAuthResponse](validateAuthResponse.md) but for signed JARM resp
 | `client` | [`Client`](../interfaces/Client.md) | Client Metadata |
 | `parameters` | `URL` \| `URLSearchParams` | JARM authorization response |
 | `expectedState` | `string` \| typeof [`expectNoState`](../variables/expectNoState.md) \| typeof [`skipStateCheck`](../variables/skipStateCheck.md) | Expected "state" parameter value |
-| `options?` | [`SignalledRequestOptions`](../interfaces/SignalledRequestOptions.md) | - |
+| `options?` | [`HttpRequestOptions`](../interfaces/HttpRequestOptions.md) | - |
 
 #### Returns
 

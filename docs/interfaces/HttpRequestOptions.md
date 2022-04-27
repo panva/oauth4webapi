@@ -1,10 +1,10 @@
-# Interface: SignalledRequestOptions
+# Interface: HttpRequestOptions
 
 ## Table of contents
 
 ### Properties
 
-- [signal](SignalledRequestOptions.md#signal)
+- [signal](HttpRequestOptions.md#signal)
 
 ## Properties
 

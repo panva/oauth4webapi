@@ -20,7 +20,7 @@ to be one coming from the
 | `response` | `Response` | `undefined` | resolved value from [authorizationCodeGrantRequest](authorizationCodeGrantRequest.md) |
 | `expectedNonce` | `string` \| typeof [`expectNoNonce`](../variables/expectNoNonce.md) | `expectNoNonce` | Expected ID Token "nonce" claim value |
 | `maxAge` | `number` \| typeof [`skipAuthTimeCheck`](../variables/skipAuthTimeCheck.md) | `undefined` | ID Token [auth_time](../interfaces/IDToken.md#auth_time) parameter will be checked to be present and conform to the "maxAge" value. Use of this option is required if you sent a max_age parameter in an authorization request. It's value defaults to [`client.default_max_age`](../interfaces/Client.md#default_max_age) and falls back to [skipAuthTimeCheck](../variables/skipAuthTimeCheck.md) |
-| `options?` | [`SignalledRequestOptions`](../interfaces/SignalledRequestOptions.md) | `undefined` | - |
+| `options?` | [`HttpRequestOptions`](../interfaces/HttpRequestOptions.md) | `undefined` | - |
 
 #### Returns
 

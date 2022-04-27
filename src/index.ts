@@ -729,7 +729,7 @@ const SUPPORTED_JWE_ENCS: ContentEncryptionAlgorithm[] = [
   'A256CBC-HS512',
 ]
 
-export interface SignalledRequestOptions {
+export interface HttpRequestOptions {
   /**
    * An {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal AbortSignal}
    * instance to abort the underlying fetch requests.
@@ -743,7 +743,7 @@ export interface SignalledRequestOptions {
   signal?: AbortSignal
 }
 
-export interface DiscoveryRequestOptions extends SignalledRequestOptions {
+export interface DiscoveryRequestOptions extends HttpRequestOptions {
   /**
    * The issuer transformation algorithm to use.
    */
@@ -1010,7 +1010,7 @@ export interface AuthenticatedRequestOptions {
 }
 
 export interface PushedAuthorizationRequestOptions
-  extends SignalledRequestOptions,
+  extends HttpRequestOptions,
     AuthenticatedRequestOptions,
     DPoPRequestOptions {}
 
@@ -1687,9 +1687,7 @@ export async function processPushedAuthorizationResponse(
   return json
 }
 
-export interface ProtectedResourceRequestOptions
-  extends SignalledRequestOptions,
-    DPoPRequestOptions {}
+export interface ProtectedResourceRequestOptions extends HttpRequestOptions, DPoPRequestOptions {}
 
 /**
  * Performs a protected resource request at an arbitrary URL.
@@ -1964,7 +1962,7 @@ export async function processUserInfoResponse(
   client: Client,
   expectedSubject: string | typeof skipSubjectCheck,
   response: Response,
-  options?: SignalledRequestOptions,
+  options?: HttpRequestOptions,
 ): Promise<UserInfoResponse> {
   assertIssuer(as)
   assertClient(client)
@@ -2083,7 +2081,7 @@ async function authenticatedRequest(
   url: URL,
   body: URLSearchParams,
   headers: Headers,
-  options?: SignalledRequestOptions & AuthenticatedRequestOptions,
+  options?: HttpRequestOptions & AuthenticatedRequestOptions,
 ) {
   headers.set('user-agent', USER_AGENT)
 
@@ -2099,7 +2097,7 @@ async function authenticatedRequest(
 }
 
 export interface TokenEndpointRequestOptions
-  extends SignalledRequestOptions,
+  extends HttpRequestOptions,
     AuthenticatedRequestOptions,
     DPoPRequestOptions {
   /**
@@ -2200,7 +2198,7 @@ async function processGenericAccessTokenResponse(
   as: AuthorizationServer,
   client: Client,
   response: Response,
-  options?: SignalledRequestOptions,
+  options?: HttpRequestOptions,
   ignoreIdToken = false,
   ignoreRefreshToken = false,
 ): Promise<TokenEndpointResponse | OAuth2Error> {
@@ -2340,7 +2338,7 @@ export async function processRefreshTokenResponse(
   as: AuthorizationServer,
   client: Client,
   response: Response,
-  options?: SignalledRequestOptions,
+  options?: HttpRequestOptions,
 ): Promise<TokenEndpointResponse | OAuth2Error> {
   return processGenericAccessTokenResponse(as, client, response, options)
 }
@@ -2594,7 +2592,7 @@ export async function processAuthorizationCodeOpenIDResponse(
   response: Response,
   expectedNonce: string | typeof expectNoNonce = expectNoNonce,
   maxAge: number | typeof skipAuthTimeCheck = client.default_max_age ?? skipAuthTimeCheck,
-  options?: SignalledRequestOptions,
+  options?: HttpRequestOptions,
 ): Promise<OpenIDTokenEndpointResponse | OAuth2Error> {
   const result = await processGenericAccessTokenResponse(as, client, response, options)
 
@@ -2754,9 +2752,7 @@ export async function processClientCredentialsResponse(
   return <ClientCredentialsGrantResponse>result
 }
 
-export interface RevocationRequestOptions
-  extends SignalledRequestOptions,
-    AuthenticatedRequestOptions {
+export interface RevocationRequestOptions extends HttpRequestOptions, AuthenticatedRequestOptions {
   /**
    * Any additional parameters to send. This cannot override existing parameter
    * values.
@@ -2838,7 +2834,7 @@ export async function processRevocationResponse(
 }
 
 export interface IntrospectionRequestOptions
-  extends SignalledRequestOptions,
+  extends HttpRequestOptions,
     AuthenticatedRequestOptions {
   /**
    * Any additional parameters to send. This cannot override existing parameter
@@ -2956,7 +2952,7 @@ export async function processIntrospectionResponse(
   as: AuthorizationServer,
   client: Client,
   response: Response,
-  options?: SignalledRequestOptions,
+  options?: HttpRequestOptions,
 ): Promise<IntrospectionResponse | OAuth2Error> {
   assertIssuer(as)
   assertClient(client)
@@ -3024,7 +3020,7 @@ export async function processIntrospectionResponse(
   return json
 }
 
-export interface JwksRequestOptions extends SignalledRequestOptions {}
+export interface JwksRequestOptions extends HttpRequestOptions {}
 
 /**
  * Performs a request to the
@@ -3283,7 +3279,7 @@ export async function validateJwtAuthResponse(
   client: Client,
   parameters: URLSearchParams | URL,
   expectedState: string | typeof expectNoState | typeof skipStateCheck,
-  options?: SignalledRequestOptions,
+  options?: HttpRequestOptions,
 ): Promise<CallbackParameters | OAuth2Error> {
   assertIssuer(as)
   assertClient(client)
@@ -3766,7 +3762,7 @@ async function importJwk(jwk: JWK) {
 }
 
 export interface DeviceAuthorizationRequestOptions
-  extends SignalledRequestOptions,
+  extends HttpRequestOptions,
     AuthenticatedRequestOptions {}
 
 /**
@@ -3958,7 +3954,7 @@ export async function processDeviceCodeResponse(
   as: AuthorizationServer,
   client: Client,
   response: Response,
-  options?: SignalledRequestOptions,
+  options?: HttpRequestOptions,
 ): Promise<TokenEndpointResponse | OAuth2Error> {
   return processGenericAccessTokenResponse(as, client, response, options)
 }

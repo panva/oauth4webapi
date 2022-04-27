@@ -17,7 +17,7 @@ to be one coming from the
 | `client` | [`Client`](../interfaces/Client.md) | Client Metadata |
 | `expectedSubject` | `string` \| typeof [`skipSubjectCheck`](../variables/skipSubjectCheck.md) | Expected "sub" claim value. In response to OpenID Connect authentication requests, the expected subject is the one from the ID Token claims retrieved from [getValidatedIdTokenClaims](getValidatedIdTokenClaims.md). |
 | `response` | `Response` | resolved value from [userInfoRequest](userInfoRequest.md) |
-| `options?` | [`SignalledRequestOptions`](../interfaces/SignalledRequestOptions.md) | - |
+| `options?` | [`HttpRequestOptions`](../interfaces/HttpRequestOptions.md) | - |
 
 #### Returns
 
