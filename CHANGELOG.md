@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.5.2](https://github.com/panva/oauth4webapi/compare/v0.5.1...v0.5.2) (2022-04-27)
+
+
+### Features
+
+* force jwks refetch every 10 minutes ([ae35bae](https://github.com/panva/oauth4webapi/commit/ae35bae4e84a66c606eb6b40f2588a1aa1955b77))
+
+
+### Fixes
+
+* correct jwks refetch minimal interval ([8af6f85](https://github.com/panva/oauth4webapi/commit/8af6f85010f415ca519c668dbf8c3bcf5961d270))
+
 ## [0.5.1](https://github.com/panva/oauth4webapi/compare/v0.5.0...v0.5.1) (2022-04-27)
 
 
