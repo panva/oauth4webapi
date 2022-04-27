@@ -2118,7 +2118,7 @@ async function authenticatedRequest(
   url: URL,
   body: URLSearchParams,
   headers: Headers,
-  options?: HttpRequestOptions & AuthenticatedRequestOptions,
+  options?: Omit<HttpRequestOptions, 'headers'> & AuthenticatedRequestOptions,
 ) {
   await clientAuthentication(as, client, body, headers, options?.clientPrivateKey)
 
