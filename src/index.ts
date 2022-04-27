@@ -1856,7 +1856,7 @@ export interface UserInfoResponse {
   readonly [claim: string]: unknown
 }
 
-const jwksCache = new LRU<string, { jwks: JsonWebKeySet; iat: number; stale: boolean }>(20)
+const jwksCache = new LRU<string, { jwks: JsonWebKeySet; iat: number; age: number }>(20)
 const cryptoKeyCaches: Record<string, WeakMap<JWK, CryptoKey>> = {}
 
 async function getPublicSigKeyFromIssuerJwksUri(
@@ -1880,17 +1880,17 @@ async function getPublicSigKeyFromIssuerJwksUri(
   }
 
   let jwks: JsonWebKeySet
-  let stale: boolean
+  let age: number
   if (jwksCache.has(as.jwks_uri!)) {
-    ;({ jwks, stale } = jwksCache.get(as.jwks_uri!)!)
+    ;({ jwks, age } = jwksCache.get(as.jwks_uri!)!)
   } else {
     jwks = await jwksRequest(as, options).then(processJwksResponse)
-    stale = false
+    age = 0
     jwksCache.set(as.jwks_uri!, {
       jwks,
       iat: epochTime(),
-      get stale() {
-        return this.iat + 5 * 60 * 60 < epochTime()
+      get age() {
+        return epochTime() - this.iat
       },
     })
   }
@@ -1934,7 +1934,8 @@ async function getPublicSigKeyFromIssuerJwksUri(
   const { 0: jwk, length } = candidates
 
   if (length === 0) {
-    if (stale) {
+    if (age > 60) {
+      // allow re-fetch if cache is at least 1 minute old
       jwksCache.delete(as.jwks_uri!)
       return getPublicSigKeyFromIssuerJwksUri(as, options, header)
     }
