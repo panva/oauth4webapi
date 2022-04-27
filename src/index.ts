@@ -1884,7 +1884,7 @@ async function getPublicSigKeyFromIssuerJwksUri(
   if (jwksCache.has(as.jwks_uri!)) {
     ;({ jwks, age } = jwksCache.get(as.jwks_uri!)!)
     if (age >= 300) {
-      // force a re-ferch every 5 minutes
+      // force a re-fetch every 5 minutes
       jwksCache.delete(as.jwks_uri!)
       return getPublicSigKeyFromIssuerJwksUri(as, options, header)
     }
