@@ -1883,6 +1883,11 @@ async function getPublicSigKeyFromIssuerJwksUri(
   let age: number
   if (jwksCache.has(as.jwks_uri!)) {
     ;({ jwks, age } = jwksCache.get(as.jwks_uri!)!)
+    if (age >= 300) {
+      // force a re-ferch every 5 minutes
+      jwksCache.delete(as.jwks_uri!)
+      return getPublicSigKeyFromIssuerJwksUri(as, options, header)
+    }
   } else {
     jwks = await jwksRequest(as, options).then(processJwksResponse)
     age = 0
@@ -1934,7 +1939,7 @@ async function getPublicSigKeyFromIssuerJwksUri(
   const { 0: jwk, length } = candidates
 
   if (length === 0) {
-    if (age > 60) {
+    if (age >= 60) {
       // allow re-fetch if cache is at least 1 minute old
       jwksCache.delete(as.jwks_uri!)
       return getPublicSigKeyFromIssuerJwksUri(as, options, header)
