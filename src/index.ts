@@ -1155,12 +1155,12 @@ function jweAlg(key: CryptoKey) {
 /**
  * Returns the current unix timestamp in seconds.
  */
-function currentTimestamp() {
+function epochTime() {
   return Math.floor(Date.now() / 1000)
 }
 
 function clientAssertion(as: AuthorizationServer, client: Client) {
-  const now = currentTimestamp()
+  const now = epochTime()
   return {
     jti: randomBytes(),
     aud: [as.issuer, as.token_endpoint],
@@ -1372,7 +1372,7 @@ export async function issueRequestObject(
 
   parameters.set('client_id', client.client_id)
 
-  const now = currentTimestamp()
+  const now = epochTime()
   const claims: Record<string, unknown> = {
     ...Object.fromEntries(parameters.entries()),
     jti: randomBytes(),
@@ -1460,7 +1460,7 @@ async function dpopProofJwt(
       jwk: await publicJwk(publicKey),
     },
     {
-      iat: currentTimestamp(),
+      iat: epochTime(),
       jti: randomBytes(),
       htm,
       nonce,
@@ -1888,9 +1888,9 @@ async function getPublicSigKeyFromIssuerJwksUri(
     stale = false
     jwksCache.set(as.jwks_uri!, {
       jwks,
-      iat: currentTimestamp(),
+      iat: epochTime(),
       get stale() {
-        return this.iat + 5 * 60 * 60 < currentTimestamp()
+        return this.iat + 5 * 60 * 60 < epochTime()
       },
     })
   }
@@ -2647,7 +2647,7 @@ export async function processAuthorizationCodeOpenIDResponse(
       throw new TypeError('"options.max_age" must be a non-negative number')
     }
 
-    const now = currentTimestamp()
+    const now = epochTime()
     const tolerance = 30 // TODO: tolerance config
     if (claims.auth_time! + maxAge < now - tolerance) {
       throw new OPE('too much time has elapsed since the last End-User authentication')
@@ -3250,7 +3250,7 @@ async function validateJwt(
     throw new OPE('JWT Payload must be a top level object')
   }
 
-  const now = currentTimestamp()
+  const now = epochTime()
   const tolerance = 30 // TODO: tolerance config
 
   if (claims.exp !== undefined) {
