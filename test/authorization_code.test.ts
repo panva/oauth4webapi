@@ -1,5 +1,13 @@
 import anyTest, { type TestFn } from 'ava'
-import setup, { type Context, teardown, issuer, endpoint, client, getResponse } from './_setup.js'
+import setup, {
+  type Context,
+  teardown,
+  issuer,
+  endpoint,
+  client,
+  getResponse,
+  UA,
+} from './_setup.js'
 import * as jose from 'jose'
 import * as lib from '../src/index.js'
 
@@ -117,6 +125,7 @@ test('authorizationCodeGrantRequest()', async (t) => {
       method: 'POST',
       headers: {
         accept: 'application/json',
+        'user-agent': UA,
       },
       body(body) {
         const params = new URLSearchParams(body)
@@ -167,6 +176,42 @@ test('authorizationCodeGrantRequest() w/ Extra Parameters', async (t) => {
       'verifier',
       {
         additionalParameters: new URLSearchParams('resource=urn:example:resource'),
+      },
+    ),
+  )
+})
+
+test('authorizationCodeGrantRequest() w/ Custom Headers', async (t) => {
+  const tIssuer: lib.AuthorizationServer = {
+    ...issuer,
+    token_endpoint: endpoint('token-headers'),
+  }
+
+  t.context
+    .intercept({
+      path: '/token-headers',
+      method: 'POST',
+      headers: {
+        accept: 'application/json',
+        'user-agent': 'foo',
+        foo: 'bar',
+      },
+    })
+    .reply(200, { access_token: 'token', token_type: 'Bearer' })
+
+  await t.notThrowsAsync(
+    lib.authorizationCodeGrantRequest(
+      tIssuer,
+      tClient,
+      cb('code=authorization_code'),
+      'redirect_uri',
+      'verifier',
+      {
+        headers: new Headers([
+          ['accept', 'will be overwritten'],
+          ['user-agent', 'foo'],
+          ['foo', 'bar'],
+        ]),
       },
     ),
   )

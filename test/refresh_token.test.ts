@@ -1,5 +1,13 @@
 import anyTest, { type TestFn } from 'ava'
-import setup, { type Context, teardown, issuer, endpoint, client, getResponse } from './_setup.js'
+import setup, {
+  type Context,
+  teardown,
+  issuer,
+  endpoint,
+  client,
+  getResponse,
+  UA,
+} from './_setup.js'
 import * as jose from 'jose'
 import * as lib from '../src/index.js'
 
@@ -48,6 +56,7 @@ test('refreshTokenGrantRequest()', async (t) => {
       method: 'POST',
       headers: {
         accept: 'application/json',
+        'user-agent': UA,
       },
       body(body) {
         const params = new URLSearchParams(body)
@@ -82,6 +91,36 @@ test('refreshTokenGrantRequest() w/ Extra Parameters', async (t) => {
   await t.notThrowsAsync(
     lib.refreshTokenGrantRequest(tIssuer, tClient, 'refresh_token', {
       additionalParameters: new URLSearchParams('resource=urn:example:resource'),
+    }),
+  )
+})
+
+test('refreshTokenGrantRequest() w/ Custom Headers', async (t) => {
+  const tIssuer: lib.AuthorizationServer = {
+    ...issuer,
+    token_endpoint: endpoint('token-headers'),
+  }
+
+  t.context
+    .intercept({
+      path: '/token-headers',
+      method: 'POST',
+
+      headers: {
+        accept: 'application/json',
+        'user-agent': 'foo',
+        foo: 'bar',
+      },
+    })
+    .reply(200, { access_token: 'token', token_type: 'Bearer' })
+
+  await t.notThrowsAsync(
+    lib.refreshTokenGrantRequest(tIssuer, tClient, 'refresh_token', {
+      headers: new Headers([
+        ['accept', 'will be overwritten'],
+        ['user-agent', 'foo'],
+        ['foo', 'bar'],
+      ]),
     }),
   )
 })

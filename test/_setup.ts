@@ -50,3 +50,5 @@ export function getResponse(
   const stream = Readable.toWeb(Readable.from(body))
   return new Response(stream, { status, headers })
 }
+
+export const UA = /^oauth4webapi\/v\d+\.\d+\.\d+ \(https\:\/\/github\.com\/panva\/oauth4webapi\)$/

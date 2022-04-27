@@ -7,6 +7,7 @@
 - [DPoP](TokenEndpointRequestOptions.md#dpop)
 - [additionalParameters](TokenEndpointRequestOptions.md#additionalparameters)
 - [clientPrivateKey](TokenEndpointRequestOptions.md#clientprivatekey)
+- [headers](TokenEndpointRequestOptions.md#headers)
 - [signal](TokenEndpointRequestOptions.md#signal)
 
 ## Properties
@@ -34,6 +35,16 @@ ___
 
 Private key to use for `private_key_jwt`
 [client authentication](../types/TokenEndpointAuthMethod.md).
+
+___
+
+### headers
+
+• `Optional` **headers**: `Headers`
+
+A [Headers](https://developer.mozilla.org/en-US/docs/Web/API/Headers)
+instance to additionally send with the HTTP Request(s) triggered by this
+functions invocation.
 
 ___
 

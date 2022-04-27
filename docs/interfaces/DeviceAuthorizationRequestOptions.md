@@ -5,6 +5,7 @@
 ### Properties
 
 - [clientPrivateKey](DeviceAuthorizationRequestOptions.md#clientprivatekey)
+- [headers](DeviceAuthorizationRequestOptions.md#headers)
 - [signal](DeviceAuthorizationRequestOptions.md#signal)
 
 ## Properties
@@ -15,6 +16,16 @@
 
 Private key to use for `private_key_jwt`
 [client authentication](../types/TokenEndpointAuthMethod.md).
+
+___
+
+### headers
+
+• `Optional` **headers**: `Headers`
+
+A [Headers](https://developer.mozilla.org/en-US/docs/Web/API/Headers)
+instance to additionally send with the HTTP Request(s) triggered by this
+functions invocation.
 
 ___
 

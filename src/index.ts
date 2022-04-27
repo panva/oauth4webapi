@@ -738,9 +738,15 @@ export interface HttpRequestOptions {
    * ```js
    * const signal = AbortSignal.timeout(5_000) // Note: AbortSignal.timeout may not yet be available in all runtimes.
    * ```
-   *
    */
   signal?: AbortSignal
+
+  /**
+   * A {@link https://developer.mozilla.org/en-US/docs/Web/API/Headers Headers}
+   * instance to additionally send with the HTTP Request(s) triggered by this
+   * functions invocation.
+   */
+  headers?: Headers
 }
 
 export interface DiscoveryRequestOptions extends HttpRequestOptions {
@@ -784,6 +790,23 @@ function isTopLevelObject<T = object>(input: unknown): input is T {
     proto = Object.getPrototypeOf(proto)
   }
   return Object.getPrototypeOf(input) === proto
+}
+
+function prepareHeaders({ headers }: HttpRequestOptions = {}): Headers {
+  if (headers !== undefined && !(headers instanceof Headers)) {
+    throw new TypeError('"options.headers" must be an instance of Headers')
+  }
+  headers = new Headers(headers)
+  if (!headers.has('user-agent')) {
+    headers.set('user-agent', USER_AGENT)
+  }
+  if (headers.has('authorization')) {
+    throw new TypeError('"options.headers" must not include the "authorization" header name')
+  }
+  if (headers.has('dpop')) {
+    throw new TypeError('"options.headers" must not include the "dpop" header name')
+  }
+  return headers
 }
 
 /**
@@ -838,8 +861,11 @@ export async function discoveryRequest(
       throw new TypeError('"options.algorithm" must be "oidc" (default), or "oauth2"')
   }
 
+  const headers = prepareHeaders(options)
+  headers.set('accept', 'application/json')
+
   return fetch(url.href, {
-    headers: new Headers({ accept: 'application/json', 'user-agent': USER_AGENT }),
+    headers,
     method: 'GET',
     redirect: 'manual',
     signal: options?.signal,
@@ -1488,7 +1514,8 @@ export async function pushedAuthorizationRequest(
   const body = new URLSearchParams(parameters)
   body.set('client_id', client.client_id)
 
-  const headers = new Headers({ accept: 'application/json' })
+  const headers = prepareHeaders(options)
+  headers.set('accept', 'application/json')
 
   if (options?.DPoP !== undefined) {
     await dpopProofJwt(headers, options.DPoP, url, 'POST')
@@ -1687,7 +1714,9 @@ export async function processPushedAuthorizationResponse(
   return json
 }
 
-export interface ProtectedResourceRequestOptions extends HttpRequestOptions, DPoPRequestOptions {}
+export interface ProtectedResourceRequestOptions
+  extends Omit<HttpRequestOptions, 'headers'>,
+    DPoPRequestOptions {}
 
 /**
  * Performs a protected resource request at an arbitrary URL.
@@ -1728,7 +1757,7 @@ export async function protectedResourceRequest(
     throw new TypeError('"headers" must be an instance of Headers')
   }
 
-  headers = new Headers(headers)
+  headers = prepareHeaders({ headers })
 
   if (options?.DPoP === undefined) {
     headers.set('authorization', `Bearer ${accessToken}`)
@@ -1736,8 +1765,6 @@ export async function protectedResourceRequest(
     await dpopProofJwt(headers, options.DPoP, url, 'GET', accessToken)
     headers.set('authorization', `DPoP ${accessToken}`)
   }
-
-  headers.set('user-agent', USER_AGENT)
 
   return fetch(url.href, {
     body,
@@ -1748,7 +1775,7 @@ export async function protectedResourceRequest(
   }).then(processDpopNonce)
 }
 
-export interface UserInfoRequestOptions extends ProtectedResourceRequestOptions {}
+export interface UserInfoRequestOptions extends HttpRequestOptions, DPoPRequestOptions {}
 
 /**
  * Performs a UserInfo Request at the
@@ -1783,7 +1810,7 @@ export async function userInfoRequest(
 
   const url = new URL(as.userinfo_endpoint)
 
-  const headers = new Headers()
+  const headers = prepareHeaders(options)
   if (client.userinfo_signed_response_alg) {
     headers.set('accept', 'application/jwt')
   } else {
@@ -1830,7 +1857,7 @@ const cryptoKeyCaches: Record<string, WeakMap<JWK, CryptoKey>> = {}
 
 async function getPublicSigKeyFromIssuerJwksUri(
   as: AuthorizationServer,
-  signal: AbortSignal | undefined,
+  options: HttpRequestOptions | undefined,
   header: CompactJWSHeaderParameters,
 ): Promise<CryptoKey> {
   const { alg, kid } = header
@@ -1853,7 +1880,7 @@ async function getPublicSigKeyFromIssuerJwksUri(
   if (jwksCache.has(as.jwks_uri!)) {
     ;({ jwks, stale } = jwksCache.get(as.jwks_uri!)!)
   } else {
-    jwks = await jwksRequest(as, { signal }).then(processJwksResponse)
+    jwks = await jwksRequest(as, options).then(processJwksResponse)
     stale = false
     jwksCache.set(as.jwks_uri!, {
       jwks,
@@ -1905,7 +1932,7 @@ async function getPublicSigKeyFromIssuerJwksUri(
   if (length === 0) {
     if (stale) {
       jwksCache.delete(as.jwks_uri!)
-      return getPublicSigKeyFromIssuerJwksUri(as, signal, header)
+      return getPublicSigKeyFromIssuerJwksUri(as, options, header)
     }
     throw new OPE('error when selecting a JWT verification key, no applicable keys found')
   } else if (length !== 1) {
@@ -1990,7 +2017,7 @@ export async function processUserInfoResponse(
         as.userinfo_signing_alg_values_supported,
         'RS256',
       ),
-      getPublicSigKeyFromIssuerJwksUri.bind(undefined, as, options?.signal),
+      getPublicSigKeyFromIssuerJwksUri.bind(undefined, as, options),
     )
       .then(validateOptionalAudience.bind(undefined, as.issuer))
       .then(validateOptionalIssuer.bind(undefined, client.client_id))
@@ -2083,8 +2110,6 @@ async function authenticatedRequest(
   headers: Headers,
   options?: HttpRequestOptions & AuthenticatedRequestOptions,
 ) {
-  headers.set('user-agent', USER_AGENT)
-
   await clientAuthentication(as, client, body, headers, options?.clientPrivateKey)
 
   return fetch(url.href, {
@@ -2129,7 +2154,8 @@ async function tokenEndpointRequest(
   const url = new URL(as.token_endpoint)
 
   parameters.set('grant_type', grantType)
-  const headers = new Headers({ accept: 'application/json' })
+  const headers = prepareHeaders(options)
+  headers.set('accept', 'application/json')
 
   if (options?.DPoP !== undefined) {
     await dpopProofJwt(headers, options.DPoP, url, 'POST')
@@ -2279,7 +2305,7 @@ async function processGenericAccessTokenResponse(
           as.id_token_signing_alg_values_supported,
           'RS256',
         ),
-        getPublicSigKeyFromIssuerJwksUri.bind(undefined, as, options?.signal),
+        getPublicSigKeyFromIssuerJwksUri.bind(undefined, as, options),
       )
         .then(
           validatePresence.bind(undefined, [
@@ -2797,7 +2823,9 @@ export async function revocationRequest(
 
   const body = new URLSearchParams(options?.additionalParameters)
   body.set('token', token)
-  const headers = new Headers()
+
+  const headers = prepareHeaders(options)
+  headers.delete('accept')
 
   return authenticatedRequest(as, client, 'POST', url, body, headers, options)
 }
@@ -2897,7 +2925,7 @@ export async function introspectionRequest(
 
   const body = new URLSearchParams(options?.additionalParameters)
   body.set('token', token)
-  const headers = new Headers()
+  const headers = prepareHeaders(options)
   if (options?.requestJwtResponse ?? client.introspection_signed_response_alg) {
     headers.set('accept', 'application/token-introspection+jwt')
   } else {
@@ -2984,7 +3012,7 @@ export async function processIntrospectionResponse(
         as.introspection_signing_alg_values_supported,
         'RS256',
       ),
-      getPublicSigKeyFromIssuerJwksUri.bind(undefined, as, options?.signal),
+      getPublicSigKeyFromIssuerJwksUri.bind(undefined, as, options),
     )
       .then(checkJwtType.bind(undefined, 'token-introspection+jwt'))
       .then(
@@ -3048,10 +3076,9 @@ export async function jwksRequest(
 
   const url = new URL(as.jwks_uri)
 
-  const headers = new Headers()
+  const headers = prepareHeaders(options)
   headers.set('accept', 'application/json')
   headers.append('accept', 'application/jwk-set+json')
-  headers.set('user-agent', USER_AGENT)
 
   return fetch(url.href, {
     headers,
@@ -3309,7 +3336,7 @@ export async function validateJwtAuthResponse(
       as.authorization_signing_alg_values_supported,
       'RS256',
     ),
-    getPublicSigKeyFromIssuerJwksUri.bind(undefined, as, options?.signal),
+    getPublicSigKeyFromIssuerJwksUri.bind(undefined, as, options),
   )
     .then(
       validatePresence.bind(undefined, [
@@ -3801,7 +3828,8 @@ export async function deviceAuthorizationRequest(
   const body = new URLSearchParams(parameters)
   body.set('client_id', client.client_id)
 
-  const headers = new Headers({ accept: 'application/json' })
+  const headers = prepareHeaders(options)
+  headers.set('accept', 'application/json')
 
   return authenticatedRequest(as, client, 'POST', url, body, headers, options)
 }

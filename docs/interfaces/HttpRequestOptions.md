@@ -4,9 +4,20 @@
 
 ### Properties
 
+- [headers](HttpRequestOptions.md#headers)
 - [signal](HttpRequestOptions.md#signal)
 
 ## Properties
+
+### headers
+
+• `Optional` **headers**: `Headers`
+
+A [Headers](https://developer.mozilla.org/en-US/docs/Web/API/Headers)
+instance to additionally send with the HTTP Request(s) triggered by this
+functions invocation.
+
+___
 
 ### signal
 

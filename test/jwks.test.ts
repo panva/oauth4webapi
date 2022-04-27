@@ -24,6 +24,33 @@ test('jwksRequest()', async (t) => {
   t.true(response instanceof Response)
 })
 
+test('jwksRequest() w/ Custom Headers', async (t) => {
+  const data = { keys: [] }
+  t.context
+    .intercept({
+      path: '/jwks-headers',
+      method: 'GET',
+      headers: {
+        accept: 'application/json, application/jwk-set+json',
+        'user-agent': 'foo',
+        foo: 'bar',
+      },
+    })
+    .reply(200, data)
+
+  const response = await lib.jwksRequest(
+    { ...issuer, jwks_uri: endpoint('jwks-headers') },
+    {
+      headers: new Headers([
+        ['accept', 'will be overwritten'],
+        ['user-agent', 'foo'],
+        ['foo', 'bar'],
+      ]),
+    },
+  )
+  t.true(response instanceof Response)
+})
+
 test('jwksRequest() requires jwks_uri', async (t) => {
   await t.throwsAsync(lib.jwksRequest({ ...issuer, jwks_uri: undefined }), {
     instanceOf: TypeError,

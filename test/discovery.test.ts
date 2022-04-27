@@ -1,5 +1,5 @@
 import anyTest, { type TestFn } from 'ava'
-import setup, { type Context, teardown, issuer, getResponse } from './_setup.js'
+import setup, { type Context, teardown, issuer, getResponse, UA } from './_setup.js'
 import * as lib from '../src/index.js'
 
 const j = JSON.stringify
@@ -16,11 +16,36 @@ test('discoveryRequest()', async (t) => {
       method: 'GET',
       headers: {
         accept: 'application/json',
+        'user-agent': UA,
       },
     })
     .reply(200, data)
 
   const response = await lib.discoveryRequest(new URL(issuer.issuer))
+  t.true(response instanceof Response)
+})
+
+test('discoveryRequest() w/ Custom Headers', async (t) => {
+  const data = { ...issuer }
+  t.context
+    .intercept({
+      path: '/.well-known/openid-configuration',
+      method: 'GET',
+      headers: {
+        'user-agent': 'foo',
+        foo: 'bar',
+        accept: 'application/json',
+      },
+    })
+    .reply(200, data)
+
+  const response = await lib.discoveryRequest(new URL(issuer.issuer), {
+    headers: new Headers([
+      ['accept', 'will be overwritten'],
+      ['user-agent', 'foo'],
+      ['foo', 'bar'],
+    ]),
+  })
   t.true(response instanceof Response)
 })
 

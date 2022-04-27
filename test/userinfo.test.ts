@@ -1,5 +1,13 @@
 import anyTest, { type TestFn } from 'ava'
-import setup, { type Context, teardown, client, issuer, endpoint, getResponse } from './_setup.js'
+import setup, {
+  type Context,
+  teardown,
+  client,
+  issuer,
+  endpoint,
+  getResponse,
+  UA,
+} from './_setup.js'
 import * as lib from '../src/index.js'
 import * as jose from 'jose'
 
@@ -33,6 +41,7 @@ test('userInfoRequest()', async (t) => {
       path: '/userinfo',
       method: 'GET',
       headers: {
+        'user-agent': UA,
         accept: 'application/json, application/jwt',
       },
     })
@@ -41,6 +50,35 @@ test('userInfoRequest()', async (t) => {
   const tIssuer: lib.AuthorizationServer = { ...issuer, userinfo_endpoint: endpoint('userinfo') }
   const tClient: lib.Client = { ...client }
   const response = await lib.userInfoRequest(tIssuer, tClient, 'token')
+  t.true(response instanceof Response)
+})
+
+test('userInfoRequest() w/ Custom Headers', async (t) => {
+  const data = { sub: 'urn:example:subject' }
+  t.context
+    .intercept({
+      path: '/userinfo-headers',
+      method: 'GET',
+      headers: {
+        accept: 'application/json, application/jwt',
+        'user-agent': 'foo',
+        foo: 'bar',
+      },
+    })
+    .reply(200, data)
+
+  const tIssuer: lib.AuthorizationServer = {
+    ...issuer,
+    userinfo_endpoint: endpoint('userinfo-headers'),
+  }
+  const tClient: lib.Client = { ...client }
+  const response = await lib.userInfoRequest(tIssuer, tClient, 'token', {
+    headers: new Headers([
+      ['accept', 'will be overwritten'],
+      ['user-agent', 'foo'],
+      ['foo', 'bar'],
+    ]),
+  })
   t.true(response instanceof Response)
 })
 

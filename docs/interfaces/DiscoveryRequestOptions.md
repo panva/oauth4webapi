@@ -5,6 +5,7 @@
 ### Properties
 
 - [algorithm](DiscoveryRequestOptions.md#algorithm)
+- [headers](DiscoveryRequestOptions.md#headers)
 - [signal](DiscoveryRequestOptions.md#signal)
 
 ## Properties
@@ -14,6 +15,16 @@
 • `Optional` **algorithm**: [`ProcessingMode`](../types/ProcessingMode.md)
 
 The issuer transformation algorithm to use.
+
+___
+
+### headers
+
+• `Optional` **headers**: `Headers`
+
+A [Headers](https://developer.mozilla.org/en-US/docs/Web/API/Headers)
+instance to additionally send with the HTTP Request(s) triggered by this
+functions invocation.
 
 ___
 

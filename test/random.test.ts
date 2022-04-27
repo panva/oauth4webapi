@@ -2,8 +2,8 @@ import test from 'ava'
 import * as lib from '../src/index.js'
 
 test('generateRandomCodeVerifier()', (t) => {
-  const nonce = lib.generateRandomCodeVerifier()
-  t.is(Buffer.from(nonce, 'base64url').byteLength, 32)
+  const codeVerifier = lib.generateRandomCodeVerifier()
+  t.is(Buffer.from(codeVerifier, 'base64url').byteLength, 32)
 })
 
 test('calculatePKCECodeChallenge() - https://www.rfc-editor.org/rfc/rfc7636#appendix-B', async (t) => {
@@ -12,4 +12,14 @@ test('calculatePKCECodeChallenge() - https://www.rfc-editor.org/rfc/rfc7636#appe
     await lib.calculatePKCECodeChallenge(verifier),
     'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
   )
+})
+
+test('generateRandomState()', (t) => {
+  const state = lib.generateRandomState()
+  t.is(Buffer.from(state, 'base64url').byteLength, 32)
+})
+
+test('generateRandomNonce()', (t) => {
+  const nonce = lib.generateRandomNonce()
+  t.is(Buffer.from(nonce, 'base64url').byteLength, 32)
 })

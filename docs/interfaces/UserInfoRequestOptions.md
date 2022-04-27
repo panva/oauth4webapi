@@ -5,6 +5,7 @@
 ### Properties
 
 - [DPoP](UserInfoRequestOptions.md#dpop)
+- [headers](UserInfoRequestOptions.md#headers)
 - [signal](UserInfoRequestOptions.md#signal)
 
 ## Properties
@@ -14,6 +15,16 @@
 • `Optional` **DPoP**: [`DPoPOptions`](DPoPOptions.md)
 
 DPoP-related options.
+
+___
+
+### headers
+
+• `Optional` **headers**: `Headers`
+
+A [Headers](https://developer.mozilla.org/en-US/docs/Web/API/Headers)
+instance to additionally send with the HTTP Request(s) triggered by this
+functions invocation.
 
 ___
 

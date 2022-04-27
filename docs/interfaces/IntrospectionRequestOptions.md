@@ -6,6 +6,7 @@
 
 - [additionalParameters](IntrospectionRequestOptions.md#additionalparameters)
 - [clientPrivateKey](IntrospectionRequestOptions.md#clientprivatekey)
+- [headers](IntrospectionRequestOptions.md#headers)
 - [requestJwtResponse](IntrospectionRequestOptions.md#requestjwtresponse)
 - [signal](IntrospectionRequestOptions.md#signal)
 
@@ -26,6 +27,16 @@ ___
 
 Private key to use for `private_key_jwt`
 [client authentication](../types/TokenEndpointAuthMethod.md).
+
+___
+
+### headers
+
+• `Optional` **headers**: `Headers`
+
+A [Headers](https://developer.mozilla.org/en-US/docs/Web/API/Headers)
+instance to additionally send with the HTTP Request(s) triggered by this
+functions invocation.
 
 ___
 

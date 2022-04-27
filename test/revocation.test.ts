@@ -1,5 +1,13 @@
 import anyTest, { type TestFn } from 'ava'
-import setup, { type Context, teardown, issuer, endpoint, client, getResponse } from './_setup.js'
+import setup, {
+  type Context,
+  teardown,
+  issuer,
+  endpoint,
+  client,
+  getResponse,
+  UA,
+} from './_setup.js'
 import * as lib from '../src/index.js'
 
 const j = JSON.stringify
@@ -30,6 +38,7 @@ test('revocationRequest()', async (t) => {
       method: 'POST',
       headers: {
         accept: '*/*',
+        'user-agent': UA,
       },
       body(body) {
         return new URLSearchParams(body).get('token') === 'token'
@@ -59,6 +68,36 @@ test('revocationRequest() w/ Extra Parameters', async (t) => {
   await t.notThrowsAsync(
     lib.revocationRequest(tIssuer, tClient, 'token', {
       additionalParameters: new URLSearchParams('token_type_hint=access_token'),
+    }),
+  )
+})
+
+test('revocationRequest() w/ Custom Headers', async (t) => {
+  const tIssuer: lib.AuthorizationServer = {
+    ...issuer,
+    revocation_endpoint: endpoint('revoke-headers'),
+  }
+
+  t.context
+    .intercept({
+      path: '/revoke-headers',
+      method: 'POST',
+      headers(headers) {
+        t.is(headers['user-agent'], 'foo')
+        t.is(headers.foo, 'bar')
+        t.is(headers.accept, '*/*')
+        return true
+      },
+    })
+    .reply(200, { access_token: 'token', token_type: 'Bearer' })
+
+  await t.notThrowsAsync(
+    lib.revocationRequest(tIssuer, tClient, 'token', {
+      headers: new Headers([
+        ['accept', 'will be overwritten'],
+        ['user-agent', 'foo'],
+        ['foo', 'bar'],
+      ]),
     }),
   )
 })

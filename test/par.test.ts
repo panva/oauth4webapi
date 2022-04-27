@@ -1,5 +1,13 @@
 import anyTest, { type TestFn } from 'ava'
-import setup, { type Context, teardown, issuer, endpoint, client, getResponse } from './_setup.js'
+import setup, {
+  type Context,
+  teardown,
+  issuer,
+  endpoint,
+  client,
+  getResponse,
+  UA,
+} from './_setup.js'
 import * as jose from 'jose'
 import * as lib from '../src/index.js'
 
@@ -31,6 +39,7 @@ test('pushedAuthorizationRequest()', async (t) => {
       method: 'POST',
       headers: {
         accept: 'application/json',
+        'user-agent': UA,
       },
       body(body) {
         return new URLSearchParams(body).get('client_id') === client.client_id
@@ -39,6 +48,35 @@ test('pushedAuthorizationRequest()', async (t) => {
     .reply(200, { request_uri: 'urn:example:uri', expires_in: 60 })
 
   await t.notThrowsAsync(lib.pushedAuthorizationRequest(tIssuer, tClient, new URLSearchParams()))
+})
+
+test('pushedAuthorizationRequest() w/ Custom Headers', async (t) => {
+  const tIssuer: lib.AuthorizationServer = {
+    ...issuer,
+    pushed_authorization_request_endpoint: endpoint('par-headers'),
+  }
+
+  t.context
+    .intercept({
+      path: '/par-headers',
+      method: 'POST',
+      headers: {
+        accept: 'application/json',
+        'user-agent': 'foo',
+        foo: 'bar',
+      },
+    })
+    .reply(200, { request_uri: 'urn:example:uri', expires_in: 60 })
+
+  await t.notThrowsAsync(
+    lib.pushedAuthorizationRequest(tIssuer, tClient, new URLSearchParams(), {
+      headers: new Headers([
+        ['accept', 'will be overwritten'],
+        ['user-agent', 'foo'],
+        ['foo', 'bar'],
+      ]),
+    }),
+  )
 })
 
 test('pushedAuthorizationRequest() w/ DPoP', async (t) => {

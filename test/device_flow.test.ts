@@ -1,5 +1,13 @@
 import anyTest, { type TestFn } from 'ava'
-import setup, { type Context, teardown, issuer, endpoint, client, getResponse } from './_setup.js'
+import setup, {
+  type Context,
+  teardown,
+  issuer,
+  endpoint,
+  client,
+  getResponse,
+  UA,
+} from './_setup.js'
 import * as jose from 'jose'
 import * as lib from '../src/index.js'
 
@@ -48,6 +56,7 @@ test('deviceAuthorizationRequest()', async (t) => {
       method: 'POST',
       headers: {
         accept: 'application/json',
+        'user-agent': UA,
       },
       body(body) {
         return new URLSearchParams(body).get('client_id') === client.client_id
@@ -56,6 +65,35 @@ test('deviceAuthorizationRequest()', async (t) => {
     .reply(200, '')
 
   await t.notThrowsAsync(lib.deviceAuthorizationRequest(tIssuer, tClient, new URLSearchParams()))
+})
+
+test('deviceAuthorizationRequest() w/ Custom Headers', async (t) => {
+  const tIssuer: lib.AuthorizationServer = {
+    ...issuer,
+    device_authorization_endpoint: endpoint('device-headers'),
+  }
+
+  t.context
+    .intercept({
+      path: '/device-headers',
+      method: 'POST',
+      headers: {
+        accept: 'application/json',
+        'user-agent': 'foo',
+        foo: 'bar',
+      },
+    })
+    .reply(200, '')
+
+  await t.notThrowsAsync(
+    lib.deviceAuthorizationRequest(tIssuer, tClient, new URLSearchParams(), {
+      headers: new Headers([
+        ['accept', 'will be overwritten'],
+        ['user-agent', 'foo'],
+        ['foo', 'bar'],
+      ]),
+    }),
+  )
 })
 
 test('processDeviceAuthorizationResponse()', async (t) => {
@@ -242,6 +280,35 @@ test('deviceCodeGrantRequest() w/ Extra Parameters', async (t) => {
   await t.notThrowsAsync(
     lib.deviceCodeGrantRequest(tIssuer, tClient, 'device_code', {
       additionalParameters: new URLSearchParams('resource=urn:example:resource'),
+    }),
+  )
+})
+
+test('deviceCodeGrantRequest() w/ Custom Headers', async (t) => {
+  const tIssuer: lib.AuthorizationServer = {
+    ...issuer,
+    token_endpoint: endpoint('token-headers'),
+  }
+
+  t.context
+    .intercept({
+      path: '/token-headers',
+      method: 'POST',
+      headers: {
+        accept: 'application/json',
+        'user-agent': 'foo',
+        foo: 'bar',
+      },
+    })
+    .reply(200, { access_token: 'token', token_type: 'Bearer' })
+
+  await t.notThrowsAsync(
+    lib.deviceCodeGrantRequest(tIssuer, tClient, 'device_code', {
+      headers: new Headers([
+        ['accept', 'will be overwritten'],
+        ['user-agent', 'foo'],
+        ['foo', 'bar'],
+      ]),
     }),
   )
 })
