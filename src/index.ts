@@ -2884,7 +2884,7 @@ export interface IntrospectionRequestOptions
 
 function assertReadableResponse(response: Response) {
   if (response.bodyUsed === true) {
-    throw new TypeError()
+    throw new TypeError('"response" body has been used already')
   }
 }
 
