@@ -723,11 +723,11 @@ function isTopLevelObject<T = object>(input: unknown): input is T {
   return Object.getPrototypeOf(input) === proto
 }
 
-function prepareHeaders({ headers }: HttpRequestOptions = {}): Headers {
-  if (headers !== undefined && !(headers instanceof Headers)) {
+function prepareHeaders(input: unknown): Headers {
+  if (input !== undefined && !(input instanceof Headers)) {
     throw new TypeError('"options.headers" must be an instance of Headers')
   }
-  headers = new Headers(headers)
+  const headers = new Headers(input)
   if (!headers.has('user-agent')) {
     headers.set('user-agent', USER_AGENT)
   }
@@ -792,7 +792,7 @@ export async function discoveryRequest(
       throw new TypeError('"options.algorithm" must be "oidc" (default), or "oauth2"')
   }
 
-  const headers = prepareHeaders(options)
+  const headers = prepareHeaders(options?.headers)
   headers.set('accept', 'application/json')
 
   return fetch(url.href, {
@@ -1390,7 +1390,7 @@ export async function pushedAuthorizationRequest(
   const body = new URLSearchParams(parameters)
   body.set('client_id', client.client_id)
 
-  const headers = prepareHeaders(options)
+  const headers = prepareHeaders(options?.headers)
   headers.set('accept', 'application/json')
 
   if (options?.DPoP !== undefined) {
@@ -1629,11 +1629,7 @@ export async function protectedResourceRequest(
     throw new TypeError('"url" must be an instance of URL')
   }
 
-  if (!(headers instanceof Headers)) {
-    throw new TypeError('"headers" must be an instance of Headers')
-  }
-
-  headers = prepareHeaders({ headers })
+  headers = prepareHeaders(headers)
 
   if (options?.DPoP === undefined) {
     headers.set('authorization', `Bearer ${accessToken}`)
@@ -1686,7 +1682,7 @@ export async function userInfoRequest(
 
   const url = new URL(as.userinfo_endpoint)
 
-  const headers = prepareHeaders(options)
+  const headers = prepareHeaders(options?.headers)
   if (client.userinfo_signed_response_alg) {
     headers.set('accept', 'application/jwt')
   } else {
@@ -2019,16 +2015,8 @@ async function tokenEndpointRequest(
   client: Client,
   grantType: string,
   parameters: URLSearchParams,
-  options?: TokenEndpointRequestOptions,
+  options?: Omit<TokenEndpointRequestOptions, 'additionalParameters'>,
 ): Promise<Response> {
-  if (typeof grantType !== 'string' || grantType.length === 0) {
-    throw new TypeError('"grantType" must be a non-empty string')
-  }
-
-  if (!(parameters instanceof URLSearchParams)) {
-    throw new TypeError('"parameters" must be an instance of URLSearchParams')
-  }
-
   if (typeof as.token_endpoint !== 'string') {
     throw new TypeError('"issuer.token_endpoint" must be a string')
   }
@@ -2036,7 +2024,7 @@ async function tokenEndpointRequest(
   const url = new URL(as.token_endpoint)
 
   parameters.set('grant_type', grantType)
-  const headers = prepareHeaders(options)
+  const headers = prepareHeaders(options?.headers)
   headers.set('accept', 'application/json')
 
   if (options?.DPoP !== undefined) {
@@ -2694,7 +2682,7 @@ export async function revocationRequest(
   const body = new URLSearchParams(options?.additionalParameters)
   body.set('token', token)
 
-  const headers = prepareHeaders(options)
+  const headers = prepareHeaders(options?.headers)
   headers.delete('accept')
 
   return authenticatedRequest(as, client, 'POST', url, body, headers, options)
@@ -2795,7 +2783,7 @@ export async function introspectionRequest(
 
   const body = new URLSearchParams(options?.additionalParameters)
   body.set('token', token)
-  const headers = prepareHeaders(options)
+  const headers = prepareHeaders(options?.headers)
   if (options?.requestJwtResponse ?? client.introspection_signed_response_alg) {
     headers.set('accept', 'application/token-introspection+jwt')
   } else {
@@ -2946,7 +2934,7 @@ export async function jwksRequest(
 
   const url = new URL(as.jwks_uri)
 
-  const headers = prepareHeaders(options)
+  const headers = prepareHeaders(options?.headers)
   headers.set('accept', 'application/json')
   headers.append('accept', 'application/jwk-set+json')
 
@@ -3442,7 +3430,7 @@ export async function deviceAuthorizationRequest(
   const body = new URLSearchParams(parameters)
   body.set('client_id', client.client_id)
 
-  const headers = prepareHeaders(options)
+  const headers = prepareHeaders(options?.headers)
   headers.set('accept', 'application/json')
 
   return authenticatedRequest(as, client, 'POST', url, body, headers, options)
