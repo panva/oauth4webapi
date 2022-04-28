@@ -14,7 +14,6 @@ Recognized Client Metadata that have an effect on the exposed functionality.
 - [default\_max\_age](Client.md#default_max_age)
 - [id\_token\_signed\_response\_alg](Client.md#id_token_signed_response_alg)
 - [introspection\_signed\_response\_alg](Client.md#introspection_signed_response_alg)
-- [request\_object\_encryption\_enc](Client.md#request_object_encryption_enc)
 - [require\_auth\_time](Client.md#require_auth_time)
 - [token\_endpoint\_auth\_method](Client.md#token_endpoint_auth_method)
 - [userinfo\_signed\_response\_alg](Client.md#userinfo_signed_response_alg)
@@ -67,15 +66,6 @@ ___
 • `Optional` **introspection\_signed\_response\_alg**: [`JWSAlgorithm`](../types/JWSAlgorithm.md)
 
 JWS "alg" algorithm REQUIRED for signed introspection responses.
-
-___
-
-### request\_object\_encryption\_enc
-
-• `Optional` **request\_object\_encryption\_enc**: [`ContentEncryptionAlgorithm`](../types/ContentEncryptionAlgorithm.md)
-
-JWE "enc" algorithm the RP is declaring that it may use for encrypting
-Request Objects sent to the authorization server.
 
 ___
 

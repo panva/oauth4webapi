@@ -68,7 +68,6 @@
 - [OpenIDTokenEndpointResponse](interfaces/OpenIDTokenEndpointResponse.md)
 - [PrivateKey](interfaces/PrivateKey.md)
 - [ProtectedResourceRequestOptions](interfaces/ProtectedResourceRequestOptions.md)
-- [PublicKey](interfaces/PublicKey.md)
 - [PushedAuthorizationRequestOptions](interfaces/PushedAuthorizationRequestOptions.md)
 - [PushedAuthorizationResponse](interfaces/PushedAuthorizationResponse.md)
 - [RevocationRequestOptions](interfaces/RevocationRequestOptions.md)
@@ -80,9 +79,7 @@
 
 ### Type aliases
 
-- [ContentEncryptionAlgorithm](types/ContentEncryptionAlgorithm.md)
 - [JWSAlgorithm](types/JWSAlgorithm.md)
-- [KeyManagementAlgorithm](types/KeyManagementAlgorithm.md)
 - [ProcessingMode](types/ProcessingMode.md)
 - [TokenEndpointAuthMethod](types/TokenEndpointAuthMethod.md)
 

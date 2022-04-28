@@ -81,12 +81,7 @@ Pending runtime support
 - OpenID Connect Hybrid Flows
 - MTLS (because fetch does not support client certificates)
 - JWS HMAC Signed Responses
-- JWE Encrypted Responses
-- JWE Key Encryption with RSAES-PKCS1-v1_5
-- JWE Key Wrapping with AES Key Wrap
-- JWE Key Encryption with AES GCM
-- JWE Key Encryption with PBES2
-- JWE Direct Encryption with a Shared Symmetric Key
+- JWE Encrypted Messages
 
 [Web Crypto API]: https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API
 [Fetch API]: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API

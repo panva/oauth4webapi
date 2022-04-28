@@ -4,27 +4,6 @@ const HOMEPAGE = 'https://github.com/panva/oauth4webapi'
 const USER_AGENT = `${NAME}/${VERSION} (${HOMEPAGE})`
 
 /**
- * Interface to pass an asymmetric public key and, optionally, its associated
- * JWK Key ID to be added as a `kid` JOSE Header Parameter.
- */
-export interface PublicKey {
-  /**
-   * An asymmetric public
-   * {@link https://developer.mozilla.org/en-US/docs/Web/API/CryptoKey CryptoKey}.
-   *
-   * Its algorithm must be compatible with a supported
-   * {@link KeyManagementAlgorithm JWE "alg" Key Management Algorithm}.
-   */
-  key: CryptoKey
-
-  /**
-   * JWK Key ID to add to JOSE headers when this key is used. When not provided
-   * no `kid` (JWK Key ID) will be added to the JOSE Header.
-   */
-  kid?: string
-}
-
-/**
  * Interface to pass an asymmetric private key and, optionally, its associated
  * JWK Key ID to be added as a `kid` JOSE Header Parameter.
  */
@@ -114,40 +93,6 @@ export type TokenEndpointAuthMethod =
  * ```
  */
 export type JWSAlgorithm = 'PS256' | 'ES256' | 'RS256'
-
-/**
- * Supported JWE "enc" Content Encryption Algorithm identifiers.
- */
-export type ContentEncryptionAlgorithm = 'A128GCM' | 'A256GCM' | 'A128CBC-HS256' | 'A256CBC-HS512'
-
-/**
- * Supported JWE "alg" Key Management Algorithm identifier.
- *
- * @example ECDH-ES CryptoKey algorithm
- * ```ts
- * interface EcdhEsAlgorithm extends EcKeyAlgorithm {
- *   name: 'ECDH'
- *   namedCurve: 'P-256'
- * }
- * ```
- *
- * @example RSA-OAEP CryptoKey algorithm
- * ```ts
- * interface RsaOaepAlgorithm extends RsaHashedKeyAlgorithm {
- *   name: 'RSA-OAEP'
- *   hash: { name: 'SHA-1' }
- * }
- * ```
- *
- * @example RSA-OAEP-256 CryptoKey algorithm
- * ```ts
- * interface RsaOaep256Algorithm extends RsaHashedKeyAlgorithm {
- *   name: 'RSA-OAEP'
- *   hash: { name: 'SHA-256' }
- * }
- * ```
- */
-export type KeyManagementAlgorithm = 'ECDH-ES' | 'RSA-OAEP' | 'RSA-OAEP-256'
 
 export interface JWK {
   // common
@@ -549,11 +494,6 @@ export interface Client {
    */
   authorization_signed_response_alg?: JWSAlgorithm
   /**
-   * JWE "enc" algorithm the RP is declaring that it may use for encrypting
-   * Request Objects sent to the authorization server.
-   */
-  request_object_encryption_enc?: ContentEncryptionAlgorithm
-  /**
    * Boolean value specifying whether the {@link IDToken.auth_time auth_time}
    * Claim in the ID Token is REQUIRED.
    */
@@ -719,15 +659,6 @@ function isPublicKey(key: unknown): key is CryptoKey {
 export type ProcessingMode = 'oidc' | 'oauth2'
 
 const SUPPORTED_JWS_ALGS: JWSAlgorithm[] = ['PS256', 'ES256', 'RS256']
-
-const SUPPORTED_JWE_ALGS: KeyManagementAlgorithm[] = ['ECDH-ES', 'RSA-OAEP', 'RSA-OAEP-256']
-
-const SUPPORTED_JWE_ENCS: ContentEncryptionAlgorithm[] = [
-  'A128GCM',
-  'A256GCM',
-  'A128CBC-HS256',
-  'A256CBC-HS512',
-]
 
 export interface HttpRequestOptions {
   /**
@@ -980,7 +911,7 @@ interface NormalizedKeyInput {
   kid?: string
 }
 
-function getKeyAndKid(input: CryptoKey | PublicKey | PrivateKey | undefined): NormalizedKeyInput {
+function getKeyAndKid(input: CryptoKey | PrivateKey | undefined): NormalizedKeyInput {
   if (input instanceof CryptoKey) {
     return { key: input }
   }
@@ -1111,42 +1042,6 @@ function determineJWSAlgorithm(key: CryptoKey) {
       return rsAlg(key)
     case 'ECDSA':
       return esAlg(key)
-    default:
-      throw new UnsupportedOperationError('unsupported CryptoKey algorithm name')
-  }
-}
-
-/**
- * Determines an RSAES OAEP algorithm identifier from CryptoKey instance
- * properties.
- */
-function oaepAlg(key: CryptoKey) {
-  switch ((<RsaHashedKeyAlgorithm>key.algorithm).hash.name) {
-    case 'SHA-1':
-      return 'RSA-OAEP'
-    case 'SHA-256':
-      return 'RSA-OAEP-256'
-    default:
-      throw new UnsupportedOperationError('unsupported RsaHashedKeyAlgorithm hash name')
-  }
-}
-
-/**
- * Determines a supported JWE "alg" identifier from CryptoKey instance
- * properties.
- */
-function jweAlg(key: CryptoKey) {
-  switch (key.algorithm.name) {
-    case 'ECDH':
-      switch ((<EcKeyAlgorithm>key.algorithm).namedCurve) {
-        case 'P-256':
-          return 'ECDH-ES'
-        default:
-          throw new UnsupportedOperationError('unsupported EcKeyAlgorithm namedCurve')
-      }
-    case 'RSA-OAEP':
-      checkRsaKeyAlgorithm(<RsaKeyAlgorithm>key.algorithm)
-      return oaepAlg(key)
     default:
       throw new UnsupportedOperationError('unsupported CryptoKey algorithm name')
   }
@@ -1348,14 +1243,12 @@ async function jwt(
  * @param as Authorization Server Metadata
  * @param client Client Metadata
  * @param privateKey Private key to sign the Request Object with.
- * @param publicKey Public key to encrypt the Signed Request Object with.
  */
 export async function issueRequestObject(
   as: AuthorizationServer,
   client: Client,
   parameters: URLSearchParams,
   privateKey: CryptoKey | PrivateKey,
-  publicKey?: CryptoKey | PublicKey,
 ) {
   assertIssuer(as)
   assertClient(client)
@@ -1393,7 +1286,7 @@ export async function issueRequestObject(
     claims.resource = resource
   }
 
-  let request = await jwt(
+  return jwt(
     {
       alg: checkSupportedJwsAlg(determineJWSAlgorithm(key)),
       typ: 'oauth-authz-req+jwt',
@@ -1402,27 +1295,6 @@ export async function issueRequestObject(
     claims,
     key,
   )
-
-  if (publicKey !== undefined) {
-    const { key, kid } = getKeyAndKid(publicKey)
-    if (!isPublicKey(key)) {
-      throw new TypeError('"publicKey.key" must be a public CryptoKey')
-    }
-    request = await jwe(
-      {
-        alg: checkSupportedJweAlg(jweAlg(key)),
-        enc: checkSupportedJweEnc(client.request_object_encryption_enc || 'A128CBC-HS256'),
-        cty: 'oauth-authz-req+jwt',
-        kid,
-        iss: client.client_id,
-        sub: client.client_id,
-        aud: as.issuer,
-      },
-      buf(request),
-      key,
-    )
-  }
-  return request
 }
 
 /**
@@ -2506,18 +2378,6 @@ interface CompactJWSHeaderParameters {
   jwk?: JWK
 }
 
-interface CompactJWEHeaderParameters {
-  alg: KeyManagementAlgorithm
-  enc: ContentEncryptionAlgorithm
-  cty?: string
-  kid?: string
-  typ?: string
-  iss: string
-  sub: string
-  aud: string
-  epk?: JWK
-}
-
 interface ParsedJWT {
   header: CompactJWSHeaderParameters
   claims: JWTPayload
@@ -3169,20 +3029,6 @@ async function handleOAuthBodyError(response: Response) {
   return undefined
 }
 
-function checkSupportedJweEnc(enc: unknown) {
-  if (SUPPORTED_JWE_ENCS.includes(<any>enc) === false) {
-    throw new UnsupportedOperationError('unsupported JWE "enc" identifier')
-  }
-  return <ContentEncryptionAlgorithm>enc
-}
-
-function checkSupportedJweAlg(alg: unknown) {
-  if (SUPPORTED_JWE_ALGS.includes(<any>alg) === false) {
-    throw new UnsupportedOperationError('unsupported JWE "alg" identifier')
-  }
-  return <KeyManagementAlgorithm>alg
-}
-
 function checkSupportedJwsAlg(alg: unknown) {
   if (SUPPORTED_JWS_ALGS.includes(<any>alg) === false) {
     throw new UnsupportedOperationError('unsupported JWS "alg" identifier')
@@ -3533,248 +3379,6 @@ type ReturnTypes =
   | PushedAuthorizationResponse
   | URLSearchParams
   | UserInfoResponse
-
-function cekBitLength(enc: string) {
-  switch (enc) {
-    case 'A128GCM':
-      return 128
-    case 'A256GCM': // Fall through
-    case 'A128CBC-HS256':
-      return 256
-    case 'A256CBC-HS512':
-      return 512
-    default:
-      throw new UnsupportedOperationError()
-  }
-}
-function randomCek(enc: string) {
-  return crypto.getRandomValues(new Uint8Array(cekBitLength(enc) >> 3))
-}
-
-function randomIv(enc: string) {
-  let bitLength: number
-  switch (enc) {
-    case 'A128GCM': // Fall through
-    case 'A256GCM':
-      bitLength = 96
-      break
-    case 'A128CBC-HS256': // Fall through
-    case 'A256CBC-HS512':
-      bitLength = 128
-      break
-    default:
-      throw new UnsupportedOperationError()
-  }
-
-  return crypto.getRandomValues(new Uint8Array(bitLength >> 3))
-}
-
-async function oaepWrap(cek: Uint8Array, key: CryptoKey) {
-  if (key.usages.includes('encrypt') === false) {
-    throw new UnsupportedOperationError()
-  }
-
-  return new Uint8Array(await crypto.subtle.encrypt('RSA-OAEP', key, cek))
-}
-
-async function gcm(plaintext: Uint8Array, cek: Uint8Array, iv: Uint8Array, aad: Uint8Array) {
-  const key = await crypto.subtle.importKey('raw', cek, 'AES-GCM', false, ['encrypt'])
-  const encrypted = new Uint8Array(
-    await crypto.subtle.encrypt(
-      {
-        additionalData: aad,
-        iv,
-        name: 'AES-GCM',
-        tagLength: 128,
-      },
-      key,
-      plaintext,
-    ),
-  )
-
-  const tag = encrypted.slice(-16)
-  const ciphertext = encrypted.slice(0, -16)
-
-  return { ciphertext, tag }
-}
-
-async function cbc(
-  enc: string,
-  plaintext: Uint8Array,
-  cek: Uint8Array,
-  iv: Uint8Array,
-  aad: Uint8Array,
-) {
-  const keySize = parseInt(enc.slice(1, 4), 10)
-
-  const [encKey, macKey] = await Promise.all([
-    crypto.subtle.importKey('raw', cek.subarray(keySize >> 3), 'AES-CBC', false, ['encrypt']),
-    crypto.subtle.importKey(
-      'raw',
-      cek.subarray(0, keySize >> 3),
-      {
-        hash: `SHA-${keySize << 1}`,
-        name: 'HMAC',
-      },
-      false,
-      ['sign'],
-    ),
-  ])
-
-  const ciphertext = new Uint8Array(
-    await crypto.subtle.encrypt(
-      {
-        iv,
-        name: 'AES-CBC',
-      },
-      encKey,
-      plaintext,
-    ),
-  )
-
-  const macData = concat(aad, iv, ciphertext, uint64be(aad.length << 3))
-  const tag = new Uint8Array(
-    (await crypto.subtle.sign('HMAC', macKey, macData)).slice(0, keySize >> 3),
-  )
-
-  return { ciphertext, tag }
-}
-
-function concat(...buffers: Uint8Array[]): Uint8Array {
-  const size = buffers.reduce((acc, { length }) => acc + length, 0)
-  const res = new Uint8Array(size)
-  let i = 0
-  buffers.forEach((buffer) => {
-    res.set(buffer, i)
-    i += buffer.length
-  })
-  return res
-}
-
-function writeUInt32BE(buffer: Uint8Array, value: number, offset?: number) {
-  if (value < 0 || value >= MAX_INT32) {
-    throw new RangeError(`value must be >= 0 and <= ${MAX_INT32 - 1}. Received ${value}`)
-  }
-  buffer.set([value >>> 24, value >>> 16, value >>> 8, value & 0xff], offset)
-}
-
-const MAX_INT32 = 2 ** 32
-function uint64be(value: number) {
-  const high = Math.floor(value / MAX_INT32)
-  const low = value % MAX_INT32
-  const buffer = new Uint8Array(8)
-  writeUInt32BE(buffer, high, 0)
-  writeUInt32BE(buffer, low, 4)
-  return buffer
-}
-
-async function encrypt(
-  enc: string,
-  plaintext: Uint8Array,
-  cek: Uint8Array,
-  iv: Uint8Array,
-  aad: Uint8Array,
-) {
-  switch (enc) {
-    case 'A128CBC-HS256': // Fall through
-    case 'A256CBC-HS512':
-      return cbc(enc, plaintext, cek, iv, aad)
-    case 'A128GCM': // Fall through
-    case 'A256GCM':
-      return gcm(plaintext, cek, iv, aad)
-    default:
-      throw new UnsupportedOperationError()
-  }
-}
-
-function uint32be(value: number) {
-  const res = new Uint8Array(4)
-  writeUInt32BE(res, value)
-  return res
-}
-
-function lengthAndInput(input: Uint8Array) {
-  return concat(uint32be(input.length), input)
-}
-
-function deriveBitsLength(algorithm: KeyAlgorithm) {
-  switch (algorithm.name) {
-    case 'ECDH': {
-      switch ((<EcKeyAlgorithm>algorithm).namedCurve) {
-        case 'P-256':
-          return 256
-      }
-      throw new UnsupportedOperationError()
-    }
-    default:
-      throw new UnsupportedOperationError()
-  }
-}
-
-async function ecdhEs(publicKey: CryptoKey, privateKey: CryptoKey, enc: string) {
-  const Z = new Uint8Array(
-    await crypto.subtle.deriveBits(
-      { name: publicKey.algorithm.name, public: publicKey },
-      privateKey,
-      deriveBitsLength(publicKey.algorithm),
-    ),
-  )
-  const keydatalen = cekBitLength(enc)
-  const AlgorithmID = lengthAndInput(buf(enc))
-  const PartyUInfo = lengthAndInput(new Uint8Array())
-  const PartyVInfo = lengthAndInput(new Uint8Array())
-  const SuppPubInfo = uint32be(keydatalen)
-  const SuppPrivInfo = new Uint8Array()
-
-  const OtherInfo = concat(AlgorithmID, PartyUInfo, PartyVInfo, SuppPubInfo, SuppPrivInfo)
-
-  const iterations = Math.ceil(keydatalen / 256)
-  const res = new Uint8Array(iterations * 32)
-  for (let counter = 0; counter < iterations; counter++) {
-    const input = new Uint8Array(4 + Z.byteLength + OtherInfo.byteLength)
-    input.set(uint32be(counter + 1))
-    input.set(Z, 4)
-    input.set(OtherInfo, 4 + Z.byteLength)
-    res.set(new Uint8Array(await crypto.subtle.digest('SHA-256', input)), counter * 32)
-  }
-  return res.slice(0, keydatalen >> 3)
-}
-
-/**
- * Minimal JWE encrypt() implementation.
- */
-async function jwe(header: CompactJWEHeaderParameters, plaintext: Uint8Array, key: CryptoKey) {
-  let cek: Uint8Array
-  let encryptedKey: Uint8Array
-  switch (<KeyManagementAlgorithm>header.alg) {
-    case 'ECDH-ES': {
-      const epk = <CryptoKeyPair>(
-        await crypto.subtle.generateKey(key.algorithm, false, ['deriveBits'])
-      )
-      const { kty, crv, x, y } = await crypto.subtle.exportKey('jwk', epk.publicKey)
-      header.epk = { kty, crv, x, y }
-      cek = await ecdhEs(key, epk.privateKey, header.enc)
-      encryptedKey = new Uint8Array()
-      break
-    }
-    case 'RSA-OAEP': // Fall through
-    case 'RSA-OAEP-256': {
-      cek = randomCek(header.enc)
-      encryptedKey = await oaepWrap(cek, key)
-      break
-    }
-    default:
-      throw new UnsupportedOperationError()
-  }
-
-  const iv = randomIv(header.enc)
-
-  const protectedHeader = buf(JSON.stringify(header))
-  const aad = buf(b64u(protectedHeader))
-  const { ciphertext, tag } = await encrypt(header.enc, plaintext, cek, iv, aad)
-
-  return [protectedHeader, encryptedKey, iv, ciphertext, tag].map((part) => b64u(part)).join('.')
-}
 
 async function importJwk(jwk: JWK) {
   const { alg, ext, key_ops, use, ...key } = jwk

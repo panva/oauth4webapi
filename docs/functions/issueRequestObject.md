@@ -1,6 +1,6 @@
 # Function: issueRequestObject
 
-▸ **issueRequestObject**(`as`, `client`, `parameters`, `privateKey`, `publicKey?`): `Promise`<`string`\>
+▸ **issueRequestObject**(`as`, `client`, `parameters`, `privateKey`): `Promise`<`string`\>
 
 Generates JWT-Secured Authorization Request (JAR) that is either signed, or
 signed and encrypted.
@@ -15,7 +15,6 @@ signed and encrypted.
 | `client` | [`Client`](../interfaces/Client.md) | Client Metadata |
 | `parameters` | `URLSearchParams` | - |
 | `privateKey` | `CryptoKey` \| [`PrivateKey`](../interfaces/PrivateKey.md) | Private key to sign the Request Object with. |
-| `publicKey?` | `CryptoKey` \| [`PublicKey`](../interfaces/PublicKey.md) | Public key to encrypt the Signed Request Object with. |
 
 #### Returns
 
