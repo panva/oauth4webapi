@@ -1897,8 +1897,8 @@ export async function processUserInfoResponse(
       ),
       getPublicSigKeyFromIssuerJwksUri.bind(undefined, as, options),
     )
-      .then(validateOptionalAudience.bind(undefined, as.issuer))
-      .then(validateOptionalIssuer.bind(undefined, client.client_id))
+      .then(validateOptionalAudience.bind(undefined, client.client_id))
+      .then(validateOptionalIssuer.bind(undefined, as.issuer))
 
     json = <UserInfoResponse>claims
   } else {
