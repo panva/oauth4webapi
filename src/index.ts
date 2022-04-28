@@ -1274,7 +1274,6 @@ export async function issueRequestObject(
     iat: now,
     nbf: now,
     iss: client.client_id,
-    sub: client.client_id,
   }
 
   let resource: string[]

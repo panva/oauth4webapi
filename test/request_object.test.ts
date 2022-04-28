@@ -30,7 +30,6 @@ test('issueRequestObject()', async (t) => {
   t.is(typeof jti, 'string')
   t.deepEqual(claims, {
     iss: client.client_id,
-    sub: client.client_id,
     aud: issuer.issuer,
     response_type: 'code',
     resource: 'urn:example:resource',
