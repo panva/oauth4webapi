@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.6.0](https://github.com/panva/oauth4webapi/compare/v0.5.2...v0.6.0) (2022-04-28)
+
+
+### ⚠ BREAKING CHANGES
+
+* remove encrypted JAR support
+
+### Refactor
+
+* remove encrypted JAR support ([4352049](https://github.com/panva/oauth4webapi/commit/435204953f80567f8b1711cb5796d1c1dd8f8d40))
+
+
+### Fixes
+
+* remove sub from request object ([41d49fa](https://github.com/panva/oauth4webapi/commit/41d49fa71707c9467219670b52d44d1e1e331870))
+* signed userinfo aud and iss expected values ([38edd37](https://github.com/panva/oauth4webapi/commit/38edd37ea87f6d04446ea00507167920bf494ded))
+
 ## [0.5.2](https://github.com/panva/oauth4webapi/compare/v0.5.1...v0.5.2) (2022-04-27)
 
 
