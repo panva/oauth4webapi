@@ -1,6 +1,8 @@
 import { generateKeyPair } from 'node:crypto'
 import { promisify } from 'node:util'
-import { existsSync as exists, writeFileSync } from 'node:fs'
+import { existsSync as exists, writeFileSync, readFileSync } from 'node:fs'
+
+const { homepage, name, version } = JSON.parse(readFileSync('package.json').toString())
 
 import '../test/_pre.mjs'
 
@@ -121,6 +123,7 @@ function makePublicJwks(def: typeof clientConfig) {
 }
 
 const configuration = {
+  description: `${name.split('/').reverse()[0]}/${version} (${homepage})`,
   alias: UUID,
   client: clientConfig,
   waitTimeoutSeconds: 2,
@@ -140,12 +143,6 @@ const { certificationProfileName } = await api.getTestPlanInfo(plan)
 if (certificationProfileName) {
   console.log('CERTIFICATION PROFILE NAME:', certificationProfileName)
 }
-
-process.env.CONFORMANCE = JSON.stringify({
-  configuration,
-  variant,
-  plan,
-})
 
 const files: Set<string> = new Set()
 for (const module of plan.modules) {
@@ -175,6 +172,13 @@ export default {
   extensions: {
     ts: 'module',
     mjs: true,
+  },
+  environmentVariables: {
+    CONFORMANCE: JSON.stringify({
+      configuration,
+      variant,
+      plan,
+    }),
   },
   concurrency: 1,
   // failFast: true,
