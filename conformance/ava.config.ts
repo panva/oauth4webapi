@@ -110,7 +110,7 @@ const clientConfig = {
 }
 
 function makePublicJwks(def: typeof clientConfig) {
-  const client = <typeof def>structuredClone(def)
+  const client = structuredClone(def)
   client.jwks.keys.forEach((jwk) => {
     delete jwk.d
     delete jwk.dp
