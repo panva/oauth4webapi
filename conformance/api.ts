@@ -1,3 +1,5 @@
+import * as fs from 'node:fs/promises'
+
 const { SUITE_BASE_URL = 'https://www.certification.openid.net', SUITE_ACCESS_TOKEN } = process.env
 
 export interface ModulePrescription {
@@ -103,6 +105,15 @@ async function getModuleInfo(module: Test) {
   }
 
   return <ModuleInfo>await response.json()
+}
+
+export async function downloadArtifact(plan: Plan) {
+  const response = await fetch(url(`/api/plan/exporthtml/${plan.id}`), {
+    headers: headers(),
+  })
+
+  const blob = await response.blob()
+  await fs.writeFile(`${plan.id}.zip`, blob.stream(), { flag: 'w' })
 }
 
 export async function waitForState(

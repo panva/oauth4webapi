@@ -128,3 +128,6 @@ dist-browser-tests
 
 examples/*.js
 conformance/*.js
+
+*.zip
+*.txt

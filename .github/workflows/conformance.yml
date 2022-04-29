@@ -124,3 +124,10 @@ jobs:
           node-version: 18
       - run: npm clean-install
       - run: npm run conformance
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          path: '*.zip'
+          name: html results
+          if-no-files-found: error
+        if: ${{ always() }}

@@ -181,9 +181,8 @@ export default {
     }),
   },
   concurrency: 1,
-  // failFast: true,
   require: ['./test/_pre.mjs'],
-  files: [...files],
+  files: [...files, './conformance/download_archive.ts'],
   nodeArguments: [
     '--loader=ts-node/esm',
     '--enable-source-maps',
