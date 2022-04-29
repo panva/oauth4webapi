@@ -3213,24 +3213,22 @@ function checkSigningAlgorithm(
   fallback: string,
   header: CompactJWSHeaderParameters,
 ) {
-  switch (true) {
-    case client !== undefined: {
-      if (header.alg !== client) {
-        throw new OPE('unexpected JWT "alg" header parameter')
-      }
-      break
+  if (client !== undefined) {
+    if (header.alg !== client) {
+      throw new OPE('unexpected JWT "alg" header parameter')
     }
-    case Array.isArray(issuer): {
-      if ((<string[]>issuer).includes(header.alg) === false) {
-        throw new OPE('unexpected JWT "alg" header parameter')
-      }
-      break
+    return
+  }
+
+  if (Array.isArray(issuer)) {
+    if (issuer.includes(header.alg) === false) {
+      throw new OPE('unexpected JWT "alg" header parameter')
     }
-    default: {
-      if (header.alg !== fallback) {
-        throw new OPE('unexpected JWT "alg" header parameter')
-      }
-    }
+    return
+  }
+
+  if (header.alg !== fallback) {
+    throw new OPE('unexpected JWT "alg" header parameter')
   }
 }
 
