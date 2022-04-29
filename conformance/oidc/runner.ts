@@ -222,11 +222,11 @@ export const red = test.macro({
         message: expectedMessage,
         name: expectedErrorName,
       })
-      .then((ok) => {
-        if (ok) {
+      .then((err) => {
+        if (err) {
           t.log('rejected with', {
-            message: expectedMessage,
-            name: expectedErrorName,
+            message: err.message,
+            name: err.name,
           })
         }
       })
