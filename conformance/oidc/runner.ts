@@ -37,23 +37,25 @@ export const green = test.macro({
   async exec(t, module: ModulePrescription) {
     t.timeout(10000)
 
-    const variant = {
-      ...conformance.variant,
-      ...module.variant,
-    }
-    t.log('variant', variant)
-
     const instance = await createTestFromPlan(plan, module)
     t.context.instance = instance
 
     t.log('Test ID', instance.id)
     t.log('Test Name', instance.name)
 
+    const variant = {
+      ...conformance.variant,
+      ...module.variant,
+    }
+    t.log('variant', variant)
+
     const issuer = new URL(`${instance.url}/`)
 
     const as = await oauth
       .discoveryRequest(issuer)
       .then((response) => oauth.processDiscoveryResponse(issuer, response))
+
+    t.log('AS Metadata', as)
 
     const client: oauth.Client = {
       client_id: configuration.client.client_id,
@@ -124,7 +126,7 @@ export const green = test.macro({
 
     const response = await fetch(authorizationUrl.href, { redirect: 'manual' })
 
-    t.log('redirect with', authorizationUrl.searchParams.toString())
+    t.log('redirect with', Object.fromEntries(authorizationUrl.searchParams.entries()))
 
     const currentUrl = new URL(response.headers.get('location')!)
 
@@ -137,7 +139,7 @@ export const green = test.macro({
         throw new Error() // Handle OAuth 2.0 redirect error
       }
 
-      t.log('parsed parameters', params.toString())
+      t.log('parsed callback parameters', Object.fromEntries(params.entries()))
 
       const response = await oauth.authorizationCodeGrantRequest(
         as,
@@ -195,6 +197,7 @@ export const green = test.macro({
 
     await waitForState(instance)
 
+    t.log('Test Finished')
     t.pass()
   },
   title(providedTitle = '', module: ModulePrescription) {
@@ -229,7 +232,7 @@ export const red = test.macro({
       })
 
     await waitForState(t.context.instance)
-
+    t.log('Test Finished')
     t.pass()
   },
   title(providedTitle = '', module: ModulePrescription) {
