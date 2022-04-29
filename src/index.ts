@@ -1842,6 +1842,10 @@ async function getPublicSigKeyFromIssuerJwksUri(
  */
 export const skipSubjectCheck = Symbol()
 
+function getContentType(response: Response) {
+  return response.headers.get('content-type')?.split(';')[0]
+}
+
 /**
  * Validates
  * {@link https://developer.mozilla.org/en-US/docs/Web/API/Response Fetch API Response}
@@ -1880,8 +1884,7 @@ export async function processUserInfoResponse(
   }
 
   let json: unknown
-  const [contentType] = (response.headers.get('content-type') || '').split(';')
-  if (contentType === 'application/jwt') {
+  if (getContentType(response) === 'application/jwt') {
     if (typeof as.jwks_uri !== 'string') {
       throw new TypeError('"issuer.jwks_uri" must be a string')
     }
@@ -2855,8 +2858,7 @@ export async function processIntrospectionResponse(
   }
 
   let json: unknown
-  const [contentType] = (response.headers.get('content-type') || '').split(';')
-  if (contentType === 'application/token-introspection+jwt') {
+  if (getContentType(response) === 'application/token-introspection+jwt') {
     if (typeof as.jwks_uri !== 'string') {
       throw new TypeError('"issuer.jwks_uri" must be a string')
     }
