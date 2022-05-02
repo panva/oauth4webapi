@@ -10,17 +10,25 @@ const rl = readline.createInterface({
 })
 
 let currentFile
+let testName
+let testId
 
 rl.on('line', (line) => {
+  line = line.substring(4)
   if (currentFile && line.includes('Test ID')) {
     throw new Error()
   }
 
   if (line.includes('Test ID')) {
-    currentFile = `${line.split(' ').reverse()[0]}.txt`
+    testId = line.split(' ').reverse()[0]
+    currentFile = `${testId}.txt`
     if (fs.existsSync(currentFile)) {
       fs.unlinkSync(currentFile)
     }
+  }
+
+  if (line.includes('Test Name')) {
+    testName = line.split(' ').reverse()[0]
   }
 
   if (!currentFile) {
@@ -30,7 +38,8 @@ rl.on('line', (line) => {
   fs.writeFileSync(currentFile, `${line}\n`, { flag: 'a' })
 
   if (line.includes('Test Finished')) {
-    currentFile = null
+    fs.renameSync(currentFile, `${testName}-${testId}.txt`)
+    currentFile = testName = testId = null
   }
 })
 
