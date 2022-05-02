@@ -623,8 +623,8 @@ class LRU<T1, T2> {
 }
 
 export class UnsupportedOperationError extends Error {
-  constructor(message = 'operation not supported') {
-    super(message)
+  constructor(message?: string) {
+    super(message ?? 'operation not supported')
     this.name = this.constructor.name
     // @ts-ignore
     Error.captureStackTrace?.(this, this.constructor)
@@ -2461,12 +2461,14 @@ export const skipAuthTimeCheck = Symbol()
  * @param as Authorization Server Metadata
  * @param client Client Metadata
  * @param response resolved value from {@link authorizationCodeGrantRequest}
- * @param expectedNonce Expected ID Token "nonce" claim value
+ * @param expectedNonce Expected ID Token "nonce" claim value. Default is
+ * {@link expectNoNonce}.
  * @param maxAge ID Token {@link IDToken.auth_time auth_time} parameter will be
  * checked to be present and conform to the "maxAge" value. Use of this option
- * is required if you sent a max_age parameter in an authorization request. It's
- * value defaults to {@link Client.default_max_age `client.default_max_age`} and
- * falls back to {@link skipAuthTimeCheck}
+ * is required if you sent a max_age parameter in an authorization request.
+ * Default is
+ * {@link Client.default_max_age `client.default_max_age`} and
+ * falls back to {@link skipAuthTimeCheck}.
  *
  * @returns Object representing the parsed successful response, or an object
  * representing an OAuth 2.0 protocol style error. Use {@link isOAuth2Error} to
@@ -2476,8 +2478,8 @@ export async function processAuthorizationCodeOpenIDResponse(
   as: AuthorizationServer,
   client: Client,
   response: Response,
-  expectedNonce: string | typeof expectNoNonce = expectNoNonce,
-  maxAge: number | typeof skipAuthTimeCheck = client.default_max_age ?? skipAuthTimeCheck,
+  expectedNonce?: string | typeof expectNoNonce,
+  maxAge?: number | typeof skipAuthTimeCheck,
   options?: HttpRequestOptions,
 ): Promise<OpenIDTokenEndpointResponse | OAuth2Error> {
   const result = await processGenericAccessTokenResponse(as, client, response, options)
@@ -2490,6 +2492,7 @@ export async function processAuthorizationCodeOpenIDResponse(
     throw new OPE('"response" body "id_token" property must be a non-empty string')
   }
 
+  maxAge ??= client.default_max_age ?? skipAuthTimeCheck
   const claims = getValidatedIdTokenClaims(result)!
   if (
     (client.require_auth_time || maxAge !== skipAuthTimeCheck) &&
@@ -2511,6 +2514,7 @@ export async function processAuthorizationCodeOpenIDResponse(
   }
 
   switch (expectedNonce) {
+    case undefined:
     case expectNoNonce:
       if (claims.nonce !== undefined) {
         throw new OPE('unexpected ID Token "nonce" claim value received')
@@ -3142,7 +3146,7 @@ async function validateJwt(
  * @param as Authorization Server Metadata
  * @param client Client Metadata
  * @param parameters JARM authorization response
- * @param expectedState Expected "state" parameter value
+ * @param expectedState Expected "state" parameter value. Default is {@link expectNoState}.
  *
  * @returns Validated Authorization Response parameters or Authorization Error Response.
  */
@@ -3150,7 +3154,7 @@ export async function validateJwtAuthResponse(
   as: AuthorizationServer,
   client: Client,
   parameters: URLSearchParams | URL,
-  expectedState: string | typeof expectNoState | typeof skipStateCheck = expectNoState,
+  expectedState?: string | typeof expectNoState | typeof skipStateCheck,
   options?: HttpRequestOptions,
 ): Promise<CallbackParameters | OAuth2Error> {
   assertIssuer(as)
@@ -3279,7 +3283,7 @@ class CallbackParameters extends URLSearchParams {}
  * @param as Authorization Server Metadata
  * @param client Client Metadata
  * @param parameters Authorization response
- * @param expectedState Expected "state" parameter value
+ * @param expectedState Expected "state" parameter value. Default is {@link expectNoState}.
  *
  * @returns Validated Authorization Response parameters or Authorization Error Response.
  */
@@ -3287,7 +3291,7 @@ export function validateAuthResponse(
   as: AuthorizationServer,
   client: Client,
   parameters: URLSearchParams | URL,
-  expectedState: string | typeof expectNoState | typeof skipStateCheck = expectNoState,
+  expectedState?: string | typeof expectNoState | typeof skipStateCheck,
 ): CallbackParameters | OAuth2Error {
   assertIssuer(as)
   assertClient(client)
@@ -3318,6 +3322,7 @@ export function validateAuthResponse(
   }
 
   switch (expectedState) {
+    case undefined:
     case expectNoState:
       if (state !== undefined) {
         throw new OPE('unexpected "state" parameter received')

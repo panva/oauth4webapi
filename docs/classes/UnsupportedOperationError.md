@@ -14,6 +14,6 @@
 
 #### Parameters
 
-| Name | Type | Default value |
-| :------ | :------ | :------ |
-| `message` | `string` | `'operation not supported'` |
+| Name | Type |
+| :------ | :------ |
+| `message?` | `string` |

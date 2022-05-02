@@ -13,14 +13,14 @@ to be one coming from the
 
 #### Parameters
 
-| Name | Type | Default value | Description |
-| :------ | :------ | :------ | :------ |
-| `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | `undefined` | Authorization Server Metadata |
-| `client` | [`Client`](../interfaces/Client.md) | `undefined` | Client Metadata |
-| `response` | `Response` | `undefined` | resolved value from [authorizationCodeGrantRequest](authorizationCodeGrantRequest.md) |
-| `expectedNonce` | `string` \| typeof [`expectNoNonce`](../variables/expectNoNonce.md) | `expectNoNonce` | Expected ID Token "nonce" claim value |
-| `maxAge` | `number` \| typeof [`skipAuthTimeCheck`](../variables/skipAuthTimeCheck.md) | `undefined` | ID Token [auth_time](../interfaces/IDToken.md#auth_time) parameter will be checked to be present and conform to the "maxAge" value. Use of this option is required if you sent a max_age parameter in an authorization request. It's value defaults to [`client.default_max_age`](../interfaces/Client.md#default_max_age) and falls back to [skipAuthTimeCheck](../variables/skipAuthTimeCheck.md) |
-| `options?` | [`HttpRequestOptions`](../interfaces/HttpRequestOptions.md) | `undefined` | - |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata |
+| `client` | [`Client`](../interfaces/Client.md) | Client Metadata |
+| `response` | `Response` | resolved value from [authorizationCodeGrantRequest](authorizationCodeGrantRequest.md) |
+| `expectedNonce?` | `string` \| typeof [`expectNoNonce`](../variables/expectNoNonce.md) | Expected ID Token "nonce" claim value. Default is [expectNoNonce](../variables/expectNoNonce.md). |
+| `maxAge?` | `number` \| typeof [`skipAuthTimeCheck`](../variables/skipAuthTimeCheck.md) | ID Token [auth_time](../interfaces/IDToken.md#auth_time) parameter will be checked to be present and conform to the "maxAge" value. Use of this option is required if you sent a max_age parameter in an authorization request. Default is [`client.default_max_age`](../interfaces/Client.md#default_max_age) and falls back to [skipAuthTimeCheck](../variables/skipAuthTimeCheck.md). |
+| `options?` | [`HttpRequestOptions`](../interfaces/HttpRequestOptions.md) | - |
 
 #### Returns
 
