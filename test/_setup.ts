@@ -20,6 +20,7 @@ export default (t: ExecutionContext<Context>) => {
 }
 
 export async function teardown(t: ExecutionContext<Context>) {
+  t.context.mock.assertNoPendingInterceptors()
   await t.context.mock.close()
 }
 
