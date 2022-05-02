@@ -117,17 +117,21 @@ jobs:
         with:
           node-version: 18
       - run: npm clean-install
-      - run: npm run conformance
+      - run: npm run conformance | tee capture.txt
         env:
           NODE_TLS_REJECT_UNAUTHORIZED: 0
           SUITE_BASE_URL: https://localhost.emobix.co.uk:8443
           PLAN_NAME: ${{ matrix.setup.plan }}
           VARIANT: ${{ toJSON(matrix.setup) }}
           JWS_ALGORITHM: ${{ matrix.setup.algorithm || 'RS256' }}
+      - run: node ./conformance/.parse-logs.mjs capture.txt
+      - run: rm capture.txt
       - name: Upload test artifacts
         uses: actions/upload-artifact@v3
         with:
-          path: '*.zip'
-          name: html results
+          path: |
+            *.zip
+            *.txt
+          name: conformance results
           if-no-files-found: error
         if: ${{ always() }}
