@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.6.1](https://github.com/panva/oauth4webapi/compare/v0.6.0...v0.6.1) (2022-05-02)
+
+
+### Fixes
+
+* **types:** validateJwtAuthResponse expectedState is optional ([e618089](https://github.com/panva/oauth4webapi/commit/e61808900805813aed59197fa8b821eb48ecc526))
+
 ## [0.6.0](https://github.com/panva/oauth4webapi/compare/v0.5.2...v0.6.0) (2022-04-28)
 
 
