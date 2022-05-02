@@ -3150,7 +3150,7 @@ export async function validateJwtAuthResponse(
   as: AuthorizationServer,
   client: Client,
   parameters: URLSearchParams | URL,
-  expectedState: string | typeof expectNoState | typeof skipStateCheck,
+  expectedState: string | typeof expectNoState | typeof skipStateCheck = expectNoState,
   options?: HttpRequestOptions,
 ): Promise<CallbackParameters | OAuth2Error> {
   assertIssuer(as)
