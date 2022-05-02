@@ -49,7 +49,7 @@ export async function createTestPlan(
 ) {
   const response = await fetch(url('/api/plan', { planName, variant: JSON.stringify(variant) }), {
     method: 'POST',
-    headers: headers({ 'content-type': 'application/json' }),
+    headers: headers({ 'content-type': 'application/json;charset=utf-8' }),
     body: JSON.stringify(config),
   })
 
