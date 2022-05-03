@@ -704,23 +704,8 @@ function normalizeTyp(value: string) {
   return value.toLowerCase().replace(/^application\//, '')
 }
 
-function isObjectLike(value: unknown) {
-  return typeof value === 'object' && value !== null
-}
-
-function isTopLevelObject<T = object>(input: unknown): input is T {
-  if (!isObjectLike(input) || Object.prototype.toString.call(input) !== '[object Object]') {
-    return false
-  }
-
-  if (Object.getPrototypeOf(input) === null) {
-    return true
-  }
-  let proto = input
-  while (Object.getPrototypeOf(proto) !== null) {
-    proto = Object.getPrototypeOf(proto)
-  }
-  return Object.getPrototypeOf(input) === proto
+function isJsonObject<T = object>(input: unknown): input is T {
+  return input !== null && typeof input === 'object' && Array.isArray(input) === false
 }
 
 function prepareHeaders(input: unknown): Headers {
@@ -839,7 +824,7 @@ export async function processDiscoveryResponse(
     throw new OPE('failed to parsed "response" body as JSON')
   }
 
-  if (!isTopLevelObject<AuthorizationServer>(json)) {
+  if (!isJsonObject<AuthorizationServer>(json)) {
     throw new OPE('"response" body must be a top level object')
   }
 
@@ -1574,7 +1559,7 @@ export async function processPushedAuthorizationResponse(
     throw new OPE('failed to parsed "response" body as JSON')
   }
 
-  if (!isTopLevelObject<PushedAuthorizationResponse>(json)) {
+  if (!isJsonObject<PushedAuthorizationResponse>(json)) {
     throw new OPE('"response" body must be a top level object')
   }
 
@@ -1915,7 +1900,7 @@ export async function processUserInfoResponse(
     }
   }
 
-  if (!isTopLevelObject<UserInfoResponse>(json)) {
+  if (!isJsonObject<UserInfoResponse>(json)) {
     throw new OPE('"response" body must be a top level object')
   }
 
@@ -2122,7 +2107,7 @@ async function processGenericAccessTokenResponse(
     throw new OPE('failed to parsed "response" body as JSON')
   }
 
-  if (!isTopLevelObject<TokenEndpointResponse>(json)) {
+  if (!isJsonObject<TokenEndpointResponse>(json)) {
     throw new OPE('"response" body must be a top level object')
   }
 
@@ -2889,7 +2874,7 @@ export async function processIntrospectionResponse(
       .then(validateAudience.bind(undefined, client.client_id))
 
     json = claims.token_introspection
-    if (!isTopLevelObject<IntrospectionResponse>(json)) {
+    if (!isJsonObject<IntrospectionResponse>(json)) {
       throw new OPE('JWT payload must be a top level object')
     }
   } else {
@@ -2900,7 +2885,7 @@ export async function processIntrospectionResponse(
     }
   }
 
-  if (!isTopLevelObject<IntrospectionResponse>(json)) {
+  if (!isJsonObject<IntrospectionResponse>(json)) {
     throw new OPE('"response" body must be a top level object')
   }
 
@@ -2983,7 +2968,7 @@ export async function processJwksResponse(response: Response): Promise<JsonWebKe
     throw new OPE('failed to parsed "response" body as JSON')
   }
 
-  if (!isTopLevelObject<JsonWebKeySet>(json)) {
+  if (!isJsonObject<JsonWebKeySet>(json)) {
     throw new OPE('"response" body must be a top level object')
   }
 
@@ -2991,7 +2976,7 @@ export async function processJwksResponse(response: Response): Promise<JsonWebKe
     throw new OPE('"response" body "keys" property must be an array')
   }
 
-  if (!Array.prototype.every.call(json.keys, isTopLevelObject)) {
+  if (!Array.prototype.every.call(json.keys, isJsonObject)) {
     throw new OPE('"response" body "keys" property members must be JWK formatted objects')
   }
 
@@ -3003,7 +2988,7 @@ async function handleOAuthBodyError(response: Response) {
     try {
       const json: unknown = await preserveBodyStream(response).json()
       if (
-        isTopLevelObject<OAuth2Error>(json) &&
+        isJsonObject<OAuth2Error>(json) &&
         typeof json.error === 'string' &&
         json.error.length !== 0
       ) {
@@ -3075,7 +3060,7 @@ async function validateJwt(
     header = JSON.parse(buf(b64u(protectedHeader)))
   } catch {}
 
-  if (!isTopLevelObject<CompactJWSHeaderParameters>(header)) {
+  if (!isJsonObject<CompactJWSHeaderParameters>(header)) {
     throw new OPE('JWT Header must be a top level object')
   }
 
@@ -3100,7 +3085,7 @@ async function validateJwt(
     claims = JSON.parse(buf(b64u(payload)))
   } catch {}
 
-  if (!isTopLevelObject<JWTPayload>(claims)) {
+  if (!isJsonObject<JWTPayload>(claims)) {
     throw new OPE('JWT Payload must be a top level object')
   }
 
@@ -3503,7 +3488,7 @@ export async function processDeviceAuthorizationResponse(
     throw new OPE('failed to parsed "response" body as JSON')
   }
 
-  if (!isTopLevelObject<DeviceAuthorizationResponse>(json)) {
+  if (!isJsonObject<DeviceAuthorizationResponse>(json)) {
     throw new OPE('"response" body must be a top level object')
   }
 
