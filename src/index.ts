@@ -1733,18 +1733,6 @@ async function getPublicSigKeyFromIssuerJwksUri(
 ): Promise<CryptoKey> {
   const { alg, kid } = header
   checkSupportedJwsAlg(alg)
-  let kty: string
-  switch (alg[0]) {
-    case 'R': // Fall through
-    case 'P':
-      kty = 'RSA'
-      break
-    case 'E':
-      kty = 'EC'
-      break
-    default:
-      throw new UnsupportedOperationError()
-  }
 
   let jwks: JsonWebKeySet
   let age: number
@@ -1767,40 +1755,52 @@ async function getPublicSigKeyFromIssuerJwksUri(
     })
   }
 
+  let kty: string
+  switch (alg[0]) {
+    case 'R': // Fall through
+    case 'P':
+      kty = 'RSA'
+      break
+    case 'E':
+      kty = 'EC'
+      break
+    default:
+      throw new UnsupportedOperationError()
+  }
+
   const candidates = jwks.keys.filter((jwk) => {
     // filter keys based on the mapping of signature algorithms to Key Type
-    let candidate = jwk.kty === kty
+    if (jwk.kty !== kty) {
+      return false
+    }
 
     // filter keys based on the JWK Key ID in the header
-    if (candidate && typeof kid === 'string') {
-      candidate = kid === jwk.kid
+    if (kid !== undefined && kid !== jwk.kid) {
+      return false
     }
 
     // filter keys based on the key's declared Algorithm
-    if (candidate && typeof jwk.alg === 'string') {
-      candidate = alg === jwk.alg
+    if (jwk.alg !== undefined && alg !== jwk.alg) {
+      return false
     }
 
     // filter keys based on the key's declared Public Key Use
-    if (candidate && typeof jwk.use === 'string') {
-      candidate = jwk.use === 'sig'
+    if (jwk.use !== undefined && jwk.use !== 'sig') {
+      return false
     }
 
     // filter keys based on the key's declared Key Operations
-    if (candidate && Array.isArray(jwk.key_ops)) {
-      candidate = jwk.key_ops.includes('verify')
+    if (jwk.key_ops?.includes('verify') === false) {
+      return false
     }
 
-    // filter out non-applicable EC curves
-    if (candidate) {
-      switch (alg) {
-        case 'ES256':
-          candidate = jwk.crv === 'P-256'
-          break
-      }
+    // filter keys based on alg-specific key requirements
+    switch (alg) {
+      case 'ES256':
+        return jwk.crv === 'P-256'
+      default:
+        return true
     }
-
-    return candidate
   })
 
   const { 0: jwk, length } = candidates
