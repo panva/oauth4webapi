@@ -11,6 +11,8 @@ export interface Test {
   id: string
   name: string
   url: string
+  issuer: string
+  accounts_endpoint?: string
 }
 
 export interface ModuleInfo {
@@ -91,6 +93,20 @@ export async function createTestFromPlan(plan: Plan, module: ModulePrescription)
   const test: Test = await response.json()
 
   await waitForState(test, { states: new Set(['WAITING']), results: new Set() })
+
+  await fetch(url(`/api/runner/${test.id}`), {
+    method: 'GET',
+    headers: headers(),
+  })
+    .then((response) => response.json())
+    .then((json) => {
+      const exposed = {
+        issuer: <string>json.exposed.issuer,
+        accounts_endpoint: <string | undefined>json.exposed.accounts_endpoint,
+      }
+
+      Object.assign(test, exposed)
+    })
 
   return test
 }

@@ -1,7 +1,7 @@
 import test from 'ava'
 
 import { downloadArtifact } from './api'
-import { plan } from './oidc/runner'
+import { plan } from './runner'
 
 test('downloading artifact', async (t) => {
   await downloadArtifact(plan)

@@ -1,6 +1,8 @@
-import { generateKeyPair } from 'node:crypto'
+import * as crypto from 'node:crypto'
 import { promisify } from 'node:util'
 import { existsSync as exists, writeFileSync, readFileSync } from 'node:fs'
+
+const generateKeyPair = promisify(crypto.generateKeyPair)
 
 const { homepage, name, version } = JSON.parse(readFileSync('package.json').toString())
 
@@ -15,16 +17,19 @@ import { JWS_ALGORITHM, PLAN_NAME, VARIANT } from './env'
 switch (PLAN_NAME) {
   case 'oidcc-client-basic-certification-test-plan':
   case 'oidcc-client-test-plan':
+  case 'fapi2-baseline-id2-client-test-plan':
     break
   default:
     throw new Error()
 }
 
+function exportPrivate(keyPair: crypto.KeyPairKeyObjectResult) {
+  return keyPair.privateKey.export({ format: 'jwk' })
+}
+
 async function RS256() {
   return {
-    ...(await promisify(generateKeyPair)('rsa', { modulusLength: 2048 })).privateKey.export({
-      format: 'jwk',
-    }),
+    ...exportPrivate(await generateKeyPair('rsa', { modulusLength: 2048 })),
     use: 'sig',
     alg: 'RS256',
     kid: crypto.randomUUID(),
@@ -40,9 +45,7 @@ async function PS256() {
 
 async function ES256() {
   return {
-    ...(await promisify(generateKeyPair)('ec', { namedCurve: 'P-256' })).privateKey.export({
-      format: 'jwk',
-    }),
+    ...exportPrivate(await generateKeyPair('ec', { namedCurve: 'P-256' })),
     use: 'sig',
     alg: 'ES256',
     kid: crypto.randomUUID(),
@@ -51,9 +54,7 @@ async function ES256() {
 
 async function EdDSA() {
   return {
-    ...(await promisify(generateKeyPair)('ed25519')).privateKey.export({
-      format: 'jwk',
-    }),
+    ...exportPrivate(await generateKeyPair('ed25519')),
     use: 'sig',
     alg: 'EdDSA',
     kid: crypto.randomUUID(),
@@ -75,7 +76,31 @@ async function generate() {
   }
 }
 
-const defaultVariants: Record<typeof PLAN_NAME, Record<string, string>> = {
+function needsSecret(variant: Record<string, string>) {
+  switch (variant.client_auth_type) {
+    case undefined:
+    case 'client_secret_basic':
+    case 'client_secret_post':
+    case 'client_secret_jwt':
+      return true
+    default:
+      return false
+  }
+}
+
+export function usesRequestObject(planName: string, variant: Record<string, string>) {
+  if (planName.startsWith('fapi2-advanced')) {
+    return true
+  }
+
+  if (variant.request_type === 'request_object') {
+    return true
+  }
+
+  return false
+}
+
+const DEFAULTS: Record<typeof PLAN_NAME, Record<string, string>> = {
   'oidcc-client-test-plan': {
     response_mode: 'default',
     client_registration: 'static_client',
@@ -87,31 +112,22 @@ const defaultVariants: Record<typeof PLAN_NAME, Record<string, string>> = {
     request_type: 'plain_http_request',
     client_registration: 'static_client',
   },
-}
-
-const { plan: ignored, algorithm: ignored2, ...parsedVariant } = JSON.parse(VARIANT)
-
-const variant = {
-  ...defaultVariants[PLAN_NAME],
-  ...parsedVariant,
-}
-
-const clientConfig = {
-  client_id: `client-${UUID}`,
-  client_secret: `client-${UUID}`,
-  scope: 'All your base are belong to us',
-  redirect_uri: `https://client-${UUID}.local/cb`,
-  jwks: {
-    keys: await generate(),
+  'fapi2-baseline-id2-client-test-plan': {
+    client_auth_type: 'private_key_jwt',
+    sender_constrain: 'dpop',
+    // TODO: why is this called fapi_jarm_type?
+    fapi_jarm_type: 'oidc', // oidc, plain_oauth
+    fapi_profile: 'plain_fapi',
   },
-  // https://gitlab.com/openid/conformance-suite/-/issues/1032
-  request_object_signing_alg: variant.request_type === 'request_object' ? JWS_ALGORITHM : undefined,
-  id_token_signed_response_alg: JWS_ALGORITHM,
 }
 
-function makePublicJwks(def: typeof clientConfig) {
+export function getScope(variant: Record<string, string>) {
+  return variant.fapi_jarm_type === 'plain_oauth' ? 'email' : 'openid email'
+}
+
+function makePublicJwks(def: any) {
   const client = structuredClone(def)
-  client.jwks.keys.forEach((jwk) => {
+  client.jwks.keys.forEach((jwk: any) => {
     delete jwk.d
     delete jwk.dp
     delete jwk.dq
@@ -122,72 +138,113 @@ function makePublicJwks(def: typeof clientConfig) {
   return client
 }
 
-const configuration = {
-  description: `${name.split('/').reverse()[0]}/${version} (${homepage})`,
-  alias: UUID,
-  client: clientConfig,
-  waitTimeoutSeconds: 2,
-}
+function ensureTestFile(path: string, name: string) {
+  if (!exists(path)) {
+    writeFileSync(
+      path,
+      `import test from 'ava'
 
-const plan = await api.createTestPlan(
-  PLAN_NAME,
-  {
-    ...configuration,
-    client: makePublicJwks(clientConfig),
-  },
-  variant,
-)
-
-const { certificationProfileName } = await api.getTestPlanInfo(plan)
-
-if (certificationProfileName) {
-  console.log('CERTIFICATION PROFILE NAME:', certificationProfileName)
-}
-
-const files: Set<string> = new Set()
-for (const module of plan.modules) {
-  // if (module.testModule !== 'oidcc-client-test') continue
-  switch (PLAN_NAME) {
-    case 'oidcc-client-test-plan':
-    case 'oidcc-client-basic-certification-test-plan':
-      const path = `./conformance/oidc/${module.testModule}.ts`
-      if (exists(path)) {
-        files.add(path)
-      } else {
-        writeFileSync(
-          path,
-          `import test from 'ava'
-
-test.todo('${module.testModule}')
+test.todo('${name}')
 `,
-        )
-      }
-      break
-    default:
-      throw new Error()
+    )
   }
 }
 
-export default {
-  extensions: {
-    ts: 'module',
-    mjs: true,
-  },
-  environmentVariables: {
-    CONFORMANCE: JSON.stringify({
-      configuration,
-      variant,
-      plan,
-    }),
-  },
-  concurrency: 1,
-  require: ['./test/_pre.mjs'],
-  files: [...files, './conformance/download_archive.ts'],
-  nodeArguments: [
-    '--loader=ts-node/esm',
-    '--enable-source-maps',
-    '--no-warnings',
-    '--conditions=browser',
-    '--experimental-specifier-resolution=node',
-  ],
+const { plan: ignored, algorithm: ignored2, ...parsedVariant } = JSON.parse(VARIANT)
+
+const variant = {
+  ...DEFAULTS[PLAN_NAME],
+  ...parsedVariant,
+}
+
+export default async () => {
+  const clientConfig = {
+    client_id: `client-${UUID}`,
+    client_secret: needsSecret(variant) ? `client-${UUID}` : undefined,
+    scope: getScope(variant),
+    redirect_uri: `https://client-${UUID}.local/cb`,
+    jwks: {
+      keys: await generate(),
+    },
+    // TODO: remove when https://gitlab.com/openid/conformance-suite/-/issues/1032 is resolved
+    request_object_signing_alg: usesRequestObject(PLAN_NAME, variant) ? JWS_ALGORITHM : undefined,
+    id_token_signed_response_alg: JWS_ALGORITHM,
+  }
+
+  const configuration = {
+    description: `${name.split('/').reverse()[0]}/${version} (${homepage})`,
+    alias: UUID,
+    client: clientConfig,
+    waitTimeoutSeconds: 2,
+    ...(PLAN_NAME.startsWith('fapi')
+      ? {
+          server: {
+            jwks: {
+              keys: await generate(),
+            },
+          },
+        }
+      : undefined),
+  }
+
+  const plan = await api.createTestPlan(
+    PLAN_NAME,
+    {
+      ...configuration,
+      client: makePublicJwks(clientConfig),
+    },
+    variant,
+  )
+
+  const { certificationProfileName } = await api.getTestPlanInfo(plan)
+
+  if (certificationProfileName) {
+    console.log('CERTIFICATION PROFILE NAME:', certificationProfileName)
+  }
+
+  const files: Set<string> = new Set()
+  for (const module of plan.modules) {
+    switch (PLAN_NAME) {
+      case 'fapi2-baseline-id2-client-test-plan': {
+        const name = module.testModule.replace('fapi2-baseline-id2-client-test-', '')
+        const path = `./conformance/fapi/${name}.ts`
+        ensureTestFile(path, name)
+        files.add(path)
+        break
+      }
+      case 'oidcc-client-test-plan':
+      case 'oidcc-client-basic-certification-test-plan':
+        const name = module.testModule.replace('oidcc-client-test-', '')
+        const path = `./conformance/oidc/${name}.ts`
+        ensureTestFile(path, name)
+        files.add(path)
+        break
+      default:
+        throw new Error()
+    }
+  }
+
+  return {
+    extensions: {
+      ts: 'module',
+      mjs: true,
+    },
+    environmentVariables: {
+      CONFORMANCE: JSON.stringify({
+        configuration,
+        variant,
+        plan,
+      }),
+    },
+    concurrency: 1,
+    require: ['./test/_pre.mjs'],
+    files: [...files, './conformance/download_archive.ts'],
+    nodeArguments: [
+      '--loader=ts-node/esm',
+      '--enable-source-maps',
+      '--no-warnings',
+      '--conditions=browser',
+      '--experimental-specifier-resolution=node',
+    ],
+  }
 }
