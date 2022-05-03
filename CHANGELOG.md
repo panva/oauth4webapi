@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.6.2](https://github.com/panva/oauth4webapi/compare/v0.6.1...v0.6.2) (2022-05-03)
+
+
+### Features
+
+* add utility for generating crypto key pairs ([d8f3e90](https://github.com/panva/oauth4webapi/commit/d8f3e90d001897587b8f7b496db43080e16ac1d5))
+
 ## [0.6.1](https://github.com/panva/oauth4webapi/compare/v0.6.0...v0.6.1) (2022-05-02)
 
 
