@@ -3069,7 +3069,16 @@ async function validateJwt(
   if (length !== 3) {
     throw new OPE('Invalid JWT')
   }
-  const header: CompactJWSHeaderParameters = JSON.parse(buf(b64u(protectedHeader)))
+
+  let header: unknown
+  try {
+    header = JSON.parse(buf(b64u(protectedHeader)))
+  } catch {}
+
+  if (!isTopLevelObject<CompactJWSHeaderParameters>(header)) {
+    throw new OPE('JWT Header must be a top level object')
+  }
+
   checkAlg(header)
   if (header.crit !== undefined) {
     throw new OPE('unexpected JWT "crit" header parameter')
