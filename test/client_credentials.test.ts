@@ -8,7 +8,6 @@ import setup, {
   getResponse,
   UA,
 } from './_setup.js'
-import * as jose from 'jose'
 import * as lib from '../src/index.js'
 
 const j = JSON.stringify
@@ -116,7 +115,7 @@ test('clientCredentialsGrantRequest() w/ DPoP', async (t) => {
     })
     .reply(200, { access_token: 'token', token_type: 'DPoP' })
 
-  const DPoP = <CryptoKeyPair>await jose.generateKeyPair('ES256')
+  const DPoP = await lib.generateKeyPair('ES256')
   await t.notThrowsAsync(lib.clientCredentialsGrantRequest(tIssuer, tClient, { DPoP }))
 })
 

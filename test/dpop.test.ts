@@ -10,7 +10,7 @@ test.before(setup)
 test.after(teardown)
 
 test('dpop()', async (t) => {
-  const sign = <CryptoKeyPair>await jose.generateKeyPair('ES256')
+  const sign = await lib.generateKeyPair('ES256')
   const publicJwk = await jose.exportJWK(sign.publicKey)
 
   t.context.mock
@@ -43,7 +43,7 @@ test('dpop()', async (t) => {
 })
 
 test('dpop() w/ a nonce', async (t) => {
-  const sign = <CryptoKeyPair>await jose.generateKeyPair('ES256')
+  const sign = await lib.generateKeyPair('ES256')
 
   t.context.mock
     .get('https://rs2.example.com')

@@ -13,7 +13,7 @@ test.serial('jwks_uri force refetch', async (t) => {
   const now = Date.now()
   timekeeper.freeze(now)
 
-  let key = <CryptoKeyPair>await jose.generateKeyPair('ES256')
+  let key = await lib.generateKeyPair('ES256')
 
   t.context
     .intercept({
@@ -54,7 +54,7 @@ test.serial('jwks_uri refetch if off cooldown and needed', async (t) => {
   const now = Date.now()
   timekeeper.freeze(now)
 
-  let key = <CryptoKeyPair>await jose.generateKeyPair('ES256')
+  let key = await lib.generateKeyPair('ES256')
 
   t.context
     .intercept({

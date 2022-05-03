@@ -18,8 +18,8 @@ test.before(setup)
 test.after(teardown)
 
 test.before(async (t) => {
-  t.context.es256 = <CryptoKeyPair>await jose.generateKeyPair('ES256')
-  t.context.rs256 = <CryptoKeyPair>await jose.generateKeyPair('RS256')
+  t.context.es256 = await lib.generateKeyPair('ES256')
+  t.context.rs256 = await lib.generateKeyPair('RS256')
 
   t.context
     .intercept({

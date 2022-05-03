@@ -2,8 +2,7 @@ import * as oauth from '../src/index.js'
 
 // a random key is generated here for the example's sake, you would however
 // use crypto.subtle.importKey to import your private key that is pre-registered on the AS
-const algorithm: EcKeyGenParams = { name: 'ECDSA', namedCurve: 'P-256' }
-const privateKey = (await crypto.subtle.generateKey(algorithm, false, ['sign'])).privateKey
+const { privateKey } = await oauth.generateKeyPair('ES256')
 const keyID = 'a52faab2-f688-44b6-bde8-f493aeb526fb' // the `kid` your authorization server expects, or undefined if not applicable
 
 const issuer = new URL('https://op.panva.cz')

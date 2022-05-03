@@ -1,9 +1,8 @@
 import * as oauth from '../src/index.js'
 
-const algorithm: EcKeyGenParams = { name: 'ECDSA', namedCurve: 'P-256' }
 // in order to take full advantage of DPoP you shall generate a random, non-extractable private key for every session
 // in the browser environment you shall use IndexedDB to persist the generated CryptoKeyPair
-const keypair = await crypto.subtle.generateKey(algorithm, false, ['sign'])
+const DPoP = await oauth.generateKeyPair('ES256')
 
 const issuer = new URL('https://op.panva.cz')
 const as = await oauth
@@ -61,7 +60,7 @@ let access_token: string
     params,
     redirect_uri,
     code_verifier,
-    { DPoP: keypair },
+    { DPoP },
   )
 
   let challenges: oauth.WWWAuthenticateChallenge[] | undefined
@@ -90,7 +89,7 @@ let access_token: string
 
 // fetch userinfo response
 {
-  const response = await oauth.userInfoRequest(as, client, access_token, { DPoP: keypair })
+  const response = await oauth.userInfoRequest(as, client, access_token, { DPoP })
 
   let challenges: oauth.WWWAuthenticateChallenge[] | undefined
   if ((challenges = oauth.parseWwwAuthenticateChallenges(response))) {

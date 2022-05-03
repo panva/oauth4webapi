@@ -1,20 +1,19 @@
 diff --git a/examples/code.ts b/examples/private_key_jwt.ts
-index f5f3315..8aace10 100644
+index f5f3315..6dc63cf 100644
 --- a/examples/code.ts
 +++ b/examples/private_key_jwt.ts
-@@ -1,5 +1,11 @@
+@@ -1,5 +1,10 @@
  import * as oauth from '../src/index.js'
  
 +// a random key is generated here for the example's sake, you would however
 +// use crypto.subtle.importKey to import your private key that is pre-registered on the AS
-+const algorithm: EcKeyGenParams = { name: 'ECDSA', namedCurve: 'P-256' }
-+const privateKey = (await crypto.subtle.generateKey(algorithm, false, ['sign'])).privateKey
++const { privateKey } = await oauth.generateKeyPair('ES256')
 +const keyID = 'a52faab2-f688-44b6-bde8-f493aeb526fb' // the `kid` your authorization server expects, or undefined if not applicable
 +
  const issuer = new URL('https://op.panva.cz')
  const as = await oauth
    .discoveryRequest(issuer)
-@@ -7,9 +13,7 @@ const as = await oauth
+@@ -7,9 +12,7 @@ const as = await oauth
  
  const client: oauth.Client = {
    client_id: 'abc4ba37-4ab8-49b5-99d4-9441ba35d428',
@@ -25,7 +24,7 @@ index f5f3315..8aace10 100644
  }
  
  const redirect_uri = 'https://rp.example.com/cb'
-@@ -56,6 +60,12 @@ let access_token: string
+@@ -56,6 +59,12 @@ let access_token: string
      params,
      redirect_uri,
      code_verifier,

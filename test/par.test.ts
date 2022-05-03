@@ -8,7 +8,6 @@ import setup, {
   getResponse,
   UA,
 } from './_setup.js'
-import * as jose from 'jose'
 import * as lib from '../src/index.js'
 
 const j = JSON.stringify
@@ -99,7 +98,7 @@ test('pushedAuthorizationRequest() w/ DPoP', async (t) => {
     })
     .reply(200, { request_uri: 'urn:example:uri', expires_in: 60 })
 
-  const DPoP = <CryptoKeyPair>await jose.generateKeyPair('ES256')
+  const DPoP = await lib.generateKeyPair('ES256')
   await t.notThrowsAsync(
     lib.pushedAuthorizationRequest(tIssuer, tClient, new URLSearchParams(), { DPoP }),
   )
@@ -125,7 +124,7 @@ test('pushedAuthorizationRequest() w/ Request Object', async (t) => {
     })
     .reply(200, { request_uri: 'urn:example:uri', expires_in: 60 })
 
-  const sign = <CryptoKeyPair>await jose.generateKeyPair('ES256')
+  const sign = await lib.generateKeyPair('ES256')
   await t.notThrowsAsync(
     lib.pushedAuthorizationRequest(
       tIssuer,

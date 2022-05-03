@@ -8,7 +8,7 @@ const test = anyTest as TestFn<{ [alg: string]: CryptoKeyPair }>
 
 test.before(async (t) => {
   for (const alg of ['RS', 'ES', 'PS'].map((s) => [`${s}256`]).flat()) {
-    t.context[alg] = <CryptoKeyPair>await jose.generateKeyPair(alg)
+    t.context[alg] = await lib.generateKeyPair(<lib.JWSAlgorithm>alg)
   }
 })
 

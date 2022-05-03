@@ -1,23 +1,22 @@
 diff --git a/examples/code.ts b/examples/dpop.ts
-index f5f3315..a38081c 100644
+index f5f3315..02e8357 100644
 --- a/examples/code.ts
 +++ b/examples/dpop.ts
-@@ -1,5 +1,10 @@
+@@ -1,5 +1,9 @@
  import * as oauth from '../src/index.js'
  
-+const algorithm: EcKeyGenParams = { name: 'ECDSA', namedCurve: 'P-256' }
 +// in order to take full advantage of DPoP you shall generate a random, non-extractable private key for every session
 +// in the browser environment you shall use IndexedDB to persist the generated CryptoKeyPair
-+const keypair = await crypto.subtle.generateKey(algorithm, false, ['sign'])
++const DPoP = await oauth.generateKeyPair('ES256')
 +
  const issuer = new URL('https://op.panva.cz')
  const as = await oauth
    .discoveryRequest(issuer)
-@@ -56,12 +61,16 @@ let access_token: string
+@@ -56,12 +60,16 @@ let access_token: string
      params,
      redirect_uri,
      code_verifier,
-+    { DPoP: keypair },
++    { DPoP },
    )
  
    let challenges: oauth.WWWAuthenticateChallenge[] | undefined
@@ -30,12 +29,12 @@ index f5f3315..a38081c 100644
      }
      throw new Error() // Handle www-authenticate challenges as needed
    }
-@@ -81,12 +90,15 @@ let access_token: string
+@@ -81,12 +89,15 @@ let access_token: string
  
  // fetch userinfo response
  {
 -  const response = await oauth.userInfoRequest(as, client, access_token)
-+  const response = await oauth.userInfoRequest(as, client, access_token, { DPoP: keypair })
++  const response = await oauth.userInfoRequest(as, client, access_token, { DPoP })
  
    let challenges: oauth.WWWAuthenticateChallenge[] | undefined
    if ((challenges = oauth.parseWwwAuthenticateChallenges(response))) {

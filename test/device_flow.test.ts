@@ -18,8 +18,8 @@ test.before(setup)
 test.after(teardown)
 
 test.before(async (t) => {
-  t.context.es256 = <CryptoKeyPair>await jose.generateKeyPair('ES256')
-  t.context.rs256 = <CryptoKeyPair>await jose.generateKeyPair('RS256')
+  t.context.es256 = await lib.generateKeyPair('ES256')
+  t.context.rs256 = await lib.generateKeyPair('RS256')
 
   t.context
     .intercept({
@@ -329,7 +329,7 @@ test('deviceCodeGrantRequest() w/ DPoP', async (t) => {
     })
     .reply(200, { access_token: 'token', token_type: 'DPoP' })
 
-  const DPoP = <CryptoKeyPair>await jose.generateKeyPair('ES256')
+  const DPoP = await lib.generateKeyPair('ES256')
   await t.notThrowsAsync(lib.deviceCodeGrantRequest(tIssuer, tClient, 'device_code', { DPoP }))
 })
 

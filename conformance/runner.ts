@@ -150,7 +150,7 @@ export const green = test.macro({
 
     let DPoP!: CryptoKeyPair
     if (usesDpop(variant)) {
-      DPoP = <CryptoKeyPair>await jose.generateKeyPair(JWS_ALGORITHM)
+      DPoP = await oauth.generateKeyPair(<oauth.JWSAlgorithm>JWS_ALGORITHM)
     }
 
     if (usesPar(plan)) {

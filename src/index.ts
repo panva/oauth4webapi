@@ -3592,3 +3592,57 @@ export async function processDeviceCodeResponse(
 ): Promise<TokenEndpointResponse | OAuth2Error> {
   return processGenericAccessTokenResponse(as, client, response, options)
 }
+
+export interface GenerateKeyPairOptions {
+  /**
+   * Indicates whether or not the private key may be exported.
+   * Default is `false`.
+   */
+  extractable?: boolean
+
+  /**
+   * (RSA algorithms only) The length, in bits, of the RSA modulus.
+   * Default is `2048`.
+   */
+  modulusLength?: number
+}
+
+/**
+ * Generates a
+ * {@link https://developer.mozilla.org/en-US/docs/Web/API/CryptoKeyPair CryptoKeyPair}
+ * for a given JWS "alg" Algorithm identifier.
+ *
+ * @param alg Supported JWS "alg" Algorithm identifier.
+ */
+export async function generateKeyPair(
+  alg: JWSAlgorithm,
+  options?: GenerateKeyPairOptions,
+): Promise<CryptoKeyPair> {
+  let algorithm: RsaHashedKeyGenParams | EcKeyGenParams
+
+  switch (alg) {
+    case 'PS256':
+      algorithm = {
+        name: 'RSA-PSS',
+        hash: 'SHA-256',
+        modulusLength: options?.modulusLength ?? 2048,
+        publicExponent: new Uint8Array([0x01, 0x00, 0x01]),
+      }
+      break
+    case 'RS256':
+      algorithm = {
+        name: 'RSASSA-PKCS1-v1_5',
+        hash: 'SHA-256',
+        modulusLength: options?.modulusLength ?? 2048,
+        publicExponent: new Uint8Array([0x01, 0x00, 0x01]),
+      }
+      break
+    case 'ES256':
+      algorithm = { name: 'ECDSA', namedCurve: 'P-256' }
+      break
+    default:
+      throw new UnsupportedOperationError()
+  }
+
+  return crypto.subtle.generateKey(algorithm, options?.extractable ?? false, ['sign', 'verify'])
+}
