@@ -3648,3 +3648,32 @@ export async function generateKeyPair(
 
   return crypto.subtle.generateKey(algorithm, options?.extractable ?? false, ['sign', 'verify'])
 }
+
+/**
+ * Calculates a base64url-encoded SHA-256 JWK Thumbprint.
+ *
+ * @param key A public extractable
+ * {@link https://developer.mozilla.org/en-US/docs/Web/API/CryptoKey CryptoKey}.
+ *
+ * @see {@link https://www.rfc-editor.org/rfc/rfc7638.html RFC 7638 - JSON Web Key (JWK) Thumbprint}
+ */
+export async function calculateJwkThumbprint(key: CryptoKey) {
+  if (!isPublicKey(key) || key.extractable !== true) {
+    throw new TypeError('"key" must be an extractable public CryptoKey')
+  }
+
+  const jwk = await crypto.subtle.exportKey('jwk', key)
+  let components: JsonValue
+  switch (jwk.kty) {
+    case 'EC':
+      components = { crv: jwk.crv, kty: jwk.kty, x: jwk.x, y: jwk.y }
+      break
+    case 'RSA':
+      components = { e: jwk.e, kty: jwk.kty, n: jwk.n }
+      break
+    default:
+      throw new UnsupportedOperationError()
+  }
+
+  return b64u(await crypto.subtle.digest('SHA-256', buf(JSON.stringify(components))))
+}

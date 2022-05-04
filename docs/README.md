@@ -5,6 +5,7 @@
 ### Functions
 
 - [authorizationCodeGrantRequest](functions/authorizationCodeGrantRequest.md)
+- [calculateJwkThumbprint](functions/calculateJwkThumbprint.md)
 - [calculatePKCECodeChallenge](functions/calculatePKCECodeChallenge.md)
 - [clientCredentialsGrantRequest](functions/clientCredentialsGrantRequest.md)
 - [deviceAuthorizationRequest](functions/deviceAuthorizationRequest.md)
