@@ -27,13 +27,15 @@
     "format": "npm run _format -- --write",
     "format-check": "npm run _format -- --check",
     "prepack": "npm run format && npm run docs && ./examples/.update-diffs.mjs && git diff --quiet && npm run test && npm run build",
-    "test": "ava"
+    "test": "ava",
+    "prepare": "husky install"
   },
   "devDependencies": {
     "@types/node": "^17.0.21",
     "@typescript/lib-dom": "npm:@types/web",
     "ava": "^4.1.0",
     "c8": "^7.11.0",
+    "husky": "^7.0.4",
     "jose": "^4.6.0",
     "patch-package": "^6.4.7",
     "prettier": "^2.5.1",
