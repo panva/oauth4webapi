@@ -5,6 +5,15 @@ function isRSA(alg: string) {
   return alg.startsWith('RS') || alg.startsWith('PS')
 }
 
+test('"alg" value validation', async (t) => {
+  for (const value of [null, 1, 0, Infinity, Boolean, undefined, false, true, '']) {
+    await t.throwsAsync(() => lib.generateKeyPair(<any>value), {
+      name: 'TypeError',
+      message: '"alg" must be a non-empty string',
+    })
+  }
+})
+
 test('unknown algorithm', async (t) => {
   await t.throwsAsync(() => lib.generateKeyPair(<any>'foo'), { name: 'UnsupportedOperationError' })
 })

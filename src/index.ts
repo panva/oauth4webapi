@@ -3618,6 +3618,10 @@ export async function generateKeyPair(
 ): Promise<CryptoKeyPair> {
   let algorithm: RsaHashedKeyGenParams | EcKeyGenParams
 
+  if (typeof alg !== 'string' || alg.length === 0) {
+    throw new TypeError('"alg" must be a non-empty string')
+  }
+
   switch (alg) {
     case 'PS256':
       algorithm = {
