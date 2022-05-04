@@ -158,15 +158,23 @@ export const green = test.macro({
     }
 
     if (usesPar(plan)) {
-      const par = await oauth.pushedAuthorizationRequest(
-        as,
-        client,
-        authorizationUrl.searchParams,
-        {
+      t.log('PAR request with', Object.fromEntries(authorizationUrl.searchParams.entries()))
+      const make = () =>
+        oauth.pushedAuthorizationRequest(as, client, authorizationUrl.searchParams, {
           DPoP,
           clientPrivateKey,
-        },
-      )
+        })
+      let par = await make()
+
+      let challenges: oauth.WWWAuthenticateChallenge[] | undefined
+      if ((challenges = oauth.parseWwwAuthenticateChallenges(par))) {
+        for (const challenge of challenges) {
+          t.log('challenge', challenge)
+          if (challenge.scheme === 'dpop' && challenge.parameters.error === 'use_dpop_nonce') {
+            par = await make()
+          }
+        }
+      }
 
       t.log('PAR response', await par.clone().json())
 
@@ -196,28 +204,35 @@ export const green = test.macro({
       } else {
         params = oauth.validateAuthResponse(as, client, currentUrl, oauth.expectNoState)
       }
+
       if (oauth.isOAuth2Error(params)) {
         t.log('error', params)
         throw new Error() // Handle OAuth 2.0 redirect error
       }
 
+      const reparams = params
+
       t.log('parsed callback parameters', Object.fromEntries(params.entries()))
 
-      const response = await oauth.authorizationCodeGrantRequest(
-        as,
-        client,
-        params,
-        configuration.client.redirect_uri,
-        code_verifier,
-        { clientPrivateKey, DPoP },
-      )
+      const make = () =>
+        oauth.authorizationCodeGrantRequest(
+          as,
+          client,
+          reparams,
+          configuration.client.redirect_uri,
+          code_verifier,
+          { clientPrivateKey, DPoP },
+        )
+      let response = await make()
 
       let challenges: oauth.WWWAuthenticateChallenge[] | undefined
       if ((challenges = oauth.parseWwwAuthenticateChallenges(response))) {
         for (const challenge of challenges) {
           t.log('challenge', challenge)
+          if (challenge.scheme === 'dpop' && challenge.parameters.error === 'use_dpop_nonce') {
+            response = await make()
+          }
         }
-        throw new Error() // Handle www-authenticate challenges as needed
       }
 
       t.log('token endpoint response body', await response.clone().json())
@@ -237,14 +252,17 @@ export const green = test.macro({
 
     if (as.userinfo_endpoint) {
       // fetch userinfo response
-      const response = await oauth.userInfoRequest(as, client, access_token, { DPoP })
+      const make = () => oauth.userInfoRequest(as, client, access_token, { DPoP })
+      let response = await make()
 
       let challenges: oauth.WWWAuthenticateChallenge[] | undefined
       if ((challenges = oauth.parseWwwAuthenticateChallenges(response))) {
         for (const challenge of challenges) {
           t.log('challenge', challenge)
+          if (challenge.scheme === 'dpop' && challenge.parameters.error === 'use_dpop_nonce') {
+            response = await make()
+          }
         }
-        throw new Error() // Handle www-authenticate challenges as needed
       }
 
       try {
@@ -258,14 +276,26 @@ export const green = test.macro({
     }
 
     if (instance.accounts_endpoint) {
-      const accounts = await oauth.protectedResourceRequest(
-        access_token,
-        'GET',
-        new URL(instance.accounts_endpoint),
-        new Headers(),
-        null,
-        { DPoP },
-      )
+      const make = () =>
+        oauth.protectedResourceRequest(
+          access_token,
+          'GET',
+          new URL(instance.accounts_endpoint!),
+          new Headers(),
+          null,
+          { DPoP },
+        )
+      let accounts = await make()
+
+      let challenges: oauth.WWWAuthenticateChallenge[] | undefined
+      if ((challenges = oauth.parseWwwAuthenticateChallenges(accounts))) {
+        for (const challenge of challenges) {
+          t.log('challenge', challenge)
+          if (challenge.scheme === 'dpop' && challenge.parameters.error === 'use_dpop_nonce') {
+            accounts = await make()
+          }
+        }
+      }
 
       try {
         t.log('accounts endpoint response body', await accounts.clone().json())
