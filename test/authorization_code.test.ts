@@ -259,7 +259,7 @@ test('processAuthorizationCodeOAuth2Response() without ID Tokens', async (t) => 
   await t.throwsAsync(
     lib.processAuthorizationCodeOAuth2Response(issuer, client, getResponse('{"')),
     {
-      message: 'failed to parsed "response" body as JSON',
+      message: 'failed to parse "response" body as JSON',
     },
   )
   await t.throwsAsync(

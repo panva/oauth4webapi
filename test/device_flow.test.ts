@@ -109,7 +109,7 @@ test('processDeviceAuthorizationResponse()', async (t) => {
   await t.throwsAsync(
     lib.processDeviceAuthorizationResponse(issuer, client, getResponse('{"', { status: 200 })),
     {
-      message: 'failed to parsed "response" body as JSON',
+      message: 'failed to parse "response" body as JSON',
     },
   )
   await t.throwsAsync(
@@ -344,7 +344,7 @@ test('processDeviceCodeResponse() without ID Tokens', async (t) => {
     },
   )
   await t.throwsAsync(lib.processDeviceCodeResponse(issuer, client, getResponse('{"')), {
-    message: 'failed to parsed "response" body as JSON',
+    message: 'failed to parse "response" body as JSON',
   })
   await t.throwsAsync(lib.processDeviceCodeResponse(issuer, client, getResponse('null')), {
     message: '"response" body must be a top level object',

@@ -113,7 +113,7 @@ test('processUserInfoResponse() - json', async (t) => {
     message: '"response" must be an instance of Response',
   })
   await t.throwsAsync(lib.processUserInfoResponse(tIssuer, client, 'sub', getResponse('{"')), {
-    message: 'failed to parsed "response" body as JSON',
+    message: 'failed to parse "response" body as JSON',
   })
   await t.throwsAsync(
     lib.processUserInfoResponse(

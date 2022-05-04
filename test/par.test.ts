@@ -151,7 +151,7 @@ test('processPushedAuthorizationResponse()', async (t) => {
   await t.throwsAsync(
     lib.processPushedAuthorizationResponse(issuer, client, getResponse('{"', { status: 201 })),
     {
-      message: 'failed to parsed "response" body as JSON',
+      message: 'failed to parse "response" body as JSON',
     },
   )
   await t.throwsAsync(

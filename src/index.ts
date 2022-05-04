@@ -821,7 +821,7 @@ export async function processDiscoveryResponse(
   try {
     json = await preserveBodyStream(response).json()
   } catch {
-    throw new OPE('failed to parsed "response" body as JSON')
+    throw new OPE('failed to parse "response" body as JSON')
   }
 
   if (!isJsonObject<AuthorizationServer>(json)) {
@@ -1556,7 +1556,7 @@ export async function processPushedAuthorizationResponse(
   try {
     json = await preserveBodyStream(response).json()
   } catch {
-    throw new OPE('failed to parsed "response" body as JSON')
+    throw new OPE('failed to parse "response" body as JSON')
   }
 
   if (!isJsonObject<PushedAuthorizationResponse>(json)) {
@@ -1896,7 +1896,7 @@ export async function processUserInfoResponse(
     try {
       json = await preserveBodyStream(response).json()
     } catch {
-      throw new OPE('failed to parsed "response" body as JSON')
+      throw new OPE('failed to parse "response" body as JSON')
     }
   }
 
@@ -2104,7 +2104,7 @@ async function processGenericAccessTokenResponse(
   try {
     json = await preserveBodyStream(response).json()
   } catch {
-    throw new OPE('failed to parsed "response" body as JSON')
+    throw new OPE('failed to parse "response" body as JSON')
   }
 
   if (!isJsonObject<TokenEndpointResponse>(json)) {
@@ -2881,7 +2881,7 @@ export async function processIntrospectionResponse(
     try {
       json = await preserveBodyStream(response).json()
     } catch {
-      throw new OPE('failed to parsed "response" body as JSON')
+      throw new OPE('failed to parse "response" body as JSON')
     }
   }
 
@@ -2965,7 +2965,7 @@ export async function processJwksResponse(response: Response): Promise<JsonWebKe
   try {
     json = await preserveBodyStream(response).json()
   } catch {
-    throw new OPE('failed to parsed "response" body as JSON')
+    throw new OPE('failed to parse "response" body as JSON')
   }
 
   if (!isJsonObject<JsonWebKeySet>(json)) {
@@ -3058,7 +3058,9 @@ async function validateJwt(
   let header: unknown
   try {
     header = JSON.parse(buf(b64u(protectedHeader)))
-  } catch {}
+  } catch {
+    throw new OPE('failed to parse JWT Header body as base64url encoded JSON')
+  }
 
   if (!isJsonObject<CompactJWSHeaderParameters>(header)) {
     throw new OPE('JWT Header must be a top level object')
@@ -3083,7 +3085,9 @@ async function validateJwt(
   let claims: unknown
   try {
     claims = JSON.parse(buf(b64u(payload)))
-  } catch {}
+  } catch {
+    throw new OPE('failed to parse JWT Payload body as base64url encoded JSON')
+  }
 
   if (!isJsonObject<JWTPayload>(claims)) {
     throw new OPE('JWT Payload must be a top level object')
@@ -3485,7 +3489,7 @@ export async function processDeviceAuthorizationResponse(
   try {
     json = await preserveBodyStream(response).json()
   } catch {
-    throw new OPE('failed to parsed "response" body as JSON')
+    throw new OPE('failed to parse "response" body as JSON')
   }
 
   if (!isJsonObject<DeviceAuthorizationResponse>(json)) {

@@ -104,7 +104,7 @@ test('processDiscoveryResponse()', async (t) => {
     message: '"response" is not a conform Authorization Server Metadata response',
   })
   await t.throwsAsync(lib.processDiscoveryResponse(expected, getResponse('{"')), {
-    message: 'failed to parsed "response" body as JSON',
+    message: 'failed to parse "response" body as JSON',
   })
   await t.throwsAsync(lib.processDiscoveryResponse(expected, getResponse('null')), {
     message: '"response" body must be a top level object',

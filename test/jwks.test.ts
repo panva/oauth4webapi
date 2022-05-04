@@ -63,7 +63,7 @@ test('processJwksResponse()', async (t) => {
     message: '"response" must be an instance of Response',
   })
   await t.throwsAsync(lib.processJwksResponse(getResponse('{"')), {
-    message: 'failed to parsed "response" body as JSON',
+    message: 'failed to parse "response" body as JSON',
   })
   await t.throwsAsync(lib.processJwksResponse(getResponse(j({ keys: [] }), { status: 404 })), {
     message: '"response" is not a conform JSON Web Key Set response',
