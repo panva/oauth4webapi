@@ -43,10 +43,6 @@ ___
 
 • `Optional` `Readonly` **cnf**: `Object`
 
-#### Index signature
-
-▪ [claim: `string`]: `unknown`
-
 #### Type declaration
 
 | Name | Type |

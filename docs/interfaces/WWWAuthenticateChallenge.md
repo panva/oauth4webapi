@@ -15,10 +15,6 @@
 
 NOTE: all parameter names are lowercased
 
-#### Index signature
-
-▪ [parameter: `string`]: `unknown`
-
 #### Type declaration
 
 | Name | Type |

@@ -19,6 +19,31 @@ index ca0cf27..95be471 100644
                  const groupTitle = group.title;
                  if (group.categories) {
                      group.categories.forEach((category) => {
+diff --git a/node_modules/typedoc-plugin-markdown/dist/resources/partials/member.declaration.hbs b/node_modules/typedoc-plugin-markdown/dist/resources/partials/member.declaration.hbs
+index 32c9e62..9b363a5 100644
+--- a/node_modules/typedoc-plugin-markdown/dist/resources/partials/member.declaration.hbs
++++ b/node_modules/typedoc-plugin-markdown/dist/resources/partials/member.declaration.hbs
+@@ -16,20 +16,6 @@
+ 
+ {{#if type.declaration}}
+ 
+-{{#if type.declaration.indexSignature}}
+-
+-{{#with type.declaration.indexSignature}}
+-
+-#### Index signature
+-
+-{{{indexSignatureTitle}}}
+-
+-{{> comment}}
+-
+-{{/with}}
+-
+-{{/if}}
+-
+ {{#if type.declaration.signatures}}
+ 
+ {{#if type.declaration.children}}
 diff --git a/node_modules/typedoc-plugin-markdown/dist/resources/partials/member.sources.hbs b/node_modules/typedoc-plugin-markdown/dist/resources/partials/member.sources.hbs
 index f642b49..3743b65 100644
 --- a/node_modules/typedoc-plugin-markdown/dist/resources/partials/member.sources.hbs

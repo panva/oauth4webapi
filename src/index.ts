@@ -3,6 +3,11 @@ const VERSION = 'v0.6.2'
 const HOMEPAGE = 'https://github.com/panva/oauth4webapi'
 const USER_AGENT = `${NAME}/${VERSION} (${HOMEPAGE})`
 
+export type JsonObject = { [Key in string]?: JsonValue }
+export type JsonArray = JsonValue[]
+export type JsonPrimitive = string | number | boolean | null
+export type JsonValue = JsonPrimitive | JsonObject | JsonArray
+
 /**
  * Interface to pass an asymmetric private key and, optionally, its associated
  * JWK Key ID to be added as a `kid` JOSE Header Parameter.
@@ -109,7 +114,7 @@ export interface JWK {
   readonly x?: string
   readonly y?: string
 
-  readonly [parameter: string]: unknown
+  readonly [parameter: string]: JsonValue | undefined
 }
 
 /**
@@ -449,7 +454,7 @@ export interface AuthorizationServer {
    */
   readonly backchannel_logout_supported?: boolean
 
-  readonly [metadata: string]: unknown
+  readonly [metadata: string]: JsonValue | undefined
 }
 
 export interface MTLSEndpointAliases
@@ -462,7 +467,7 @@ export interface MTLSEndpointAliases
     | 'userinfo_endpoint'
     | 'pushed_authorization_request_endpoint'
   > {
-  readonly [metadata: string]: unknown
+  readonly [metadata: string]: JsonValue | undefined
 }
 
 /**
@@ -511,7 +516,7 @@ export interface Client {
    */
   default_max_age?: number
 
-  [metadata: string]: unknown
+  [metadata: string]: JsonValue | undefined
 }
 
 const encoder = new TextEncoder()
@@ -704,8 +709,12 @@ function normalizeTyp(value: string) {
   return value.toLowerCase().replace(/^application\//, '')
 }
 
-function isJsonObject<T = object>(input: unknown): input is T {
-  return input !== null && typeof input === 'object' && Array.isArray(input) === false
+function isJsonObject<T = JsonObject>(input: JsonValue): input is T {
+  if (input === null || typeof input !== 'object' || Array.isArray(input)) {
+    return false
+  }
+
+  return true
 }
 
 function prepareHeaders(input: unknown): Headers {
@@ -817,7 +826,7 @@ export async function processDiscoveryResponse(
     throw new OPE('"response" is not a conform Authorization Server Metadata response')
   }
 
-  let json: unknown
+  let json: JsonValue
   try {
     json = await preserveBodyStream(response).json()
   } catch {
@@ -1388,7 +1397,7 @@ export interface PushedAuthorizationResponse {
   readonly request_uri: string
   readonly expires_in: number
 
-  readonly [parameter: string]: unknown
+  readonly [parameter: string]: JsonValue | undefined
 }
 
 export interface OAuth2Error {
@@ -1398,7 +1407,7 @@ export interface OAuth2Error {
   readonly algs?: string
   readonly scope?: string
 
-  readonly [parameter: string]: unknown
+  readonly [parameter: string]: JsonValue | undefined
 }
 
 /**
@@ -1431,7 +1440,7 @@ export interface WWWAuthenticateChallenge {
     readonly algs?: string
     readonly scope?: string
 
-    readonly [parameter: string]: unknown
+    readonly [parameter: string]: JsonValue | undefined
   }
 }
 
@@ -1552,7 +1561,7 @@ export async function processPushedAuthorizationResponse(
     throw new OPE('"response" is not a conform Pushed Authorization Request Endpoint response')
   }
 
-  let json: unknown
+  let json: JsonValue
   try {
     json = await preserveBodyStream(response).json()
   } catch {
@@ -1705,7 +1714,7 @@ export interface UserInfoResponse {
     readonly country?: string
   }
 
-  readonly [claim: string]: unknown
+  readonly [claim: string]: JsonValue | undefined
 }
 
 const jwksCache = new LRU<string, { jwks: JsonWebKeySet; iat: number; age: number }>(20)
@@ -1868,7 +1877,7 @@ export async function processUserInfoResponse(
     throw new OPE('"response" is not a conform UserInfo Endpoint response')
   }
 
-  let json: unknown
+  let json: JsonValue
   if (getContentType(response) === 'application/jwt') {
     if (typeof as.jwks_uri !== 'string') {
       throw new TypeError('"issuer.jwks_uri" must be a string')
@@ -1887,7 +1896,7 @@ export async function processUserInfoResponse(
       .then(validateOptionalAudience.bind(undefined, client.client_id))
       .then(validateOptionalIssuer.bind(undefined, as.issuer))
 
-    json = <UserInfoResponse>claims
+    json = <JsonValue>claims
   } else {
     if (client.userinfo_signed_response_alg) {
       throw new OPE('JWT UserInfo Response expected')
@@ -2092,7 +2101,7 @@ async function processGenericAccessTokenResponse(
     throw new OPE('"response" is not a conform Token Endpoint response')
   }
 
-  let json: unknown
+  let json: JsonValue
   try {
     json = await preserveBodyStream(response).json()
   } catch {
@@ -2319,7 +2328,7 @@ interface JWTPayload {
   readonly exp?: number
   readonly iat?: number
 
-  readonly [claim: string]: unknown
+  readonly [claim: string]: JsonValue | undefined
 }
 
 export interface IDToken extends JWTPayload {
@@ -2371,7 +2380,7 @@ export interface TokenEndpointResponse {
   readonly id_token?: string
   readonly scope?: string
 
-  readonly [parameter: string]: unknown
+  readonly [parameter: string]: JsonValue | undefined
 }
 
 export interface OpenIDTokenEndpointResponse {
@@ -2385,7 +2394,7 @@ export interface OpenIDTokenEndpointResponse {
   readonly id_token: string
   readonly scope?: string
 
-  readonly [parameter: string]: unknown
+  readonly [parameter: string]: JsonValue | undefined
 }
 
 export interface OAuth2TokenEndpointResponse {
@@ -2398,7 +2407,7 @@ export interface OAuth2TokenEndpointResponse {
   readonly expires_in?: number
   readonly scope?: string
 
-  readonly [parameter: string]: unknown
+  readonly [parameter: string]: JsonValue | undefined
 }
 
 export interface ClientCredentialsGrantResponse {
@@ -2410,7 +2419,7 @@ export interface ClientCredentialsGrantResponse {
   readonly expires_in?: number
   readonly scope?: string
 
-  readonly [parameter: string]: unknown
+  readonly [parameter: string]: JsonValue | undefined
 }
 
 /**
@@ -2794,10 +2803,10 @@ export interface IntrospectionResponse {
     readonly 'x5t#S256'?: string
     readonly jkt?: string
 
-    readonly [claim: string]: unknown
+    readonly [claim: string]: JsonValue | undefined
   }
 
-  readonly [claim: string]: unknown
+  readonly [claim: string]: JsonValue | undefined
 }
 
 /**
@@ -2838,7 +2847,7 @@ export async function processIntrospectionResponse(
     throw new OPE('"response" is not a conform Introspection Endpoint response')
   }
 
-  let json: unknown
+  let json: JsonValue
   if (getContentType(response) === 'application/token-introspection+jwt') {
     if (typeof as.jwks_uri !== 'string') {
       throw new TypeError('"issuer.jwks_uri" must be a string')
@@ -2865,9 +2874,9 @@ export async function processIntrospectionResponse(
       .then(validateIssuer.bind(undefined, as.issuer))
       .then(validateAudience.bind(undefined, client.client_id))
 
-    json = claims.token_introspection
-    if (!isJsonObject<IntrospectionResponse>(json)) {
-      throw new OPE('JWT payload must be a top level object')
+    json = <JsonValue>claims.token_introspection
+    if (!isJsonObject(json)) {
+      throw new OPE('JWT "token_introspection" claim must be a JSON object')
     }
   } else {
     try {
@@ -2875,17 +2884,16 @@ export async function processIntrospectionResponse(
     } catch {
       throw new OPE('failed to parse "response" body as JSON')
     }
-  }
-
-  if (!isJsonObject<IntrospectionResponse>(json)) {
-    throw new OPE('"response" body must be a top level object')
+    if (!isJsonObject(json)) {
+      throw new OPE('"response" body must be a top level object')
+    }
   }
 
   if (typeof json.active !== 'boolean') {
     throw new OPE('"response" body "active" property must be a boolean')
   }
 
-  return json
+  return <IntrospectionResponse>json
 }
 
 export interface JwksRequestOptions extends HttpRequestOptions {}
@@ -2953,7 +2961,7 @@ export async function processJwksResponse(response: Response): Promise<JsonWebKe
     throw new OPE('"response" is not a conform JSON Web Key Set response')
   }
 
-  let json: unknown
+  let json: JsonValue
   try {
     json = await preserveBodyStream(response).json()
   } catch {
@@ -2975,24 +2983,24 @@ export async function processJwksResponse(response: Response): Promise<JsonWebKe
   return json
 }
 
-async function handleOAuthBodyError(response: Response) {
+async function handleOAuthBodyError(response: Response): Promise<OAuth2Error | undefined> {
   if (response.status > 399 && response.status < 500) {
     try {
-      const json: unknown = await preserveBodyStream(response).json()
-      if (
-        isJsonObject<OAuth2Error>(json) &&
-        typeof json.error === 'string' &&
-        json.error.length !== 0
-      ) {
-        if (typeof json.error_description !== 'string') {
-          // @ts-expect-error
+      const json: JsonValue = await preserveBodyStream(response).json()
+      if (isJsonObject(json) && typeof json.error === 'string' && json.error.length !== 0) {
+        if (json.error_description !== undefined && typeof json.error_description !== 'string') {
           delete json.error_description
         }
-        if (typeof json.error_uri !== 'string') {
-          // @ts-expect-error
+        if (json.error_uri !== undefined && typeof json.error_uri !== 'string') {
           delete json.error_uri
         }
-        return json
+        if (json.algs !== undefined && typeof json.algs !== 'string') {
+          delete json.algs
+        }
+        if (json.scope !== undefined && typeof json.scope !== 'string') {
+          delete json.scope
+        }
+        return <OAuth2Error>json
       }
     } catch {}
   }
@@ -3047,7 +3055,7 @@ async function validateJwt(
     throw new OPE('Invalid JWT')
   }
 
-  let header: unknown
+  let header: JsonValue
   try {
     header = JSON.parse(buf(b64u(protectedHeader)))
   } catch {
@@ -3074,7 +3082,7 @@ async function validateJwt(
     throw new OPE('JWT signature verification failed')
   }
 
-  let claims: unknown
+  let claims: JsonValue
   try {
     claims = JSON.parse(buf(b64u(payload)))
   } catch {
@@ -3438,7 +3446,7 @@ export interface DeviceAuthorizationResponse {
   readonly verification_uri_complete?: string
   readonly interval?: number
 
-  readonly [parameter: string]: unknown
+  readonly [parameter: string]: JsonValue | undefined
 }
 
 /**
@@ -3477,7 +3485,7 @@ export async function processDeviceAuthorizationResponse(
     throw new OPE('"response" is not a conform Device Authorization Endpoint response')
   }
 
-  let json: unknown
+  let json: JsonValue
   try {
     json = await preserveBodyStream(response).json()
   } catch {
