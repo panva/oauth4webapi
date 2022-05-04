@@ -1,4 +1,4 @@
-import { test, red, modules } from '../runner'
+import { test, red, modules } from '../runner.js'
 
 for (const module of modules('kid-absent-multiple-jwks')) {
   test.serial(

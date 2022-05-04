@@ -6,13 +6,13 @@ const generateKeyPair = promisify(crypto.generateKeyPair)
 
 const { homepage, name, version } = JSON.parse(readFileSync('package.json').toString())
 
-import '../test/_pre.mjs'
+import '../test/_pre.js'
 
-import * as api from './api'
+import * as api from './api.js'
 
 const UUID = crypto.randomUUID()
 
-import { JWS_ALGORITHM, PLAN_NAME, VARIANT } from './env'
+import { JWS_ALGORITHM, PLAN_NAME, VARIANT } from './env.js'
 
 switch (PLAN_NAME) {
   case 'oidcc-client-basic-certification-test-plan':
@@ -207,7 +207,7 @@ export default async () => {
     switch (PLAN_NAME) {
       case 'fapi2-baseline-id2-client-test-plan': {
         const name = module.testModule.replace('fapi2-baseline-id2-client-test-', '')
-        const path = `./conformance/fapi/${name}.ts`
+        const path = `./build/conformance/fapi/${name}.js`
         ensureTestFile(path, name)
         files.add(path)
         break
@@ -215,7 +215,7 @@ export default async () => {
       case 'oidcc-client-test-plan':
       case 'oidcc-client-basic-certification-test-plan':
         const name = module.testModule.replace('oidcc-client-test-', '')
-        const path = `./conformance/oidc/${name}.ts`
+        const path = `./build/conformance/oidc/${name}.js`
         ensureTestFile(path, name)
         files.add(path)
         break
@@ -225,10 +225,6 @@ export default async () => {
   }
 
   return {
-    extensions: {
-      ts: 'module',
-      mjs: true,
-    },
     environmentVariables: {
       CONFORMANCE: JSON.stringify({
         configuration,
@@ -237,14 +233,8 @@ export default async () => {
       }),
     },
     concurrency: 1,
-    require: ['./test/_pre.mjs'],
-    files: [...files, './conformance/download_archive.ts'],
-    nodeArguments: [
-      '--loader=ts-node/esm',
-      '--enable-source-maps',
-      '--no-warnings',
-      '--conditions=browser',
-      '--experimental-specifier-resolution=node',
-    ],
+    require: ['./build/test/_pre.js'],
+    files: [...files, './build/conformance/download_archive.js'],
+    nodeArguments: ['--enable-source-maps', '--conditions=browser'],
   }
 }

@@ -2,7 +2,7 @@ import anyTest, { type TestFn } from 'ava'
 
 export const test = anyTest as TestFn<{ instance: Test }>
 
-import { getScope, usesRequestObject } from './ava.config'
+import { getScope, usesRequestObject } from './ava.config.js'
 import * as jose from 'jose'
 import * as oauth from '../src/index.js'
 import {
@@ -11,9 +11,9 @@ import {
   type ModulePrescription,
   type Plan,
   type Test,
-} from './api'
+} from './api.js'
 
-import { JWS_ALGORITHM } from './env'
+import { JWS_ALGORITHM } from './env.js'
 const conformance = JSON.parse(process.env.CONFORMANCE!)
 
 const configuration: {

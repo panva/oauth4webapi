@@ -1,17 +1,7 @@
 {
-  "files": [
-    "client_credentials.ts",
-    "device_authorization_grant.ts",
-    "code.ts",
-    "dpop.ts",
-    "private_key_jwt.ts",
-    "jarm.ts",
-    "par.ts",
-    "oauth.ts"
-  ],
+  "include": ["**/*.ts"],
   "compilerOptions": {
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    "target": "ESNext",
+    "target": "ES2020",
     "module": "ES2022",
     "moduleResolution": "Node",
     "strict": true,

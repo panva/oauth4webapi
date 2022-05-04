@@ -1,7 +1,3 @@
-# crypto runtime copies
-src/runtime/*.ts
-!src/runtime/*.d.ts
-
 # Logs
 logs
 *.log
@@ -126,8 +122,9 @@ dist-browser-tests
 
 .npmrc
 
-examples/*.js
-conformance/*.js
+examples/**/*.js
+conformance/**/*.js
+src/*.js
 
 *.zip
 *.txt

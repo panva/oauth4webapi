@@ -1,4 +1,4 @@
-import { test, green, modules } from '../runner'
+import { test, green, modules } from '../runner.js'
 
 const name = import.meta.url.split('/').reverse()[0].split('.')[0]
 

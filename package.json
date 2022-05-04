@@ -20,8 +20,8 @@
   ],
   "scripts": {
     "_format": "find src test examples conformance -type f -name '*.ts' -o -name '*.mjs' | xargs prettier",
-    "build": "tsc && tsc --declaration true --emitDeclarationOnly true --removeComments false && tsc -p examples",
-    "conformance": "tsc -p conformance && NODE_OPTIONS='--experimental-specifier-resolution=node --no-warnings' ava --config conformance/ava.config.js",
+    "build": "rm -rf build && tsc && tsc --declaration true --emitDeclarationOnly true --removeComments false && tsc -p examples && tsc -p conformance",
+    "conformance": "rm -rf build && tsc -p conformance --noEmit false && ava --config build/conformance/ava.config.js",
     "coverage": "c8 ava",
     "docs": "npx patch-package && typedoc",
     "format": "npm run _format -- --write",

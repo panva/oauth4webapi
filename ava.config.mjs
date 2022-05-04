@@ -3,7 +3,7 @@ export default {
     ts: 'module',
     mjs: true,
   },
-  require: './test/_pre.mjs',
+  require: './test/_pre.ts',
   files: ['test/**/*.ts', '!test/**/_*.ts'],
   nodeArguments: [
     '--loader=ts-node/esm',
