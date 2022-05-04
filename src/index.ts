@@ -1924,19 +1924,11 @@ export async function processUserInfoResponse(
 }
 
 async function timingSafeEqual(a: Uint8Array, b: Uint8Array) {
-  if (!(a instanceof Uint8Array)) {
-    throw new TypeError('"a" must be an instance of Uint8Array')
-  }
-
-  if (!(b instanceof Uint8Array)) {
-    throw new TypeError('"b" must be an instance of Uint8Array')
-  }
-
-  if (a.length !== b.length) {
+  if (a.byteLength !== b.byteLength) {
     return false
   }
 
-  const len = a.length
+  const len = a.byteLength
   let out = 0
   let i = -1
   while (++i < len) {
