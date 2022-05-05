@@ -35,3 +35,33 @@ test('EC', async (t) => {
   const expected = 'ZrBaai73Hi8Fg4MElvDGzIne2NsbI75RHubOViHYE5Q'
   t.is(await lib.calculateJwkThumbprint(key), expected)
 })
+
+test('private key or unrecognized public key', async (t) => {
+  const keypair = await crypto.subtle.generateKey({ name: 'ECDH', namedCurve: 'P-256' }, false, [])
+  await t.throwsAsync(() => lib.calculateJwkThumbprint(keypair.publicKey), {
+    name: 'UnsupportedOperationError',
+  })
+  await t.throwsAsync(() => lib.calculateJwkThumbprint(keypair.privateKey), {
+    name: 'TypeError',
+    message: '"key" must be an extractable public CryptoKey',
+  })
+})
+
+test('public key non-extractable key', async (t) => {
+  const key = await crypto.subtle.importKey(
+    'jwk',
+    {
+      crv: 'P-256',
+      kty: 'EC',
+      x: 'q3zAwR_kUwtdLEwtB2oVfucXiLHmEhu9bJUFYjJxYGs',
+      y: '8h0D-ONoU-iZqrq28TyUxEULxuGwJZGMJYTMbeMshvI',
+    },
+    { name: 'ECDSA', namedCurve: 'P-256' },
+    false,
+    [],
+  )
+  await t.throwsAsync(() => lib.calculateJwkThumbprint(key), {
+    name: 'TypeError',
+    message: '"key" must be an extractable public CryptoKey',
+  })
+})

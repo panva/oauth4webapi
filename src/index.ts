@@ -3674,6 +3674,9 @@ export async function calculateJwkThumbprint(key: CryptoKey) {
     throw new TypeError('"key" must be an extractable public CryptoKey')
   }
 
+  // checks that the key is a supported one
+  determineJWSAlgorithm(key)
+
   const jwk = await crypto.subtle.exportKey('jwk', key)
   let components: JsonValue
   switch (jwk.kty) {
