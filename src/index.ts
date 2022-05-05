@@ -1388,7 +1388,7 @@ export async function pushedAuthorizationRequest(
 
   if (options?.DPoP !== undefined) {
     await dpopProofJwt(headers, options.DPoP, url, 'POST')
-    body.set('dpop_jkt', await calculateJwkThumbprint(options?.DPoP.publicKey))
+    body.set('dpop_jkt', await calculateJwkThumbprint(options.DPoP.publicKey))
   }
 
   return authenticatedRequest(as, client, 'POST', url, body, headers, options)
