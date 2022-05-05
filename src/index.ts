@@ -990,7 +990,7 @@ function clientSecretBasic(clientId: string, clientSecret: string) {
  * Determines an RSASSA-PSS algorithm identifier from CryptoKey instance
  * properties.
  */
-function psAlg(key: CryptoKey) {
+function psAlg(key: CryptoKey): JWSAlgorithm {
   switch ((<RsaHashedKeyAlgorithm>key.algorithm).hash.name) {
     case 'SHA-256':
       return 'PS256'
@@ -1003,7 +1003,7 @@ function psAlg(key: CryptoKey) {
  * Determines an RSASSA-PKCS1-v1_5 algorithm identifier from CryptoKey instance
  * properties.
  */
-function rsAlg(key: CryptoKey) {
+function rsAlg(key: CryptoKey): JWSAlgorithm {
   switch ((<RsaHashedKeyAlgorithm>key.algorithm).hash.name) {
     case 'SHA-256':
       return 'RS256'
@@ -1015,7 +1015,7 @@ function rsAlg(key: CryptoKey) {
 /**
  * Determines an ECDSA algorithm identifier from CryptoKey instance properties.
  */
-function esAlg(key: CryptoKey) {
+function esAlg(key: CryptoKey): JWSAlgorithm {
   switch ((<EcKeyAlgorithm>key.algorithm).namedCurve) {
     case 'P-256':
       return 'ES256'
@@ -1073,7 +1073,7 @@ async function privateKeyJwt(
 ) {
   return jwt(
     {
-      alg: checkSupportedJwsAlg(determineJWSAlgorithm(key)),
+      alg: determineJWSAlgorithm(key),
       kid,
     },
     clientAssertion(as, client),
@@ -1281,7 +1281,7 @@ export async function issueRequestObject(
 
   return jwt(
     {
-      alg: checkSupportedJwsAlg(determineJWSAlgorithm(key)),
+      alg: determineJWSAlgorithm(key),
       typ: 'oauth-authz-req+jwt',
       kid,
     },
@@ -1320,7 +1320,7 @@ async function dpopProofJwt(
 
   const proof = await jwt(
     {
-      alg: checkSupportedJwsAlg(determineJWSAlgorithm(privateKey)),
+      alg: determineJWSAlgorithm(privateKey),
       typ: 'dpop+jwt',
       jwk: await publicJwk(publicKey),
     },
