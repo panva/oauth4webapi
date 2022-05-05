@@ -1456,7 +1456,7 @@ export interface WWWAuthenticateChallenge {
     readonly algs?: string
     readonly scope?: string
 
-    readonly [parameter: string]: JsonValue | undefined
+    readonly [parameter: string]: string | undefined
   }
 }
 
