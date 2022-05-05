@@ -1,27 +1,29 @@
-# OAuth 2 / OpenID Connect Client for Web APIs runtime
+# OAuth 2 / OpenID Connect for Web Platform API javascript runtimes
+ 
+This software is a collection of routines upon which framework-specific client modules may be written. Its objective is to support and, where possible, enforce secure and current best practices using only capabilities common to Browser and Non-Browser JavaScript-based runtime environments.
 
-This is a collection of bits and pieces upon which a more streamlined Client module may be written.
+Target profiles of this software are OAuth 2.1, OAuth 2.0 complemented by the latest Security BCP, and FAPI 2.0. Where applicable Open ID Connect is also supported.
 
 ## In Scope & Implemented
 
 - Authorization Server Metadata discovery
-- OpenID Connect 1.0 and OAuth 2.0 Authorization Code Flow
-- PKCE
-- Refresh Token Grant
-- Device Authorization Grant
-- Client Credentials Grant
+- Authorization Code Flow (profiled under OpenID Connect 1.0, OAuth 2.0, OAuth 2.1, and FAPI 2.0), PKCE
+- Refresh Token, Device Authorization, and Client Credentials Grants
 - Demonstrating Proof-of-Possession at the Application Layer (DPoP)
-- Token Introspection
-- JWT Token Introspection
-- Token Revocation
-- JWT Secured Authorization Response Mode (JARM)
-- Confidential and Public Client
-- JWT-Secured Authorization Request (JAR)
+- Token Introspection and Revocation
 - Pushed Authorization Requests (PAR)
-- UserInfo Requests (Bearer and DPoP)
-- JWT UserInfo Responses
-- Protected Resource Requests (Bearer and DPoP)
+- UserInfo and Protected Resource Requests
 - Authorization Server Issuer Identification
+- JWT Secured Introspection, Response Mode, Authorization Request, and UserInfo
+
+[<img width="184" height="96" align="right" src="https://user-images.githubusercontent.com/241506/166977513-7cd710a9-7f60-4944-aebe-a658e9f36375.png" alt="OpenID Certification">](#certification)
+
+## [Certification](https://openid.net/certification/faq/)
+
+
+[Filip Skokan](https://github.com/panva) has certified that [this software](https://github.com/panva/oauth4webapi) conforms to the Basic RP Conformance Profile of the OpenID Connect™ protocol.
+
+## [💗 Help the project](https://github.com/sponsors/panva)
 
 ## Dependencies: 0
 
@@ -39,7 +41,7 @@ import * as oauth2 from '@panva/oauth4webapi'
 import * as oauth2 from 'https://deno.land/x/doauth/src/index.ts'
 ```
 
-- Authorization Code Flow - OpenID Connect [source](examples/code.ts), or plain OAuth 2.0 [source](examples/oauth.ts)
+- Authorization Code Flow - OpenID Connect [source](examples/code.ts), or plain OAuth 2 [source](examples/oauth.ts)
 - Private Key JWT Client Authentication - [source](examples/private_key_jwt.ts) | [diff from code flow](examples/private_key_jwt.diff)
 - DPoP - [source](examples/dpop.ts) | [diff from code flow](examples/dpop.diff)
 - Pushed Authorization Request (PAR) - [source](examples/par.ts) | [diff from code flow](examples/par.diff)
@@ -70,18 +72,15 @@ Other than browsers the supported runtimes are
 
 Pending runtime support
 
-- Node.js - once [fetch][] and [Web Crypto API][] are available as globals
-- Electron (main process) - once [fetch][] and [Web Crypto API][] are available as globals
+- Node.js, Electron (main process) - once [fetch][] and [Web Crypto API][] are available as globals
 
 ## Out of scope
 
 - CommonJS
-- OAuth 2.0 & OpenID Connect Implicit Flows
-- OAuth 2.0 Resource Owner Password Credentials
-- OpenID Connect Hybrid Flows
-- MTLS (because fetch does not support client certificates)
-- JWS HMAC Signed Responses
-- JWE Encrypted Messages
+- Implicit, Hybrid, and Resource Owner Password Credentials Flows
+- Mutual-TLS Client Authentication and Certificate-Bound Access Tokens
+- JSON Web Encryption (JWE)
+- JSON Web Signature (JWS) rarely used algorithms and HMAC
 
 [Web Crypto API]: https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API
 [Fetch API]: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API
