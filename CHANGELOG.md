@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.7.0](https://github.com/panva/oauth4webapi/compare/v0.6.4...v0.7.0) (2022-05-05)
+
+
+### ⚠ BREAKING CHANGES
+
+* ensure supported key in calculateJwkThumbprint
+* clientCredentialsGrantRequest now requires parameters
+
+### Features
+
+* explicitly add dpop_jkt to par request when using dpop ([e6acd99](https://github.com/panva/oauth4webapi/commit/e6acd99220188b1f13a97e9a6e8f315ba0a2dfc9))
+
+
+### Refactor
+
+* clientCredentialsGrantRequest now requires parameters ([76e4fea](https://github.com/panva/oauth4webapi/commit/76e4fea3f1f9ec19dd1e24e51d29a91f91379837))
+* ensure supported key in calculateJwkThumbprint ([540f6cf](https://github.com/panva/oauth4webapi/commit/540f6cfca4ae5757757542432e543430429391a7))
+
 ## [0.6.4](https://github.com/panva/oauth4webapi/compare/v0.6.3...v0.6.4) (2022-05-04)
 
 
