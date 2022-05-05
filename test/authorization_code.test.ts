@@ -708,7 +708,7 @@ test('processAuthorizationCodeOpenIDResponse() nonce checks', async (t) => {
         ),
         <any>nonce,
       ),
-      { message: '"expectedNonce" must be a non-empty string', instanceOf: TypeError },
+      { message: '"expectedNonce" must be a non-empty string', name: 'TypeError' },
     )
   }
 

@@ -53,7 +53,7 @@ test('jwksRequest() w/ Custom Headers', async (t) => {
 
 test('jwksRequest() requires jwks_uri', async (t) => {
   await t.throwsAsync(lib.jwksRequest({ ...issuer, jwks_uri: undefined }), {
-    instanceOf: TypeError,
+    name: 'TypeError',
     message: '"issuer.jwks_uri" must be a string',
   })
 })

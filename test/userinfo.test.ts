@@ -102,7 +102,7 @@ test('userInfoRequest() w/ jwt signal', async (t) => {
 
 test('userInfoRequest() requires userinfo_endpoint', async (t) => {
   await t.throwsAsync(lib.userInfoRequest(issuer, client, 'token'), {
-    instanceOf: TypeError,
+    name: 'TypeError',
     message: '"issuer.userinfo_endpoint" must be a string',
   })
 })
