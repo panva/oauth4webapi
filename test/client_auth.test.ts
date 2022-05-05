@@ -37,6 +37,35 @@ test('client_secret_basic', async (t) => {
   t.pass()
 })
 
+test('client_secret_basic (appendix b)', async (t) => {
+  t.context
+    .intercept({
+      path: '/test-basic-encoding',
+      method: 'POST',
+      headers: {
+        authorization(authorization) {
+          const [, auth] = authorization.split(' ')
+          for (const token of atob(auth).split(':')) {
+            t.is(decodeURIComponent(token), '+%&+£€')
+          }
+          return true
+        },
+      },
+      body(body) {
+        const params = new URLSearchParams(body)
+        return !params.has('client_id') && !params.has('client_secret')
+      },
+    })
+    .reply(200, '')
+
+  await lib.revocationRequest(
+    { ...issuer, revocation_endpoint: endpoint('test-basic-encoding') },
+    { ...client, client_id: ' %&+£€', client_secret: ' %&+£€' },
+    'token',
+  )
+  t.pass()
+})
+
 test('client_secret_post', async (t) => {
   t.context
     .intercept({
