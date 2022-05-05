@@ -491,11 +491,18 @@ export interface Client {
   token_endpoint_auth_method?: TokenEndpointAuthMethod
   /**
    * JWS "alg" algorithm required for signing the ID Token issued to this
-   * Client.
+   * Client. When not configured the default is
+   * to allow only {@link JWSAlgorithm supported algorithms} listed in
+   * {@link AuthorizationServer.id_token_signing_alg_values_supported `as.id_token_signing_alg_values_supported`}
+   * and fall back to `RS256` when the authorization server metadata is not set.
    */
   id_token_signed_response_alg?: JWSAlgorithm
   /**
-   * JWS "alg" algorithm required for signing authorization responses.
+   * JWS "alg" algorithm required for signing authorization responses. When not
+   * configured the default is
+   * to allow only {@link JWSAlgorithm supported algorithms} listed in
+   * {@link AuthorizationServer.authorization_signing_alg_values_supported `as.authorization_signing_alg_values_supported`}
+   * and fall back to `RS256` when the authorization server metadata is not set.
    */
   authorization_signed_response_alg?: JWSAlgorithm
   /**
@@ -504,11 +511,19 @@ export interface Client {
    */
   require_auth_time?: boolean
   /**
-   * JWS "alg" algorithm REQUIRED for signing UserInfo Responses.
+   * JWS "alg" algorithm REQUIRED for signing UserInfo Responses. When not
+   * configured the default is
+   * to allow only {@link JWSAlgorithm supported algorithms} listed in
+   * {@link AuthorizationServer.userinfo_signing_alg_values_supported `as.userinfo_signing_alg_values_supported`}
+   * and fall back to `RS256` when the authorization server metadata is not set.
    */
   userinfo_signed_response_alg?: JWSAlgorithm
   /**
-   * JWS "alg" algorithm REQUIRED for signed introspection responses.
+   * JWS "alg" algorithm REQUIRED for signed introspection responses. When not
+   * configured the default is
+   * to allow only {@link JWSAlgorithm supported algorithms} listed in
+   * {@link AuthorizationServer.introspection_signing_alg_values_supported `as.introspection_signing_alg_values_supported`}
+   * and fall back to `RS256` when the authorization server metadata is not set.
    */
   introspection_signed_response_alg?: JWSAlgorithm
   /**

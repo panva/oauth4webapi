@@ -24,7 +24,11 @@ Recognized Client Metadata that have an effect on the exposed functionality.
 
 • `Optional` **authorization\_signed\_response\_alg**: [`JWSAlgorithm`](../types/JWSAlgorithm.md)
 
-JWS "alg" algorithm required for signing authorization responses.
+JWS "alg" algorithm required for signing authorization responses. When not
+configured the default is
+to allow only [supported algorithms](../types/JWSAlgorithm.md) listed in
+[`as.authorization_signing_alg_values_supported`](AuthorizationServer.md#authorization_signing_alg_values_supported)
+and fall back to `RS256` when the authorization server metadata is not set.
 
 ___
 
@@ -57,7 +61,10 @@ ___
 • `Optional` **id\_token\_signed\_response\_alg**: [`JWSAlgorithm`](../types/JWSAlgorithm.md)
 
 JWS "alg" algorithm required for signing the ID Token issued to this
-Client.
+Client. When not configured the default is
+to allow only [supported algorithms](../types/JWSAlgorithm.md) listed in
+[`as.id_token_signing_alg_values_supported`](AuthorizationServer.md#id_token_signing_alg_values_supported)
+and fall back to `RS256` when the authorization server metadata is not set.
 
 ___
 
@@ -65,7 +72,11 @@ ___
 
 • `Optional` **introspection\_signed\_response\_alg**: [`JWSAlgorithm`](../types/JWSAlgorithm.md)
 
-JWS "alg" algorithm REQUIRED for signed introspection responses.
+JWS "alg" algorithm REQUIRED for signed introspection responses. When not
+configured the default is
+to allow only [supported algorithms](../types/JWSAlgorithm.md) listed in
+[`as.introspection_signing_alg_values_supported`](AuthorizationServer.md#introspection_signing_alg_values_supported)
+and fall back to `RS256` when the authorization server metadata is not set.
 
 ___
 
@@ -91,4 +102,8 @@ ___
 
 • `Optional` **userinfo\_signed\_response\_alg**: [`JWSAlgorithm`](../types/JWSAlgorithm.md)
 
-JWS "alg" algorithm REQUIRED for signing UserInfo Responses.
+JWS "alg" algorithm REQUIRED for signing UserInfo Responses. When not
+configured the default is
+to allow only [supported algorithms](../types/JWSAlgorithm.md) listed in
+[`as.userinfo_signing_alg_values_supported`](AuthorizationServer.md#userinfo_signing_alg_values_supported)
+and fall back to `RS256` when the authorization server metadata is not set.
