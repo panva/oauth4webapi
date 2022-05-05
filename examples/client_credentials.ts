@@ -12,7 +12,13 @@ const client: oauth.Client = {
   token_endpoint_auth_method: 'client_secret_basic',
 }
 
-const response = await oauth.clientCredentialsGrantRequest(as, client)
+const parameters = new URLSearchParams()
+parameters.set('scope', 'api:read api:write')
+parameters.set('resource', 'urn:example:api')
+
+const response = await oauth.clientCredentialsGrantRequest(as, client, {
+  additionalParameters: parameters,
+})
 
 let challenges: oauth.WWWAuthenticateChallenge[] | undefined
 if ((challenges = oauth.parseWwwAuthenticateChallenges(response))) {
