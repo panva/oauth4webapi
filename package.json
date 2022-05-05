@@ -27,8 +27,8 @@
     "format": "npm run _format -- --write",
     "format-check": "npm run _format -- --check",
     "prepack": "npm run format && npm run docs && ./examples/.update-diffs.mjs && git diff --quiet && npm run test && npm run build",
-    "test": "ava",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "test": "ava"
   },
   "devDependencies": {
     "@types/node": "^17.0.21",
