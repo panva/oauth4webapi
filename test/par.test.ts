@@ -93,7 +93,7 @@ test('pushedAuthorizationRequest() w/ DPoP', async (t) => {
         dpop: /.+/,
       },
       body(body) {
-        return new URLSearchParams(body).get('client_id') === client.client_id
+        return new URLSearchParams(body).has('dpop_jkt')
       },
     })
     .reply(200, { request_uri: 'urn:example:uri', expires_in: 60 })
