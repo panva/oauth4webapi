@@ -17,11 +17,10 @@ let user_code: string
 let verification_uri_complete: string | undefined
 
 {
-  const response = await oauth.deviceAuthorizationRequest(
-    as,
-    client,
-    new URLSearchParams({ scope: 'openid email' }),
-  )
+  const parameters = new URLSearchParams()
+  parameters.set('scope', 'openid email')
+
+  const response = await oauth.deviceAuthorizationRequest(as, client, parameters)
   let challenges: oauth.WWWAuthenticateChallenge[] | undefined
   if ((challenges = oauth.parseWwwAuthenticateChallenges(response))) {
     for (const challenge of challenges) {
