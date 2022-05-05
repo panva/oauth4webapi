@@ -86,8 +86,6 @@ Pending runtime support
 [Web Crypto API]: https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API
 [Fetch API]: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API
 [fetch]: https://developer.mozilla.org/en-US/docs/Web/API/fetch
-[OpenID Connect Discovery 1.0]: https://openid.net/specs/openid-connect-discovery-1_0.html
-[OAuth 2.0 Authorization Server Metadata]: https://www.rfc-editor.org/rfc/rfc8414.html
 [TextDecoder]: https://developer.mozilla.org/en-US/docs/Web/API/TextDecoder
 [TextEncoder]: https://developer.mozilla.org/en-US/docs/Web/API/TextEncoder
 [btoa]: https://developer.mozilla.org/en-US/docs/Web/API/btoa
