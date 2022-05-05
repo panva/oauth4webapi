@@ -486,7 +486,7 @@ export interface Client {
   client_secret?: string
   /**
    * Client {@link TokenEndpointAuthMethod authentication method} for the
-   * client's authenticated requests.
+   * client's authenticated requests. Default is `client_secret_basic`.
    */
   token_endpoint_auth_method?: TokenEndpointAuthMethod
   /**
@@ -500,7 +500,7 @@ export interface Client {
   authorization_signed_response_alg?: JWSAlgorithm
   /**
    * Boolean value specifying whether the {@link IDToken.auth_time auth_time}
-   * Claim in the ID Token is REQUIRED.
+   * Claim in the ID Token is REQUIRED. Default is `false`.
    */
   require_auth_time?: boolean
   /**

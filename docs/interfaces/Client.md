@@ -74,7 +74,7 @@ ___
 • `Optional` **require\_auth\_time**: `boolean`
 
 Boolean value specifying whether the [auth_time](IDToken.md#auth_time)
-Claim in the ID Token is REQUIRED.
+Claim in the ID Token is REQUIRED. Default is `false`.
 
 ___
 
@@ -83,7 +83,7 @@ ___
 • `Optional` **token\_endpoint\_auth\_method**: [`TokenEndpointAuthMethod`](../types/TokenEndpointAuthMethod.md)
 
 Client [authentication method](../types/TokenEndpointAuthMethod.md) for the
-client's authenticated requests.
+client's authenticated requests. Default is `client_secret_basic`.
 
 ___
 
