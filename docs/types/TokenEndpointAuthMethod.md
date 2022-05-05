@@ -1,6 +1,6 @@
 # Type alias: TokenEndpointAuthMethod
 
-Ƭ **TokenEndpointAuthMethod**: ``"client_secret_basic"`` \| ``"client_secret_post"`` \| ``"client_secret_jwt"`` \| ``"private_key_jwt"`` \| ``"none"``
+Ƭ **TokenEndpointAuthMethod**: ``"client_secret_basic"`` \| ``"client_secret_post"`` \| ``"private_key_jwt"`` \| ``"none"``
 
 Supported Client Authentication Methods.
 
@@ -20,11 +20,6 @@ as `application/x-www-form-urlencoded` body parameters.
 as `application/x-www-form-urlencoded` body parameters.
 The `client_assertion` is signed using a private key supplied
 as an [options parameter](../interfaces/AuthenticatedRequestOptions.md#clientprivatekey).
-
-- **`client_secret_jwt`** uses the HTTP request body to send
-[`client_id`](../interfaces/Client.md#client_id), `client_assertion_type`, and `client_assertion`
-as `application/x-www-form-urlencoded` body parameters.
-The `client_assertion` is signed using the [`client_secret`](../interfaces/Client.md#client_secret).
 
 - **`none`** (public client) uses the HTTP request body to send only
 [`client_id`](../interfaces/Client.md#client_id)

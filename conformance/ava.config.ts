@@ -81,7 +81,6 @@ function needsSecret(variant: Record<string, string>) {
     case undefined:
     case 'client_secret_basic':
     case 'client_secret_post':
-    case 'client_secret_jwt':
       return true
     default:
       return false
@@ -106,7 +105,7 @@ const DEFAULTS: Record<typeof PLAN_NAME, Record<string, string>> = {
     client_registration: 'static_client',
     request_type: 'plain_http_request', // plain_http_request, request_object
     response_type: 'code',
-    client_auth_type: 'client_secret_basic', // none, client_secret_basic, client_secret_post, client_secret_jwt, private_key_jwt
+    client_auth_type: 'client_secret_basic', // none, client_secret_basic, client_secret_post, private_key_jwt
   },
   'oidcc-client-basic-certification-test-plan': {
     request_type: 'plain_http_request',

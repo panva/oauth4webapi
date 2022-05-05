@@ -351,69 +351,6 @@ for (const alg of ['RS', 'ES', 'PS'].map((s) => [`${s}256`]).flat()) {
   })
 }
 
-test('client_secret_jwt', async (t) => {
-  const tIssuer: lib.AuthorizationServer = {
-    ...issuer,
-    revocation_endpoint: endpoint('test-csjwt'),
-    token_endpoint: endpoint('token'),
-  }
-
-  t.context
-    .intercept({
-      path: '/test-csjwt',
-      method: 'POST',
-      headers(headers) {
-        return !('authorization' in headers)
-      },
-      body(body) {
-        const params = new URLSearchParams(body)
-        t.false(params.has('client_secret'))
-        t.true(params.has('client_assertion'))
-        t.is(params.get('client_id'), client.client_id)
-        t.is(
-          params.get('client_assertion_type'),
-          'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
-        )
-
-        const { alg } = jose.decodeProtectedHeader(params.get('client_assertion')!)
-        t.is(alg, 'HS256')
-        const assertion = jose.decodeJwt(params.get('client_assertion')!)
-        t.deepEqual(assertion.aud, [tIssuer.issuer, tIssuer.token_endpoint])
-        t.is(assertion.iss, client.client_id)
-        t.is(assertion.sub, client.client_id)
-        t.is(typeof assertion.exp, 'number')
-        t.is(typeof assertion.iat, 'number')
-        t.is(typeof assertion.nbf, 'number')
-        t.is(typeof assertion.jti, 'string')
-
-        return true
-      },
-    })
-    .reply(200, '')
-
-  await lib.revocationRequest(
-    tIssuer,
-    {
-      ...client,
-      client_secret: 'foo',
-      token_endpoint_auth_method: 'client_secret_jwt',
-    },
-    'token',
-  )
-  await t.throwsAsync(
-    lib.revocationRequest(
-      { ...issuer, revocation_endpoint: endpoint('test-csjwt') },
-      {
-        ...client,
-        token_endpoint_auth_method: 'client_secret_jwt',
-      },
-      'token',
-    ),
-    { message: '"client.client_secret" property must be a non-empty string' },
-  )
-  t.pass()
-})
-
 test('none', async (t) => {
   t.context
     .intercept({
