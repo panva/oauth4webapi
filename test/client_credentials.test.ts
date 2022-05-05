@@ -19,7 +19,7 @@ test.after(teardown)
 const tClient: lib.Client = { ...client, client_secret: 'foo' }
 
 test('clientCredentialsGrantRequest()', async (t) => {
-  await t.throwsAsync(lib.clientCredentialsGrantRequest(issuer, tClient), {
+  await t.throwsAsync(lib.clientCredentialsGrantRequest(issuer, tClient, new URLSearchParams()), {
     message: '"issuer.token_endpoint" must be a string',
   })
 
@@ -43,7 +43,7 @@ test('clientCredentialsGrantRequest()', async (t) => {
     })
     .reply(200, { access_token: 'token', token_type: 'Bearer' })
 
-  await t.notThrowsAsync(lib.clientCredentialsGrantRequest(tIssuer, tClient))
+  await t.notThrowsAsync(lib.clientCredentialsGrantRequest(tIssuer, tClient, new URLSearchParams()))
 })
 
 test('clientCredentialsGrantRequest() w/ Extra Parameters', async (t) => {
@@ -64,9 +64,11 @@ test('clientCredentialsGrantRequest() w/ Extra Parameters', async (t) => {
     .reply(200, { access_token: 'token', token_type: 'Bearer' })
 
   await t.notThrowsAsync(
-    lib.clientCredentialsGrantRequest(tIssuer, tClient, {
-      additionalParameters: new URLSearchParams('resource=urn:example:resource'),
-    }),
+    lib.clientCredentialsGrantRequest(
+      tIssuer,
+      tClient,
+      new URLSearchParams('resource=urn:example:resource'),
+    ),
   )
 })
 
@@ -89,7 +91,7 @@ test('clientCredentialsGrantRequest() w/ Custom Headers', async (t) => {
     .reply(200, { access_token: 'token', token_type: 'Bearer' })
 
   await t.notThrowsAsync(
-    lib.clientCredentialsGrantRequest(tIssuer, tClient, {
+    lib.clientCredentialsGrantRequest(tIssuer, tClient, new URLSearchParams(), {
       headers: new Headers([
         ['accept', 'will be overwritten'],
         ['user-agent', 'foo'],
@@ -116,7 +118,9 @@ test('clientCredentialsGrantRequest() w/ DPoP', async (t) => {
     .reply(200, { access_token: 'token', token_type: 'DPoP' })
 
   const DPoP = await lib.generateKeyPair('ES256')
-  await t.notThrowsAsync(lib.clientCredentialsGrantRequest(tIssuer, tClient, { DPoP }))
+  await t.notThrowsAsync(
+    lib.clientCredentialsGrantRequest(tIssuer, tClient, new URLSearchParams(), { DPoP }),
+  )
 })
 
 test('processClientCredentialsResponse()', async (t) => {

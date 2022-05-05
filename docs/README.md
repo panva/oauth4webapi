@@ -51,6 +51,7 @@
 - [AuthenticatedRequestOptions](interfaces/AuthenticatedRequestOptions.md)
 - [AuthorizationServer](interfaces/AuthorizationServer.md)
 - [Client](interfaces/Client.md)
+- [ClientCredentialsGrantRequestOptions](interfaces/ClientCredentialsGrantRequestOptions.md)
 - [ClientCredentialsGrantResponse](interfaces/ClientCredentialsGrantResponse.md)
 - [DPoPOptions](interfaces/DPoPOptions.md)
 - [DPoPRequestOptions](interfaces/DPoPRequestOptions.md)

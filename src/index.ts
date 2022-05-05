@@ -2566,6 +2566,11 @@ function checkJwtType(expected: string, result: ParsedJWT) {
   return result
 }
 
+export interface ClientCredentialsGrantRequestOptions
+  extends HttpRequestOptions,
+    AuthenticatedRequestOptions,
+    DPoPRequestOptions {}
+
 /**
  * Performs a Client Credentials Grant request at the
  * {@link AuthorizationServer.token_endpoint `as.token_endpoint`}.
@@ -2583,13 +2588,19 @@ function checkJwtType(expected: string, result: ParsedJWT) {
 export async function clientCredentialsGrantRequest(
   as: AuthorizationServer,
   client: Client,
-  options?: TokenEndpointRequestOptions,
+  parameters: URLSearchParams,
+  options?: ClientCredentialsGrantRequestOptions,
 ): Promise<Response> {
   assertIssuer(as)
   assertClient(client)
 
-  const parameters = new URLSearchParams(options?.additionalParameters)
-  return tokenEndpointRequest(as, client, 'client_credentials', parameters, options)
+  return tokenEndpointRequest(
+    as,
+    client,
+    'client_credentials',
+    new URLSearchParams(parameters),
+    options,
+  )
 }
 
 /**

@@ -16,9 +16,7 @@ const parameters = new URLSearchParams()
 parameters.set('scope', 'api:read api:write')
 parameters.set('resource', 'urn:example:api')
 
-const response = await oauth.clientCredentialsGrantRequest(as, client, {
-  additionalParameters: parameters,
-})
+const response = await oauth.clientCredentialsGrantRequest(as, client, parameters)
 
 let challenges: oauth.WWWAuthenticateChallenge[] | undefined
 if ((challenges = oauth.parseWwwAuthenticateChallenges(response))) {

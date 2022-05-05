@@ -1,6 +1,6 @@
 # Function: clientCredentialsGrantRequest
 
-▸ **clientCredentialsGrantRequest**(`as`, `client`, `options?`): `Promise`<`Response`\>
+▸ **clientCredentialsGrantRequest**(`as`, `client`, `parameters`, `options?`): `Promise`<`Response`\>
 
 Performs a Client Credentials Grant request at the
 [`as.token_endpoint`](../interfaces/AuthorizationServer.md#token_endpoint).
@@ -15,7 +15,8 @@ Performs a Client Credentials Grant request at the
 | :------ | :------ | :------ |
 | `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata |
 | `client` | [`Client`](../interfaces/Client.md) | Client Metadata |
-| `options?` | [`TokenEndpointRequestOptions`](../interfaces/TokenEndpointRequestOptions.md) | - |
+| `parameters` | `URLSearchParams` | - |
+| `options?` | [`ClientCredentialsGrantRequestOptions`](../interfaces/ClientCredentialsGrantRequestOptions.md) | - |
 
 #### Returns
 
