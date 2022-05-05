@@ -1,6 +1,6 @@
 A collection of examples for the most common use cases.
 
-- Authorization Code Flow - OpenID Connect [source](code.ts), or plain OAuth 2.0 [source](oauth.ts)
+- Authorization Code Flow - OpenID Connect [source](code.ts), or plain OAuth 2 [source](oauth.ts)
 - Private Key JWT Client Authentication - [source](private_key_jwt.ts) | [diff from code flow](private_key_jwt.diff)
 - DPoP - [source](dpop.ts) | [diff from code flow](dpop.diff)
 - Pushed Authorization Request (PAR) - [source](par.ts) | [diff from code flow](par.diff)
