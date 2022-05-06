@@ -62,16 +62,15 @@ The supported JavaScript runtimes include ones that
    - [URL API][] and its related globals [URL][], [URLSearchParams][]
    - [atob][] and [btoa][]
    - [Uint8Array][]
+- These are (not an exhaustive list):
+  - Browsers
+  - Cloudflare Workers
+  - Deno (^1.21.0)
+  - Electron
+  - Next.js Middlewares
+  - Node.js ([runtime flags may be needed](https://github.com/panva/oauth4webapi/issues/8))
+  - Vercel Edge Functions
 
-These are (not an exhaustive list):
-
-- Browsers
-- Cloudflare Workers
-- Deno (^1.21.0)
-- Electron
-- Next.js Middlewares
-- Node.js ([runtime flags may be needed](https://github.com/panva/oauth4webapi/issues/8))
-- Vercel Edge Functions
 
 ## Out of scope
 
