@@ -77,7 +77,7 @@ test('authorizationCodeGrantRequest()', async (t) => {
     lib.authorizationCodeGrantRequest(issuer, tClient, <any>null, 'redirect_uri', 'verifier'),
     {
       message:
-        '"callbackParameters" must be an instance of CallbackParameters obtained from "validateAuthResponse()"',
+        '"callbackParameters" must be an instance of CallbackParameters obtained from "validateAuthResponse()", or "validateJwtAuthResponse()',
     },
   )
 

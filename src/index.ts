@@ -2278,7 +2278,7 @@ export async function authorizationCodeGrantRequest(
 
   if (!(callbackParameters instanceof CallbackParameters)) {
     throw new TypeError(
-      '"callbackParameters" must be an instance of CallbackParameters obtained from "validateAuthResponse()"',
+      '"callbackParameters" must be an instance of CallbackParameters obtained from "validateAuthResponse()", or "validateJwtAuthResponse()',
     )
   }
 
