@@ -1,11 +1,11 @@
 import * as oauth from '../src/index.js'
 
-// a random key is generated here for the example's sake, you would however
-// use crypto.subtle.importKey to import your private key that is pre-registered on the AS
+// a random client authentication key is generated here for the example's sake, you would however
+// use crypto.subtle.importKey to import a private key that is pre-registered on the AS
 const { privateKey } = await oauth.generateKeyPair('ES256')
-const keyID = 'a52faab2-f688-44b6-bde8-f493aeb526fb' // the `kid` your authorization server expects, or undefined if not applicable
+const keyID = 'a52faab2-f688-44b6-bde8-f493aeb526fb' // the `kid` the authorization server expects, or undefined if not applicable
 
-const issuer = new URL('https://op.panva.cz')
+const issuer = new URL('https://example.as.com')
 const as = await oauth
   .discoveryRequest(issuer)
   .then((response) => oauth.processDiscoveryResponse(issuer, response))
@@ -15,7 +15,7 @@ const client: oauth.Client = {
   token_endpoint_auth_method: 'private_key_jwt',
 }
 
-const redirect_uri = 'https://rp.example.com/cb'
+const redirect_uri = 'https://example.rp.com/cb'
 
 if (as.code_challenge_methods_supported?.includes('S256') !== true) {
   // This example assumes S256 PKCE support is signalled
@@ -30,9 +30,7 @@ const code_challenge_method = 'S256'
 {
   // redirect user to as.authorization_endpoint
 
-  if (!as.authorization_endpoint) throw new Error()
-
-  const authorizationUrl = new URL(as.authorization_endpoint)
+  const authorizationUrl = new URL(as.authorization_endpoint!)
   authorizationUrl.searchParams.set('client_id', client.client_id)
   authorizationUrl.searchParams.set('code_challenge', code_challenge)
   authorizationUrl.searchParams.set('code_challenge_method', code_challenge_method)

@@ -1,6 +1,6 @@
 import * as oauth from '../src/index.js'
 
-const issuer = new URL('https://op.panva.cz')
+const issuer = new URL('https://example.as.com')
 const as = await oauth
   .discoveryRequest(issuer)
   .then((response) => oauth.processDiscoveryResponse(issuer, response))
@@ -12,7 +12,7 @@ const client: oauth.Client = {
   token_endpoint_auth_method: 'client_secret_basic',
 }
 
-const redirect_uri = 'https://rp.example.com/cb'
+const redirect_uri = 'https://example.rp.com/cb'
 
 if (as.code_challenge_methods_supported?.includes('S256') !== true) {
   // This example assumes S256 PKCE is supported and signalled to be supported
@@ -27,9 +27,7 @@ const code_challenge_method = 'S256'
 {
   // redirect user to as.authorization_endpoint
 
-  if (!as.authorization_endpoint) throw new Error()
-
-  const authorizationUrl = new URL(as.authorization_endpoint)
+  const authorizationUrl = new URL(as.authorization_endpoint!)
   authorizationUrl.searchParams.set('client_id', client.client_id)
   authorizationUrl.searchParams.set('code_challenge', code_challenge)
   authorizationUrl.searchParams.set('code_challenge_method', code_challenge_method)

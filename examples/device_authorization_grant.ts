@@ -1,6 +1,6 @@
 import * as oauth from '../src/index.js'
 
-const issuer = new URL('https://op.panva.cz')
+const issuer = new URL('https://example.as.com')
 const as = await oauth
   .discoveryRequest(issuer)
   .then((response) => oauth.processDiscoveryResponse(issuer, response))

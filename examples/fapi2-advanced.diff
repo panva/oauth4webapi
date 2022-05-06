@@ -1,0 +1,41 @@
+diff --git a/examples/fapi2-baseline.ts b/examples/fapi2-advanced.ts
+index 2f1df32..1bfafe2 100644
+--- a/examples/fapi2-baseline.ts
++++ b/examples/fapi2-advanced.ts
+@@ -26,7 +26,7 @@ const code_verifier = oauth.generateRandomCodeVerifier()
+ const code_challenge = await oauth.calculatePKCECodeChallenge(code_verifier)
+ const code_challenge_method = 'S256'
+ 
+-let request_uri: string
++let request: string
+ {
+   const params = new URLSearchParams()
+   params.set('client_id', client.client_id)
+@@ -34,8 +34,18 @@ let request_uri: string
+   params.set('code_challenge_method', code_challenge_method)
+   params.set('redirect_uri', redirect_uri)
+   params.set('response_type', 'code')
++  params.set('response_mode', 'jwt')
+   params.set('scope', 'openid email')
+ 
++  request = await oauth.issueRequestObject(as, client, params, clientPrivateKey)
++}
++
++let request_uri: string
++{
++  const params = new URLSearchParams()
++  params.set('client_id', client.client_id)
++  params.set('request', request)
++
+   const response = await oauth.pushedAuthorizationRequest(as, client, params, {
+     DPoP,
+     clientPrivateKey,
+@@ -73,7 +83,7 @@ let request_uri: string
+ {
+   // @ts-ignore
+   const currentUrl: URL = getCurrentUrl()
+-  const params = oauth.validateAuthResponse(as, client, currentUrl, oauth.expectNoState)
++  const params = await oauth.validateJwtAuthResponse(as, client, currentUrl, oauth.expectNoState)
+   if (oauth.isOAuth2Error(params)) {
+     console.log('error', params)
+     throw new Error() // Handle OAuth 2.0 redirect error

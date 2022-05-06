@@ -7,3 +7,5 @@ A collection of examples for the most common use cases.
 - JWT Authorization Response Mode (JARM) - [source](jarm.ts) | [diff from code flow](jarm.diff)
 - Client Credentials Grant - [source](client_credentials.ts)
 - Device Authorization Grant - [source](device_authorization_grant.ts)
+- FAPI 2.0 Baseline (Private Key JWT, PAR, DPoP) - [source](fapi2-baseline.ts)
+- FAPI 2.0 Advanced (Private Key JWT, PAR, DPoP, JAR, JARM) - [source](fapi2-advanced.ts) | [diff from baseline](fapi2-advanced.diff)

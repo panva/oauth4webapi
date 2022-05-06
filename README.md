@@ -47,6 +47,8 @@ import * as oauth2 from 'https://deno.land/x/doauth/src/index.ts'
 - JWT Authorization Response Mode (JARM) - [source](examples/jarm.ts) | [diff from code flow](examples/jarm.diff)
 - Client Credentials Grant - [source](examples/client_credentials.ts)
 - Device Authorization Grant - [source](examples/device_authorization_grant.ts)
+- FAPI 2.0 Baseline (Private Key JWT, PAR, DPoP) - [source](examples/fapi2-baseline.ts)
+- FAPI 2.0 Advanced (Private Key JWT, PAR, DPoP, JAR, JARM) - [source](examples/fapi2-advanced.ts) | [diff from baseline](examples/fapi2-advanced.diff)
 
 ## Runtime requirements
 

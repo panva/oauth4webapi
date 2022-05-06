@@ -1,5 +1,15 @@
 import * as oauth from '../src/index.js'
 
+// in order to take full advantage of DPoP you shall generate a random private key for every session
+const DPoP = await oauth.generateKeyPair('ES256')
+
+// a random client private key is generated here for the example's sake, you would however
+// use crypto.subtle.importKey to import a private key that is pre-registered on the AS
+const clientPrivateKey = {
+  key: (await oauth.generateKeyPair('ES256')).privateKey,
+  kid: 'a52faab2-f688-44b6-bde8-f493aeb526fb', // the `kid` the authorization server expects, or undefined if not applicable
+}
+
 const issuer = new URL('https://example.as.com')
 const as = await oauth
   .discoveryRequest(issuer)
@@ -7,18 +17,10 @@ const as = await oauth
 
 const client: oauth.Client = {
   client_id: 'abc4ba37-4ab8-49b5-99d4-9441ba35d428',
-  client_secret:
-    'ddce41c3d7618bb30e8a5e5e423fce223427426265ebc96fd9dd5713a6d4fc58bc523c45af42274c210ab18d4a93b5b7169edf6236ed2657f6be64ec41b72f87',
-  token_endpoint_auth_method: 'client_secret_basic',
+  token_endpoint_auth_method: 'private_key_jwt',
 }
 
 const redirect_uri = 'https://example.rp.com/cb'
-
-if (as.code_challenge_methods_supported?.includes('S256') !== true) {
-  // This example assumes S256 PKCE support is signalled
-  // If it isn't supported, random `nonce` should be used for CSRF protection.
-  throw new Error()
-}
 
 const code_verifier = oauth.generateRandomCodeVerifier()
 const code_challenge = await oauth.calculatePKCECodeChallenge(code_verifier)
@@ -34,11 +36,17 @@ let request_uri: string
   params.set('response_type', 'code')
   params.set('scope', 'openid email')
 
-  const response = await oauth.pushedAuthorizationRequest(as, client, params)
+  const response = await oauth.pushedAuthorizationRequest(as, client, params, {
+    DPoP,
+    clientPrivateKey,
+  })
   let challenges: oauth.WWWAuthenticateChallenge[] | undefined
   if ((challenges = oauth.parseWwwAuthenticateChallenges(response))) {
     for (const challenge of challenges) {
       console.log('challenge', challenge)
+      if (challenge.scheme === 'dpop' && challenge.parameters.error === 'use_dpop_nonce') {
+        // the AS-signalled nonce is now already cached, you should retry `pushedAuthorizationRequest`
+      }
     }
     throw new Error() // Handle www-authenticate challenges as needed
   }
@@ -62,8 +70,6 @@ let request_uri: string
 }
 
 // one eternity later, the user lands back on the redirect_uri
-let sub: string
-let access_token: string
 {
   // @ts-ignore
   const currentUrl: URL = getCurrentUrl()
@@ -79,12 +85,19 @@ let access_token: string
     params,
     redirect_uri,
     code_verifier,
+    {
+      DPoP,
+      clientPrivateKey,
+    },
   )
 
   let challenges: oauth.WWWAuthenticateChallenge[] | undefined
   if ((challenges = oauth.parseWwwAuthenticateChallenges(response))) {
     for (const challenge of challenges) {
       console.log('challenge', challenge)
+      if (challenge.scheme === 'dpop' && challenge.parameters.error === 'use_dpop_nonce') {
+        // the AS-signalled nonce is now already cached, you should retry `authorizationCodeGrantRequest`
+      }
     }
     throw new Error() // Handle www-authenticate challenges as needed
   }
@@ -96,24 +109,6 @@ let access_token: string
   }
 
   console.log('result', result)
-  ;({ access_token } = result)
   const claims = oauth.getValidatedIdTokenClaims(result)!
   console.log('ID Token Claims', claims)
-  ;({ sub } = claims)
-}
-
-// fetch userinfo response
-{
-  const response = await oauth.userInfoRequest(as, client, access_token)
-
-  let challenges: oauth.WWWAuthenticateChallenge[] | undefined
-  if ((challenges = oauth.parseWwwAuthenticateChallenges(response))) {
-    for (const challenge of challenges) {
-      console.log('challenge', challenge)
-    }
-    throw new Error() // Handle www-authenticate challenges as needed
-  }
-
-  const result = await oauth.processUserInfoResponse(as, client, sub, response)
-  console.log('result', result)
 }
