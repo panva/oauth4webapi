@@ -1,4 +1,4 @@
-# OAuth 2 / OpenID Connect for Web Platform API javascript runtimes
+# OAuth 2 / OpenID Connect for Web Platform API JavaScript runtimes
  
 This software is a collection of routines upon which framework-specific client modules may be written. Its objective is to support and, where possible, enforce secure and current best practices using only capabilities common to Browser and Non-Browser JavaScript-based runtime environments.
 
@@ -16,10 +16,9 @@ Target profiles of this software are OAuth 2.1, OAuth 2.0 complemented by the la
 - Authorization Server Issuer Identification
 - JWT Secured Introspection, Response Mode, Authorization Request, and UserInfo
 
-[<img width="184" height="96" align="right" src="https://user-images.githubusercontent.com/241506/166977513-7cd710a9-7f60-4944-aebe-a658e9f36375.png" alt="OpenID Certification">](#certification)
-
 ## [Certification](https://openid.net/certification/faq/)
 
+[<img width="96" height="50" align="right" src="https://user-images.githubusercontent.com/241506/166977513-7cd710a9-7f60-4944-aebe-a658e9f36375.png" alt="OpenID Certification">](#certification)
 
 [Filip Skokan](https://github.com/panva) has certified that [this software](https://github.com/panva/oauth4webapi) conforms to the Basic RP Conformance Profile of the OpenID Connect™ protocol.
 
@@ -51,7 +50,7 @@ import * as oauth2 from 'https://deno.land/x/doauth/src/index.ts'
 
 ## Runtime requirements
 
-The supported javascript runtimes include ones that
+The supported JavaScript runtimes include ones that
 
 - are reasonably up to date ECMAScript (targets ES2020, but may be further transpiled for compatibility)
 - support required Web API globals and standard built-in objects
@@ -62,17 +61,15 @@ The supported javascript runtimes include ones that
    - [atob][] and [btoa][]
    - [Uint8Array][]
 
-Other than browsers the supported runtimes are
+These are (not an exhaustive list):
 
-- Deno (^1.21.0)
+- Browsers
 - Cloudflare Workers
-- Vercel Edge Functions
+- Deno (^1.21.0)
+- Electron
 - Next.js Middlewares
-- Electron (renderer process)
-
-Pending runtime support
-
-- Node.js, Electron (main process) - once [fetch][] and [Web Crypto API][] are available as globals
+- Node.js ([runtime flags may be needed](https://github.com/panva/oauth4webapi/issues/8))
+- Vercel Edge Functions
 
 ## Out of scope
 
@@ -81,6 +78,7 @@ Pending runtime support
 - Mutual-TLS Client Authentication and Certificate-Bound Access Tokens
 - JSON Web Encryption (JWE)
 - JSON Web Signature (JWS) rarely used algorithms and HMAC
+- Automatic polyfills of any kind 
 
 [Web Crypto API]: https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API
 [Fetch API]: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API
