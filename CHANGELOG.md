@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.8.0](https://github.com/panva/oauth4webapi/compare/v0.7.0...v0.8.0) (2022-05-06)
+
+
+### ⚠ BREAKING CHANGES
+
+* getValidatedIdTokenClaims throws if ref isnt weak referenced
+* remove client_secret_jwt
+
+### Refactor
+
+* getValidatedIdTokenClaims throws if ref isnt weak referenced ([1ee5485](https://github.com/panva/oauth4webapi/commit/1ee54858402d3099258f78e746ee14f6185f5cdf))
+* remove client_secret_jwt ([7611169](https://github.com/panva/oauth4webapi/commit/7611169deb68cd9f8283ce8356a75bf8b5ab0f7f))
+
 ## [0.7.0](https://github.com/panva/oauth4webapi/compare/v0.6.4...v0.7.0) (2022-05-05)
 
 
