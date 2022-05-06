@@ -3223,20 +3223,20 @@ function checkSigningAlgorithm(
 ) {
   if (client !== undefined) {
     if (header.alg !== client) {
-      throw new OPE('unexpected JWT `alg` header parameter')
+      throw new OPE('unexpected JWT "alg" header parameter')
     }
     return
   }
 
   if (Array.isArray(issuer)) {
     if (issuer.includes(header.alg) === false) {
-      throw new OPE('unexpected JWT `alg` header parameter')
+      throw new OPE('unexpected JWT "alg" header parameter')
     }
     return
   }
 
   if (header.alg !== fallback) {
-    throw new OPE('unexpected JWT `alg` header parameter')
+    throw new OPE('unexpected JWT "alg" header parameter')
   }
 }
 
