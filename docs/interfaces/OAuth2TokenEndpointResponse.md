@@ -8,6 +8,7 @@
 
 - [access\_token](OAuth2TokenEndpointResponse.md#access_token)
 - [expires\_in](OAuth2TokenEndpointResponse.md#expires_in)
+- [id\_token](OAuth2TokenEndpointResponse.md#id_token)
 - [refresh\_token](OAuth2TokenEndpointResponse.md#refresh_token)
 - [scope](OAuth2TokenEndpointResponse.md#scope)
 - [token\_type](OAuth2TokenEndpointResponse.md#token_type)
@@ -23,6 +24,12 @@ ___
 ### expires\_in
 
 • `Optional` `Readonly` **expires\_in**: `number`
+
+___
+
+### id\_token
+
+• `Optional` `Readonly` **id\_token**: `undefined`
 
 ___
 

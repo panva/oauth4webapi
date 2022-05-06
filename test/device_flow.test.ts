@@ -465,24 +465,37 @@ test('processDeviceCodeResponse() with an ID Token (alg signalled)', async (t) =
   )
 
   await t.notThrowsAsync(
-    lib.processDeviceCodeResponse(
-      { ...tIssuer, id_token_signing_alg_values_supported: ['ES256'] },
-      client,
-      getResponse(
-        j({
-          access_token: 'token',
-          token_type: 'Bearer',
-          id_token: await new jose.SignJWT({})
-            .setProtectedHeader({ alg: 'ES256' })
-            .setIssuer(issuer.issuer)
-            .setSubject('urn:example:subject')
-            .setAudience(client.client_id)
-            .setExpirationTime('5m')
-            .setIssuedAt()
-            .sign(t.context.es256.privateKey),
-        }),
-      ),
-    ),
+    lib
+      .processDeviceCodeResponse(
+        { ...tIssuer, id_token_signing_alg_values_supported: ['ES256'] },
+        client,
+        getResponse(
+          j({
+            access_token: 'token',
+            token_type: 'Bearer',
+            id_token: await new jose.SignJWT({})
+              .setProtectedHeader({ alg: 'ES256' })
+              .setIssuer(issuer.issuer)
+              .setSubject('urn:example:subject')
+              .setAudience(client.client_id)
+              .setExpirationTime('5m')
+              .setIssuedAt()
+              .sign(t.context.es256.privateKey),
+          }),
+        ),
+      )
+      .then(async (result) => {
+        if (lib.isOAuth2Error(result)) {
+          t.fail()
+        } else {
+          t.assert(lib.getValidatedIdTokenClaims(result))
+          t.throws(() => lib.getValidatedIdTokenClaims({ ...result }), {
+            name: 'TypeError',
+            message:
+              '"ref" was already garbage collected or did not resolve from the proper sources',
+          })
+        }
+      }),
   )
 })
 

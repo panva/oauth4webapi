@@ -237,7 +237,16 @@ export const green = test.macro({
 
       t.log('token endpoint response body', await response.clone().json())
 
-      const result = await oauth.processAuthorizationCodeOpenIDResponse(as, client, response)
+      let result:
+        | oauth.OAuth2TokenEndpointResponse
+        | oauth.OpenIDTokenEndpointResponse
+        | oauth.OAuth2Error
+      if (scope.includes('openid')) {
+        result = await oauth.processAuthorizationCodeOpenIDResponse(as, client, response)
+      } else {
+        result = await oauth.processAuthorizationCodeOAuth2Response(as, client, response)
+      }
+
       if (oauth.isOAuth2Error(result)) {
         t.log('error', result)
         throw new Error() // Handle OAuth 2.0 response body error
@@ -245,12 +254,14 @@ export const green = test.macro({
 
       t.log('token endpoint response passed validation')
       ;({ access_token } = result)
-      const claims = oauth.getValidatedIdTokenClaims(result)!
-      t.log('ID Token Claims', claims)
-      ;({ sub } = claims)
+      if (result.id_token) {
+        const claims = oauth.getValidatedIdTokenClaims(result)
+        t.log('ID Token Claims', claims)
+        ;({ sub } = claims)
+      }
     }
 
-    if (as.userinfo_endpoint) {
+    if (scope.includes('openid') && as.userinfo_endpoint) {
       // fetch userinfo response
       const make = () => oauth.userInfoRequest(as, client, access_token, { DPoP })
       let response = await make()
@@ -271,7 +282,7 @@ export const green = test.macro({
         t.log('userinfo endpoint response body', await response.clone().text())
       }
 
-      await oauth.processUserInfoResponse(as, client, sub, response)
+      await oauth.processUserInfoResponse(as, client, sub!, response)
       t.log('userinfo response passed validation')
     }
 

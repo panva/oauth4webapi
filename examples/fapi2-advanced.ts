@@ -119,6 +119,6 @@ let request_uri: string
   }
 
   console.log('result', result)
-  const claims = oauth.getValidatedIdTokenClaims(result)!
+  const claims = oauth.getValidatedIdTokenClaims(result)
   console.log('ID Token Claims', claims)
 }

@@ -2043,22 +2043,36 @@ export async function refreshTokenGrantRequest(
 const idTokenClaims = new WeakMap<TokenEndpointResponse, IDToken>()
 
 /**
- * Returns ID Token claims validated during {@link authorizationCodeGrantRequest} or
- * {@link refreshTokenGrantRequest}.
+ * Returns ID Token claims validated during {@link processAuthorizationCodeOpenIDResponse}.
  *
- * @param ref object previously resolved from
- * {@link processAuthorizationCodeOpenIDResponse},
- * {@link refreshTokenGrantRequest}, or
- * {@link processDeviceCodeResponse}.
- * If the "ref" object did not come from these methods, or didn't contain an ID
- * Token, this function returns undefined.
+ * @param ref Value previously resolved from
+ * {@link processAuthorizationCodeOpenIDResponse}.
  *
- * @returns JWT Claims Set from an ID Token, or undefined if there was no ID
- * Token returned in "ref".
+ * @returns JWT Claims Set from an ID Token.
  */
+export function getValidatedIdTokenClaims(ref: OpenIDTokenEndpointResponse): IDToken
+
+/**
+ * Returns ID Token claims validated during {@link processRefreshTokenResponse}
+ * or {@link processDeviceCodeResponse}.
+ *
+ * @param ref Value previously resolved from
+ * {@link processRefreshTokenResponse} or
+ * {@link processDeviceCodeResponse}.
+ *
+ * @returns JWT Claims Set from an ID Token, or undefined if there is no ID
+ * Token in `ref`.
+ */
+export function getValidatedIdTokenClaims(ref: TokenEndpointResponse): IDToken | undefined
 export function getValidatedIdTokenClaims(
-  ref: OpenIDTokenEndpointResponse | OAuth2TokenEndpointResponse | TokenEndpointResponse,
+  ref: OpenIDTokenEndpointResponse | TokenEndpointResponse,
 ): IDToken | undefined {
+  if (!idTokenClaims.has(ref)) {
+    throw new TypeError(
+      '"ref" was already garbage collected or did not resolve from the proper sources',
+    )
+  }
+
   return idTokenClaims.get(ref)
 }
 
@@ -2386,6 +2400,7 @@ export interface OAuth2TokenEndpointResponse {
   readonly token_type: string
   readonly expires_in?: number
   readonly scope?: string
+  readonly id_token?: undefined
 
   readonly [parameter: string]: JsonValue | undefined
 }

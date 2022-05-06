@@ -80,7 +80,7 @@ let access_token: string
 
   console.log('result', result)
   ;({ access_token } = result)
-  const claims = oauth.getValidatedIdTokenClaims(result)!
+  const claims = oauth.getValidatedIdTokenClaims(result)
   console.log('ID Token Claims', claims)
   ;({ sub } = claims)
 }
