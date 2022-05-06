@@ -5,15 +5,14 @@
 ▸ **discoveryRequest**(`issuerIdentifier`, `options?`): `Promise`<`Response`\>
 
 Performs an authorization server metadata discovery using one of two
-algorithms.
+[transformation algorithms](../interfaces/DiscoveryRequestOptions.md#algorithm)
+applied to the `issuerIdentifier` argument.
 
-- "oidc" (default) with the issuer identifier URL as input and target url
-transformation algorithm as defined by OpenID Connect Discovery 1.0.
-- "oauth2" with the issuer identifier URL as input and target url
-transformation algorithm as defined by RFC 8414.
+- `oidc` (default) as defined by OpenID Connect Discovery 1.0.
+- `oauth2` as defined by RFC 8414.
 
 The difference between these two algorithms is in their handling of path
-components in the issuer identifier.
+components in the Issuer Identifier.
 
 **`see`** [RFC 8414 - OAuth 2.0 Authorization Server Metadata](https://www.rfc-editor.org/rfc/rfc8414.html#section-3)
 
@@ -23,7 +22,7 @@ components in the issuer identifier.
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `issuerIdentifier` | `URL` | Issuer identifier to resolve the well-known discovery URI for |
+| `issuerIdentifier` | `URL` | Issuer Identifier to resolve the well-known discovery URI for. |
 | `options?` | [`DiscoveryRequestOptions`](../interfaces/DiscoveryRequestOptions.md) | - |
 
 #### Returns
@@ -32,4 +31,4 @@ components in the issuer identifier.
 
 Resolves with
 [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)'s
-[Response](https://developer.mozilla.org/en-US/docs/Web/API/Response)
+[Response](https://developer.mozilla.org/en-US/docs/Web/API/Response).

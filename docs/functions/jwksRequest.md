@@ -5,7 +5,7 @@
 ▸ **jwksRequest**(`as`, `options?`): `Promise`<`Response`\>
 
 Performs a request to the
-[`as.jwks_uri`](../interfaces/AuthorizationServer.md#jwks_uri)
+[`as.jwks_uri`](../interfaces/AuthorizationServer.md#jwks_uri).
 
 **`see`** [JWK Set Format](https://www.rfc-editor.org/rfc/rfc7517.html#section-5)
 
@@ -17,7 +17,7 @@ Performs a request to the
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata |
+| `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata. |
 | `options?` | [`JwksRequestOptions`](../interfaces/JwksRequestOptions.md) | - |
 
 #### Returns
@@ -26,4 +26,4 @@ Performs a request to the
 
 Resolves with
 [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)'s
-[Response](https://developer.mozilla.org/en-US/docs/Web/API/Response)
+[Response](https://developer.mozilla.org/en-US/docs/Web/API/Response).

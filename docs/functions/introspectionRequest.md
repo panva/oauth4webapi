@@ -4,7 +4,7 @@
 
 ▸ **introspectionRequest**(`as`, `client`, `token`, `options?`): `Promise`<`Response`\>
 
-Performs an introspection request at the
+Performs an Introspection Request at the
 [`as.introspection_endpoint`](../interfaces/AuthorizationServer.md#introspection_endpoint).
 
 **`see`** [RFC 7662 - OAuth 2.0 Token Introspection](https://www.rfc-editor.org/rfc/rfc7662.html#section-2)
@@ -15,8 +15,8 @@ Performs an introspection request at the
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata |
-| `client` | [`Client`](../interfaces/Client.md) | Client Metadata |
+| `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata. |
+| `client` | [`Client`](../interfaces/Client.md) | Client Metadata. |
 | `token` | `string` | Token to introspect. You can provide the `token_type_hint` parameter via [options](../interfaces/IntrospectionRequestOptions.md#additionalparameters). |
 | `options?` | [`IntrospectionRequestOptions`](../interfaces/IntrospectionRequestOptions.md) | - |
 
@@ -26,4 +26,4 @@ Performs an introspection request at the
 
 Resolves with
 [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)'s
-[Response](https://developer.mozilla.org/en-US/docs/Web/API/Response)
+[Response](https://developer.mozilla.org/en-US/docs/Web/API/Response).

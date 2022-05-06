@@ -13,7 +13,7 @@ request using the S256 PKCE Code Challenge Method transformation.
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `codeVerifier` | `string` | code_verifier value generated e.g. from [generateRandomCodeVerifier](generateRandomCodeVerifier.md) |
+| `codeVerifier` | `string` | `code_verifier` value generated e.g. from [generateRandomCodeVerifier](generateRandomCodeVerifier.md). |
 
 #### Returns
 

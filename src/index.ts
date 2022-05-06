@@ -18,7 +18,7 @@ export interface PrivateKey {
    * {@link https://developer.mozilla.org/en-US/docs/Web/API/CryptoKey CryptoKey}.
    *
    * Its algorithm must be compatible with a supported
-   * {@link JWSAlgorithm JWS "alg" Algorithm}.
+   * {@link JWSAlgorithm JWS `alg` Algorithm}.
    */
   key: CryptoKey
 
@@ -65,7 +65,7 @@ export type TokenEndpointAuthMethod =
   | 'none'
 
 /**
- * Supported JWS "alg" Algorithm identifiers.
+ * Supported JWS `alg` Algorithm identifiers.
  *
  * @example PS256 CryptoKey algorithm
  * ```ts
@@ -118,7 +118,7 @@ export interface JWK {
  */
 export interface AuthorizationServer {
   /**
-   * Authorization server's issuer identifier URL.
+   * Authorization server's Issuer Identifier URL.
    */
   readonly issuer: string
   /**
@@ -138,22 +138,22 @@ export interface AuthorizationServer {
    */
   readonly registration_endpoint?: string
   /**
-   * JSON array containing a list of the "scope" values that this authorization
+   * JSON array containing a list of the `scope` values that this authorization
    * server supports.
    */
   readonly scopes_supported?: string[]
   /**
-   * JSON array containing a list of the "response_type" values that this
+   * JSON array containing a list of the `response_type` values that this
    * authorization server supports.
    */
   readonly response_types_supported?: string[]
   /**
-   * JSON array containing a list of the "response_mode" values that this
+   * JSON array containing a list of the `response_mode` values that this
    * authorization server supports.
    */
   readonly response_modes_supported?: string[]
   /**
-   * JSON array containing a list of the "grant_type" values that this
+   * JSON array containing a list of the `grant_type` values that this
    * authorization server supports.
    */
   readonly grant_types_supported?: string[]
@@ -258,52 +258,52 @@ export interface AuthorizationServer {
    */
   readonly subject_types_supported?: string[]
   /**
-   * JSON array containing a list of the JWS "alg" values supported by the
+   * JSON array containing a list of the JWS `alg` values supported by the
    * authorization server for the ID Token.
    */
   readonly id_token_signing_alg_values_supported?: string[]
   /**
-   * JSON array containing a list of the JWE "alg" values supported by the
+   * JSON array containing a list of the JWE `alg` values supported by the
    * authorization server for the ID Token.
    */
   readonly id_token_encryption_alg_values_supported?: string[]
   /**
-   * JSON array containing a list of the JWE "enc" values supported by the
+   * JSON array containing a list of the JWE `enc` values supported by the
    * authorization server for the ID Token.
    */
   readonly id_token_encryption_enc_values_supported?: string[]
   /**
-   * JSON array containing a list of the JWS "alg" values supported by the
+   * JSON array containing a list of the JWS `alg` values supported by the
    * UserInfo Endpoint.
    */
   readonly userinfo_signing_alg_values_supported?: string[]
   /**
-   * JSON array containing a list of the JWE "alg" values supported by the
+   * JSON array containing a list of the JWE `alg` values supported by the
    * UserInfo Endpoint.
    */
   readonly userinfo_encryption_alg_values_supported?: string[]
   /**
-   * JSON array containing a list of the JWE "enc" values supported by the
+   * JSON array containing a list of the JWE `enc` values supported by the
    * UserInfo Endpoint.
    */
   readonly userinfo_encryption_enc_values_supported?: string[]
   /**
-   * JSON array containing a list of the JWS "alg" values supported by the
+   * JSON array containing a list of the JWS `alg` values supported by the
    * authorization server for Request Objects.
    */
   readonly request_object_signing_alg_values_supported?: string[]
   /**
-   * JSON array containing a list of the JWE "alg" values supported by the
+   * JSON array containing a list of the JWE `alg` values supported by the
    * authorization server for Request Objects.
    */
   readonly request_object_encryption_alg_values_supported?: string[]
   /**
-   * JSON array containing a list of the JWE "enc" values supported by the
+   * JSON array containing a list of the JWE `enc` values supported by the
    * authorization server for Request Objects.
    */
   readonly request_object_encryption_enc_values_supported?: string[]
   /**
-   * JSON array containing a list of the "display" parameter values that the
+   * JSON array containing a list of the `display` parameter values that the
    * authorization server supports.
    */
   readonly display_values_supported?: string[]
@@ -324,27 +324,27 @@ export interface AuthorizationServer {
   readonly claims_locales_supported?: string[]
   /**
    * Boolean value specifying whether the authorization server supports use of
-   * the "claims" parameter.
+   * the `claims` parameter.
    */
   readonly claims_parameter_supported?: boolean
   /**
    * Boolean value specifying whether the authorization server supports use of
-   * the "request" parameter.
+   * the `request` parameter.
    */
   readonly request_parameter_supported?: boolean
   /**
    * Boolean value specifying whether the authorization server supports use of
-   * the "request_uri" parameter.
+   * the `request_uri` parameter.
    */
   readonly request_uri_parameter_supported?: boolean
   /**
    * Boolean value specifying whether the authorization server requires any
-   * "request_uri" values used to be pre-registered.
+   * `request_uri` values used to be pre-registered.
    */
   readonly require_request_uri_registration?: boolean
   /**
    * Indicates where authorization request needs to be protected as Request
-   * Object and provided through either request or request_uri parameter.
+   * Object and provided through either `request` or `request_uri` parameter.
    */
   readonly require_signed_request_object?: boolean
   /**
@@ -363,17 +363,17 @@ export interface AuthorizationServer {
   readonly introspection_signing_alg_values_supported?: string[]
   /**
    * JSON array containing a list of algorithms supported by the authorization
-   * server for introspection response content key encryption (alg value).
+   * server for introspection response content key encryption (`alg` value).
    */
   readonly introspection_encryption_alg_values_supported?: string[]
   /**
    * JSON array containing a list of algorithms supported by the authorization
-   * server for introspection response content encryption (enc value).
+   * server for introspection response content encryption (`enc` value).
    */
   readonly introspection_encryption_enc_values_supported?: string[]
   /**
    * Boolean value indicating whether the authorization server provides the
-   * "iss" parameter in the authorization response.
+   * `iss` parameter in the authorization response.
    */
   readonly authorization_response_iss_parameter_supported?: boolean
   /**
@@ -383,12 +383,12 @@ export interface AuthorizationServer {
   readonly authorization_signing_alg_values_supported?: string[]
   /**
    * JSON array containing a list of algorithms supported by the authorization
-   * server for introspection response encryption (alg value).
+   * server for introspection response encryption (`alg` value).
    */
   readonly authorization_encryption_alg_values_supported?: string[]
   /**
    * JSON array containing a list of algorithms supported by the authorization
-   * server for introspection response encryption (enc value).
+   * server for introspection response encryption (`enc` value).
    */
   readonly authorization_encryption_enc_values_supported?: string[]
   /**
@@ -406,7 +406,7 @@ export interface AuthorizationServer {
   readonly backchannel_token_delivery_modes_supported?: string[]
   /**
    * Indicates whether the authorization server supports the use of the CIBA
-   * user_code parameter.
+   * `user_code` parameter.
    */
   readonly backchannel_user_code_parameter_supported?: boolean
   /**
@@ -426,9 +426,9 @@ export interface AuthorizationServer {
    */
   readonly end_session_endpoint?: string
   /**
-   * Boolean value specifying whether the authorization server can pass "iss"
-   * (issuer) and "sid" (session ID) query parameters to identify the RP session
-   * with the authorization server when the "frontchannel_logout_uri" is used.
+   * Boolean value specifying whether the authorization server can pass `iss`
+   * (issuer) and `sid` (session ID) query parameters to identify the RP session
+   * with the authorization server when the `frontchannel_logout_uri` is used.
    */
   readonly frontchannel_logout_session_supported?: boolean
   /**
@@ -437,7 +437,7 @@ export interface AuthorizationServer {
    */
   readonly frontchannel_logout_supported?: boolean
   /**
-   * Boolean value specifying whether the authorization server can pass a sid
+   * Boolean value specifying whether the authorization server can pass a `sid`
    * (session ID) Claim in the Logout Token to identify the RP session with the
    * OP.
    */
@@ -484,7 +484,7 @@ export interface Client {
    */
   token_endpoint_auth_method?: TokenEndpointAuthMethod
   /**
-   * JWS "alg" algorithm required for signing the ID Token issued to this
+   * JWS `alg` algorithm required for signing the ID Token issued to this
    * Client. When not configured the default is
    * to allow only {@link JWSAlgorithm supported algorithms} listed in
    * {@link AuthorizationServer.id_token_signing_alg_values_supported `as.id_token_signing_alg_values_supported`}
@@ -492,7 +492,7 @@ export interface Client {
    */
   id_token_signed_response_alg?: JWSAlgorithm
   /**
-   * JWS "alg" algorithm required for signing authorization responses. When not
+   * JWS `alg` algorithm required for signing authorization responses. When not
    * configured the default is
    * to allow only {@link JWSAlgorithm supported algorithms} listed in
    * {@link AuthorizationServer.authorization_signing_alg_values_supported `as.authorization_signing_alg_values_supported`}
@@ -500,12 +500,12 @@ export interface Client {
    */
   authorization_signed_response_alg?: JWSAlgorithm
   /**
-   * Boolean value specifying whether the {@link IDToken.auth_time auth_time}
+   * Boolean value specifying whether the {@link IDToken.auth_time `auth_time`}
    * Claim in the ID Token is REQUIRED. Default is `false`.
    */
   require_auth_time?: boolean
   /**
-   * JWS "alg" algorithm REQUIRED for signing UserInfo Responses. When not
+   * JWS `alg` algorithm REQUIRED for signing UserInfo Responses. When not
    * configured the default is
    * to allow only {@link JWSAlgorithm supported algorithms} listed in
    * {@link AuthorizationServer.userinfo_signing_alg_values_supported `as.userinfo_signing_alg_values_supported`}
@@ -513,7 +513,7 @@ export interface Client {
    */
   userinfo_signed_response_alg?: JWSAlgorithm
   /**
-   * JWS "alg" algorithm REQUIRED for signed introspection responses. When not
+   * JWS `alg` algorithm REQUIRED for signed introspection responses. When not
    * configured the default is
    * to allow only {@link JWSAlgorithm supported algorithms} listed in
    * {@link AuthorizationServer.introspection_signing_alg_values_supported `as.introspection_signing_alg_values_supported`}
@@ -745,25 +745,24 @@ function prepareHeaders(input: unknown): Headers {
 
 /**
  * Performs an authorization server metadata discovery using one of two
- * algorithms.
+ * {@link DiscoveryRequestOptions.algorithm transformation algorithms}
+ * applied to the `issuerIdentifier` argument.
  *
- * - "oidc" (default) with the issuer identifier URL as input and target url
- * transformation algorithm as defined by OpenID Connect Discovery 1.0.
- * - "oauth2" with the issuer identifier URL as input and target url
- * transformation algorithm as defined by RFC 8414.
+ * - `oidc` (default) as defined by OpenID Connect Discovery 1.0.
+ * - `oauth2` as defined by RFC 8414.
  *
  * The difference between these two algorithms is in their handling of path
- * components in the issuer identifier.
+ * components in the Issuer Identifier.
  *
  * @see {@link https://www.rfc-editor.org/rfc/rfc8414.html#section-3 RFC 8414 - OAuth 2.0 Authorization Server Metadata}
  * @see {@link https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfig OpenID Connect Discovery 1.0}
  *
- * @param issuerIdentifier Issuer identifier to resolve the well-known discovery
- * URI for
+ * @param issuerIdentifier Issuer Identifier to resolve the well-known discovery
+ * URI for.
  *
  * @returns Resolves with
  * {@link https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API Fetch API}'s
- * {@link https://developer.mozilla.org/en-US/docs/Web/API/Response Response}
+ * {@link https://developer.mozilla.org/en-US/docs/Web/API/Response Response}.
  */
 export async function discoveryRequest(
   issuerIdentifier: URL,
@@ -814,10 +813,10 @@ export async function discoveryRequest(
  * @see {@link https://www.rfc-editor.org/rfc/rfc8414.html#section-3 RFC 8414 - OAuth 2.0 Authorization Server Metadata}
  * @see {@link https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfig OpenID Connect Discovery 1.0}
  *
- * @param expectedIssuerIdentifier Expected issuer identifier value
- * @param response resolved value from {@link discoveryRequest}
+ * @param expectedIssuerIdentifier Expected Issuer Identifier value.
+ * @param response Resolved value from {@link discoveryRequest}.
  *
- * @returns Discovered Authorization Server Metadata
+ * @returns Resolves with the discovered Authorization Server Metadata.
  */
 export async function processDiscoveryResponse(
   expectedIssuerIdentifier: URL,
@@ -898,8 +897,8 @@ export function generateRandomNonce() {
  *
  * @see {@link https://www.rfc-editor.org/rfc/rfc7636.html#section-4 RFC 7636 - Proof Key for Code Exchange by OAuth Public Clients (PKCE)}
  *
- * @param codeVerifier code_verifier value generated e.g. from
- * {@link generateRandomCodeVerifier}
+ * @param codeVerifier `code_verifier` value generated e.g. from
+ * {@link generateRandomCodeVerifier}.
  */
 export async function calculatePKCECodeChallenge(codeVerifier: string) {
   if (typeof codeVerifier !== 'string' || codeVerifier.length === 0) {
@@ -937,7 +936,7 @@ export interface DPoPOptions extends CryptoKeyPair {
    * instance to sign the DPoP Proof JWT with.
    *
    * Its algorithm must be compatible with a supported
-   * {@link JWSAlgorithm JWS "alg" Algorithm}.
+   * {@link JWSAlgorithm JWS `alg` Algorithm}.
    */
   privateKey: CryptoKey
 
@@ -976,7 +975,7 @@ export interface PushedAuthorizationRequestOptions
 
 /**
  * The client identifier is encoded using the
- * "application/x-www-form-urlencoded" encoding algorithm per Appendix B, and
+ * `application/x-www-form-urlencoded` encoding algorithm per Appendix B, and
  * the encoded value is used as the username; the client password is encoded
  * using the same algorithm and used as the password.
  */
@@ -1034,7 +1033,7 @@ function esAlg(key: CryptoKey): JWSAlgorithm {
 }
 
 /**
- * Determines a supported JWS "alg" identifier from CryptoKey instance
+ * Determines a supported JWS `alg` identifier from CryptoKey instance
  * properties.
  */
 function determineJWSAlgorithm(key: CryptoKey) {
@@ -1217,8 +1216,8 @@ async function jwt(
  *
  * @see {@link https://www.rfc-editor.org/rfc/rfc9101.html#name-request-object-2 RFC 9101 - The OAuth 2.0 Authorization Framework: JWT-Secured Authorization Request (JAR)}
  *
- * @param as Authorization Server Metadata
- * @param client Client Metadata
+ * @param as Authorization Server Metadata.
+ * @param client Client Metadata.
  * @param privateKey Private key to sign the Request Object with.
  */
 export async function issueRequestObject(
@@ -1336,13 +1335,13 @@ async function publicJwk(key: CryptoKey) {
  * @see {@link https://www.rfc-editor.org/rfc/rfc9126.html#name-pushed-authorization-reques RFC 9126 - OAuth 2.0 Pushed Authorization Requests}
  * @see {@link https://www.ietf.org/archive/id/draft-ietf-oauth-dpop-08.html#name-dpop-with-pushed-authorizat draft-ietf-oauth-dpop-08 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)}
  *
- * @param as Authorization Server Metadata
- * @param client Client Metadata
- * @param parameters authorization request parameters
+ * @param as Authorization Server Metadata.
+ * @param client Client Metadata.
+ * @param parameters Authorization Request parameters.
  *
  * @returns Resolves with
  * {@link https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API Fetch API}'s
- * {@link https://developer.mozilla.org/en-US/docs/Web/API/Response Response}
+ * {@link https://developer.mozilla.org/en-US/docs/Web/API/Response Response}.
  */
 export async function pushedAuthorizationRequest(
   as: AuthorizationServer,
@@ -1468,10 +1467,11 @@ function wwwAuth(scheme: string, params: string): WWWAuthenticateChallenge {
  * Parses the `WWW-Authenticate` HTTP Header from a
  * {@link https://developer.mozilla.org/en-US/docs/Web/API/Response Fetch API Response}.
  *
- * @param response {@link https://developer.mozilla.org/en-US/docs/Web/API/Response Fetch API Response}
+ * @param response {@link https://developer.mozilla.org/en-US/docs/Web/API/Response Fetch API Response}.
  *
  * @returns Array of {@link WWWAuthenticateChallenge} objects. Their order from
- * the response is preserved.
+ * the response is preserved. `undefined` when there wasn't a `WWW-Authenticate`
+ * HTTP Header returned.
  */
 export function parseWwwAuthenticateChallenges(
   response: Response,
@@ -1517,11 +1517,11 @@ export function parseWwwAuthenticateChallenges(
  *
  * @see {@link https://www.rfc-editor.org/rfc/rfc9126.html#name-pushed-authorization-reques RFC 9126 - OAuth 2.0 Pushed Authorization Requests}
  *
- * @param as Authorization Server Metadata
- * @param client Client Metadata
- * @param response resolved value from {@link pushedAuthorizationRequest}
+ * @param as Authorization Server Metadata.
+ * @param client Client Metadata.
+ * @param response Resolved value from {@link pushedAuthorizationRequest}.
  *
- * @returns Object representing the parsed successful response, or an object
+ * @returns Resolves with an object representing the parsed successful response, or an object
  * representing an OAuth 2.0 protocol style error. Use {@link isOAuth2Error} to
  * determine if an OAuth 2.0 error was returned.
  */
@@ -1580,15 +1580,15 @@ export interface ProtectedResourceRequestOptions
  * @see {@link https://www.rfc-editor.org/rfc/rfc6750.html#section-2.1 RFC 6750 - The OAuth 2.0 Authorization Framework: Bearer Token Usage}
  * @see {@link https://www.ietf.org/archive/id/draft-ietf-oauth-dpop-08.html#name-protected-resource-access draft-ietf-oauth-dpop-08 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)}
  *
- * @param accessToken The access token for the request
- * @param method The HTTP method for the request
- * @param url Instance of {@link https://developer.mozilla.org/en-US/docs/Web/API/URL URL} as the target URL for the request
- * @param headers Instance of {@link https://developer.mozilla.org/en-US/docs/Web/API/Headers Headers} for the request
- * @param body see {@link https://developer.mozilla.org/en-US/docs/Web/API/fetch#body Fetch API documentation}.
+ * @param accessToken The Access Token for the request.
+ * @param method The HTTP method for the request.
+ * @param url Instance of {@link https://developer.mozilla.org/en-US/docs/Web/API/URL URL} as the target URL for the request.
+ * @param headers Instance of {@link https://developer.mozilla.org/en-US/docs/Web/API/Headers Headers} for the request.
+ * @param body See {@link https://developer.mozilla.org/en-US/docs/Web/API/fetch#body Fetch API documentation}.
  *
  * @returns Resolves with
  * {@link https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API Fetch API}'s
- * {@link https://developer.mozilla.org/en-US/docs/Web/API/Response Response}
+ * {@link https://developer.mozilla.org/en-US/docs/Web/API/Response Response}.
  */
 export async function protectedResourceRequest(
   accessToken: string,
@@ -1636,13 +1636,13 @@ export interface UserInfoRequestOptions extends HttpRequestOptions, DPoPRequestO
  * @see {@link https://openid.net/specs/openid-connect-core-1_0.html#UserInfo OpenID Connect Core 1.0}
  * @see {@link https://www.ietf.org/archive/id/draft-ietf-oauth-dpop-08.html#name-protected-resource-access draft-ietf-oauth-dpop-08 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)}
  *
- * @param as Authorization Server Metadata
- * @param client Client Metadata
- * @param accessToken Access Token value
+ * @param as Authorization Server Metadata.
+ * @param client Client Metadata.
+ * @param accessToken Access Token value.
  *
  * @returns Resolves with
  * {@link https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API Fetch API}'s
- * {@link https://developer.mozilla.org/en-US/docs/Web/API/Response Response}
+ * {@link https://developer.mozilla.org/en-US/docs/Web/API/Response Response}.
  */
 export async function userInfoRequest(
   as: AuthorizationServer,
@@ -1814,7 +1814,7 @@ async function getPublicSigKeyFromIssuerJwksUri(
  * DANGER ZONE
  *
  * Use this as a value to {@link processUserInfoResponse} `expectedSubject`
- * parameter to skip the "sub" value check.
+ * parameter to skip the `sub` claim value check.
  *
  * @see {@link https://openid.net/specs/openid-connect-core-1_0.html#UserInfoResponse OpenID Connect Core 1.0}
  */
@@ -1832,14 +1832,14 @@ function getContentType(response: Response) {
  *
  * @see {@link https://openid.net/specs/openid-connect-core-1_0.html#UserInfo OpenID Connect Core 1.0}
  *
- * @param as Authorization Server Metadata
- * @param client Client Metadata
- * @param expectedSubject Expected "sub" claim value. In response to
+ * @param as Authorization Server Metadata.
+ * @param client Client Metadata.
+ * @param expectedSubject Expected `sub` claim value. In response to
  * OpenID Connect authentication requests, the expected subject is the one from
  * the ID Token claims retrieved from {@link getValidatedIdTokenClaims}.
- * @param response resolved value from {@link userInfoRequest}
+ * @param response Resolved value from {@link userInfoRequest}.
  *
- * @returns Object representing the parsed successful response, or an object
+ * @returns Resolves with an object representing the parsed successful response, or an object
  * representing an OAuth 2.0 protocol style error. Use {@link isOAuth2Error} to
  * determine if an OAuth 2.0 error was returned.
  */
@@ -2014,13 +2014,13 @@ async function tokenEndpointRequest(
  * @see {@link https://openid.net/specs/openid-connect-core-1_0.html#RefreshTokens OpenID Connect Core 1.0}
  * @see {@link https://www.ietf.org/archive/id/draft-ietf-oauth-dpop-08.html#name-dpop-access-token-request draft-ietf-oauth-dpop-08 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)}
  *
- * @param as Authorization Server Metadata
- * @param client Client Metadata
- * @param refreshToken Refresh Token value
+ * @param as Authorization Server Metadata.
+ * @param client Client Metadata.
+ * @param refreshToken Refresh Token value.
  *
  * @returns Resolves with
  * {@link https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API Fetch API}'s
- * {@link https://developer.mozilla.org/en-US/docs/Web/API/Response Response}
+ * {@link https://developer.mozilla.org/en-US/docs/Web/API/Response Response}.
  */
 export async function refreshTokenGrantRequest(
   as: AuthorizationServer,
@@ -2208,11 +2208,11 @@ async function processGenericAccessTokenResponse(
  * @see {@link https://www.rfc-editor.org/rfc/rfc6749.html#section-6 RFC 6749 - The OAuth 2.0 Authorization Framework}
  * @see {@link https://openid.net/specs/openid-connect-core-1_0.html#RefreshTokens OpenID Connect Core 1.0}
  *
- * @param as Authorization Server Metadata
- * @param client Client Metadata
- * @param response resolved value from {@link refreshTokenGrantRequest}
+ * @param as Authorization Server Metadata.
+ * @param client Client Metadata.
+ * @param response Resolved value from {@link refreshTokenGrantRequest}.
  *
- * @returns Object representing the parsed successful response, or an object
+ * @returns Resolves with an object representing the parsed successful response, or an object
  * representing an OAuth 2.0 protocol style error. Use {@link isOAuth2Error} to
  * determine if an OAuth 2.0 error was returned.
  */
@@ -2267,17 +2267,17 @@ function validateIssuer(expected: string, result: ParsedJWT) {
  * @see {@link https://www.rfc-editor.org/rfc/rfc7636.html#section-4 RFC 7636 - Proof Key for Code Exchange by OAuth Public Clients (PKCE)}
  * @see {@link https://www.ietf.org/archive/id/draft-ietf-oauth-dpop-08.html#name-dpop-access-token-request draft-ietf-oauth-dpop-08 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)}
  *
- * @param as Authorization Server Metadata
- * @param client Client Metadata
- * @param callbackParameters parameters obtained from the callback to
+ * @param as Authorization Server Metadata.
+ * @param client Client Metadata.
+ * @param callbackParameters Parameters obtained from the callback to
  * redirect_uri, this is returned from {@link validateAuthResponse}, or
- * {@link validateJwtAuthResponse}
- * @param redirectUri redirect_uri value used in the authorization request
- * @param codeVerifier PKCE code verifier to send to the token endpoint
+ * {@link validateJwtAuthResponse}.
+ * @param redirectUri `redirect_uri` value used in the authorization request.
+ * @param codeVerifier PKCE `code_verifier` to send to the token endpoint.
  *
  * @returns Resolves with
  * {@link https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API Fetch API}'s
- * {@link https://developer.mozilla.org/en-US/docs/Web/API/Response Response}
+ * {@link https://developer.mozilla.org/en-US/docs/Web/API/Response Response}.
  */
 export async function authorizationCodeGrantRequest(
   as: AuthorizationServer,
@@ -2419,14 +2419,14 @@ export interface ClientCredentialsGrantResponse {
 
 /**
  * Use this as a value to {@link processAuthorizationCodeOpenIDResponse} `expectedNonce`
- * parameter to indicate no "nonce" ID Token claim value is expected, i.e. no "nonce"
+ * parameter to indicate no `nonce` ID Token claim value is expected, i.e. no `nonce`
  * parameter value was sent with the authorization request.
  */
 export const expectNoNonce = Symbol()
 
 /**
  * Use this as a value to {@link processAuthorizationCodeOpenIDResponse} `maxAge`
- * parameter to indicate no "auth_time" ID Token claim value check should be performed.
+ * parameter to indicate no `auth_time` ID Token claim value check should be performed.
  */
 export const skipAuthTimeCheck = Symbol()
 
@@ -2439,19 +2439,19 @@ export const skipAuthTimeCheck = Symbol()
  * @see {@link https://www.rfc-editor.org/rfc/rfc6749.html#section-4.1 RFC 6749 - The OAuth 2.0 Authorization Framework}
  * @see {@link https://openid.net/specs/openid-connect-core-1_0.html#CodeFlowAuth OpenID Connect Core 1.0}
  *
- * @param as Authorization Server Metadata
- * @param client Client Metadata
- * @param response resolved value from {@link authorizationCodeGrantRequest}
- * @param expectedNonce Expected ID Token "nonce" claim value. Default is
+ * @param as Authorization Server Metadata.
+ * @param client Client Metadata.
+ * @param response Resolved value from {@link authorizationCodeGrantRequest}.
+ * @param expectedNonce Expected ID Token `nonce` claim value. Default is
  * {@link expectNoNonce}.
- * @param maxAge ID Token {@link IDToken.auth_time auth_time} parameter will be
- * checked to be present and conform to the "maxAge" value. Use of this option
- * is required if you sent a max_age parameter in an authorization request.
+ * @param maxAge ID Token {@link IDToken.auth_time `auth_time`} claim value will be
+ * checked to be present and conform to the `maxAge` value. Use of this option
+ * is required if you sent a `max_age` parameter in an authorization request.
  * Default is
  * {@link Client.default_max_age `client.default_max_age`} and
  * falls back to {@link skipAuthTimeCheck}.
  *
- * @returns Object representing the parsed successful response, or an object
+ * @returns Resolves with an object representing the parsed successful response, or an object
  * representing an OAuth 2.0 protocol style error. Use {@link isOAuth2Error} to
  * determine if an OAuth 2.0 error was returned.
  */
@@ -2524,11 +2524,11 @@ export async function processAuthorizationCodeOpenIDResponse(
  *
  * @see {@link https://www.rfc-editor.org/rfc/rfc6749.html#section-4.1 RFC 6749 - The OAuth 2.0 Authorization Framework}
  *
- * @param as Authorization Server Metadata
- * @param client Client Metadata
- * @param response resolved value from {@link authorizationCodeGrantRequest}
+ * @param as Authorization Server Metadata.
+ * @param client Client Metadata.
+ * @param response Resolved value from {@link authorizationCodeGrantRequest}.
  *
- * @returns Object representing the parsed successful response, or an object
+ * @returns Resolves with an object representing the parsed successful response, or an object
  * representing an OAuth 2.0 protocol style error. Use {@link isOAuth2Error} to
  * determine if an OAuth 2.0 error was returned.
  */
@@ -2572,12 +2572,12 @@ export interface ClientCredentialsGrantRequestOptions
  * @see {@link https://www.rfc-editor.org/rfc/rfc6749.html#section-4.4 RFC 6749 - The OAuth 2.0 Authorization Framework}
  * @see {@link https://www.ietf.org/archive/id/draft-ietf-oauth-dpop-08.html#name-dpop-access-token-request draft-ietf-oauth-dpop-08 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)}
  *
- * @param as Authorization Server Metadata
- * @param client Client Metadata
+ * @param as Authorization Server Metadata.
+ * @param client Client Metadata.
  *
  * @returns Resolves with
  * {@link https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API Fetch API}'s
- * {@link https://developer.mozilla.org/en-US/docs/Web/API/Response Response}
+ * {@link https://developer.mozilla.org/en-US/docs/Web/API/Response Response}.
  */
 export async function clientCredentialsGrantRequest(
   as: AuthorizationServer,
@@ -2605,11 +2605,11 @@ export async function clientCredentialsGrantRequest(
  *
  * @see {@link https://www.rfc-editor.org/rfc/rfc6749.html#section-4.4 RFC 6749 - The OAuth 2.0 Authorization Framework}
  *
- * @param as Authorization Server Metadata
- * @param client Client Metadata
- * @param response resolved value from {@link clientCredentialsGrantRequest}
+ * @param as Authorization Server Metadata.
+ * @param client Client Metadata.
+ * @param response Resolved value from {@link clientCredentialsGrantRequest}.
  *
- * @returns Object representing the parsed successful response, or an object
+ * @returns Resolves with an object representing the parsed successful response, or an object
  * representing an OAuth 2.0 protocol style error. Use {@link isOAuth2Error} to
  * determine if an OAuth 2.0 error was returned.
  */
@@ -2644,19 +2644,19 @@ export interface RevocationRequestOptions extends HttpRequestOptions, Authentica
 
 /**
  *
- * Performs a revocation request at the
+ * Performs a Revocation Request at the
  * {@link AuthorizationServer.revocation_endpoint `as.revocation_endpoint`}.
  *
  * @see {@link https://www.rfc-editor.org/rfc/rfc7009.html#section-2 RFC 7009 - OAuth 2.0 Token Revocation}
  *
- * @param as Authorization Server Metadata
- * @param client Client Metadata
+ * @param as Authorization Server Metadata.
+ * @param client Client Metadata.
  * @param token Token to revoke. You can provide the `token_type_hint`
  * parameter via {@link RevocationRequestOptions.additionalParameters options}.
  *
  * @returns Resolves with
  * {@link https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API Fetch API}'s
- * {@link https://developer.mozilla.org/en-US/docs/Web/API/Response Response}
+ * {@link https://developer.mozilla.org/en-US/docs/Web/API/Response Response}.
  */
 export async function revocationRequest(
   as: AuthorizationServer,
@@ -2694,9 +2694,9 @@ export async function revocationRequest(
  *
  * @see {@link https://www.rfc-editor.org/rfc/rfc7009.html#section-2 RFC 7009 - OAuth 2.0 Token Revocation}
  *
- * @param response resolved value from {@link revocationRequest}
+ * @param response Resolved value from {@link revocationRequest}.
  *
- * @returns `undefined` when the request was successful, or an object
+ * @returns Resolves with `undefined` when the request was successful, or an object
  * representing an OAuth 2.0 protocol style error.
  */
 export async function processRevocationResponse(
@@ -2744,21 +2744,21 @@ function assertReadableResponse(response: Response) {
 }
 
 /**
- * Performs an introspection request at the
+ * Performs an Introspection Request at the
  * {@link AuthorizationServer.introspection_endpoint `as.introspection_endpoint`}.
  *
  * @see {@link https://www.rfc-editor.org/rfc/rfc7662.html#section-2 RFC 7662 - OAuth 2.0 Token Introspection}
  * @see {@link https://www.ietf.org/archive/id/draft-ietf-oauth-jwt-introspection-response-12.html#section-4 draft-ietf-oauth-jwt-introspection-response-12 - JWT Response for OAuth Token Introspection}
  *
- * @param as Authorization Server Metadata
- * @param client Client Metadata
+ * @param as Authorization Server Metadata.
+ * @param client Client Metadata.
  * @param token Token to introspect. You can provide the `token_type_hint`
  * parameter via
  * {@link IntrospectionRequestOptions.additionalParameters options}.
  *
  * @returns Resolves with
  * {@link https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API Fetch API}'s
- * {@link https://developer.mozilla.org/en-US/docs/Web/API/Response Response}
+ * {@link https://developer.mozilla.org/en-US/docs/Web/API/Response Response}.
  */
 export async function introspectionRequest(
   as: AuthorizationServer,
@@ -2824,11 +2824,11 @@ export interface IntrospectionResponse {
  * @see {@link https://www.rfc-editor.org/rfc/rfc7662.html#section-2 RFC 7662 - OAuth 2.0 Token Introspection}
  * @see {@link https://www.ietf.org/archive/id/draft-ietf-oauth-jwt-introspection-response-12.html#section-5 draft-ietf-oauth-jwt-introspection-response-12 - JWT Response for OAuth Token Introspection}
  *
- * @param as Authorization Server Metadata
- * @param client Client Metadata
- * @param response resolved value from {@link introspectionRequest}
+ * @param as Authorization Server Metadata.
+ * @param client Client Metadata.
+ * @param response Resolved value from {@link introspectionRequest}.
  *
- * @returns Object representing the parsed successful response, or an object
+ * @returns Resolves with an object representing the parsed successful response, or an object
  * representing an OAuth 2.0 protocol style error. Use {@link isOAuth2Error} to
  * determine if an OAuth 2.0 error was returned.
  */
@@ -2906,17 +2906,17 @@ export interface JwksRequestOptions extends HttpRequestOptions {}
 
 /**
  * Performs a request to the
- * {@link AuthorizationServer.jwks_uri `as.jwks_uri`}
+ * {@link AuthorizationServer.jwks_uri `as.jwks_uri`}.
  *
  * @see {@link https://www.rfc-editor.org/rfc/rfc7517.html#section-5 JWK Set Format}
  * @see {@link https://www.rfc-editor.org/rfc/rfc8414.html#section-3 RFC 8414 - OAuth 2.0 Authorization Server Metadata}
  * @see {@link https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfig OpenID Connect Discovery 1.0}
  *
- * @param as Authorization Server Metadata
+ * @param as Authorization Server Metadata.
  *
  * @returns Resolves with
  * {@link https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API Fetch API}'s
- * {@link https://developer.mozilla.org/en-US/docs/Web/API/Response Response}
+ * {@link https://developer.mozilla.org/en-US/docs/Web/API/Response Response}.
  */
 export async function jwksRequest(
   as: AuthorizationServer,
@@ -2954,9 +2954,9 @@ export interface JsonWebKeySet {
  *
  * @see {@link https://www.rfc-editor.org/rfc/rfc7517.html#section-5 JWK Set Format}
  *
- * @param response resolved value from {@link jwksRequest}
+ * @param response Resolved value from {@link jwksRequest}.
  *
- * @returns Object representing the parsed successful response
+ * @returns Resolves with an object representing the parsed successful response.
  */
 export async function processJwksResponse(response: Response): Promise<JsonWebKeySet> {
   if (!(response instanceof Response)) {
@@ -3015,7 +3015,7 @@ async function handleOAuthBodyError(response: Response): Promise<OAuth2Error | u
 
 function checkSupportedJwsAlg(alg: unknown) {
   if (SUPPORTED_JWS_ALGS.includes(<any>alg) === false) {
-    throw new UnsupportedOperationError('unsupported JWS "alg" identifier')
+    throw new UnsupportedOperationError('unsupported JWS `alg` identifier')
   }
   return <JWSAlgorithm>alg
 }
@@ -3145,10 +3145,10 @@ async function validateJwt(
  *
  * @see {@link https://openid.net/specs/openid-financial-api-jarm-ID1.html openid-financial-api-jarm-ID1 - JWT Secured Authorization Response Mode for OAuth 2.0 (JARM)}
  *
- * @param as Authorization Server Metadata
- * @param client Client Metadata
- * @param parameters JARM authorization response
- * @param expectedState Expected "state" parameter value. Default is {@link expectNoState}.
+ * @param as Authorization Server Metadata.
+ * @param client Client Metadata.
+ * @param parameters JARM authorization response.
+ * @param expectedState Expected `state` parameter value. Default is {@link expectNoState}.
  *
  * @returns Validated Authorization Response parameters or Authorization Error Response.
  */
@@ -3223,20 +3223,20 @@ function checkSigningAlgorithm(
 ) {
   if (client !== undefined) {
     if (header.alg !== client) {
-      throw new OPE('unexpected JWT "alg" header parameter')
+      throw new OPE('unexpected JWT `alg` header parameter')
     }
     return
   }
 
   if (Array.isArray(issuer)) {
     if (issuer.includes(header.alg) === false) {
-      throw new OPE('unexpected JWT "alg" header parameter')
+      throw new OPE('unexpected JWT `alg` header parameter')
     }
     return
   }
 
   if (header.alg !== fallback) {
-    throw new OPE('unexpected JWT "alg" header parameter')
+    throw new OPE('unexpected JWT `alg` header parameter')
   }
 }
 
@@ -3256,17 +3256,17 @@ function getURLSearchParameter(parameters: URLSearchParams, name: string): strin
  * DANGER ZONE
  *
  * Use this as a value to {@link validateAuthResponse} `expectedState`
- * parameter to skip the "state" value check. This should only ever be done if
- * you use a "state" parameter value that is integrity protected and bound to
+ * parameter to skip the `state` value check. This should only ever be done if
+ * you use a `state` parameter value that is integrity protected and bound to
  * the browsing session. One such mechanism to do so is described in an I-D
  * {@link https://datatracker.ietf.org/doc/html/draft-bradley-oauth-jwt-encoded-state-09 draft-bradley-oauth-jwt-encoded-state-09}.
- * It is expected you'll validate such state value yourself.
+ * It is expected you'll validate such `state` value yourself.
  */
 export const skipStateCheck = Symbol()
 
 /**
  * Use this as a value to {@link validateAuthResponse} `expectedState`
- * parameter to indicate no "state" parameter value is expected, i.e. no "state"
+ * parameter to indicate no `state` parameter value is expected, i.e. no `state`
  * parameter value was sent with the authorization request.
  */
 export const expectNoState = Symbol()
@@ -3282,10 +3282,10 @@ class CallbackParameters extends URLSearchParams {}
  * @see {@link https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication OpenID Connect Core 1.0}
  * @see {@link https://www.rfc-editor.org/rfc/rfc9207.html RFC 9207 - OAuth 2.0 Authorization Server Issuer Identification}
  *
- * @param as Authorization Server Metadata
- * @param client Client Metadata
- * @param parameters Authorization response
- * @param expectedState Expected "state" parameter value. Default is {@link expectNoState}.
+ * @param as Authorization Server Metadata.
+ * @param client Client Metadata.
+ * @param parameters Authorization response.
+ * @param expectedState Expected `state` parameter value. Default is {@link expectNoState}.
  *
  * @returns Validated Authorization Response parameters or Authorization Error Response.
  */
@@ -3406,13 +3406,13 @@ export interface DeviceAuthorizationRequestOptions
  *
  * @see {@link https://www.rfc-editor.org/rfc/rfc8628.html#section-3.1 RFC 8628 - OAuth 2.0 Device Authorization Grant}
  *
- * @param as Authorization Server Metadata
- * @param client Client Metadata
- * @param parameters device authorization request parameters
+ * @param as Authorization Server Metadata.
+ * @param client Client Metadata.
+ * @param parameters Device Authorization Request parameters.
  *
  * @returns Resolves with
  * {@link https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API Fetch API}'s
- * {@link https://developer.mozilla.org/en-US/docs/Web/API/Response Response}
+ * {@link https://developer.mozilla.org/en-US/docs/Web/API/Response Response}.
  */
 export async function deviceAuthorizationRequest(
   as: AuthorizationServer,
@@ -3461,11 +3461,11 @@ export interface DeviceAuthorizationResponse {
  *
  * @see {@link https://www.rfc-editor.org/rfc/rfc8628.html#section-3.1 RFC 8628 - OAuth 2.0 Device Authorization Grant}
  *
- * @param as Authorization Server Metadata
- * @param client Client Metadata
- * @param response resolved value from {@link deviceAuthorizationRequest}
+ * @param as Authorization Server Metadata.
+ * @param client Client Metadata.
+ * @param response Resolved value from {@link deviceAuthorizationRequest}.
  *
- * @returns Object representing the parsed successful response, or an object
+ * @returns Resolves with an object representing the parsed successful response, or an object
  * representing an OAuth 2.0 protocol style error. Use {@link isOAuth2Error} to
  * determine if an OAuth 2.0 error was returned.
  */
@@ -3538,13 +3538,13 @@ export async function processDeviceAuthorizationResponse(
  * @see {@link https://www.rfc-editor.org/rfc/rfc8628.html#section-3.4 RFC 8628 - OAuth 2.0 Device Authorization Grant}
  * @see {@link https://www.ietf.org/archive/id/draft-ietf-oauth-dpop-08.html#name-dpop-access-token-request draft-ietf-oauth-dpop-08 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)}
  *
- * @param as Authorization Server Metadata
- * @param client Client Metadata
- * @param deviceCode {@link DeviceAuthorizationResponse.device_code `device_code`}
+ * @param as Authorization Server Metadata.
+ * @param client Client Metadata.
+ * @param deviceCode Device Code.
  *
  * @returns Resolves with
  * {@link https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API Fetch API}'s
- * {@link https://developer.mozilla.org/en-US/docs/Web/API/Response Response}
+ * {@link https://developer.mozilla.org/en-US/docs/Web/API/Response Response}.
  */
 export async function deviceCodeGrantRequest(
   as: AuthorizationServer,
@@ -3578,11 +3578,11 @@ export async function deviceCodeGrantRequest(
  *
  * @see {@link https://www.rfc-editor.org/rfc/rfc8628.html#section-3.4 RFC 8628 - OAuth 2.0 Device Authorization Grant}
  *
- * @param as Authorization Server Metadata
- * @param client Client Metadata
- * @param response resolved value from {@link deviceCodeGrantRequest}
+ * @param as Authorization Server Metadata.
+ * @param client Client Metadata.
+ * @param response Resolved value from {@link deviceCodeGrantRequest}.
  *
- * @returns Object representing the parsed successful response, or an object
+ * @returns Resolves with an object representing the parsed successful response, or an object
  * representing an OAuth 2.0 protocol style error. Use {@link isOAuth2Error} to
  * determine if an OAuth 2.0 error was returned.
  */
@@ -3612,9 +3612,9 @@ export interface GenerateKeyPairOptions {
 /**
  * Generates a
  * {@link https://developer.mozilla.org/en-US/docs/Web/API/CryptoKeyPair CryptoKeyPair}
- * for a given JWS "alg" Algorithm identifier.
+ * for a given JWS `alg` Algorithm identifier.
  *
- * @param alg Supported JWS "alg" Algorithm identifier.
+ * @param alg Supported JWS `alg` Algorithm identifier.
  */
 export async function generateKeyPair(
   alg: JWSAlgorithm,

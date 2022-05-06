@@ -16,11 +16,11 @@ to be one coming from the authorization server's well-known discovery endpoint.
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `expectedIssuerIdentifier` | `URL` | Expected issuer identifier value |
-| `response` | `Response` | resolved value from [discoveryRequest](discoveryRequest.md) |
+| `expectedIssuerIdentifier` | `URL` | Expected Issuer Identifier value. |
+| `response` | `Response` | Resolved value from [discoveryRequest](discoveryRequest.md). |
 
 #### Returns
 
 `Promise`<[`AuthorizationServer`](../interfaces/AuthorizationServer.md)\>
 
-Discovered Authorization Server Metadata
+Resolves with the discovered Authorization Server Metadata.

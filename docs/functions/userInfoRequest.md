@@ -18,9 +18,9 @@ value.
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata |
-| `client` | [`Client`](../interfaces/Client.md) | Client Metadata |
-| `accessToken` | `string` | Access Token value |
+| `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata. |
+| `client` | [`Client`](../interfaces/Client.md) | Client Metadata. |
+| `accessToken` | `string` | Access Token value. |
 | `options?` | [`UserInfoRequestOptions`](../interfaces/UserInfoRequestOptions.md) | - |
 
 #### Returns
@@ -29,4 +29,4 @@ value.
 
 Resolves with
 [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)'s
-[Response](https://developer.mozilla.org/en-US/docs/Web/API/Response)
+[Response](https://developer.mozilla.org/en-US/docs/Web/API/Response).

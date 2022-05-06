@@ -15,10 +15,10 @@ to be one coming from the
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `response` | `Response` | resolved value from [jwksRequest](jwksRequest.md) |
+| `response` | `Response` | Resolved value from [jwksRequest](jwksRequest.md). |
 
 #### Returns
 
 `Promise`<[`JsonWebKeySet`](../interfaces/JsonWebKeySet.md)\>
 
-Object representing the parsed successful response
+Resolves with an object representing the parsed successful response.

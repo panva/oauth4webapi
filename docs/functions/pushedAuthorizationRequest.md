@@ -15,9 +15,9 @@ Performs a Pushed Authorization Request at the
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata |
-| `client` | [`Client`](../interfaces/Client.md) | Client Metadata |
-| `parameters` | `URLSearchParams` | authorization request parameters |
+| `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata. |
+| `client` | [`Client`](../interfaces/Client.md) | Client Metadata. |
+| `parameters` | `URLSearchParams` | Authorization Request parameters. |
 | `options?` | [`PushedAuthorizationRequestOptions`](../interfaces/PushedAuthorizationRequestOptions.md) | - |
 
 #### Returns
@@ -26,4 +26,4 @@ Performs a Pushed Authorization Request at the
 
 Resolves with
 [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)'s
-[Response](https://developer.mozilla.org/en-US/docs/Web/API/Response)
+[Response](https://developer.mozilla.org/en-US/docs/Web/API/Response).

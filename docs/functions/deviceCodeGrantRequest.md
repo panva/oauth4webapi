@@ -15,9 +15,9 @@ Performs a Device Authorization Grant request at the
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata |
-| `client` | [`Client`](../interfaces/Client.md) | Client Metadata |
-| `deviceCode` | `string` | [`device_code`](../interfaces/DeviceAuthorizationResponse.md#device_code) |
+| `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata. |
+| `client` | [`Client`](../interfaces/Client.md) | Client Metadata. |
+| `deviceCode` | `string` | Device Code. |
 | `options?` | [`TokenEndpointRequestOptions`](../interfaces/TokenEndpointRequestOptions.md) | - |
 
 #### Returns
@@ -26,4 +26,4 @@ Performs a Device Authorization Grant request at the
 
 Resolves with
 [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)'s
-[Response](https://developer.mozilla.org/en-US/docs/Web/API/Response)
+[Response](https://developer.mozilla.org/en-US/docs/Web/API/Response).

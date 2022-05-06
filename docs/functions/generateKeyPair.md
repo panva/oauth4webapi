@@ -6,13 +6,13 @@
 
 Generates a
 [CryptoKeyPair](https://developer.mozilla.org/en-US/docs/Web/API/CryptoKeyPair)
-for a given JWS "alg" Algorithm identifier.
+for a given JWS `alg` Algorithm identifier.
 
 #### Parameters
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `alg` | [`JWSAlgorithm`](../types/JWSAlgorithm.md) | Supported JWS "alg" Algorithm identifier. |
+| `alg` | [`JWSAlgorithm`](../types/JWSAlgorithm.md) | Supported JWS `alg` Algorithm identifier. |
 | `options?` | [`GenerateKeyPairOptions`](../interfaces/GenerateKeyPairOptions.md) | - |
 
 #### Returns

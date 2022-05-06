@@ -15,15 +15,15 @@ to be one coming from the
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata |
-| `client` | [`Client`](../interfaces/Client.md) | Client Metadata |
-| `response` | `Response` | resolved value from [deviceCodeGrantRequest](deviceCodeGrantRequest.md) |
+| `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata. |
+| `client` | [`Client`](../interfaces/Client.md) | Client Metadata. |
+| `response` | `Response` | Resolved value from [deviceCodeGrantRequest](deviceCodeGrantRequest.md). |
 | `options?` | [`HttpRequestOptions`](../interfaces/HttpRequestOptions.md) | - |
 
 #### Returns
 
 `Promise`<[`TokenEndpointResponse`](../interfaces/TokenEndpointResponse.md) \| [`OAuth2Error`](../interfaces/OAuth2Error.md)\>
 
-Object representing the parsed successful response, or an object
+Resolves with an object representing the parsed successful response, or an object
 representing an OAuth 2.0 protocol style error. Use [isOAuth2Error](isOAuth2Error.md) to
 determine if an OAuth 2.0 error was returned.

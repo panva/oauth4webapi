@@ -31,7 +31,7 @@ Private
 instance to sign the DPoP Proof JWT with.
 
 Its algorithm must be compatible with a supported
-[JWS "alg" Algorithm](../types/JWSAlgorithm.md).
+[JWS `alg` Algorithm](../types/JWSAlgorithm.md).
 
 ___
 

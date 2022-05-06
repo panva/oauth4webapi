@@ -22,7 +22,7 @@ An asymmetric private
 [CryptoKey](https://developer.mozilla.org/en-US/docs/Web/API/CryptoKey).
 
 Its algorithm must be compatible with a supported
-[JWS "alg" Algorithm](../types/JWSAlgorithm.md).
+[JWS `alg` Algorithm](../types/JWSAlgorithm.md).
 
 ___
 

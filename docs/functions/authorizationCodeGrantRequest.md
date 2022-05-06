@@ -19,11 +19,11 @@ Performs an Authorization Code grant request at the
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata |
-| `client` | [`Client`](../interfaces/Client.md) | Client Metadata |
-| `callbackParameters` | `CallbackParameters` | parameters obtained from the callback to redirect_uri, this is returned from [validateAuthResponse](validateAuthResponse.md), or [validateJwtAuthResponse](validateJwtAuthResponse.md) |
-| `redirectUri` | `string` | redirect_uri value used in the authorization request |
-| `codeVerifier` | `string` | PKCE code verifier to send to the token endpoint |
+| `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata. |
+| `client` | [`Client`](../interfaces/Client.md) | Client Metadata. |
+| `callbackParameters` | `CallbackParameters` | Parameters obtained from the callback to redirect_uri, this is returned from [validateAuthResponse](validateAuthResponse.md), or [validateJwtAuthResponse](validateJwtAuthResponse.md). |
+| `redirectUri` | `string` | `redirect_uri` value used in the authorization request. |
+| `codeVerifier` | `string` | PKCE `code_verifier` to send to the token endpoint. |
 | `options?` | [`TokenEndpointRequestOptions`](../interfaces/TokenEndpointRequestOptions.md) | - |
 
 #### Returns
@@ -32,4 +32,4 @@ Performs an Authorization Code grant request at the
 
 Resolves with
 [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)'s
-[Response](https://developer.mozilla.org/en-US/docs/Web/API/Response)
+[Response](https://developer.mozilla.org/en-US/docs/Web/API/Response).

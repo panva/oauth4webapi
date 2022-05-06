@@ -15,16 +15,16 @@ to be one coming from the
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata |
-| `client` | [`Client`](../interfaces/Client.md) | Client Metadata |
-| `expectedSubject` | `string` \| typeof [`skipSubjectCheck`](../variables/skipSubjectCheck.md) | Expected "sub" claim value. In response to OpenID Connect authentication requests, the expected subject is the one from the ID Token claims retrieved from [getValidatedIdTokenClaims](getValidatedIdTokenClaims.md). |
-| `response` | `Response` | resolved value from [userInfoRequest](userInfoRequest.md) |
+| `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata. |
+| `client` | [`Client`](../interfaces/Client.md) | Client Metadata. |
+| `expectedSubject` | `string` \| typeof [`skipSubjectCheck`](../variables/skipSubjectCheck.md) | Expected `sub` claim value. In response to OpenID Connect authentication requests, the expected subject is the one from the ID Token claims retrieved from [getValidatedIdTokenClaims](getValidatedIdTokenClaims.md). |
+| `response` | `Response` | Resolved value from [userInfoRequest](userInfoRequest.md). |
 | `options?` | [`HttpRequestOptions`](../interfaces/HttpRequestOptions.md) | - |
 
 #### Returns
 
 `Promise`<[`UserInfoResponse`](../interfaces/UserInfoResponse.md)\>
 
-Object representing the parsed successful response, or an object
+Resolves with an object representing the parsed successful response, or an object
 representing an OAuth 2.0 protocol style error. Use [isOAuth2Error](isOAuth2Error.md) to
 determine if an OAuth 2.0 error was returned.

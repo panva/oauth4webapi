@@ -15,11 +15,11 @@ to be one coming from the
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `response` | `Response` | resolved value from [revocationRequest](revocationRequest.md) |
+| `response` | `Response` | Resolved value from [revocationRequest](revocationRequest.md). |
 
 #### Returns
 
 `Promise`<`undefined` \| [`OAuth2Error`](../interfaces/OAuth2Error.md)\>
 
-`undefined` when the request was successful, or an object
+Resolves with `undefined` when the request was successful, or an object
 representing an OAuth 2.0 protocol style error.

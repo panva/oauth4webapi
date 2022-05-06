@@ -26,7 +26,7 @@ Recognized Client Metadata that have an effect on the exposed functionality.
 
 • `Optional` **authorization\_signed\_response\_alg**: [`JWSAlgorithm`](../types/JWSAlgorithm.md)
 
-JWS "alg" algorithm required for signing authorization responses. When not
+JWS `alg` algorithm required for signing authorization responses. When not
 configured the default is
 to allow only [supported algorithms](../types/JWSAlgorithm.md) listed in
 [`as.authorization_signing_alg_values_supported`](AuthorizationServer.md#authorization_signing_alg_values_supported)
@@ -62,7 +62,7 @@ ___
 
 • `Optional` **id\_token\_signed\_response\_alg**: [`JWSAlgorithm`](../types/JWSAlgorithm.md)
 
-JWS "alg" algorithm required for signing the ID Token issued to this
+JWS `alg` algorithm required for signing the ID Token issued to this
 Client. When not configured the default is
 to allow only [supported algorithms](../types/JWSAlgorithm.md) listed in
 [`as.id_token_signing_alg_values_supported`](AuthorizationServer.md#id_token_signing_alg_values_supported)
@@ -74,7 +74,7 @@ ___
 
 • `Optional` **introspection\_signed\_response\_alg**: [`JWSAlgorithm`](../types/JWSAlgorithm.md)
 
-JWS "alg" algorithm REQUIRED for signed introspection responses. When not
+JWS `alg` algorithm REQUIRED for signed introspection responses. When not
 configured the default is
 to allow only [supported algorithms](../types/JWSAlgorithm.md) listed in
 [`as.introspection_signing_alg_values_supported`](AuthorizationServer.md#introspection_signing_alg_values_supported)
@@ -86,7 +86,7 @@ ___
 
 • `Optional` **require\_auth\_time**: `boolean`
 
-Boolean value specifying whether the [auth_time](IDToken.md#auth_time)
+Boolean value specifying whether the [`auth_time`](IDToken.md#auth_time)
 Claim in the ID Token is REQUIRED. Default is `false`.
 
 ___
@@ -104,7 +104,7 @@ ___
 
 • `Optional` **userinfo\_signed\_response\_alg**: [`JWSAlgorithm`](../types/JWSAlgorithm.md)
 
-JWS "alg" algorithm REQUIRED for signing UserInfo Responses. When not
+JWS `alg` algorithm REQUIRED for signing UserInfo Responses. When not
 configured the default is
 to allow only [supported algorithms](../types/JWSAlgorithm.md) listed in
 [`as.userinfo_signing_alg_values_supported`](AuthorizationServer.md#userinfo_signing_alg_values_supported)

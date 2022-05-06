@@ -11,11 +11,12 @@ Parses the `WWW-Authenticate` HTTP Header from a
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `response` | `Response` | [Fetch API Response](https://developer.mozilla.org/en-US/docs/Web/API/Response) |
+| `response` | `Response` | [Fetch API Response](https://developer.mozilla.org/en-US/docs/Web/API/Response). |
 
 #### Returns
 
 [`WWWAuthenticateChallenge`](../interfaces/WWWAuthenticateChallenge.md)[] \| `undefined`
 
 Array of [WWWAuthenticateChallenge](../interfaces/WWWAuthenticateChallenge.md) objects. Their order from
-the response is preserved.
+the response is preserved. `undefined` when there wasn't a `WWW-Authenticate`
+HTTP Header returned.

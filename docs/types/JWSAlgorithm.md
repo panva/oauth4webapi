@@ -4,7 +4,7 @@
 
 Ƭ **JWSAlgorithm**: ``"PS256"`` \| ``"ES256"`` \| ``"RS256"``
 
-Supported JWS "alg" Algorithm identifiers.
+Supported JWS `alg` Algorithm identifiers.
 
 **`example`** PS256 CryptoKey algorithm
 ```ts

@@ -12,10 +12,10 @@ Same as [validateAuthResponse](validateAuthResponse.md) but for signed JARM resp
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata |
-| `client` | [`Client`](../interfaces/Client.md) | Client Metadata |
-| `parameters` | `URL` \| `URLSearchParams` | JARM authorization response |
-| `expectedState?` | `string` \| typeof [`expectNoState`](../variables/expectNoState.md) \| typeof [`skipStateCheck`](../variables/skipStateCheck.md) | Expected "state" parameter value. Default is [expectNoState](../variables/expectNoState.md). |
+| `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata. |
+| `client` | [`Client`](../interfaces/Client.md) | Client Metadata. |
+| `parameters` | `URL` \| `URLSearchParams` | JARM authorization response. |
+| `expectedState?` | `string` \| typeof [`expectNoState`](../variables/expectNoState.md) \| typeof [`skipStateCheck`](../variables/skipStateCheck.md) | Expected `state` parameter value. Default is [expectNoState](../variables/expectNoState.md). |
 | `options?` | [`HttpRequestOptions`](../interfaces/HttpRequestOptions.md) | - |
 
 #### Returns

@@ -17,11 +17,11 @@ value.
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `accessToken` | `string` | The access token for the request |
-| `method` | `string` | The HTTP method for the request |
-| `url` | `URL` | Instance of [URL](https://developer.mozilla.org/en-US/docs/Web/API/URL) as the target URL for the request |
-| `headers` | `Headers` | Instance of [Headers](https://developer.mozilla.org/en-US/docs/Web/API/Headers) for the request |
-| `body` | `undefined` \| ``null`` \| `BodyInit` | see [Fetch API documentation](https://developer.mozilla.org/en-US/docs/Web/API/fetch#body). |
+| `accessToken` | `string` | The Access Token for the request. |
+| `method` | `string` | The HTTP method for the request. |
+| `url` | `URL` | Instance of [URL](https://developer.mozilla.org/en-US/docs/Web/API/URL) as the target URL for the request. |
+| `headers` | `Headers` | Instance of [Headers](https://developer.mozilla.org/en-US/docs/Web/API/Headers) for the request. |
+| `body` | `undefined` \| ``null`` \| `BodyInit` | See [Fetch API documentation](https://developer.mozilla.org/en-US/docs/Web/API/fetch#body). |
 | `options?` | [`ProtectedResourceRequestOptions`](../interfaces/ProtectedResourceRequestOptions.md) | - |
 
 #### Returns
@@ -30,4 +30,4 @@ value.
 
 Resolves with
 [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)'s
-[Response](https://developer.mozilla.org/en-US/docs/Web/API/Response)
+[Response](https://developer.mozilla.org/en-US/docs/Web/API/Response).

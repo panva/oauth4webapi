@@ -94,7 +94,7 @@ ___
 • `Optional` `Readonly` **authorization\_encryption\_alg\_values\_supported**: `string`[]
 
 JSON array containing a list of algorithms supported by the authorization
-server for introspection response encryption (alg value).
+server for introspection response encryption (`alg` value).
 
 ___
 
@@ -103,7 +103,7 @@ ___
 • `Optional` `Readonly` **authorization\_encryption\_enc\_values\_supported**: `string`[]
 
 JSON array containing a list of algorithms supported by the authorization
-server for introspection response encryption (enc value).
+server for introspection response encryption (`enc` value).
 
 ___
 
@@ -120,7 +120,7 @@ ___
 • `Optional` `Readonly` **authorization\_response\_iss\_parameter\_supported**: `boolean`
 
 Boolean value indicating whether the authorization server provides the
-"iss" parameter in the authorization response.
+`iss` parameter in the authorization response.
 
 ___
 
@@ -154,7 +154,7 @@ ___
 
 • `Optional` `Readonly` **backchannel\_logout\_session\_supported**: `boolean`
 
-Boolean value specifying whether the authorization server can pass a sid
+Boolean value specifying whether the authorization server can pass a `sid`
 (session ID) Claim in the Logout Token to identify the RP session with the
 OP.
 
@@ -182,7 +182,7 @@ ___
 • `Optional` `Readonly` **backchannel\_user\_code\_parameter\_supported**: `boolean`
 
 Indicates whether the authorization server supports the use of the CIBA
-user_code parameter.
+`user_code` parameter.
 
 ___
 
@@ -219,7 +219,7 @@ ___
 • `Optional` `Readonly` **claims\_parameter\_supported**: `boolean`
 
 Boolean value specifying whether the authorization server supports use of
-the "claims" parameter.
+the `claims` parameter.
 
 ___
 
@@ -252,7 +252,7 @@ ___
 
 • `Optional` `Readonly` **display\_values\_supported**: `string`[]
 
-JSON array containing a list of the "display" parameter values that the
+JSON array containing a list of the `display` parameter values that the
 authorization server supports.
 
 ___
@@ -279,9 +279,9 @@ ___
 
 • `Optional` `Readonly` **frontchannel\_logout\_session\_supported**: `boolean`
 
-Boolean value specifying whether the authorization server can pass "iss"
-(issuer) and "sid" (session ID) query parameters to identify the RP session
-with the authorization server when the "frontchannel_logout_uri" is used.
+Boolean value specifying whether the authorization server can pass `iss`
+(issuer) and `sid` (session ID) query parameters to identify the RP session
+with the authorization server when the `frontchannel_logout_uri` is used.
 
 ___
 
@@ -298,7 +298,7 @@ ___
 
 • `Optional` `Readonly` **grant\_types\_supported**: `string`[]
 
-JSON array containing a list of the "grant_type" values that this
+JSON array containing a list of the `grant_type` values that this
 authorization server supports.
 
 ___
@@ -307,7 +307,7 @@ ___
 
 • `Optional` `Readonly` **id\_token\_encryption\_alg\_values\_supported**: `string`[]
 
-JSON array containing a list of the JWE "alg" values supported by the
+JSON array containing a list of the JWE `alg` values supported by the
 authorization server for the ID Token.
 
 ___
@@ -316,7 +316,7 @@ ___
 
 • `Optional` `Readonly` **id\_token\_encryption\_enc\_values\_supported**: `string`[]
 
-JSON array containing a list of the JWE "enc" values supported by the
+JSON array containing a list of the JWE `enc` values supported by the
 authorization server for the ID Token.
 
 ___
@@ -325,7 +325,7 @@ ___
 
 • `Optional` `Readonly` **id\_token\_signing\_alg\_values\_supported**: `string`[]
 
-JSON array containing a list of the JWS "alg" values supported by the
+JSON array containing a list of the JWS `alg` values supported by the
 authorization server for the ID Token.
 
 ___
@@ -335,7 +335,7 @@ ___
 • `Optional` `Readonly` **introspection\_encryption\_alg\_values\_supported**: `string`[]
 
 JSON array containing a list of algorithms supported by the authorization
-server for introspection response content key encryption (alg value).
+server for introspection response content key encryption (`alg` value).
 
 ___
 
@@ -344,7 +344,7 @@ ___
 • `Optional` `Readonly` **introspection\_encryption\_enc\_values\_supported**: `string`[]
 
 JSON array containing a list of algorithms supported by the authorization
-server for introspection response content encryption (enc value).
+server for introspection response content encryption (`enc` value).
 
 ___
 
@@ -388,7 +388,7 @@ ___
 
 • `Readonly` **issuer**: `string`
 
-Authorization server's issuer identifier URL.
+Authorization server's Issuer Identifier URL.
 
 ___
 
@@ -449,7 +449,7 @@ ___
 
 • `Optional` `Readonly` **request\_object\_encryption\_alg\_values\_supported**: `string`[]
 
-JSON array containing a list of the JWE "alg" values supported by the
+JSON array containing a list of the JWE `alg` values supported by the
 authorization server for Request Objects.
 
 ___
@@ -458,7 +458,7 @@ ___
 
 • `Optional` `Readonly` **request\_object\_encryption\_enc\_values\_supported**: `string`[]
 
-JSON array containing a list of the JWE "enc" values supported by the
+JSON array containing a list of the JWE `enc` values supported by the
 authorization server for Request Objects.
 
 ___
@@ -467,7 +467,7 @@ ___
 
 • `Optional` `Readonly` **request\_object\_signing\_alg\_values\_supported**: `string`[]
 
-JSON array containing a list of the JWS "alg" values supported by the
+JSON array containing a list of the JWS `alg` values supported by the
 authorization server for Request Objects.
 
 ___
@@ -477,7 +477,7 @@ ___
 • `Optional` `Readonly` **request\_parameter\_supported**: `boolean`
 
 Boolean value specifying whether the authorization server supports use of
-the "request" parameter.
+the `request` parameter.
 
 ___
 
@@ -486,7 +486,7 @@ ___
 • `Optional` `Readonly` **request\_uri\_parameter\_supported**: `boolean`
 
 Boolean value specifying whether the authorization server supports use of
-the "request_uri" parameter.
+the `request_uri` parameter.
 
 ___
 
@@ -504,7 +504,7 @@ ___
 • `Optional` `Readonly` **require\_request\_uri\_registration**: `boolean`
 
 Boolean value specifying whether the authorization server requires any
-"request_uri" values used to be pre-registered.
+`request_uri` values used to be pre-registered.
 
 ___
 
@@ -513,7 +513,7 @@ ___
 • `Optional` `Readonly` **require\_signed\_request\_object**: `boolean`
 
 Indicates where authorization request needs to be protected as Request
-Object and provided through either request or request_uri parameter.
+Object and provided through either `request` or `request_uri` parameter.
 
 ___
 
@@ -521,7 +521,7 @@ ___
 
 • `Optional` `Readonly` **response\_modes\_supported**: `string`[]
 
-JSON array containing a list of the "response_mode" values that this
+JSON array containing a list of the `response_mode` values that this
 authorization server supports.
 
 ___
@@ -530,7 +530,7 @@ ___
 
 • `Optional` `Readonly` **response\_types\_supported**: `string`[]
 
-JSON array containing a list of the "response_type" values that this
+JSON array containing a list of the `response_type` values that this
 authorization server supports.
 
 ___
@@ -566,7 +566,7 @@ ___
 
 • `Optional` `Readonly` **scopes\_supported**: `string`[]
 
-JSON array containing a list of the "scope" values that this authorization
+JSON array containing a list of the `scope` values that this authorization
 server supports.
 
 ___
@@ -647,7 +647,7 @@ ___
 
 • `Optional` `Readonly` **userinfo\_encryption\_alg\_values\_supported**: `string`[]
 
-JSON array containing a list of the JWE "alg" values supported by the
+JSON array containing a list of the JWE `alg` values supported by the
 UserInfo Endpoint.
 
 ___
@@ -656,7 +656,7 @@ ___
 
 • `Optional` `Readonly` **userinfo\_encryption\_enc\_values\_supported**: `string`[]
 
-JSON array containing a list of the JWE "enc" values supported by the
+JSON array containing a list of the JWE `enc` values supported by the
 UserInfo Endpoint.
 
 ___
@@ -673,5 +673,5 @@ ___
 
 • `Optional` `Readonly` **userinfo\_signing\_alg\_values\_supported**: `string`[]
 
-JSON array containing a list of the JWS "alg" values supported by the
+JSON array containing a list of the JWS `alg` values supported by the
 UserInfo Endpoint.

@@ -13,8 +13,8 @@ signed and encrypted.
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata |
-| `client` | [`Client`](../interfaces/Client.md) | Client Metadata |
+| `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata. |
+| `client` | [`Client`](../interfaces/Client.md) | Client Metadata. |
 | `parameters` | `URLSearchParams` | - |
 | `privateKey` | `CryptoKey` \| [`PrivateKey`](../interfaces/PrivateKey.md) | Private key to sign the Request Object with. |
 

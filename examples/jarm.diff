@@ -1,5 +1,5 @@
 diff --git a/examples/code.ts b/examples/jarm.ts
-index 4f7f8e7..0ca7b47 100644
+index 17d6b71..f04c0d4 100644
 --- a/examples/code.ts
 +++ b/examples/jarm.ts
 @@ -34,6 +34,7 @@ const code_challenge_method = 'S256'
