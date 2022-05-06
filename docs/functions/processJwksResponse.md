@@ -1,5 +1,7 @@
 # Function: processJwksResponse
 
+[💗 Help the project](https://github.com/sponsors/panva)
+
 ▸ **processJwksResponse**(`response`): `Promise`<[`JsonWebKeySet`](../interfaces/JsonWebKeySet.md)\>
 
 Validates

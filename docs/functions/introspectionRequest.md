@@ -1,5 +1,7 @@
 # Function: introspectionRequest
 
+[💗 Help the project](https://github.com/sponsors/panva)
+
 ▸ **introspectionRequest**(`as`, `client`, `token`, `options?`): `Promise`<`Response`\>
 
 Performs an introspection request at the

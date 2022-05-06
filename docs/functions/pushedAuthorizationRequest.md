@@ -1,5 +1,7 @@
 # Function: pushedAuthorizationRequest
 
+[💗 Help the project](https://github.com/sponsors/panva)
+
 ▸ **pushedAuthorizationRequest**(`as`, `client`, `parameters`, `options?`): `Promise`<`Response`\>
 
 Performs a Pushed Authorization Request at the

@@ -1,5 +1,7 @@
 # Function: generateKeyPair
 
+[💗 Help the project](https://github.com/sponsors/panva)
+
 ▸ **generateKeyPair**(`alg`, `options?`): `Promise`<`CryptoKeyPair`\>
 
 Generates a

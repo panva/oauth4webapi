@@ -1,5 +1,7 @@
 # Function: deviceCodeGrantRequest
 
+[💗 Help the project](https://github.com/sponsors/panva)
+
 ▸ **deviceCodeGrantRequest**(`as`, `client`, `deviceCode`, `options?`): `Promise`<`Response`\>
 
 Performs a Device Authorization Grant request at the

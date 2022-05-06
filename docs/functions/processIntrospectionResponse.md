@@ -1,5 +1,7 @@
 # Function: processIntrospectionResponse
 
+[💗 Help the project](https://github.com/sponsors/panva)
+
 ▸ **processIntrospectionResponse**(`as`, `client`, `response`, `options?`): `Promise`<[`IntrospectionResponse`](../interfaces/IntrospectionResponse.md) \| [`OAuth2Error`](../interfaces/OAuth2Error.md)\>
 
 Validates

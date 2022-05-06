@@ -1,5 +1,7 @@
 # Function: issueRequestObject
 
+[💗 Help the project](https://github.com/sponsors/panva)
+
 ▸ **issueRequestObject**(`as`, `client`, `parameters`, `privateKey`): `Promise`<`string`\>
 
 Generates JWT-Secured Authorization Request (JAR) that is either signed, or

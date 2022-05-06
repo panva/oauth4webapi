@@ -1,5 +1,7 @@
 # Function: authorizationCodeGrantRequest
 
+[💗 Help the project](https://github.com/sponsors/panva)
+
 ▸ **authorizationCodeGrantRequest**(`as`, `client`, `callbackParameters`, `redirectUri`, `codeVerifier`, `options?`): `Promise`<`Response`\>
 
 Performs an Authorization Code grant request at the

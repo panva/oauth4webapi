@@ -1,5 +1,7 @@
 # Function: generateRandomCodeVerifier
 
+[💗 Help the project](https://github.com/sponsors/panva)
+
 ▸ **generateRandomCodeVerifier**(): `string`
 
 Generate random `code_verifier` value.

@@ -1,5 +1,7 @@
 # Function: processRefreshTokenResponse
 
+[💗 Help the project](https://github.com/sponsors/panva)
+
 ▸ **processRefreshTokenResponse**(`as`, `client`, `response`, `options?`): `Promise`<[`TokenEndpointResponse`](../interfaces/TokenEndpointResponse.md) \| [`OAuth2Error`](../interfaces/OAuth2Error.md)\>
 
 Validates Refresh Token Grant

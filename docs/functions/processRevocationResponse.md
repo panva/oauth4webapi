@@ -1,5 +1,7 @@
 # Function: processRevocationResponse
 
+[💗 Help the project](https://github.com/sponsors/panva)
+
 ▸ **processRevocationResponse**(`response`): `Promise`<`undefined` \| [`OAuth2Error`](../interfaces/OAuth2Error.md)\>
 
 Validates

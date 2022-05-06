@@ -1,5 +1,7 @@
 # @panva/oauth4webapi
 
+[💗 Help the project](https://github.com/sponsors/panva)
+
 ## Table of contents
 
 ### Functions

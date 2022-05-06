@@ -1,5 +1,7 @@
 # Function: processUserInfoResponse
 
+[💗 Help the project](https://github.com/sponsors/panva)
+
 ▸ **processUserInfoResponse**(`as`, `client`, `expectedSubject`, `response`, `options?`): `Promise`<[`UserInfoResponse`](../interfaces/UserInfoResponse.md)\>
 
 Validates

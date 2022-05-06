@@ -1,5 +1,7 @@
 # Function: generateRandomState
 
+[💗 Help the project](https://github.com/sponsors/panva)
+
 ▸ **generateRandomState**(): `string`
 
 Generate random `state` value.

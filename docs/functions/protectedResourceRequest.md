@@ -1,5 +1,7 @@
 # Function: protectedResourceRequest
 
+[💗 Help the project](https://github.com/sponsors/panva)
+
 ▸ **protectedResourceRequest**(`accessToken`, `method`, `url`, `headers`, `body`, `options?`): `Promise`<`Response`\>
 
 Performs a protected resource request at an arbitrary URL.

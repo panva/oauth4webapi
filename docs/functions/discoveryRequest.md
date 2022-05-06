@@ -1,5 +1,7 @@
 # Function: discoveryRequest
 
+[💗 Help the project](https://github.com/sponsors/panva)
+
 ▸ **discoveryRequest**(`issuerIdentifier`, `options?`): `Promise`<`Response`\>
 
 Performs an authorization server metadata discovery using one of two

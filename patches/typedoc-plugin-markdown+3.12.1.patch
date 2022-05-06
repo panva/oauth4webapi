@@ -20,7 +20,7 @@ index ca0cf27..95be471 100644
                  if (group.categories) {
                      group.categories.forEach((category) => {
 diff --git a/node_modules/typedoc-plugin-markdown/dist/resources/partials/member.declaration.hbs b/node_modules/typedoc-plugin-markdown/dist/resources/partials/member.declaration.hbs
-index 32c9e62..9b363a5 100644
+index 32c9e62..03a30b0 100644
 --- a/node_modules/typedoc-plugin-markdown/dist/resources/partials/member.declaration.hbs
 +++ b/node_modules/typedoc-plugin-markdown/dist/resources/partials/member.declaration.hbs
 @@ -16,20 +16,6 @@
@@ -79,6 +79,16 @@ index f642b49..3743b65 100644
  {{#if sources}}
  
  #### Defined in
+diff --git a/node_modules/typedoc-plugin-markdown/dist/resources/partials/title.hbs b/node_modules/typedoc-plugin-markdown/dist/resources/partials/title.hbs
+index 68b4dba..0c97f46 100644
+--- a/node_modules/typedoc-plugin-markdown/dist/resources/partials/title.hbs
++++ b/node_modules/typedoc-plugin-markdown/dist/resources/partials/title.hbs
+@@ -5,3 +5,5 @@
+ {{/ifShowPageTitle}}
+ 
+ {{{reflectionPath}}}
++
++[💗 Help the project](https://github.com/sponsors/panva)
 diff --git a/node_modules/typedoc-plugin-markdown/dist/resources/templates/reflection.hbs b/node_modules/typedoc-plugin-markdown/dist/resources/templates/reflection.hbs
 index 6a29bf7..f9dcbc4 100644
 --- a/node_modules/typedoc-plugin-markdown/dist/resources/templates/reflection.hbs

@@ -1,5 +1,7 @@
 # Function: parseWwwAuthenticateChallenges
 
+[💗 Help the project](https://github.com/sponsors/panva)
+
 ▸ **parseWwwAuthenticateChallenges**(`response`): [`WWWAuthenticateChallenge`](../interfaces/WWWAuthenticateChallenge.md)[] \| `undefined`
 
 Parses the `WWW-Authenticate` HTTP Header from a

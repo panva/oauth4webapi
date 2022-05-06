@@ -1,5 +1,7 @@
 # Function: processPushedAuthorizationResponse
 
+[💗 Help the project](https://github.com/sponsors/panva)
+
 ▸ **processPushedAuthorizationResponse**(`as`, `client`, `response`): `Promise`<[`PushedAuthorizationResponse`](../interfaces/PushedAuthorizationResponse.md) \| [`OAuth2Error`](../interfaces/OAuth2Error.md)\>
 
 Validates

@@ -1,5 +1,7 @@
 # Function: processDeviceCodeResponse
 
+[💗 Help the project](https://github.com/sponsors/panva)
+
 ▸ **processDeviceCodeResponse**(`as`, `client`, `response`, `options?`): `Promise`<[`TokenEndpointResponse`](../interfaces/TokenEndpointResponse.md) \| [`OAuth2Error`](../interfaces/OAuth2Error.md)\>
 
 Validates Device Authorization Grant

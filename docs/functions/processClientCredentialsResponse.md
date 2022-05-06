@@ -1,5 +1,7 @@
 # Function: processClientCredentialsResponse
 
+[💗 Help the project](https://github.com/sponsors/panva)
+
 ▸ **processClientCredentialsResponse**(`as`, `client`, `response`): `Promise`<[`ClientCredentialsGrantResponse`](../interfaces/ClientCredentialsGrantResponse.md) \| [`OAuth2Error`](../interfaces/OAuth2Error.md)\>
 
 Validates Client Credentials Grant

@@ -1,5 +1,7 @@
 # Function: refreshTokenGrantRequest
 
+[💗 Help the project](https://github.com/sponsors/panva)
+
 ▸ **refreshTokenGrantRequest**(`as`, `client`, `refreshToken`, `options?`): `Promise`<`Response`\>
 
 Performs a Refresh Token Grant request at the

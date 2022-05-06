@@ -1,5 +1,7 @@
 # Function: validateAuthResponse
 
+[💗 Help the project](https://github.com/sponsors/panva)
+
 ▸ **validateAuthResponse**(`as`, `client`, `parameters`, `expectedState?`): `CallbackParameters` \| [`OAuth2Error`](../interfaces/OAuth2Error.md)
 
 Validates an OAuth 2.0 Authorization Response or Authorization Error Response

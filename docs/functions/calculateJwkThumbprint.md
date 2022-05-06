@@ -1,5 +1,7 @@
 # Function: calculateJwkThumbprint
 
+[💗 Help the project](https://github.com/sponsors/panva)
+
 ▸ **calculateJwkThumbprint**(`key`): `Promise`<`string`\>
 
 Calculates a base64url-encoded SHA-256 JWK Thumbprint.

@@ -1,5 +1,7 @@
 # Function: userInfoRequest
 
+[💗 Help the project](https://github.com/sponsors/panva)
+
 ▸ **userInfoRequest**(`as`, `client`, `accessToken`, `options?`): `Promise`<`Response`\>
 
 Performs a UserInfo Request at the

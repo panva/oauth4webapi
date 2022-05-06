@@ -1,5 +1,7 @@
 # Function: getValidatedIdTokenClaims
 
+[💗 Help the project](https://github.com/sponsors/panva)
+
 ▸ **getValidatedIdTokenClaims**(`ref`): [`IDToken`](../interfaces/IDToken.md) \| `undefined`
 
 Returns ID Token claims validated during [authorizationCodeGrantRequest](authorizationCodeGrantRequest.md) or

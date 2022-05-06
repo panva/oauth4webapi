@@ -1,5 +1,7 @@
 # Interface: PrivateKey
 
+[💗 Help the project](https://github.com/sponsors/panva)
+
 Interface to pass an asymmetric private key and, optionally, its associated
 JWK Key ID to be added as a `kid` JOSE Header Parameter.
 

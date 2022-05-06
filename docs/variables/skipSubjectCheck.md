@@ -1,5 +1,7 @@
 # Variable: skipSubjectCheck
 
+[💗 Help the project](https://github.com/sponsors/panva)
+
 • `Const` **skipSubjectCheck**: typeof [`skipSubjectCheck`](skipSubjectCheck.md)
 
 DANGER ZONE

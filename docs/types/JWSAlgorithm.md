@@ -1,5 +1,7 @@
 # Type alias: JWSAlgorithm
 
+[💗 Help the project](https://github.com/sponsors/panva)
+
 Ƭ **JWSAlgorithm**: ``"PS256"`` \| ``"ES256"`` \| ``"RS256"``
 
 Supported JWS "alg" Algorithm identifiers.

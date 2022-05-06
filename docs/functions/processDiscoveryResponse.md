@@ -1,5 +1,7 @@
 # Function: processDiscoveryResponse
 
+[💗 Help the project](https://github.com/sponsors/panva)
+
 ▸ **processDiscoveryResponse**(`expectedIssuerIdentifier`, `response`): `Promise`<[`AuthorizationServer`](../interfaces/AuthorizationServer.md)\>
 
 Validates

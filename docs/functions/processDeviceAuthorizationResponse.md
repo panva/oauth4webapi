@@ -1,5 +1,7 @@
 # Function: processDeviceAuthorizationResponse
 
+[💗 Help the project](https://github.com/sponsors/panva)
+
 ▸ **processDeviceAuthorizationResponse**(`as`, `client`, `response`): `Promise`<[`DeviceAuthorizationResponse`](../interfaces/DeviceAuthorizationResponse.md) \| [`OAuth2Error`](../interfaces/OAuth2Error.md)\>
 
 Validates

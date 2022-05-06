@@ -1,5 +1,7 @@
 # Function: calculatePKCECodeChallenge
 
+[💗 Help the project](https://github.com/sponsors/panva)
+
 ▸ **calculatePKCECodeChallenge**(`codeVerifier`): `Promise`<`string`\>
 
 Calculates the PKCE `code_verifier` value to send with an authorization

@@ -1,5 +1,7 @@
 # Function: clientCredentialsGrantRequest
 
+[💗 Help the project](https://github.com/sponsors/panva)
+
 ▸ **clientCredentialsGrantRequest**(`as`, `client`, `parameters`, `options?`): `Promise`<`Response`\>
 
 Performs a Client Credentials Grant request at the

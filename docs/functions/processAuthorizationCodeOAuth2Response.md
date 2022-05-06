@@ -1,5 +1,7 @@
 # Function: processAuthorizationCodeOAuth2Response
 
+[💗 Help the project](https://github.com/sponsors/panva)
+
 ▸ **processAuthorizationCodeOAuth2Response**(`as`, `client`, `response`): `Promise`<[`OAuth2TokenEndpointResponse`](../interfaces/OAuth2TokenEndpointResponse.md) \| [`OAuth2Error`](../interfaces/OAuth2Error.md)\>
 
 (OAuth 2.0 without OpenID Connect only) Validates Authorization Code Grant

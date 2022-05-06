@@ -1,5 +1,7 @@
 # Function: jwksRequest
 
+[💗 Help the project](https://github.com/sponsors/panva)
+
 ▸ **jwksRequest**(`as`, `options?`): `Promise`<`Response`\>
 
 Performs a request to the

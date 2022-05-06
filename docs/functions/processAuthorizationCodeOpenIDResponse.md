@@ -1,5 +1,7 @@
 # Function: processAuthorizationCodeOpenIDResponse
 
+[💗 Help the project](https://github.com/sponsors/panva)
+
 ▸ **processAuthorizationCodeOpenIDResponse**(`as`, `client`, `response`, `expectedNonce?`, `maxAge?`, `options?`): `Promise`<[`OpenIDTokenEndpointResponse`](../interfaces/OpenIDTokenEndpointResponse.md) \| [`OAuth2Error`](../interfaces/OAuth2Error.md)\>
 
 (OpenID Connect only) Validates Authorization Code Grant

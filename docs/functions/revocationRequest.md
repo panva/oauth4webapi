@@ -1,5 +1,7 @@
 # Function: revocationRequest
 
+[💗 Help the project](https://github.com/sponsors/panva)
+
 ▸ **revocationRequest**(`as`, `client`, `token`, `options?`): `Promise`<`Response`\>
 
 Performs a revocation request at the

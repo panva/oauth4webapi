@@ -1,5 +1,7 @@
 # Function: deviceAuthorizationRequest
 
+[💗 Help the project](https://github.com/sponsors/panva)
+
 ▸ **deviceAuthorizationRequest**(`as`, `client`, `parameters`, `options?`): `Promise`<`Response`\>
 
 Performs a Device Authorization Request at the

@@ -1,5 +1,7 @@
 # Function: generateRandomNonce
 
+[💗 Help the project](https://github.com/sponsors/panva)
+
 ▸ **generateRandomNonce**(): `string`
 
 Generate random `nonce` value.

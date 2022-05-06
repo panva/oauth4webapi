@@ -1,5 +1,7 @@
 # Interface: AuthorizationServer
 
+[💗 Help the project](https://github.com/sponsors/panva)
+
 Authorization Server Metadata
 
 **`see`** [IANA OAuth Authorization Server Metadata registry](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#authorization-server-metadata)

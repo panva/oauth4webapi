@@ -1,5 +1,7 @@
 # Variable: expectNoState
 
+[💗 Help the project](https://github.com/sponsors/panva)
+
 • `Const` **expectNoState**: typeof [`expectNoState`](expectNoState.md)
 
 Use this as a value to [validateAuthResponse](../functions/validateAuthResponse.md) `expectedState`
