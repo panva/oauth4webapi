@@ -7,33 +7,21 @@
 ### Properties
 
 - [aud](IDToken.md#aud)
-- [auth\_time](IDToken.md#auth_time)
-- [azp](IDToken.md#azp)
 - [exp](IDToken.md#exp)
 - [iat](IDToken.md#iat)
 - [iss](IDToken.md#iss)
+- [sub](IDToken.md#sub)
+- [auth\_time](IDToken.md#auth_time)
+- [azp](IDToken.md#azp)
 - [jti](IDToken.md#jti)
 - [nbf](IDToken.md#nbf)
 - [nonce](IDToken.md#nonce)
-- [sub](IDToken.md#sub)
 
 ## Properties
 
 ### aud
 
 • `Readonly` **aud**: `string` \| `string`[]
-
-___
-
-### auth\_time
-
-• `Optional` `Readonly` **auth\_time**: `number`
-
-___
-
-### azp
-
-• `Optional` `Readonly` **azp**: `string`
 
 ___
 
@@ -55,6 +43,24 @@ ___
 
 ___
 
+### sub
+
+• `Readonly` **sub**: `string`
+
+___
+
+### auth\_time
+
+• `Optional` `Readonly` **auth\_time**: `number`
+
+___
+
+### azp
+
+• `Optional` `Readonly` **azp**: `string`
+
+___
+
 ### jti
 
 • `Optional` `Readonly` **jti**: `string`
@@ -70,9 +76,3 @@ ___
 ### nonce
 
 • `Optional` `Readonly` **nonce**: `string`
-
-___
-
-### sub
-
-• `Readonly` **sub**: `string`

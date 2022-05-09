@@ -7,11 +7,11 @@
 ### Properties
 
 - [access\_token](OpenIDTokenEndpointResponse.md#access_token)
-- [expires\_in](OpenIDTokenEndpointResponse.md#expires_in)
 - [id\_token](OpenIDTokenEndpointResponse.md#id_token)
+- [token\_type](OpenIDTokenEndpointResponse.md#token_type)
+- [expires\_in](OpenIDTokenEndpointResponse.md#expires_in)
 - [refresh\_token](OpenIDTokenEndpointResponse.md#refresh_token)
 - [scope](OpenIDTokenEndpointResponse.md#scope)
-- [token\_type](OpenIDTokenEndpointResponse.md#token_type)
 
 ## Properties
 
@@ -21,15 +21,23 @@
 
 ___
 
-### expires\_in
-
-• `Optional` `Readonly` **expires\_in**: `number`
-
-___
-
 ### id\_token
 
 • `Readonly` **id\_token**: `string`
+
+___
+
+### token\_type
+
+• `Readonly` **token\_type**: `string`
+
+NOTE: the token_type value is lowercased
+
+___
+
+### expires\_in
+
+• `Optional` `Readonly` **expires\_in**: `number`
 
 ___
 
@@ -42,11 +50,3 @@ ___
 ### scope
 
 • `Optional` `Readonly` **scope**: `string`
-
-___
-
-### token\_type
-
-• `Readonly` **token\_type**: `string`
-
-NOTE: the token_type value is lowercased

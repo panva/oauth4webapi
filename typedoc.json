@@ -12,5 +12,11 @@
   "intentionallyNotExported": ["ReturnTypes", "CallbackParameters"],
   "out": "docs",
   "plugin": ["typedoc-plugin-markdown"],
-  "readme": "none"
+  "readme": "none",
+  "sort": [
+    "kind",
+    "static-first",
+    "required-first",
+    "alphabetical"
+  ]
 }

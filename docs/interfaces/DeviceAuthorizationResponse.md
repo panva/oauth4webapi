@@ -8,9 +8,9 @@
 
 - [device\_code](DeviceAuthorizationResponse.md#device_code)
 - [expires\_in](DeviceAuthorizationResponse.md#expires_in)
-- [interval](DeviceAuthorizationResponse.md#interval)
 - [user\_code](DeviceAuthorizationResponse.md#user_code)
 - [verification\_uri](DeviceAuthorizationResponse.md#verification_uri)
+- [interval](DeviceAuthorizationResponse.md#interval)
 - [verification\_uri\_complete](DeviceAuthorizationResponse.md#verification_uri_complete)
 
 ## Properties
@@ -27,12 +27,6 @@ ___
 
 ___
 
-### interval
-
-• `Optional` `Readonly` **interval**: `number`
-
-___
-
 ### user\_code
 
 • `Readonly` **user\_code**: `string`
@@ -42,6 +36,12 @@ ___
 ### verification\_uri
 
 • `Readonly` **verification\_uri**: `string`
+
+___
+
+### interval
+
+• `Optional` `Readonly` **interval**: `number`
 
 ___
 

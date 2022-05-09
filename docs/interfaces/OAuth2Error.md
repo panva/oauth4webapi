@@ -6,23 +6,23 @@
 
 ### Properties
 
-- [algs](OAuth2Error.md#algs)
 - [error](OAuth2Error.md#error)
+- [algs](OAuth2Error.md#algs)
 - [error\_description](OAuth2Error.md#error_description)
 - [error\_uri](OAuth2Error.md#error_uri)
 - [scope](OAuth2Error.md#scope)
 
 ## Properties
 
-### algs
-
-• `Optional` `Readonly` **algs**: `string`
-
-___
-
 ### error
 
 • `Readonly` **error**: `string`
+
+___
+
+### algs
+
+• `Optional` `Readonly` **algs**: `string`
 
 ___
 

@@ -10,6 +10,7 @@ Authorization Server Metadata
 
 ### Properties
 
+- [issuer](AuthorizationServer.md#issuer)
 - [acr\_values\_supported](AuthorizationServer.md#acr_values_supported)
 - [authorization\_encryption\_alg\_values\_supported](AuthorizationServer.md#authorization_encryption_alg_values_supported)
 - [authorization\_encryption\_enc\_values\_supported](AuthorizationServer.md#authorization_encryption_enc_values_supported)
@@ -44,7 +45,6 @@ Authorization Server Metadata
 - [introspection\_endpoint\_auth\_methods\_supported](AuthorizationServer.md#introspection_endpoint_auth_methods_supported)
 - [introspection\_endpoint\_auth\_signing\_alg\_values\_supported](AuthorizationServer.md#introspection_endpoint_auth_signing_alg_values_supported)
 - [introspection\_signing\_alg\_values\_supported](AuthorizationServer.md#introspection_signing_alg_values_supported)
-- [issuer](AuthorizationServer.md#issuer)
 - [jwks\_uri](AuthorizationServer.md#jwks_uri)
 - [mtls\_endpoint\_aliases](AuthorizationServer.md#mtls_endpoint_aliases)
 - [op\_policy\_uri](AuthorizationServer.md#op_policy_uri)
@@ -79,6 +79,14 @@ Authorization Server Metadata
 - [userinfo\_signing\_alg\_values\_supported](AuthorizationServer.md#userinfo_signing_alg_values_supported)
 
 ## Properties
+
+### issuer
+
+• `Readonly` **issuer**: `string`
+
+Authorization server's Issuer Identifier URL.
+
+___
 
 ### acr\_values\_supported
 
@@ -381,14 +389,6 @@ ___
 
 JSON array containing a list of algorithms supported by the authorization
 server for introspection response signing.
-
-___
-
-### issuer
-
-• `Readonly` **issuer**: `string`
-
-Authorization server's Issuer Identifier URL.
 
 ___
 

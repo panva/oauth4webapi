@@ -7,17 +7,25 @@
 ### Properties
 
 - [access\_token](OAuth2TokenEndpointResponse.md#access_token)
+- [token\_type](OAuth2TokenEndpointResponse.md#token_type)
 - [expires\_in](OAuth2TokenEndpointResponse.md#expires_in)
 - [id\_token](OAuth2TokenEndpointResponse.md#id_token)
 - [refresh\_token](OAuth2TokenEndpointResponse.md#refresh_token)
 - [scope](OAuth2TokenEndpointResponse.md#scope)
-- [token\_type](OAuth2TokenEndpointResponse.md#token_type)
 
 ## Properties
 
 ### access\_token
 
 • `Readonly` **access\_token**: `string`
+
+___
+
+### token\_type
+
+• `Readonly` **token\_type**: `string`
+
+NOTE: the token_type value is lowercased
 
 ___
 
@@ -42,11 +50,3 @@ ___
 ### scope
 
 • `Optional` `Readonly` **scope**: `string`
-
-___
-
-### token\_type
-
-• `Readonly` **token\_type**: `string`
-
-NOTE: the token_type value is lowercased

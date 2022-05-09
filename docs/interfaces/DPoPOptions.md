@@ -6,21 +6,11 @@
 
 ### Properties
 
-- [nonce](DPoPOptions.md#nonce)
 - [privateKey](DPoPOptions.md#privatekey)
 - [publicKey](DPoPOptions.md#publickey)
+- [nonce](DPoPOptions.md#nonce)
 
 ## Properties
-
-### nonce
-
-• `Optional` **nonce**: `string`
-
-Server-Provided Nonce to use in the request. This option serves as an
-override in case the self-correcting mechanism does not work with a
-particular server. Previously received nonces will be used automatically.
-
-___
 
 ### privateKey
 
@@ -40,3 +30,13 @@ ___
 • **publicKey**: `CryptoKey`
 
 The public key corresponding to [DPoPOptions.privateKey](DPoPOptions.md#privatekey)
+
+___
+
+### nonce
+
+• `Optional` **nonce**: `string`
+
+Server-Provided Nonce to use in the request. This option serves as an
+override in case the self-correcting mechanism does not work with a
+particular server. Previously received nonces will be used automatically.

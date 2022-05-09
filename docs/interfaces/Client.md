@@ -10,8 +10,8 @@ Recognized Client Metadata that have an effect on the exposed functionality.
 
 ### Properties
 
-- [authorization\_signed\_response\_alg](Client.md#authorization_signed_response_alg)
 - [client\_id](Client.md#client_id)
+- [authorization\_signed\_response\_alg](Client.md#authorization_signed_response_alg)
 - [client\_secret](Client.md#client_secret)
 - [default\_max\_age](Client.md#default_max_age)
 - [id\_token\_signed\_response\_alg](Client.md#id_token_signed_response_alg)
@@ -22,6 +22,14 @@ Recognized Client Metadata that have an effect on the exposed functionality.
 
 ## Properties
 
+### client\_id
+
+• **client\_id**: `string`
+
+Client identifier.
+
+___
+
 ### authorization\_signed\_response\_alg
 
 • `Optional` **authorization\_signed\_response\_alg**: [`JWSAlgorithm`](../types/JWSAlgorithm.md)
@@ -31,14 +39,6 @@ configured the default is
 to allow only [supported algorithms](../types/JWSAlgorithm.md) listed in
 [`as.authorization_signing_alg_values_supported`](AuthorizationServer.md#authorization_signing_alg_values_supported)
 and fall back to `RS256` when the authorization server metadata is not set.
-
-___
-
-### client\_id
-
-• **client\_id**: `string`
-
-Client identifier.
 
 ___
 

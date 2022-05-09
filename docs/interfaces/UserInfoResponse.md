@@ -6,6 +6,7 @@
 
 ### Properties
 
+- [sub](UserInfoResponse.md#sub)
 - [address](UserInfoResponse.md#address)
 - [birthdate](UserInfoResponse.md#birthdate)
 - [email](UserInfoResponse.md#email)
@@ -21,12 +22,17 @@
 - [picture](UserInfoResponse.md#picture)
 - [preferred\_username](UserInfoResponse.md#preferred_username)
 - [profile](UserInfoResponse.md#profile)
-- [sub](UserInfoResponse.md#sub)
 - [updated\_at](UserInfoResponse.md#updated_at)
 - [website](UserInfoResponse.md#website)
 - [zoneinfo](UserInfoResponse.md#zoneinfo)
 
 ## Properties
+
+### sub
+
+• `Readonly` **sub**: `string`
+
+___
 
 ### address
 
@@ -126,12 +132,6 @@ ___
 ### profile
 
 • `Optional` `Readonly` **profile**: `string`
-
-___
-
-### sub
-
-• `Readonly` **sub**: `string`
 
 ___
 
