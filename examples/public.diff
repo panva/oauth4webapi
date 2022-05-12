@@ -1,0 +1,15 @@
+diff --git a/examples/code.ts b/examples/public.ts
+index 17d6b71..ab2038f 100644
+--- a/examples/code.ts
++++ b/examples/public.ts
+@@ -7,9 +7,7 @@ const as = await oauth
+ 
+ const client: oauth.Client = {
+   client_id: 'abc4ba37-4ab8-49b5-99d4-9441ba35d428',
+-  client_secret:
+-    'ddce41c3d7618bb30e8a5e5e423fce223427426265ebc96fd9dd5713a6d4fc58bc523c45af42274c210ab18d4a93b5b7169edf6236ed2657f6be64ec41b72f87',
+-  token_endpoint_auth_method: 'client_secret_basic',
++  token_endpoint_auth_method: 'none',
+ }
+ 
+ const redirect_uri = 'https://example.rp.com/cb'

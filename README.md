@@ -43,6 +43,7 @@ import * as oauth2 from 'https://deno.land/x/doauth/src/index.ts'
 ```
 
 - Authorization Code Flow - OpenID Connect [source](examples/code.ts), or plain OAuth 2 [source](examples/oauth.ts)
+- Public Client Authorization Code Flow - [source](examples/public.ts) | [diff from code flow](examples/public.diff)
 - Private Key JWT Client Authentication - [source](examples/private_key_jwt.ts) | [diff from code flow](examples/private_key_jwt.diff)
 - DPoP - [source](examples/dpop.ts) | [diff from code flow](examples/dpop.diff)
 - Pushed Authorization Request (PAR) - [source](examples/par.ts) | [diff from code flow](examples/par.diff)
