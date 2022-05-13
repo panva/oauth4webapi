@@ -1,8 +1,8 @@
-# Type alias: TokenEndpointAuthMethod
+# Type alias: ClientAuthenticationMethod
 
 [💗 Help the project](https://github.com/sponsors/panva)
 
-Ƭ **TokenEndpointAuthMethod**: ``"client_secret_basic"`` \| ``"client_secret_post"`` \| ``"private_key_jwt"`` \| ``"none"``
+Ƭ **ClientAuthenticationMethod**: ``"client_secret_basic"`` \| ``"client_secret_post"`` \| ``"private_key_jwt"`` \| ``"none"``
 
 Supported Client Authentication Methods.
 

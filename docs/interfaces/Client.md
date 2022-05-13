@@ -93,9 +93,9 @@ ___
 
 ### token\_endpoint\_auth\_method
 
-• `Optional` **token\_endpoint\_auth\_method**: [`TokenEndpointAuthMethod`](../types/TokenEndpointAuthMethod.md)
+• `Optional` **token\_endpoint\_auth\_method**: [`ClientAuthenticationMethod`](../types/ClientAuthenticationMethod.md)
 
-Client [authentication method](../types/TokenEndpointAuthMethod.md) for the
+Client [authentication method](../types/ClientAuthenticationMethod.md) for the
 client's authenticated requests. Default is `client_secret_basic`.
 
 ___

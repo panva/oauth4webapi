@@ -58,7 +58,7 @@ export interface PrivateKey {
  * @see {@link https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication OpenID Connect Core 1.0}
  * @see {@link https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#token-endpoint-auth-method OAuth Token Endpoint Authentication Methods}
  */
-export type TokenEndpointAuthMethod =
+export type ClientAuthenticationMethod =
   | 'client_secret_basic'
   | 'client_secret_post'
   | 'private_key_jwt'
@@ -479,10 +479,10 @@ export interface Client {
    */
   client_secret?: string
   /**
-   * Client {@link TokenEndpointAuthMethod authentication method} for the
+   * Client {@link ClientAuthenticationMethod authentication method} for the
    * client's authenticated requests. Default is `client_secret_basic`.
    */
-  token_endpoint_auth_method?: TokenEndpointAuthMethod
+  token_endpoint_auth_method?: ClientAuthenticationMethod
   /**
    * JWS `alg` algorithm required for signing the ID Token issued to this
    * Client. When not configured the default is
@@ -963,7 +963,7 @@ export interface DPoPRequestOptions {
 export interface AuthenticatedRequestOptions {
   /**
    * Private key to use for `private_key_jwt`
-   * {@link TokenEndpointAuthMethod client authentication}.
+   * {@link ClientAuthenticationMethod client authentication}.
    */
   clientPrivateKey?: CryptoKey | PrivateKey
 }
