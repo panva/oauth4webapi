@@ -964,6 +964,8 @@ export interface AuthenticatedRequestOptions {
   /**
    * Private key to use for `private_key_jwt`
    * {@link ClientAuthenticationMethod client authentication}.
+   * Its algorithm must be compatible with a supported
+   * {@link JWSAlgorithm JWS `alg` Algorithm}.
    */
   clientPrivateKey?: CryptoKey | PrivateKey
 }

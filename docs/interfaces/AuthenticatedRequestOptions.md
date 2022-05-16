@@ -16,3 +16,5 @@
 
 Private key to use for `private_key_jwt`
 [client authentication](../types/ClientAuthenticationMethod.md).
+Its algorithm must be compatible with a supported
+[JWS `alg` Algorithm](../types/JWSAlgorithm.md).
