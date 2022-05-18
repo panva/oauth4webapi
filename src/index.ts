@@ -2171,15 +2171,7 @@ async function processGenericAccessTokenResponse(
         ),
         getPublicSigKeyFromIssuerJwksUri.bind(undefined, as, options),
       )
-        .then(
-          validatePresence.bind(undefined, [
-            ['iss', 'issuer'],
-            ['aud', 'audience'],
-            ['sub', 'subject'],
-            ['iat', 'issued at'],
-            ['exp', 'expiration time'],
-          ]),
-        )
+        .then(validatePresence.bind(undefined, ['aud', 'exp', 'iat', 'iss', 'sub']))
         .then(validateIssuer.bind(undefined, as.issuer))
         .then(validateAudience.bind(undefined, client.client_id))
 
@@ -2361,11 +2353,18 @@ interface ParsedJWT {
   claims: JWTPayload
 }
 
-type Entries = [string, string]
-function validatePresence(required: Entries[], result: ParsedJWT) {
-  for (const [claim, name] of required) {
+const claimNames = {
+  aud: 'audience',
+  exp: 'expiration time',
+  iat: 'issued at',
+  iss: 'issuer',
+  sub: 'subject',
+}
+
+function validatePresence(required: (keyof typeof claimNames)[], result: ParsedJWT) {
+  for (const claim of required) {
     if (result.claims[claim] === undefined) {
-      throw new OPE(`missing JWT "${claim}" (${name})`)
+      throw new OPE(`missing JWT "${claim}" (${claimNames[claim]})`)
     }
   }
   return result
@@ -2882,13 +2881,7 @@ export async function processIntrospectionResponse(
       getPublicSigKeyFromIssuerJwksUri.bind(undefined, as, options),
     )
       .then(checkJwtType.bind(undefined, 'token-introspection+jwt'))
-      .then(
-        validatePresence.bind(undefined, [
-          ['iss', 'issuer'],
-          ['aud', 'audience'],
-          ['iat', 'issued at'],
-        ]),
-      )
+      .then(validatePresence.bind(undefined, ['aud', 'iat', 'iss']))
       .then(validateIssuer.bind(undefined, as.issuer))
       .then(validateAudience.bind(undefined, client.client_id))
 
@@ -3201,13 +3194,7 @@ export async function validateJwtAuthResponse(
     ),
     getPublicSigKeyFromIssuerJwksUri.bind(undefined, as, options),
   )
-    .then(
-      validatePresence.bind(undefined, [
-        ['iss', 'issuer'],
-        ['aud', 'audience'],
-        ['exp', 'expiration time'],
-      ]),
-    )
+    .then(validatePresence.bind(undefined, ['aud', 'exp', 'iss']))
     .then(validateIssuer.bind(undefined, as.issuer))
     .then(validateAudience.bind(undefined, client.client_id))
 
