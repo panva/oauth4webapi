@@ -7,7 +7,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Fixes
 
-* reject unsupported token_type values ([3d2cc0c](https://github.com/panva/oauth4webapi/commit/3d2cc0cbcd53c9d33fe0c8cae44675736459ed1a)), closes [/datatracker.ietf.org/doc/html/rfc6749#section-7](https://github.com/panva//datatracker.ietf.org/doc/html/rfc6749/issues/section-7)
+* reject unsupported token_type values ([3d2cc0c](https://github.com/panva/oauth4webapi/commit/3d2cc0cbcd53c9d33fe0c8cae44675736459ed1a))
 
 ## [1.0.0](https://github.com/panva/oauth4webapi/compare/v0.9.0...v1.0.0) (2022-05-13)
 
