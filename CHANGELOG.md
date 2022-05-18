@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.0.1](https://github.com/panva/oauth4webapi/compare/v1.0.0...v1.0.1) (2022-05-18)
+
+
+### Fixes
+
+* reject unsupported token_type values ([3d2cc0c](https://github.com/panva/oauth4webapi/commit/3d2cc0cbcd53c9d33fe0c8cae44675736459ed1a)), closes [/datatracker.ietf.org/doc/html/rfc6749#section-7](https://github.com/panva//datatracker.ietf.org/doc/html/rfc6749/issues/section-7)
+
 ## [1.0.0](https://github.com/panva/oauth4webapi/compare/v0.9.0...v1.0.0) (2022-05-13)
 
 ## [0.9.0](https://github.com/panva/oauth4webapi/compare/v0.8.0...v0.9.0) (2022-05-13)
