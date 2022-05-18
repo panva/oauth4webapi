@@ -52,4 +52,4 @@ export function getResponse(
   return new Response(stream, { status, headers })
 }
 
-export const UA = /^oauth4webapi\/v\d+\.\d+\.\d+ \(https\:\/\/github\.com\/panva\/oauth4webapi\)$/
+export const UA = /^oauth4webapi\/v\d+\.\d+\.\d+$/

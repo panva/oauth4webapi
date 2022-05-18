@@ -1,7 +1,6 @@
 const NAME = 'oauth4webapi'
 const VERSION = 'v1.0.1'
-const HOMEPAGE = 'https://github.com/panva/oauth4webapi'
-const USER_AGENT = `${NAME}/${VERSION} (${HOMEPAGE})`
+const USER_AGENT = `${NAME}/${VERSION}`
 
 export type JsonObject = { [Key in string]?: JsonValue }
 export type JsonArray = JsonValue[]
