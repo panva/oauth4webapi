@@ -3,7 +3,6 @@ import 'zx/globals'
 
 const diffable = [
   ['code', 'dpop'],
-  ['code', 'jarm'],
   ['code', 'par'],
   ['code', 'private_key_jwt'],
   ['code', 'public'],
