@@ -14,7 +14,7 @@ Target profiles of this software are OAuth 2.1, OAuth 2.0 complemented by the la
 - Pushed Authorization Requests (PAR)
 - UserInfo and Protected Resource Requests
 - Authorization Server Issuer Identification
-- JWT Secured Introspection, Response Mode, Authorization Request, and UserInfo
+- JWT Secured Introspection, Response Mode (JARM), Authorization Request (JAR), and UserInfo
 
 ## [Certification](https://openid.net/certification/faq/)
 
