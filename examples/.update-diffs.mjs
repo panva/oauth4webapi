@@ -7,7 +7,7 @@ const diffable = [
   ['code', 'par'],
   ['code', 'private_key_jwt'],
   ['code', 'public'],
-  ['fapi2-baseline', 'fapi2-advanced'],
+  ['fapi2', 'fapi2-message-signing'],
 ]
 
 await Promise.all(

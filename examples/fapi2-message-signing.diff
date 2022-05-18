@@ -1,7 +1,7 @@
-diff --git a/examples/fapi2-baseline.ts b/examples/fapi2-advanced.ts
+diff --git a/examples/fapi2.ts b/examples/fapi2-message-signing.ts
 index 71a11b7..a89ed03 100644
---- a/examples/fapi2-baseline.ts
-+++ b/examples/fapi2-advanced.ts
+--- a/examples/fapi2.ts
++++ b/examples/fapi2-message-signing.ts
 @@ -26,7 +26,7 @@ const code_verifier = oauth.generateRandomCodeVerifier()
  const code_challenge = await oauth.calculatePKCECodeChallenge(code_verifier)
  const code_challenge_method = 'S256'
