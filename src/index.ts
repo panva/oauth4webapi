@@ -1877,7 +1877,6 @@ export async function processUserInfoResponse(
         undefined,
         client.userinfo_signed_response_alg,
         as.userinfo_signing_alg_values_supported,
-        'RS256',
       ),
       getPublicSigKeyFromIssuerJwksUri.bind(undefined, as, options),
     )
@@ -2167,7 +2166,6 @@ async function processGenericAccessTokenResponse(
           undefined,
           client.id_token_signed_response_alg,
           as.id_token_signing_alg_values_supported,
-          'RS256',
         ),
         getPublicSigKeyFromIssuerJwksUri.bind(undefined, as, options),
       )
@@ -2876,7 +2874,6 @@ export async function processIntrospectionResponse(
         undefined,
         client.introspection_signed_response_alg,
         as.introspection_signing_alg_values_supported,
-        'RS256',
       ),
       getPublicSigKeyFromIssuerJwksUri.bind(undefined, as, options),
     )
@@ -3190,7 +3187,6 @@ export async function validateJwtAuthResponse(
       undefined,
       client.authorization_signed_response_alg,
       as.authorization_signing_alg_values_supported,
-      'RS256',
     ),
     getPublicSigKeyFromIssuerJwksUri.bind(undefined, as, options),
   )
@@ -3217,7 +3213,6 @@ export async function validateJwtAuthResponse(
 function checkSigningAlgorithm(
   client: string | undefined,
   issuer: string[] | undefined,
-  fallback: string,
   header: CompactJWSHeaderParameters,
 ) {
   if (client !== undefined) {
@@ -3234,7 +3229,7 @@ function checkSigningAlgorithm(
     return
   }
 
-  if (header.alg !== fallback) {
+  if (header.alg !== 'RS256') {
     throw new OPE('unexpected JWT "alg" header parameter')
   }
 }
