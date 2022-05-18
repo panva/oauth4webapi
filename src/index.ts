@@ -92,19 +92,53 @@ export type ClientAuthenticationMethod =
  */
 export type JWSAlgorithm = 'PS256' | 'ES256' | 'RS256'
 
+/**
+ * JSON Web Key
+ */
 export interface JWK {
-  // common
+  /**
+   * Key Type
+   */
   readonly kty?: string
+  /**
+   * Key ID
+   */
   readonly kid?: string
+  /**
+   * Algorithm
+   */
   readonly alg?: string
+  /**
+   * Public Key Use
+   */
   readonly use?: string
+  /**
+   * Key Operations
+   */
   readonly key_ops?: string[]
-  // RSA
+  /**
+   * (RSA) Exponent
+   */
   readonly e?: string
+  /**
+   * (RSA) Modulus
+   */
   readonly n?: string
-  // EC
+  /**
+   * (EC) Curve
+   *
+   * (OKP) The subtype of key pair
+   */
   readonly crv?: string
+  /**
+   * (EC) X Coordinate
+   *
+   * (OKP) The public key
+   */
   readonly x?: string
+  /**
+   * (EC) Y Coordinate
+   */
   readonly y?: string
 
   readonly [parameter: string]: JsonValue | undefined
@@ -2943,7 +2977,13 @@ export async function jwksRequest(
   }).then(processDpopNonce)
 }
 
+/**
+ * JSON Web Key Set
+ */
 export interface JsonWebKeySet {
+  /**
+   * Array of JWK Values
+   */
   readonly keys: JWK[]
 }
 

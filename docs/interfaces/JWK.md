@@ -2,6 +2,8 @@
 
 [💗 Help the project](https://github.com/sponsors/panva)
 
+JSON Web Key
+
 ## Table of contents
 
 ### Properties
@@ -23,11 +25,17 @@
 
 • `Optional` `Readonly` **alg**: `string`
 
+Algorithm
+
 ___
 
 ### crv
 
 • `Optional` `Readonly` **crv**: `string`
+
+(EC) Curve
+
+(OKP) The subtype of key pair
 
 ___
 
@@ -35,11 +43,15 @@ ___
 
 • `Optional` `Readonly` **e**: `string`
 
+(RSA) Exponent
+
 ___
 
 ### key\_ops
 
 • `Optional` `Readonly` **key\_ops**: `string`[]
+
+Key Operations
 
 ___
 
@@ -47,11 +59,15 @@ ___
 
 • `Optional` `Readonly` **kid**: `string`
 
+Key ID
+
 ___
 
 ### kty
 
 • `Optional` `Readonly` **kty**: `string`
+
+Key Type
 
 ___
 
@@ -59,11 +75,15 @@ ___
 
 • `Optional` `Readonly` **n**: `string`
 
+(RSA) Modulus
+
 ___
 
 ### use
 
 • `Optional` `Readonly` **use**: `string`
+
+Public Key Use
 
 ___
 
@@ -71,8 +91,14 @@ ___
 
 • `Optional` `Readonly` **x**: `string`
 
+(EC) X Coordinate
+
+(OKP) The public key
+
 ___
 
 ### y
 
 • `Optional` `Readonly` **y**: `string`
+
+(EC) Y Coordinate
