@@ -2125,6 +2125,10 @@ async function processGenericAccessTokenResponse(
   // @ts-expect-error
   json.token_type = json.token_type.toLowerCase()
 
+  if (json.token_type !== 'dpop' && json.token_type !== 'bearer') {
+    throw new UnsupportedOperationError('unsupported `token_type` value')
+  }
+
   if (
     json.expires_in !== undefined &&
     (typeof json.expires_in !== 'number' || json.expires_in <= 0)
