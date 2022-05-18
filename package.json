@@ -53,20 +53,20 @@
     "test": "ava"
   },
   "devDependencies": {
-    "@types/node": "^17.0.21",
+    "@types/node": "^17.0.34",
     "@typescript/lib-dom": "npm:@types/web",
-    "ava": "^4.1.0",
-    "c8": "^7.11.0",
-    "husky": "^7.0.4",
-    "jose": "^4.6.0",
+    "ava": "^4.2.0",
+    "c8": "^7.11.3",
+    "husky": "^8.0.1",
+    "jose": "^4.8.1",
     "patch-package": "^6.4.7",
-    "prettier": "^2.5.1",
+    "prettier": "^2.6.2",
     "timekeeper": "^2.2.0",
     "ts-node": "^10.7.0",
-    "typedoc": "^0.22.13",
-    "typedoc-plugin-markdown": "^3.11.14",
-    "typescript": "^4.6.2",
-    "undici": "^5.1.1",
-    "zx": "^6.0.1"
+    "typedoc": "^0.22.15",
+    "typedoc-plugin-markdown": "^3.12.1",
+    "typescript": "^4.6.4",
+    "undici": "^5.2.0",
+    "zx": "^6.1.0"
   }
 }
