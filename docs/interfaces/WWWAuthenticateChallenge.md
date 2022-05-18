@@ -15,8 +15,6 @@
 
 • `Readonly` **parameters**: `Object`
 
-NOTE: all parameter names are lowercased
-
 #### Type declaration
 
 | Name | Type |
@@ -34,4 +32,5 @@ ___
 
 • `Readonly` **scheme**: `string`
 
-NOTE: the scheme value is lowercased
+NOTE: because the value is case insensitive it is always returned
+lowercased

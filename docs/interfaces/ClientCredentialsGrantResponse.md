@@ -23,7 +23,8 @@ ___
 
 • `Readonly` **token\_type**: `string`
 
-NOTE: the token_type value is lowercased
+NOTE: because the value is case insensitive it is always returned
+lowercased
 
 ___
 

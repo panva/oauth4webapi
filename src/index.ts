@@ -1411,12 +1411,10 @@ export function isOAuth2Error(input?: ReturnTypes): input is OAuth2Error {
 
 export interface WWWAuthenticateChallenge {
   /**
-   * NOTE: the scheme value is lowercased
+   * NOTE: because the value is case insensitive it is always returned
+   * lowercased
    */
   readonly scheme: string
-  /**
-   * NOTE: all parameter names are lowercased
-   */
   readonly parameters: {
     readonly realm?: string
     readonly error?: string
@@ -1425,6 +1423,10 @@ export interface WWWAuthenticateChallenge {
     readonly algs?: string
     readonly scope?: string
 
+    /**
+     * NOTE: because the parameter names are case insensitive they are always
+     * returned lowercased
+     */
     readonly [parameter: string]: string | undefined
   }
 }
@@ -2367,54 +2369,58 @@ function validatePresence(required: Entries[], result: ParsedJWT) {
 
 export interface TokenEndpointResponse {
   readonly access_token: string
-  readonly refresh_token?: string
-  /**
-   * NOTE: the token_type value is lowercased
-   */
-  readonly token_type: string
   readonly expires_in?: number
   readonly id_token?: string
+  readonly refresh_token?: string
   readonly scope?: string
+  /**
+   * NOTE: because the value is case insensitive it is always returned
+   * lowercased
+   */
+  readonly token_type: string
 
   readonly [parameter: string]: JsonValue | undefined
 }
 
 export interface OpenIDTokenEndpointResponse {
   readonly access_token: string
-  readonly refresh_token?: string
-  /**
-   * NOTE: the token_type value is lowercased
-   */
-  readonly token_type: string
   readonly expires_in?: number
   readonly id_token: string
+  readonly refresh_token?: string
   readonly scope?: string
+  /**
+   * NOTE: because the value is case insensitive it is always returned
+   * lowercased
+   */
+  readonly token_type: string
 
   readonly [parameter: string]: JsonValue | undefined
 }
 
 export interface OAuth2TokenEndpointResponse {
   readonly access_token: string
+  readonly expires_in?: number
+  readonly id_token?: undefined
   readonly refresh_token?: string
+  readonly scope?: string
   /**
-   * NOTE: the token_type value is lowercased
+   * NOTE: because the value is case insensitive it is always returned
+   * lowercased
    */
   readonly token_type: string
-  readonly expires_in?: number
-  readonly scope?: string
-  readonly id_token?: undefined
 
   readonly [parameter: string]: JsonValue | undefined
 }
 
 export interface ClientCredentialsGrantResponse {
   readonly access_token: string
-  /**
-   * NOTE: the token_type value is lowercased
-   */
-  readonly token_type: string
   readonly expires_in?: number
   readonly scope?: string
+  /**
+   * NOTE: because the value is case insensitive it is always returned
+   * lowercased
+   */
+  readonly token_type: string
 
   readonly [parameter: string]: JsonValue | undefined
 }
