@@ -11,7 +11,6 @@ import setup, {
 import * as jose from 'jose'
 import * as lib from '../src/index.js'
 
-const j = JSON.stringify
 const test = anyTest as TestFn<Context & { [alg: string]: CryptoKeyPair }>
 
 test.before(setup)
@@ -278,7 +277,7 @@ test('processAuthorizationCodeOAuth2Response() without ID Tokens', async (t) => 
     lib.processAuthorizationCodeOAuth2Response(
       issuer,
       client,
-      getResponse(j({ token_type: 'Bearer' })),
+      getResponse(JSON.stringify({ token_type: 'Bearer' })),
     ),
     {
       message: '"response" body "access_token" property must be a non-empty string',
@@ -288,7 +287,7 @@ test('processAuthorizationCodeOAuth2Response() without ID Tokens', async (t) => 
     lib.processAuthorizationCodeOAuth2Response(
       issuer,
       client,
-      getResponse(j({ access_token: 'token' })),
+      getResponse(JSON.stringify({ access_token: 'token' })),
     ),
     {
       message: '"response" body "token_type" property must be a non-empty string',
@@ -299,7 +298,11 @@ test('processAuthorizationCodeOAuth2Response() without ID Tokens', async (t) => 
       issuer,
       client,
       getResponse(
-        j({ access_token: 'token', token_type: 'Bearer', expires_in: new Date().toUTCString() }),
+        JSON.stringify({
+          access_token: 'token',
+          token_type: 'Bearer',
+          expires_in: new Date().toUTCString(),
+        }),
       ),
     ),
     {
@@ -310,7 +313,7 @@ test('processAuthorizationCodeOAuth2Response() without ID Tokens', async (t) => 
     lib.processAuthorizationCodeOAuth2Response(
       issuer,
       client,
-      getResponse(j({ access_token: 'token', token_type: 'Bearer', scope: null })),
+      getResponse(JSON.stringify({ access_token: 'token', token_type: 'Bearer', scope: null })),
     ),
     {
       message: '"response" body "scope" property must be a non-empty string',
@@ -320,7 +323,9 @@ test('processAuthorizationCodeOAuth2Response() without ID Tokens', async (t) => 
     lib.processAuthorizationCodeOAuth2Response(
       issuer,
       client,
-      getResponse(j({ access_token: 'token', token_type: 'Bearer', refresh_token: null })),
+      getResponse(
+        JSON.stringify({ access_token: 'token', token_type: 'Bearer', refresh_token: null }),
+      ),
     ),
     {
       message: '"response" body "refresh_token" property must be a non-empty string',
@@ -330,7 +335,7 @@ test('processAuthorizationCodeOAuth2Response() without ID Tokens', async (t) => 
     lib.processAuthorizationCodeOAuth2Response(
       issuer,
       client,
-      getResponse(j({ access_token: 'token', token_type: 'Bearer', id_token: null })),
+      getResponse(JSON.stringify({ access_token: 'token', token_type: 'Bearer', id_token: null })),
     ),
     {
       message: '"response" body "id_token" property must be a non-empty string',
@@ -342,7 +347,7 @@ test('processAuthorizationCodeOAuth2Response() without ID Tokens', async (t) => 
       issuer,
       client,
       getResponse(
-        j({
+        JSON.stringify({
           access_token: 'token',
           token_type: 'Bearer',
           expires_in: 60,
@@ -365,7 +370,7 @@ test('processAuthorizationCodeOAuth2Response() without ID Tokens', async (t) => 
       await lib.processAuthorizationCodeOAuth2Response(
         issuer,
         client,
-        getResponse(j({ error: 'invalid_grant' }), { status: 400 }),
+        getResponse(JSON.stringify({ error: 'invalid_grant' }), { status: 400 }),
       ),
     ),
   )
@@ -375,7 +380,7 @@ test('processAuthorizationCodeOAuth2Response() without ID Tokens', async (t) => 
       await lib.processAuthorizationCodeOAuth2Response(
         issuer,
         client,
-        getResponse(j({ access_token: 'token', token_type: 'Bearer' })),
+        getResponse(JSON.stringify({ access_token: 'token', token_type: 'Bearer' })),
       ),
     ),
   )
@@ -387,7 +392,9 @@ test('processAuthorizationCodeOpenIDResponse() with an ID Token (alg signalled)'
     lib.processAuthorizationCodeOpenIDResponse(
       issuer,
       client,
-      getResponse(j({ access_token: 'token', token_type: 'Bearer', id_token: 'id_token' })),
+      getResponse(
+        JSON.stringify({ access_token: 'token', token_type: 'Bearer', id_token: 'id_token' }),
+      ),
     ),
     {
       message: '"issuer.jwks_uri" must be a string',
@@ -400,7 +407,7 @@ test('processAuthorizationCodeOpenIDResponse() with an ID Token (alg signalled)'
         { ...tIssuer, id_token_signing_alg_values_supported: ['ES256'] },
         client,
         getResponse(
-          j({
+          JSON.stringify({
             access_token: 'token',
             token_type: 'Bearer',
             id_token: await new jose.SignJWT({})
@@ -437,7 +444,7 @@ test('processAuthorizationCodeOpenIDResponse() with an ID Token (alg specified)'
       tIssuer,
       { ...client, id_token_signed_response_alg: 'ES256' },
       getResponse(
-        j({
+        JSON.stringify({
           access_token: 'token',
           token_type: 'Bearer',
           id_token: await new jose.SignJWT({})
@@ -462,7 +469,7 @@ test('processAuthorizationCodeOpenIDResponse() with an ID Token (alg default)', 
       tIssuer,
       client,
       getResponse(
-        j({
+        JSON.stringify({
           access_token: 'token',
           token_type: 'Bearer',
           id_token: await new jose.SignJWT({})
@@ -487,7 +494,7 @@ test('processAuthorizationCodeOpenIDResponse() with an ID Token typ: "JWT"', asy
       tIssuer,
       client,
       getResponse(
-        j({
+        JSON.stringify({
           access_token: 'token',
           token_type: 'Bearer',
           id_token: await new jose.SignJWT({})
@@ -512,7 +519,7 @@ test('processAuthorizationCodeOpenIDResponse() with an ID Token typ: "applicatio
       tIssuer,
       client,
       getResponse(
-        j({
+        JSON.stringify({
           access_token: 'token',
           token_type: 'Bearer',
           id_token: await new jose.SignJWT({})
@@ -553,7 +560,7 @@ for (const alg of ['RS', 'ES', 'PS'].map((s) => [`${s}256`]).flat()) {
         tIssuer,
         client,
         getResponse(
-          j({
+          JSON.stringify({
             access_token:
               'YmJiZTAwYmYtMzgyOC00NzhkLTkyOTItNjJjNDM3MGYzOWIy9sFhvH8K_x8UIHj1osisS57f5DduL',
             token_type: 'Bearer',
@@ -580,7 +587,7 @@ test('processAuthorizationCodeOpenIDResponse() with an ID Token w/ at_hash', asy
       tIssuer,
       client,
       getResponse(
-        j({
+        JSON.stringify({
           access_token:
             'YmJiZTAwYmYtMzgyOC00NzhkLTkyOTItNjJjNDM3MGYzOWIy9sFhvH8K_x8UIHj1osisS57f5DduL-ar_qw5jl3lthwpMjm283aVMQXDmoqqqydDSqJfbhptzw8rUVwkuQbolw',
           token_type: 'Bearer',
@@ -604,7 +611,7 @@ test('processAuthorizationCodeOpenIDResponse() with an ID Token w/ at_hash', asy
       tIssuer,
       client,
       getResponse(
-        j({
+        JSON.stringify({
           access_token:
             'YmJiZTAwYmYtMzgyOC00NzhkLTkyOTItNjJjNDM3MGYzOWIy9sFhvH8K_x8UIHj1osisS57f5DduL-ar_qw5jl3lthwpMjm283aVMQXDmoqqqydDSqJfbhptzw8rUVwkuQbolw',
           token_type: 'Bearer',
@@ -633,7 +640,7 @@ test('processAuthorizationCodeOpenIDResponse() nonce checks', async (t) => {
       tIssuer,
       client,
       getResponse(
-        j({
+        JSON.stringify({
           access_token: 'token',
           token_type: 'Bearer',
           id_token: await new jose.SignJWT({
@@ -657,7 +664,7 @@ test('processAuthorizationCodeOpenIDResponse() nonce checks', async (t) => {
       tIssuer,
       client,
       getResponse(
-        j({
+        JSON.stringify({
           access_token: 'token',
           token_type: 'Bearer',
           id_token: await new jose.SignJWT({
@@ -682,7 +689,7 @@ test('processAuthorizationCodeOpenIDResponse() nonce checks', async (t) => {
       tIssuer,
       client,
       getResponse(
-        j({
+        JSON.stringify({
           access_token: 'token',
           token_type: 'Bearer',
           id_token: await new jose.SignJWT({})
@@ -706,7 +713,7 @@ test('processAuthorizationCodeOpenIDResponse() nonce checks', async (t) => {
         tIssuer,
         client,
         getResponse(
-          j({
+          JSON.stringify({
             access_token: 'token',
             token_type: 'Bearer',
             id_token: await new jose.SignJWT({})
@@ -730,7 +737,7 @@ test('processAuthorizationCodeOpenIDResponse() nonce checks', async (t) => {
       tIssuer,
       client,
       getResponse(
-        j({
+        JSON.stringify({
           access_token: 'token',
           token_type: 'Bearer',
           id_token: await new jose.SignJWT({ nonce: 'random-value' })

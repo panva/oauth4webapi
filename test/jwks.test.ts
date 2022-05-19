@@ -2,7 +2,6 @@ import anyTest, { type TestFn } from 'ava'
 import setup, { issuer, endpoint, type Context, teardown, getResponse } from './_setup.js'
 import * as lib from '../src/index.js'
 
-const j = JSON.stringify
 const test = anyTest as TestFn<Context>
 
 test.before(setup)
@@ -65,20 +64,23 @@ test('processJwksResponse()', async (t) => {
   await t.throwsAsync(lib.processJwksResponse(getResponse('{"')), {
     message: 'failed to parse "response" body as JSON',
   })
-  await t.throwsAsync(lib.processJwksResponse(getResponse(j({ keys: [] }), { status: 404 })), {
-    message: '"response" is not a conform JSON Web Key Set response',
-  })
-  await t.throwsAsync(lib.processJwksResponse(getResponse(j([]))), {
+  await t.throwsAsync(
+    lib.processJwksResponse(getResponse(JSON.stringify({ keys: [] }), { status: 404 })),
+    {
+      message: '"response" is not a conform JSON Web Key Set response',
+    },
+  )
+  await t.throwsAsync(lib.processJwksResponse(getResponse(JSON.stringify([]))), {
     message: '"response" body must be a top level object',
   })
-  await t.throwsAsync(lib.processJwksResponse(getResponse(j({ keys: {} }))), {
+  await t.throwsAsync(lib.processJwksResponse(getResponse(JSON.stringify({ keys: {} }))), {
     message: '"response" body "keys" property must be an array',
   })
-  await t.throwsAsync(lib.processJwksResponse(getResponse(j({ keys: [null] }))), {
+  await t.throwsAsync(lib.processJwksResponse(getResponse(JSON.stringify({ keys: [null] }))), {
     message: '"response" body "keys" property members must be JWK formatted objects',
   })
   await t.notThrowsAsync(async () => {
-    const response = getResponse(j({ keys: [] }))
+    const response = getResponse(JSON.stringify({ keys: [] }))
     await lib.processJwksResponse(response)
     t.false(response.bodyUsed)
   })

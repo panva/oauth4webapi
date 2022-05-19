@@ -11,7 +11,6 @@ import setup, {
 import * as lib from '../src/index.js'
 import * as jose from 'jose'
 
-const j = JSON.stringify
 const test = anyTest as TestFn<Context & { es256: CryptoKeyPair; rs256: CryptoKeyPair }>
 
 test.before(setup)
@@ -120,33 +119,41 @@ test('processUserInfoResponse() - json', async (t) => {
       tIssuer,
       client,
       'sub',
-      getResponse(j({ sub: 'urn:example:subject' }), { status: 404 }),
+      getResponse(JSON.stringify({ sub: 'urn:example:subject' }), { status: 404 }),
     ),
     {
       message: '"response" is not a conform UserInfo Endpoint response',
     },
   )
-  await t.throwsAsync(lib.processUserInfoResponse(tIssuer, client, 'sub', getResponse(j([]))), {
-    message: '"response" body must be a top level object',
-  })
   await t.throwsAsync(
-    lib.processUserInfoResponse(tIssuer, client, 'sub', getResponse(j({ sub: 2321678 }))),
+    lib.processUserInfoResponse(tIssuer, client, 'sub', getResponse(JSON.stringify([]))),
+    {
+      message: '"response" body must be a top level object',
+    },
+  )
+  await t.throwsAsync(
+    lib.processUserInfoResponse(
+      tIssuer,
+      client,
+      'sub',
+      getResponse(JSON.stringify({ sub: 2321678 })),
+    ),
     {
       message: '"response" body "sub" property must be a non-empty string',
     },
   )
   await t.notThrowsAsync(async () => {
-    const response = getResponse(j({ sub: 'urn:example:subject' }))
+    const response = getResponse(JSON.stringify({ sub: 'urn:example:subject' }))
     await lib.processUserInfoResponse(tIssuer, client, 'urn:example:subject', response)
     t.false(response.bodyUsed)
   })
   await t.notThrowsAsync(async () => {
-    const response = getResponse(j({ sub: 'urn:example:subject' }))
+    const response = getResponse(JSON.stringify({ sub: 'urn:example:subject' }))
     await lib.processUserInfoResponse(tIssuer, client, lib.skipSubjectCheck, response)
   })
   await t.throwsAsync(
     async () => {
-      const response = getResponse(j({ sub: 'urn:example:subject' }))
+      const response = getResponse(JSON.stringify({ sub: 'urn:example:subject' }))
       await lib.processUserInfoResponse(tIssuer, client, <any>null, response)
       t.false(response.bodyUsed)
     },
@@ -154,14 +161,14 @@ test('processUserInfoResponse() - json', async (t) => {
   )
   await t.throwsAsync(
     async () => {
-      const response = getResponse(j({ sub: 'urn:example:different-subject' }))
+      const response = getResponse(JSON.stringify({ sub: 'urn:example:different-subject' }))
       await lib.processUserInfoResponse(tIssuer, client, 'urn:example:subject', response)
     },
     { message: 'unexpected "response" body "sub" value' },
   )
   await t.throwsAsync(
     async () => {
-      const response = getResponse(j({ sub: 'urn:example:subject' }))
+      const response = getResponse(JSON.stringify({ sub: 'urn:example:subject' }))
       await lib.processUserInfoResponse(
         tIssuer,
         { ...client, userinfo_signed_response_alg: 'ES256' },

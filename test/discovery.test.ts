@@ -2,7 +2,6 @@ import anyTest, { type TestFn } from 'ava'
 import setup, { type Context, teardown, issuer, getResponse, UA } from './_setup.js'
 import * as lib from '../src/index.js'
 
-const j = JSON.stringify
 const test = anyTest as TestFn<Context>
 
 test.before(setup)
@@ -113,14 +112,17 @@ test('processDiscoveryResponse()', async (t) => {
     message: '"response" body must be a top level object',
   })
 
-  await t.throwsAsync(lib.processDiscoveryResponse(expected, getResponse(j({ issuer: null }))), {
-    message: '"response" body "issuer" property must be a non-empty string',
-  })
+  await t.throwsAsync(
+    lib.processDiscoveryResponse(expected, getResponse(JSON.stringify({ issuer: null }))),
+    {
+      message: '"response" body "issuer" property must be a non-empty string',
+    },
+  )
 
   await t.throwsAsync(
     lib.processDiscoveryResponse(
       expected,
-      getResponse(j({ issuer: 'https://another-op.example.com' })),
+      getResponse(JSON.stringify({ issuer: 'https://another-op.example.com' })),
     ),
     { message: '"response" body "issuer" does not match "expectedIssuer"' },
   )
@@ -128,7 +130,7 @@ test('processDiscoveryResponse()', async (t) => {
   t.deepEqual(
     await lib.processDiscoveryResponse(
       expected,
-      getResponse(j({ issuer: 'https://op.example.com' })),
+      getResponse(JSON.stringify({ issuer: 'https://op.example.com' })),
     ),
     {
       issuer: 'https://op.example.com',

@@ -11,7 +11,6 @@ import setup, {
 import * as jose from 'jose'
 import * as lib from '../src/index.js'
 
-const j = JSON.stringify
 const test = anyTest as TestFn<Context & { es256: CryptoKeyPair; rs256: CryptoKeyPair }>
 
 test.before(setup)
@@ -165,13 +164,21 @@ test('processRefreshTokenResponse() without ID Tokens', async (t) => {
     message: '"response" body must be a top level object',
   })
   await t.throwsAsync(
-    lib.processRefreshTokenResponse(issuer, client, getResponse(j({ token_type: 'Bearer' }))),
+    lib.processRefreshTokenResponse(
+      issuer,
+      client,
+      getResponse(JSON.stringify({ token_type: 'Bearer' })),
+    ),
     {
       message: '"response" body "access_token" property must be a non-empty string',
     },
   )
   await t.throwsAsync(
-    lib.processRefreshTokenResponse(issuer, client, getResponse(j({ access_token: 'token' }))),
+    lib.processRefreshTokenResponse(
+      issuer,
+      client,
+      getResponse(JSON.stringify({ access_token: 'token' })),
+    ),
     {
       message: '"response" body "token_type" property must be a non-empty string',
     },
@@ -181,7 +188,11 @@ test('processRefreshTokenResponse() without ID Tokens', async (t) => {
       issuer,
       client,
       getResponse(
-        j({ access_token: 'token', token_type: 'Bearer', expires_in: new Date().toUTCString() }),
+        JSON.stringify({
+          access_token: 'token',
+          token_type: 'Bearer',
+          expires_in: new Date().toUTCString(),
+        }),
       ),
     ),
     {
@@ -192,7 +203,7 @@ test('processRefreshTokenResponse() without ID Tokens', async (t) => {
     lib.processRefreshTokenResponse(
       issuer,
       client,
-      getResponse(j({ access_token: 'token', token_type: 'Bearer', scope: null })),
+      getResponse(JSON.stringify({ access_token: 'token', token_type: 'Bearer', scope: null })),
     ),
     {
       message: '"response" body "scope" property must be a non-empty string',
@@ -202,7 +213,9 @@ test('processRefreshTokenResponse() without ID Tokens', async (t) => {
     lib.processRefreshTokenResponse(
       issuer,
       client,
-      getResponse(j({ access_token: 'token', token_type: 'Bearer', refresh_token: null })),
+      getResponse(
+        JSON.stringify({ access_token: 'token', token_type: 'Bearer', refresh_token: null }),
+      ),
     ),
     {
       message: '"response" body "refresh_token" property must be a non-empty string',
@@ -212,7 +225,7 @@ test('processRefreshTokenResponse() without ID Tokens', async (t) => {
     lib.processRefreshTokenResponse(
       issuer,
       client,
-      getResponse(j({ access_token: 'token', token_type: 'Bearer', id_token: null })),
+      getResponse(JSON.stringify({ access_token: 'token', token_type: 'Bearer', id_token: null })),
     ),
     {
       message: '"response" body "id_token" property must be a non-empty string',
@@ -224,7 +237,7 @@ test('processRefreshTokenResponse() without ID Tokens', async (t) => {
       issuer,
       client,
       getResponse(
-        j({
+        JSON.stringify({
           access_token: 'token',
           token_type: 'Bearer',
           expires_in: 60,
@@ -247,7 +260,7 @@ test('processRefreshTokenResponse() without ID Tokens', async (t) => {
       await lib.processRefreshTokenResponse(
         issuer,
         client,
-        getResponse(j({ error: 'invalid_grant' }), { status: 400 }),
+        getResponse(JSON.stringify({ error: 'invalid_grant' }), { status: 400 }),
       ),
     ),
   )
@@ -257,7 +270,7 @@ test('processRefreshTokenResponse() without ID Tokens', async (t) => {
       await lib.processRefreshTokenResponse(
         issuer,
         client,
-        getResponse(j({ access_token: 'token', token_type: 'Bearer' })),
+        getResponse(JSON.stringify({ access_token: 'token', token_type: 'Bearer' })),
       ),
     ),
   )
@@ -269,7 +282,9 @@ test('processRefreshTokenResponse() with an ID Token (alg signalled)', async (t)
     lib.processRefreshTokenResponse(
       issuer,
       client,
-      getResponse(j({ access_token: 'token', token_type: 'Bearer', id_token: 'id_token' })),
+      getResponse(
+        JSON.stringify({ access_token: 'token', token_type: 'Bearer', id_token: 'id_token' }),
+      ),
     ),
     {
       message: '"issuer.jwks_uri" must be a string',
@@ -282,7 +297,7 @@ test('processRefreshTokenResponse() with an ID Token (alg signalled)', async (t)
         { ...tIssuer, id_token_signing_alg_values_supported: ['ES256'] },
         client,
         getResponse(
-          j({
+          JSON.stringify({
             access_token: 'token',
             token_type: 'Bearer',
             id_token: await new jose.SignJWT({})
@@ -319,7 +334,7 @@ test('processRefreshTokenResponse() with an ID Token (alg specified)', async (t)
       tIssuer,
       { ...client, id_token_signed_response_alg: 'ES256' },
       getResponse(
-        j({
+        JSON.stringify({
           access_token: 'token',
           token_type: 'Bearer',
           id_token: await new jose.SignJWT({})
@@ -344,7 +359,7 @@ test('processRefreshTokenResponse() with an ID Token (alg default)', async (t) =
       tIssuer,
       client,
       getResponse(
-        j({
+        JSON.stringify({
           access_token: 'token',
           token_type: 'Bearer',
           id_token: await new jose.SignJWT({})
@@ -369,7 +384,7 @@ test('processRefreshTokenResponse() with an ID Token w/ at_hash', async (t) => {
       tIssuer,
       client,
       getResponse(
-        j({
+        JSON.stringify({
           access_token:
             'YmJiZTAwYmYtMzgyOC00NzhkLTkyOTItNjJjNDM3MGYzOWIy9sFhvH8K_x8UIHj1osisS57f5DduL-ar_qw5jl3lthwpMjm283aVMQXDmoqqqydDSqJfbhptzw8rUVwkuQbolw',
           token_type: 'Bearer',
@@ -393,7 +408,7 @@ test('processRefreshTokenResponse() with an ID Token w/ at_hash', async (t) => {
       tIssuer,
       client,
       getResponse(
-        j({
+        JSON.stringify({
           access_token:
             'YmJiZTAwYmYtMzgyOC00NzhkLTkyOTItNjJjNDM3MGYzOWIy9sFhvH8K_x8UIHj1osisS57f5DduL-ar_qw5jl3lthwpMjm283aVMQXDmoqqqydDSqJfbhptzw8rUVwkuQbolw',
           token_type: 'Bearer',

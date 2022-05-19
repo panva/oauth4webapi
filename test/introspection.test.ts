@@ -11,7 +11,6 @@ import setup, {
 import * as jose from 'jose'
 import * as lib from '../src/index.js'
 
-const j = JSON.stringify
 const test = anyTest as TestFn<Context & { es256: CryptoKeyPair; rs256: CryptoKeyPair }>
 
 test.before(setup)
@@ -221,14 +220,22 @@ test('processIntrospectionResponse()', async (t) => {
   })
 
   await t.throwsAsync(
-    lib.processIntrospectionResponse(issuer, client, getResponse(j({ token_type: 'Bearer' }))),
+    lib.processIntrospectionResponse(
+      issuer,
+      client,
+      getResponse(JSON.stringify({ token_type: 'Bearer' })),
+    ),
     {
       message: '"response" body "active" property must be a boolean',
     },
   )
 
   t.deepEqual(
-    await lib.processIntrospectionResponse(issuer, client, getResponse(j({ active: false }))),
+    await lib.processIntrospectionResponse(
+      issuer,
+      client,
+      getResponse(JSON.stringify({ active: false })),
+    ),
     {
       active: false,
     },
@@ -239,14 +246,18 @@ test('processIntrospectionResponse()', async (t) => {
       await lib.processIntrospectionResponse(
         issuer,
         client,
-        getResponse(j({ error: 'invalid_client' }), { status: 401 }),
+        getResponse(JSON.stringify({ error: 'invalid_client' }), { status: 401 }),
       ),
     ),
   )
 
   t.false(
     lib.isOAuth2Error(
-      await lib.processIntrospectionResponse(issuer, client, getResponse(j({ active: false }))),
+      await lib.processIntrospectionResponse(
+        issuer,
+        client,
+        getResponse(JSON.stringify({ active: false })),
+      ),
     ),
   )
 })

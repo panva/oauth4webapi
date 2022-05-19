@@ -10,7 +10,6 @@ import setup, {
 } from './_setup.js'
 import * as lib from '../src/index.js'
 
-const j = JSON.stringify
 const test = anyTest as TestFn<Context>
 
 test.before(setup)
@@ -143,13 +142,21 @@ test('processClientCredentialsResponse()', async (t) => {
     message: '"response" body must be a top level object',
   })
   await t.throwsAsync(
-    lib.processClientCredentialsResponse(issuer, client, getResponse(j({ token_type: 'Bearer' }))),
+    lib.processClientCredentialsResponse(
+      issuer,
+      client,
+      getResponse(JSON.stringify({ token_type: 'Bearer' })),
+    ),
     {
       message: '"response" body "access_token" property must be a non-empty string',
     },
   )
   await t.throwsAsync(
-    lib.processClientCredentialsResponse(issuer, client, getResponse(j({ access_token: 'token' }))),
+    lib.processClientCredentialsResponse(
+      issuer,
+      client,
+      getResponse(JSON.stringify({ access_token: 'token' })),
+    ),
     {
       message: '"response" body "token_type" property must be a non-empty string',
     },
@@ -159,7 +166,11 @@ test('processClientCredentialsResponse()', async (t) => {
       issuer,
       client,
       getResponse(
-        j({ access_token: 'token', token_type: 'Bearer', expires_in: new Date().toUTCString() }),
+        JSON.stringify({
+          access_token: 'token',
+          token_type: 'Bearer',
+          expires_in: new Date().toUTCString(),
+        }),
       ),
     ),
     {
@@ -171,7 +182,7 @@ test('processClientCredentialsResponse()', async (t) => {
     await lib.processClientCredentialsResponse(
       issuer,
       client,
-      getResponse(j({ access_token: 'token', token_type: 'Bearer', expires_in: 60 })),
+      getResponse(JSON.stringify({ access_token: 'token', token_type: 'Bearer', expires_in: 60 })),
     ),
     {
       access_token: 'token',
@@ -185,7 +196,7 @@ test('processClientCredentialsResponse()', async (t) => {
       await lib.processClientCredentialsResponse(
         issuer,
         client,
-        getResponse(j({ error: 'invalid_grant' }), { status: 400 }),
+        getResponse(JSON.stringify({ error: 'invalid_grant' }), { status: 400 }),
       ),
     ),
   )
@@ -195,7 +206,7 @@ test('processClientCredentialsResponse()', async (t) => {
       await lib.processClientCredentialsResponse(
         issuer,
         client,
-        getResponse(j({ access_token: 'token', token_type: 'Bearer' })),
+        getResponse(JSON.stringify({ access_token: 'token', token_type: 'Bearer' })),
       ),
     ),
   )

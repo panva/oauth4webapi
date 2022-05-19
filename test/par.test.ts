@@ -10,7 +10,6 @@ import setup, {
 } from './_setup.js'
 import * as lib from '../src/index.js'
 
-const j = JSON.stringify
 const test = anyTest as TestFn<Context & { es256: CryptoKeyPair; rs256: CryptoKeyPair }>
 
 test.before(setup)
@@ -171,7 +170,7 @@ test('processPushedAuthorizationResponse()', async (t) => {
     lib.processPushedAuthorizationResponse(
       issuer,
       client,
-      getResponse(j({ request_uri: null, expires_in: 60 }), { status: 201 }),
+      getResponse(JSON.stringify({ request_uri: null, expires_in: 60 }), { status: 201 }),
     ),
     {
       message: '"response" body "request_uri" property must be a non-empty string',
@@ -182,7 +181,9 @@ test('processPushedAuthorizationResponse()', async (t) => {
     lib.processPushedAuthorizationResponse(
       issuer,
       client,
-      getResponse(j({ request_uri: 'urn:example:uri', expires_in: null }), { status: 201 }),
+      getResponse(JSON.stringify({ request_uri: 'urn:example:uri', expires_in: null }), {
+        status: 201,
+      }),
     ),
     {
       message: '"response" body "expires_in" property must be a positive number',
@@ -193,7 +194,9 @@ test('processPushedAuthorizationResponse()', async (t) => {
     await lib.processPushedAuthorizationResponse(
       issuer,
       client,
-      getResponse(j({ request_uri: 'urn:example:uri', expires_in: 60 }), { status: 201 }),
+      getResponse(JSON.stringify({ request_uri: 'urn:example:uri', expires_in: 60 }), {
+        status: 201,
+      }),
     ),
     { request_uri: 'urn:example:uri', expires_in: 60 },
   )
@@ -203,7 +206,7 @@ test('processPushedAuthorizationResponse()', async (t) => {
       await lib.processPushedAuthorizationResponse(
         issuer,
         client,
-        getResponse(j({ error: 'invalid_client' }), { status: 401 }),
+        getResponse(JSON.stringify({ error: 'invalid_client' }), { status: 401 }),
       ),
     ),
   )
@@ -213,7 +216,9 @@ test('processPushedAuthorizationResponse()', async (t) => {
       await lib.processPushedAuthorizationResponse(
         issuer,
         client,
-        getResponse(j({ request_uri: 'urn:example:uri', expires_in: 60 }), { status: 201 }),
+        getResponse(JSON.stringify({ request_uri: 'urn:example:uri', expires_in: 60 }), {
+          status: 201,
+        }),
       ),
     ),
   )

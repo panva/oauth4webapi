@@ -10,7 +10,6 @@ import setup, {
 } from './_setup.js'
 import * as lib from '../src/index.js'
 
-const j = JSON.stringify
 const test = anyTest as TestFn<Context>
 
 test.before(setup)
@@ -115,7 +114,7 @@ test('processRevocationResponse()', async (t) => {
   t.true(
     lib.isOAuth2Error(
       await lib.processRevocationResponse(
-        getResponse(j({ error: 'invalid_client' }), { status: 401 }),
+        getResponse(JSON.stringify({ error: 'invalid_client' }), { status: 401 }),
       ),
     ),
   )
