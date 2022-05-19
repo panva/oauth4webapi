@@ -1,5 +1,5 @@
 const NAME = 'oauth4webapi'
-const VERSION = 'v1.0.1'
+const VERSION = 'v1.0.2'
 const USER_AGENT = `${NAME}/${VERSION}`
 
 export type JsonObject = { [Key in string]?: JsonValue }
