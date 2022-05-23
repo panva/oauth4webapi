@@ -1249,7 +1249,7 @@ async function jwt(
   claimsSet: Record<string, unknown>,
   key: CryptoKey,
 ) {
-  if (key.usages.includes('sign') === false) {
+  if (!key.usages.includes('sign')) {
     throw new TypeError(
       'private CryptoKey instances used for signing assertions must include "sign" in their "usages"',
     )
@@ -1345,7 +1345,7 @@ async function dpopProofJwt(
     throw new TypeError('"DPoP.nonce" must be a non-empty string or undefined')
   }
 
-  if (publicKey.extractable !== true) {
+  if (!publicKey.extractable) {
     throw new TypeError('"DPoP.publicKey.extractable" must be true')
   }
 
@@ -1419,7 +1419,7 @@ export async function pushedAuthorizationRequest(
 
   if (options?.DPoP !== undefined) {
     await dpopProofJwt(headers, options.DPoP, url, 'POST')
-    if (body.has('dpop_jkt') === false) {
+    if (!body.has('dpop_jkt')) {
       body.set('dpop_jkt', await calculateJwkThumbprint(options.DPoP.publicKey))
     }
   }
@@ -1493,7 +1493,7 @@ const SCHEMES_REGEXP = /(?:^|, ?)([0-9a-zA-Z!#$%&'*+\-.^_`|~]+)(?=$|[ ,])/g
 
 function wwwAuth(scheme: string, params: string): WWWAuthenticateChallenge {
   const arr = params.split(SPLIT_REGEXP).slice(1)
-  if (arr.length === 0) {
+  if (!arr.length) {
     return { scheme: scheme.toLowerCase(), parameters: {} }
   }
   arr[arr.length - 1] = arr[arr.length - 1].replace(/,$/, '')
@@ -1533,7 +1533,7 @@ export function parseWwwAuthenticateChallenges(
     throw new TypeError('"response" must be an instance of Response')
   }
 
-  if (response.headers.has('www-authenticate') === false) {
+  if (!response.headers.has('www-authenticate')) {
     return undefined
   }
 
@@ -1544,7 +1544,7 @@ export function parseWwwAuthenticateChallenges(
     result.push([scheme, index!])
   }
 
-  if (result.length === 0) {
+  if (!result.length) {
     return undefined
   }
 
@@ -1836,7 +1836,7 @@ async function getPublicSigKeyFromIssuerJwksUri(
 
   const { 0: jwk, length } = candidates
 
-  if (length === 0) {
+  if (!length) {
     if (age >= 60) {
       // allow re-fetch if cache is at least 1 minute old
       jwksCache.delete(as.jwks_uri!)
@@ -2196,7 +2196,7 @@ async function processGenericAccessTokenResponse(
     throw new OPE('"response" body "scope" property must be a non-empty string')
   }
 
-  if (ignoreIdToken === false) {
+  if (!ignoreIdToken) {
     if (
       json.id_token !== undefined &&
       (typeof json.id_token !== 'string' || json.id_token.length === 0)
@@ -2233,7 +2233,7 @@ async function processGenericAccessTokenResponse(
       if (claims.at_hash !== undefined) {
         if (
           typeof claims.at_hash !== 'string' ||
-          (await idTokenHashMatches(header.alg, json.access_token, claims.at_hash)) !== true
+          !(await idTokenHashMatches(header.alg, json.access_token, claims.at_hash))
         ) {
           throw new OPE('invalid ID Token "at_hash"')
         }
@@ -2281,7 +2281,7 @@ function validateOptionalAudience(expected: string, result: ParsedJWT) {
 
 function validateAudience(expected: string, result: ParsedJWT) {
   if (Array.isArray(result.claims.aud)) {
-    if (result.claims.aud.includes(expected) === false) {
+    if (!result.claims.aud.includes(expected)) {
       throw new OPE('unexpected JWT "aud" (audience)')
     }
   } else if (result.claims.aud !== expected) {
@@ -2796,7 +2796,7 @@ export interface IntrospectionRequestOptions
 }
 
 function assertReadableResponse(response: Response) {
-  if (response.bodyUsed === true) {
+  if (response.bodyUsed) {
     throw new TypeError('"response" body has been used already')
   }
 }
@@ -3080,7 +3080,7 @@ async function handleOAuthBodyError(response: Response): Promise<OAuth2Error | u
 }
 
 function checkSupportedJwsAlg(alg: unknown) {
-  if (SUPPORTED_JWS_ALGS.includes(<any>alg) === false) {
+  if (!SUPPORTED_JWS_ALGS.includes(<any>alg)) {
     throw new UnsupportedOperationError('unsupported JWS "alg" identifier')
   }
   return <JWSAlgorithm>alg
@@ -3148,7 +3148,7 @@ async function validateJwt(
     b64u(signature),
     buf(input),
   )
-  if (verified !== true) {
+  if (!verified) {
     throw new OPE('JWT signature verification failed')
   }
 
@@ -3287,7 +3287,7 @@ function checkSigningAlgorithm(
   }
 
   if (Array.isArray(issuer)) {
-    if (issuer.includes(header.alg) === false) {
+    if (!issuer.includes(header.alg)) {
       throw new OPE('unexpected JWT "alg" header parameter')
     }
     return
@@ -3373,7 +3373,7 @@ export function validateAuthResponse(
   const iss = getURLSearchParameter(parameters, 'iss')
   const state = getURLSearchParameter(parameters, 'state')
 
-  if (!iss && as.authorization_response_iss_parameter_supported === true) {
+  if (!iss && as.authorization_response_iss_parameter_supported) {
     throw new OPE('"iss" issuer parameter expected')
   }
 
@@ -3722,7 +3722,7 @@ export async function generateKeyPair(
  * @ignore
  */
 export async function calculateJwkThumbprint(key: CryptoKey) {
-  if (!isPublicKey(key) || key.extractable !== true) {
+  if (!isPublicKey(key) || !key.extractable) {
     throw new TypeError('"key" must be an extractable public CryptoKey')
   }
 
