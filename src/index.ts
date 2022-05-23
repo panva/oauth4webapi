@@ -2,9 +2,21 @@ const NAME = 'oauth4webapi'
 const VERSION = 'v1.0.2'
 const USER_AGENT = `${NAME}/${VERSION}`
 
+/**
+ * @ignore
+ */
 export type JsonObject = { [Key in string]?: JsonValue }
+/**
+ * @ignore
+ */
 export type JsonArray = JsonValue[]
+/**
+ * @ignore
+ */
 export type JsonPrimitive = string | number | boolean | null
+/**
+ * @ignore
+ */
 export type JsonValue = JsonPrimitive | JsonObject | JsonArray
 
 /**
@@ -94,6 +106,8 @@ export type JWSAlgorithm = 'PS256' | 'ES256' | 'RS256'
 
 /**
  * JSON Web Key
+ *
+ * @ignore
  */
 export interface JWK {
   /**
@@ -2937,6 +2951,9 @@ export async function processIntrospectionResponse(
   return <IntrospectionResponse>json
 }
 
+/**
+ * @ignore
+ */
 export interface JwksRequestOptions extends HttpRequestOptions {}
 
 /**
@@ -2952,6 +2969,8 @@ export interface JwksRequestOptions extends HttpRequestOptions {}
  * @returns Resolves with
  * {@link https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API Fetch API}'s
  * {@link https://developer.mozilla.org/en-US/docs/Web/API/Response Response}.
+ *
+ * @ignore
  */
 export async function jwksRequest(
   as: AuthorizationServer,
@@ -2979,6 +2998,8 @@ export async function jwksRequest(
 
 /**
  * JSON Web Key Set
+ *
+ * @ignore
  */
 export interface JsonWebKeySet {
   /**
@@ -2998,6 +3019,8 @@ export interface JsonWebKeySet {
  * @param response Resolved value from {@link jwksRequest}.
  *
  * @returns Resolves with an object representing the parsed successful response.
+ *
+ * @ignore
  */
 export async function processJwksResponse(response: Response): Promise<JsonWebKeySet> {
   if (!(response instanceof Response)) {
@@ -3693,6 +3716,8 @@ export async function generateKeyPair(
  * {@link https://developer.mozilla.org/en-US/docs/Web/API/CryptoKey CryptoKey}.
  *
  * @see {@link https://www.rfc-editor.org/rfc/rfc7638.html RFC 7638 - JSON Web Key (JWK) Thumbprint}
+ *
+ * @ignore
  */
 export async function calculateJwkThumbprint(key: CryptoKey) {
   if (!isPublicKey(key) || key.extractable !== true) {

@@ -7,7 +7,6 @@
 ### Functions
 
 - [authorizationCodeGrantRequest](functions/authorizationCodeGrantRequest.md)
-- [calculateJwkThumbprint](functions/calculateJwkThumbprint.md)
 - [calculatePKCECodeChallenge](functions/calculatePKCECodeChallenge.md)
 - [clientCredentialsGrantRequest](functions/clientCredentialsGrantRequest.md)
 - [deviceAuthorizationRequest](functions/deviceAuthorizationRequest.md)
@@ -21,7 +20,6 @@
 - [introspectionRequest](functions/introspectionRequest.md)
 - [isOAuth2Error](functions/isOAuth2Error.md)
 - [issueRequestObject](functions/issueRequestObject.md)
-- [jwksRequest](functions/jwksRequest.md)
 - [parseWwwAuthenticateChallenges](functions/parseWwwAuthenticateChallenges.md)
 - [processAuthorizationCodeOAuth2Response](functions/processAuthorizationCodeOAuth2Response.md)
 - [processAuthorizationCodeOpenIDResponse](functions/processAuthorizationCodeOpenIDResponse.md)
@@ -30,7 +28,6 @@
 - [processDeviceCodeResponse](functions/processDeviceCodeResponse.md)
 - [processDiscoveryResponse](functions/processDiscoveryResponse.md)
 - [processIntrospectionResponse](functions/processIntrospectionResponse.md)
-- [processJwksResponse](functions/processJwksResponse.md)
 - [processPushedAuthorizationResponse](functions/processPushedAuthorizationResponse.md)
 - [processRefreshTokenResponse](functions/processRefreshTokenResponse.md)
 - [processRevocationResponse](functions/processRevocationResponse.md)
@@ -65,9 +62,6 @@
 - [IDToken](interfaces/IDToken.md)
 - [IntrospectionRequestOptions](interfaces/IntrospectionRequestOptions.md)
 - [IntrospectionResponse](interfaces/IntrospectionResponse.md)
-- [JWK](interfaces/JWK.md)
-- [JsonWebKeySet](interfaces/JsonWebKeySet.md)
-- [JwksRequestOptions](interfaces/JwksRequestOptions.md)
 - [MTLSEndpointAliases](interfaces/MTLSEndpointAliases.md)
 - [OAuth2Error](interfaces/OAuth2Error.md)
 - [OAuth2TokenEndpointResponse](interfaces/OAuth2TokenEndpointResponse.md)
@@ -87,10 +81,6 @@
 
 - [ClientAuthenticationMethod](types/ClientAuthenticationMethod.md)
 - [JWSAlgorithm](types/JWSAlgorithm.md)
-- [JsonArray](types/JsonArray.md)
-- [JsonObject](types/JsonObject.md)
-- [JsonPrimitive](types/JsonPrimitive.md)
-- [JsonValue](types/JsonValue.md)
 - [ProcessingMode](types/ProcessingMode.md)
 
 ### Variables
