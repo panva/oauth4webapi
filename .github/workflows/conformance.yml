@@ -121,7 +121,9 @@ jobs:
         with:
           node-version: 18
       - run: npm clean-install
-      - run: npm run conformance | tee capture.txt
+      - run: |
+          set -o pipefail
+          npm run conformance | tee capture.txt
         env:
           NODE_TLS_REJECT_UNAUTHORIZED: 0
           SUITE_BASE_URL: https://localhost.emobix.co.uk:8443
