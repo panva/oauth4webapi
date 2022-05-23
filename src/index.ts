@@ -852,6 +852,10 @@ export async function discoveryRequest(
   }).then(processDpopNonce)
 }
 
+function validateString(input: unknown): input is string {
+  return typeof input === 'string' && input.length !== 0
+}
+
 /**
  * Validates
  * {@link https://developer.mozilla.org/en-US/docs/Web/API/Response Fetch API Response}
@@ -892,7 +896,7 @@ export async function processDiscoveryResponse(
     throw new OPE('"response" body must be a top level object')
   }
 
-  if (typeof json.issuer !== 'string' || json.issuer.length === 0) {
+  if (!validateString(json.issuer)) {
     throw new OPE('"response" body "issuer" property must be a non-empty string')
   }
 
@@ -948,7 +952,7 @@ export function generateRandomNonce() {
  * {@link generateRandomCodeVerifier}.
  */
 export async function calculatePKCECodeChallenge(codeVerifier: string) {
-  if (typeof codeVerifier !== 'string' || codeVerifier.length === 0) {
+  if (!validateString(codeVerifier)) {
     throw new TypeError('"codeVerifier" must be a non-empty string')
   }
 
@@ -969,7 +973,7 @@ function getKeyAndKid(input: CryptoKey | PrivateKey | undefined): NormalizedKeyI
     return {}
   }
 
-  if (input.kid !== undefined && (typeof input.kid !== 'string' || input.kid.length === 0)) {
+  if (input.kid !== undefined && !validateString(input.kid)) {
     throw new TypeError('"kid" must be a non-empty string')
   }
 
@@ -1143,7 +1147,7 @@ function assertIssuer(metadata: AuthorizationServer): metadata is AuthorizationS
     throw new TypeError('"issuer" must be an object')
   }
 
-  if (typeof metadata.issuer !== 'string' || metadata.issuer.length === 0) {
+  if (!validateString(metadata.issuer)) {
     throw new TypeError('"issuer.issuer" property must be a non-empty string')
   }
   return true
@@ -1154,14 +1158,14 @@ function assertClient(metadata: Client): metadata is Client {
     throw new TypeError('"client" must be an object')
   }
 
-  if (typeof metadata.client_id !== 'string' || metadata.client_id.length === 0) {
+  if (!validateString(metadata.client_id)) {
     throw new TypeError('"client.client_id" property must be a non-empty string')
   }
   return true
 }
 
 function assertClientSecret(clientSecret: unknown) {
-  if (typeof clientSecret !== 'string' || clientSecret.length === 0) {
+  if (!validateString(clientSecret)) {
     throw new TypeError('"client.client_secret" property must be a non-empty string')
   }
   return clientSecret
@@ -1341,7 +1345,7 @@ async function dpopProofJwt(
     throw new TypeError('"DPoP.publicKey" must be a public CryptoKey')
   }
 
-  if (nonce !== undefined && (typeof nonce !== 'string' || nonce.length === 0)) {
+  if (nonce !== undefined && !validateString(nonce)) {
     throw new TypeError('"DPoP.nonce" must be a non-empty string or undefined')
   }
 
@@ -1609,7 +1613,7 @@ export async function processPushedAuthorizationResponse(
     throw new OPE('"response" body must be a top level object')
   }
 
-  if (typeof json.request_uri !== 'string' || json.request_uri.length === 0) {
+  if (!validateString(json.request_uri)) {
     throw new OPE('"response" body "request_uri" property must be a non-empty string')
   }
 
@@ -1651,7 +1655,7 @@ export async function protectedResourceRequest(
   body: RequestInit['body'],
   options?: ProtectedResourceRequestOptions,
 ): Promise<Response> {
-  if (typeof accessToken !== 'string' || accessToken.length === 0) {
+  if (!validateString(accessToken)) {
     throw new TypeError('"accessToken" must be a non-empty string')
   }
 
@@ -1949,7 +1953,7 @@ export async function processUserInfoResponse(
     throw new OPE('"response" body must be a top level object')
   }
 
-  if (typeof json.sub !== 'string' || json.sub.length === 0) {
+  if (!validateString(json.sub)) {
     throw new OPE('"response" body "sub" property must be a non-empty string')
   }
 
@@ -1957,7 +1961,7 @@ export async function processUserInfoResponse(
     case skipSubjectCheck:
       break
     default:
-      if (typeof expectedSubject !== 'string' || expectedSubject.length === 0) {
+      if (!validateString(expectedSubject)) {
         throw new OPE('"expectedSubject" must be a non-empty string')
       }
       if (json.sub !== expectedSubject) {
@@ -2083,7 +2087,7 @@ export async function refreshTokenGrantRequest(
   assertIssuer(as)
   assertClient(client)
 
-  if (typeof refreshToken !== 'string' || refreshToken.length === 0) {
+  if (!validateString(refreshToken)) {
     throw new TypeError('"refreshToken" must be a non-empty string')
   }
 
@@ -2162,11 +2166,11 @@ async function processGenericAccessTokenResponse(
     throw new OPE('"response" body must be a top level object')
   }
 
-  if (typeof json.access_token !== 'string' || json.access_token.length === 0) {
+  if (!validateString(json.access_token)) {
     throw new OPE('"response" body "access_token" property must be a non-empty string')
   }
 
-  if (typeof json.token_type !== 'string' || json.token_type.length === 0) {
+  if (!validateString(json.token_type)) {
     throw new OPE('"response" body "token_type" property must be a non-empty string')
   }
 
@@ -2185,22 +2189,19 @@ async function processGenericAccessTokenResponse(
   }
 
   if (
-    ignoreRefreshToken === false &&
+    !ignoreRefreshToken &&
     json.refresh_token !== undefined &&
-    (typeof json.refresh_token !== 'string' || json.refresh_token.length === 0)
+    !validateString(json.refresh_token)
   ) {
     throw new OPE('"response" body "refresh_token" property must be a non-empty string')
   }
 
-  if (json.scope !== undefined && (typeof json.scope !== 'string' || json.scope.length === 0)) {
+  if (json.scope !== undefined && !validateString(json.scope)) {
     throw new OPE('"response" body "scope" property must be a non-empty string')
   }
 
   if (!ignoreIdToken) {
-    if (
-      json.id_token !== undefined &&
-      (typeof json.id_token !== 'string' || json.id_token.length === 0)
-    ) {
+    if (json.id_token !== undefined && !validateString(json.id_token)) {
       throw new OPE('"response" body "id_token" property must be a non-empty string')
     }
 
@@ -2343,11 +2344,11 @@ export async function authorizationCodeGrantRequest(
     )
   }
 
-  if (typeof redirectUri !== 'string' || redirectUri.length === 0) {
+  if (!validateString(redirectUri)) {
     throw new TypeError('"redirectUri" must be a non-empty string')
   }
 
-  if (typeof codeVerifier !== 'string' || codeVerifier.length === 0) {
+  if (!validateString(codeVerifier)) {
     throw new TypeError('"codeVerifier" must be a non-empty string')
   }
 
@@ -2527,7 +2528,7 @@ export async function processAuthorizationCodeOpenIDResponse(
     return result
   }
 
-  if (typeof result.id_token !== 'string' || result.id_token.length === 0) {
+  if (!validateString(result.id_token)) {
     throw new OPE('"response" body "id_token" property must be a non-empty string')
   }
 
@@ -2560,7 +2561,7 @@ export async function processAuthorizationCodeOpenIDResponse(
       }
       break
     default:
-      if (typeof expectedNonce !== 'string' || expectedNonce.length === 0) {
+      if (!validateString(expectedNonce)) {
         throw new TypeError('"expectedNonce" must be a non-empty string')
       }
       if (claims.nonce === undefined) {
@@ -2725,7 +2726,7 @@ export async function revocationRequest(
   assertIssuer(as)
   assertClient(client)
 
-  if (typeof token !== 'string' || token.length === 0) {
+  if (!validateString(token)) {
     throw new TypeError('"token" must be a non-empty string')
   }
 
@@ -2827,7 +2828,7 @@ export async function introspectionRequest(
   assertIssuer(as)
   assertClient(client)
 
-  if (typeof token !== 'string' || token.length === 0) {
+  if (!validateString(token)) {
     throw new TypeError('"token" must be a non-empty string')
   }
 
@@ -3059,7 +3060,7 @@ async function handleOAuthBodyError(response: Response): Promise<OAuth2Error | u
   if (response.status > 399 && response.status < 500) {
     try {
       const json: JsonValue = await preserveBodyStream(response).json()
-      if (isJsonObject(json) && typeof json.error === 'string' && json.error.length !== 0) {
+      if (isJsonObject(json) && typeof json.error === 'string' && json.error.length) {
         if (json.error_description !== undefined && typeof json.error_description !== 'string') {
           delete json.error_description
         }
@@ -3391,7 +3392,7 @@ export function validateAuthResponse(
     case skipStateCheck:
       break
     default:
-      if (typeof expectedState !== 'string' || expectedState.length === 0) {
+      if (!validateString(expectedState)) {
         throw new OPE('"expectedState" must be a non-empty string')
       }
       if (state === undefined) {
@@ -3558,15 +3559,15 @@ export async function processDeviceAuthorizationResponse(
     throw new OPE('"response" body must be a top level object')
   }
 
-  if (typeof json.device_code !== 'string' || json.device_code.length === 0) {
+  if (!validateString(json.device_code)) {
     throw new OPE('"response" body "device_code" property must be a non-empty string')
   }
 
-  if (typeof json.user_code !== 'string' || json.user_code.length === 0) {
+  if (!validateString(json.user_code)) {
     throw new OPE('"response" body "user_code" property must be a non-empty string')
   }
 
-  if (typeof json.verification_uri !== 'string' || json.verification_uri.length === 0) {
+  if (!validateString(json.verification_uri)) {
     throw new OPE('"response" body "verification_uri" property must be a non-empty string')
   }
 
@@ -3576,8 +3577,7 @@ export async function processDeviceAuthorizationResponse(
 
   if (
     json.verification_uri_complete !== undefined &&
-    (typeof json.verification_uri_complete !== 'string' ||
-      json.verification_uri_complete.length === 0)
+    !validateString(json.verification_uri_complete)
   ) {
     throw new OPE('"response" body "verification_uri_complete" property must be a non-empty string')
   }
@@ -3613,7 +3613,7 @@ export async function deviceCodeGrantRequest(
   assertIssuer(as)
   assertClient(client)
 
-  if (typeof deviceCode !== 'string' || deviceCode.length === 0) {
+  if (!validateString(deviceCode)) {
     throw new TypeError('"deviceCode" must be a non-empty string')
   }
 
@@ -3680,7 +3680,7 @@ export async function generateKeyPair(
 ): Promise<CryptoKeyPair> {
   let algorithm: RsaHashedKeyGenParams | EcKeyGenParams
 
-  if (typeof alg !== 'string' || alg.length === 0) {
+  if (!validateString(alg)) {
     throw new TypeError('"alg" must be a non-empty string')
   }
 
