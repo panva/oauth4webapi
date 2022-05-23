@@ -3056,7 +3056,7 @@ async function handleOAuthBodyError(response: Response): Promise<OAuth2Error | u
 
 function checkSupportedJwsAlg(alg: unknown) {
   if (SUPPORTED_JWS_ALGS.includes(<any>alg) === false) {
-    throw new UnsupportedOperationError('unsupported JWS `alg` identifier')
+    throw new UnsupportedOperationError('unsupported JWS "alg" identifier')
   }
   return <JWSAlgorithm>alg
 }
