@@ -65,9 +65,6 @@ let access_token: string
   if ((challenges = oauth.parseWwwAuthenticateChallenges(response))) {
     for (const challenge of challenges) {
       console.log('challenge', challenge)
-      if (challenge.scheme === 'dpop' && challenge.parameters.error === 'use_dpop_nonce') {
-        // the AS-signalled nonce is now already cached, you should retry `authorizationCodeGrantRequest`
-      }
     }
     throw new Error() // Handle www-authenticate challenges as needed
   }
@@ -75,6 +72,9 @@ let access_token: string
   const result = await oauth.processAuthorizationCodeOpenIDResponse(as, client, response)
   if (oauth.isOAuth2Error(result)) {
     console.log('error', result)
+    if (result.error === 'use_dpop_nonce') {
+      // the AS-signalled nonce is now cached, you should retry
+    }
     throw new Error() // Handle OAuth 2.0 response body error
   }
 
@@ -94,7 +94,7 @@ let access_token: string
     for (const challenge of challenges) {
       console.log('challenge', challenge)
       if (challenge.scheme === 'dpop' && challenge.parameters.error === 'use_dpop_nonce') {
-        // the AS-signalled nonce is now already cached, you should retry `userInfoRequest`
+        // the AS-signalled nonce is now cached, you should retry
       }
     }
     throw new Error() // Handle www-authenticate challenges as needed

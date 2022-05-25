@@ -1,5 +1,5 @@
 diff --git a/examples/code.ts b/examples/dpop.ts
-index 17d6b71..570fb96 100644
+index 17d6b71..338f4b9 100644
 --- a/examples/code.ts
 +++ b/examples/dpop.ts
 @@ -1,5 +1,9 @@
@@ -12,7 +12,7 @@ index 17d6b71..570fb96 100644
  const issuer = new URL('https://example.as.com')
  const as = await oauth
    .discoveryRequest(issuer)
-@@ -54,12 +58,16 @@ let access_token: string
+@@ -54,6 +58,7 @@ let access_token: string
      params,
      redirect_uri,
      code_verifier,
@@ -20,15 +20,16 @@ index 17d6b71..570fb96 100644
    )
  
    let challenges: oauth.WWWAuthenticateChallenge[] | undefined
-   if ((challenges = oauth.parseWwwAuthenticateChallenges(response))) {
-     for (const challenge of challenges) {
-       console.log('challenge', challenge)
-+      if (challenge.scheme === 'dpop' && challenge.parameters.error === 'use_dpop_nonce') {
-+        // the AS-signalled nonce is now already cached, you should retry `authorizationCodeGrantRequest`
-+      }
-     }
-     throw new Error() // Handle www-authenticate challenges as needed
+@@ -67,6 +72,9 @@ let access_token: string
+   const result = await oauth.processAuthorizationCodeOpenIDResponse(as, client, response)
+   if (oauth.isOAuth2Error(result)) {
+     console.log('error', result)
++    if (result.error === 'use_dpop_nonce') {
++      // the AS-signalled nonce is now cached, you should retry
++    }
+     throw new Error() // Handle OAuth 2.0 response body error
    }
+ 
 @@ -79,12 +87,15 @@ let access_token: string
  
  // fetch userinfo response
@@ -41,7 +42,7 @@ index 17d6b71..570fb96 100644
      for (const challenge of challenges) {
        console.log('challenge', challenge)
 +      if (challenge.scheme === 'dpop' && challenge.parameters.error === 'use_dpop_nonce') {
-+        // the AS-signalled nonce is now already cached, you should retry `userInfoRequest`
++        // the AS-signalled nonce is now cached, you should retry
 +      }
      }
      throw new Error() // Handle www-authenticate challenges as needed

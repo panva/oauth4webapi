@@ -1,5 +1,5 @@
 diff --git a/examples/fapi2.ts b/examples/fapi2-message-signing.ts
-index 71a11b7..a89ed03 100644
+index 1fe0d39..8fdcfec 100644
 --- a/examples/fapi2.ts
 +++ b/examples/fapi2-message-signing.ts
 @@ -26,7 +26,7 @@ const code_verifier = oauth.generateRandomCodeVerifier()

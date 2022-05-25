@@ -159,33 +159,35 @@ export const green = test.macro({
 
     if (usesPar(plan)) {
       t.log('PAR request with', Object.fromEntries(authorizationUrl.searchParams.entries()))
-      const make = () =>
+      const request = () =>
         oauth.pushedAuthorizationRequest(as, client, authorizationUrl.searchParams, {
           DPoP,
           clientPrivateKey,
         })
-      let par = await make()
+      let par = await request()
 
       let challenges: oauth.WWWAuthenticateChallenge[] | undefined
       if ((challenges = oauth.parseWwwAuthenticateChallenges(par))) {
         for (const challenge of challenges) {
           t.log('challenge', challenge)
-          if (challenge.scheme === 'dpop' && challenge.parameters.error === 'use_dpop_nonce') {
-            par = await make()
-          }
         }
+        throw new Error()
       }
 
+      let result = await oauth.processPushedAuthorizationResponse(as, client, par)
+      if (oauth.isOAuth2Error(result)) {
+        t.log('error', result)
+        if (result.error === 'use_dpop_nonce') {
+          t.log('retrying with a newly obtained dpop nonce')
+          par = await request()
+          result = await oauth.processPushedAuthorizationResponse(as, client, par)
+        }
+        throw new Error() // Handle OAuth 2.0 response body error
+      }
       t.log('PAR response', await par.clone().json())
-
-      const params = await oauth.processPushedAuthorizationResponse(as, client, par)
-      if (oauth.isOAuth2Error(params)) {
-        t.log('error', params)
-        throw new Error() // Handle OAuth 2.0 redirect error
-      }
-      authorizationUrl.search = ''
+      authorizationUrl = new URL(as.authorization_endpoint!)
       authorizationUrl.searchParams.set('client_id', client.client_id)
-      authorizationUrl.searchParams.set('request_uri', params.request_uri)
+      authorizationUrl.searchParams.set('request_uri', result.request_uri)
     }
 
     const response = await fetch(authorizationUrl.href, { redirect: 'manual' })
@@ -210,32 +212,26 @@ export const green = test.macro({
         throw new Error() // Handle OAuth 2.0 redirect error
       }
 
-      const reparams = params
-
       t.log('parsed callback parameters', Object.fromEntries(params.entries()))
 
-      const make = () =>
+      const request = () =>
         oauth.authorizationCodeGrantRequest(
           as,
           client,
-          reparams,
+          <Exclude<typeof params, oauth.OAuth2Error>>params,
           configuration.client.redirect_uri,
           code_verifier,
           { clientPrivateKey, DPoP },
         )
-      let response = await make()
+      let response = await request()
 
       let challenges: oauth.WWWAuthenticateChallenge[] | undefined
       if ((challenges = oauth.parseWwwAuthenticateChallenges(response))) {
         for (const challenge of challenges) {
           t.log('challenge', challenge)
-          if (challenge.scheme === 'dpop' && challenge.parameters.error === 'use_dpop_nonce') {
-            response = await make()
-          }
         }
+        throw new Error()
       }
-
-      t.log('token endpoint response body', await response.clone().json())
 
       let result:
         | oauth.OAuth2TokenEndpointResponse
@@ -249,10 +245,19 @@ export const green = test.macro({
 
       if (oauth.isOAuth2Error(result)) {
         t.log('error', result)
+        if (result.error === 'use_dpop_nonce') {
+          t.log('retrying with a newly obtained dpop nonce')
+          response = await request()
+          if (scope.includes('openid')) {
+            result = await oauth.processAuthorizationCodeOpenIDResponse(as, client, response)
+          } else {
+            result = await oauth.processAuthorizationCodeOAuth2Response(as, client, response)
+          }
+        }
         throw new Error() // Handle OAuth 2.0 response body error
       }
 
-      t.log('token endpoint response passed validation')
+      t.log('token endpoint response body', await response.clone().json())
       ;({ access_token } = result)
       if (result.id_token) {
         const claims = oauth.getValidatedIdTokenClaims(result)
@@ -263,16 +268,25 @@ export const green = test.macro({
 
     if (scope.includes('openid') && as.userinfo_endpoint) {
       // fetch userinfo response
-      const make = () => oauth.userInfoRequest(as, client, access_token, { DPoP })
-      let response = await make()
+      const request = () => {
+        t.log('fetching', as.userinfo_endpoint)
+        return oauth.userInfoRequest(as, client, access_token, { DPoP })
+      }
+      let response = await request()
 
       let challenges: oauth.WWWAuthenticateChallenge[] | undefined
       if ((challenges = oauth.parseWwwAuthenticateChallenges(response))) {
+        let retried = false
         for (const challenge of challenges) {
           t.log('challenge', challenge)
           if (challenge.scheme === 'dpop' && challenge.parameters.error === 'use_dpop_nonce') {
-            response = await make()
+            t.log('retrying with a newly obtained dpop nonce')
+            response = await request()
+            retried = true
           }
+        }
+        if (!retried) {
+          throw new Error()
         }
       }
 
@@ -287,8 +301,9 @@ export const green = test.macro({
     }
 
     if (instance.accounts_endpoint) {
-      const make = () =>
-        oauth.protectedResourceRequest(
+      const request = () => {
+        t.log('fetching', instance.accounts_endpoint)
+        return oauth.protectedResourceRequest(
           access_token,
           'GET',
           new URL(instance.accounts_endpoint!),
@@ -296,15 +311,22 @@ export const green = test.macro({
           null,
           { DPoP },
         )
-      let accounts = await make()
+      }
+      let accounts = await request()
 
       let challenges: oauth.WWWAuthenticateChallenge[] | undefined
       if ((challenges = oauth.parseWwwAuthenticateChallenges(accounts))) {
+        let retried = false
         for (const challenge of challenges) {
           t.log('challenge', challenge)
           if (challenge.scheme === 'dpop' && challenge.parameters.error === 'use_dpop_nonce') {
-            accounts = await make()
+            t.log('retrying with a newly obtained dpop nonce')
+            accounts = await request()
+            retried = true
           }
+        }
+        if (!retried) {
+          throw new Error()
         }
       }
 
