@@ -77,7 +77,7 @@
 - [UserInfoResponse](interfaces/UserInfoResponse.md)
 - [WWWAuthenticateChallenge](interfaces/WWWAuthenticateChallenge.md)
 
-### Type aliases
+### Type Aliases
 
 - [ClientAuthenticationMethod](types/ClientAuthenticationMethod.md)
 - [JWSAlgorithm](types/JWSAlgorithm.md)

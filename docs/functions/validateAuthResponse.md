@@ -19,7 +19,7 @@ message returned from the authorization server's [`as.authorization_endpoint`](.
 | :------ | :------ | :------ |
 | `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata. |
 | `client` | [`Client`](../interfaces/Client.md) | Client Metadata. |
-| `parameters` | `URL` \| `URLSearchParams` | Authorization response. |
+| `parameters` | `URLSearchParams` \| `URL` | Authorization response. |
 | `expectedState?` | `string` \| typeof [`expectNoState`](../variables/expectNoState.md) \| typeof [`skipStateCheck`](../variables/skipStateCheck.md) | Expected `state` parameter value. Default is [expectNoState](../variables/expectNoState.md). |
 
 #### Returns
