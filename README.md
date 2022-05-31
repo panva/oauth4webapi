@@ -2,7 +2,7 @@
 
 This software is a collection of routines upon which framework-specific client modules may be written. Its objective is to support and, where possible, enforce secure and current best practices using only capabilities common to Browser and Non-Browser JavaScript-based runtime environments.
 
-Target profiles of this software are OAuth 2.1, OAuth 2.0 complemented by the latest Security BCP, and FAPI 2.0. Where applicable Open ID Connect is also supported.
+Target profiles of this software are OAuth 2.1, OAuth 2.0 complemented by the latest Security BCP, and FAPI 2.0. Where applicable OpenID Connect is also supported.
 
 ## In Scope & Implemented
 
