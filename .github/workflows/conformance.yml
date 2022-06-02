@@ -119,9 +119,10 @@ jobs:
           while ! curl -skfail https://localhost.emobix.co.uk:8443/api/runner/available >/dev/null; do sleep 2; done
       - uses: actions/setup-node@v2
         with:
-          node-version: 18
+          node-version: '>=18.3.0'
       - run: npm clean-install
-      - run: |
+      - name: npm run conformance
+        run: |
           set -o pipefail
           npm run conformance | tee capture.txt
         env:

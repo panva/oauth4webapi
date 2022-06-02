@@ -6,8 +6,6 @@ const generateKeyPair = promisify(crypto.generateKeyPair)
 
 const { homepage, name, version } = JSON.parse(readFileSync('package.json').toString())
 
-import '../test/_pre.js'
-
 import * as api from './api.js'
 
 const UUID = crypto.randomUUID()
@@ -232,8 +230,12 @@ export default async () => {
       }),
     },
     concurrency: 1,
-    require: ['./build/test/_pre.js'],
     files: [...files, './build/conformance/download_archive.js'],
-    nodeArguments: ['--enable-source-maps', '--conditions=browser'],
+    nodeArguments: [
+      '--conditions=browser',
+      '--enable-source-maps',
+      '--experimental-global-webcrypto',
+      '--no-warnings',
+    ],
   }
 }
