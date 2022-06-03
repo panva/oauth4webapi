@@ -1,0 +1,12 @@
+diff --git a/node_modules/istanbul-reports/lib/html/assets/block-navigation.js b/node_modules/istanbul-reports/lib/html/assets/block-navigation.js
+index d58c460..4d9fc74 100644
+--- a/node_modules/istanbul-reports/lib/html/assets/block-navigation.js
++++ b/node_modules/istanbul-reports/lib/html/assets/block-navigation.js
+@@ -31,7 +31,6 @@ var jumpToCode = (function init() {
+         toggleClass(index);
+         currentIndex = index;
+         missingCoverageElements.item(index).scrollIntoView({
+-            behavior: 'smooth',
+             block: 'center',
+             inline: 'center'
+         });
