@@ -26,7 +26,7 @@ jobs:
           export VERSION=($(curl --silent "https://gitlab.com/api/v4/projects/4175605/releases" | jq -r '.[0].tag_name'))
           echo "VERSION=$VERSION" >> $GITHUB_ENV
       - name: Load Cached Conformance Suite Build
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: cache
         with:
           path: ./conformance-suite
@@ -101,7 +101,7 @@ jobs:
           export VERSION=($(curl --silent "https://gitlab.com/api/v4/projects/4175605/releases" | jq -r '.[0].tag_name'))
           echo "VERSION=$VERSION" >> $GITHUB_ENV
       - name: Load Cached Conformance Suite Build
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: cache
         with:
           path: ./conformance-suite
@@ -117,7 +117,7 @@ jobs:
         run: |
           docker-compose -f docker-compose-dev.yml up -d
           while ! curl -skfail https://localhost.emobix.co.uk:8443/api/runner/available >/dev/null; do sleep 2; done
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
           node-version: '>=18.3.0'
       - run: npm clean-install
