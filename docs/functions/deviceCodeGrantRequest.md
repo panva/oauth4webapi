@@ -9,7 +9,7 @@ Performs a Device Authorization Grant request at the
 
 **`see`** [RFC 8628 - OAuth 2.0 Device Authorization Grant](https://www.rfc-editor.org/rfc/rfc8628.html#section-3.4)
 
-**`see`** [draft-ietf-oauth-dpop-08 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)](https://www.ietf.org/archive/id/draft-ietf-oauth-dpop-08.html#name-dpop-access-token-request)
+**`see`** [draft-ietf-oauth-dpop-09 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)](https://www.ietf.org/archive/id/draft-ietf-oauth-dpop-09.html#name-dpop-access-token-request)
 
 #### Parameters
 

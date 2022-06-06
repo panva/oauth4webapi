@@ -1386,7 +1386,7 @@ async function publicJwk(key: CryptoKey) {
  * {@link AuthorizationServer.pushed_authorization_request_endpoint `as.pushed_authorization_request_endpoint`}.
  *
  * @see {@link https://www.rfc-editor.org/rfc/rfc9126.html#name-pushed-authorization-reques RFC 9126 - OAuth 2.0 Pushed Authorization Requests}
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-oauth-dpop-08.html#name-dpop-with-pushed-authorizat draft-ietf-oauth-dpop-08 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)}
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-oauth-dpop-09.html#name-dpop-with-pushed-authorizat draft-ietf-oauth-dpop-09 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)}
  *
  * @param as Authorization Server Metadata.
  * @param client Client Metadata.
@@ -1635,7 +1635,7 @@ export interface ProtectedResourceRequestOptions
  * value.
  *
  * @see {@link https://www.rfc-editor.org/rfc/rfc6750.html#section-2.1 RFC 6750 - The OAuth 2.0 Authorization Framework: Bearer Token Usage}
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-oauth-dpop-08.html#name-protected-resource-access draft-ietf-oauth-dpop-08 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)}
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-oauth-dpop-09.html#name-protected-resource-access draft-ietf-oauth-dpop-09 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)}
  *
  * @param accessToken The Access Token for the request.
  * @param method The HTTP method for the request.
@@ -1691,7 +1691,7 @@ export interface UserInfoRequestOptions extends HttpRequestOptions, DPoPRequestO
  * value.
  *
  * @see {@link https://openid.net/specs/openid-connect-core-1_0.html#UserInfo OpenID Connect Core 1.0}
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-oauth-dpop-08.html#name-protected-resource-access draft-ietf-oauth-dpop-08 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)}
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-oauth-dpop-09.html#name-protected-resource-access draft-ietf-oauth-dpop-09 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)}
  *
  * @param as Authorization Server Metadata.
  * @param client Client Metadata.
@@ -2068,7 +2068,7 @@ async function tokenEndpointRequest(
  *
  * @see {@link https://www.rfc-editor.org/rfc/rfc6749.html#section-6 RFC 6749 - The OAuth 2.0 Authorization Framework}
  * @see {@link https://openid.net/specs/openid-connect-core-1_0.html#RefreshTokens OpenID Connect Core 1.0}
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-oauth-dpop-08.html#name-dpop-access-token-request draft-ietf-oauth-dpop-08 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)}
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-oauth-dpop-09.html#name-dpop-access-token-request draft-ietf-oauth-dpop-09 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)}
  *
  * @param as Authorization Server Metadata.
  * @param client Client Metadata.
@@ -2313,7 +2313,7 @@ function validateIssuer(expected: string, result: ParsedJWT) {
  * @see {@link https://www.rfc-editor.org/rfc/rfc6749.html#section-4.1 RFC 6749 - The OAuth 2.0 Authorization Framework}
  * @see {@link https://openid.net/specs/openid-connect-core-1_0.html#CodeFlowAuth OpenID Connect Core 1.0}
  * @see {@link https://www.rfc-editor.org/rfc/rfc7636.html#section-4 RFC 7636 - Proof Key for Code Exchange by OAuth Public Clients (PKCE)}
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-oauth-dpop-08.html#name-dpop-access-token-request draft-ietf-oauth-dpop-08 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)}
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-oauth-dpop-09.html#name-dpop-access-token-request draft-ietf-oauth-dpop-09 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)}
  *
  * @param as Authorization Server Metadata.
  * @param client Client Metadata.
@@ -2629,7 +2629,7 @@ export interface ClientCredentialsGrantRequestOptions
  * {@link AuthorizationServer.token_endpoint `as.token_endpoint`}.
  *
  * @see {@link https://www.rfc-editor.org/rfc/rfc6749.html#section-4.4 RFC 6749 - The OAuth 2.0 Authorization Framework}
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-oauth-dpop-08.html#name-dpop-access-token-request draft-ietf-oauth-dpop-08 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)}
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-oauth-dpop-09.html#name-dpop-access-token-request draft-ietf-oauth-dpop-09 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)}
  *
  * @param as Authorization Server Metadata.
  * @param client Client Metadata.
@@ -3594,7 +3594,7 @@ export async function processDeviceAuthorizationResponse(
  * {@link AuthorizationServer.token_endpoint `as.token_endpoint`}.
  *
  * @see {@link https://www.rfc-editor.org/rfc/rfc8628.html#section-3.4 RFC 8628 - OAuth 2.0 Device Authorization Grant}
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-oauth-dpop-08.html#name-dpop-access-token-request draft-ietf-oauth-dpop-08 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)}
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-oauth-dpop-09.html#name-dpop-access-token-request draft-ietf-oauth-dpop-09 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)}
  *
  * @param as Authorization Server Metadata.
  * @param client Client Metadata.
