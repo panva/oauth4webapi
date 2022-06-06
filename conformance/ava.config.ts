@@ -50,15 +50,6 @@ async function ES256() {
   }
 }
 
-async function EdDSA() {
-  return {
-    ...exportPrivate(await generateKeyPair('ed25519')),
-    use: 'sig',
-    alg: 'EdDSA',
-    kid: crypto.randomUUID(),
-  }
-}
-
 async function generate() {
   switch (JWS_ALGORITHM) {
     case 'PS256':
@@ -67,8 +58,6 @@ async function generate() {
       return Promise.all([RS256()])
     case 'ES256':
       return Promise.all([ES256()])
-    case 'EdDSA':
-      return Promise.all([EdDSA()])
     default:
       throw new Error()
   }
@@ -231,11 +220,6 @@ export default async () => {
     },
     concurrency: 1,
     files: [...files, './build/conformance/download_archive.js'],
-    nodeArguments: [
-      '--conditions=browser',
-      '--enable-source-maps',
-      '--experimental-global-webcrypto',
-      '--no-warnings',
-    ],
+    nodeArguments: ['--enable-source-maps', '--experimental-global-webcrypto', '--no-warnings'],
   }
 }

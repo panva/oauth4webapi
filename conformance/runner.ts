@@ -3,7 +3,6 @@ import anyTest, { type TestFn } from 'ava'
 export const test = anyTest as TestFn<{ instance: Test }>
 
 import { getScope, usesRequestObject } from './ava.config.js'
-import * as jose from 'jose'
 import * as oauth from '../src/index.js'
 import {
   createTestFromPlan,
@@ -23,7 +22,7 @@ const configuration: {
     client_secret?: string
     redirect_uri: string
     jwks: {
-      keys: jose.JWK[]
+      keys: Array<JsonWebKey & { kid: string }>
     }
   }
 } = conformance.configuration
@@ -42,6 +41,34 @@ switch (plan.name) {
     break
   default:
     throw new Error()
+}
+
+const algorithms: Map<string, RsaHashedImportParams | EcKeyImportParams> = new Map([
+  [
+    'PS256',
+    {
+      name: 'RSA-PSS',
+      hash: { name: 'SHA-256' },
+    },
+  ],
+  [
+    'ES256',
+    {
+      name: 'ECDSA',
+      namedCurve: 'P-256',
+    },
+  ],
+  [
+    'RS256',
+    {
+      name: 'RSASSA-PKCS1-v1_5',
+      hash: { name: 'SHA-256' },
+    },
+  ],
+])
+
+function importPrivateKey(alg: string, jwk: JsonWebKey) {
+  return crypto.subtle.importKey('jwk', jwk, algorithms.get(alg)!, false, ['sign'])
 }
 
 export function modules(name: string): ModulePrescription[] {
@@ -111,7 +138,7 @@ export const green = test.macro({
         const jwk = configuration.client.jwks.keys.find((key) => key.alg === JWS_ALGORITHM)!
         clientPrivateKey = {
           kid: jwk.kid,
-          key: <CryptoKey>await jose.importJWK(jwk, JWS_ALGORITHM),
+          key: await importPrivateKey(JWS_ALGORITHM, jwk),
         }
     }
 
@@ -138,7 +165,7 @@ export const green = test.macro({
       params.set('scope', scope)
 
       const jwk = configuration.client.jwks.keys.find((key) => key.alg === JWS_ALGORITHM)!
-      const privateKey = <CryptoKey>await jose.importJWK(jwk, JWS_ALGORITHM)
+      const privateKey = await importPrivateKey(JWS_ALGORITHM, jwk)
 
       authorizationUrl.searchParams.set(
         'request',

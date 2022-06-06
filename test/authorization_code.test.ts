@@ -1,4 +1,5 @@
 import anyTest, { type TestFn } from 'ava'
+import { createPrivateKey } from 'node:crypto'
 import setup, {
   type Context,
   teardown,
@@ -16,9 +17,14 @@ const test = anyTest as TestFn<Context & { [alg: string]: CryptoKeyPair }>
 test.before(setup)
 test.after(teardown)
 
+const algs: lib.JWSAlgorithm[] = ['RS256', 'ES256', 'PS256']
+
 test.before(async (t) => {
-  for (const alg of ['RS', 'ES', 'PS'].map((s) => [`${s}256`]).flat()) {
-    t.context[alg] = await lib.generateKeyPair(<lib.JWSAlgorithm>alg)
+  const keys = []
+  for (const alg of algs) {
+    const key = await lib.generateKeyPair(alg, { extractable: true })
+    t.context[alg] = key
+    keys.push(await crypto.subtle.exportKey('jwk', key.publicKey))
   }
 
   t.context
@@ -26,21 +32,7 @@ test.before(async (t) => {
       path: '/jwks',
       method: 'GET',
     })
-    .reply(200, {
-      keys: await Promise.all(
-        ['RS', 'ES', 'PS']
-          .map((s) => [`${s}256`])
-          .flat()
-          .map((alg) =>
-            jose.exportJWK(t.context[alg].publicKey).then((jwk) => {
-              if (alg.startsWith('RS') || alg.startsWith('PS')) {
-                jwk.alg = alg
-              }
-              return jwk
-            }),
-          ),
-      ),
-    })
+    .reply(200, { keys })
 })
 
 const tClient: lib.Client = { ...client, client_secret: 'foo' }
@@ -536,7 +528,7 @@ test('processAuthorizationCodeOpenIDResponse() with an ID Token typ: "applicatio
   )
 })
 
-for (const alg of ['RS', 'ES', 'PS'].map((s) => [`${s}256`]).flat()) {
+for (const alg of algs) {
   test(`processAuthorizationCodeOpenIDResponse() with an ${alg} ID Token`, async (t) => {
     const tIssuer: lib.AuthorizationServer = {
       ...issuer,
@@ -571,7 +563,15 @@ for (const alg of ['RS', 'ES', 'PS'].map((s) => [`${s}256`]).flat()) {
               .setAudience(client.client_id)
               .setExpirationTime('5m')
               .setIssuedAt()
-              .sign(t.context[alg].privateKey),
+              .sign(
+                createPrivateKey({
+                  key: await crypto.subtle
+                    .exportKey('pkcs8', t.context[alg].privateKey)
+                    .then(Buffer.from),
+                  format: 'der',
+                  type: 'pkcs8',
+                }),
+              ),
           }),
         ),
       ),

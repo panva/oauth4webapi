@@ -6,9 +6,12 @@ import * as lib from '../src/index.js'
 
 const test = anyTest as TestFn<{ [alg: string]: CryptoKeyPair }>
 
+const algs: lib.JWSAlgorithm[] = ['RS256', 'ES256', 'PS256']
+
 test.before(async (t) => {
-  for (const alg of ['RS', 'ES', 'PS'].map((s) => [`${s}256`]).flat()) {
-    t.context[alg] = await lib.generateKeyPair(<lib.JWSAlgorithm>alg)
+  for (const alg of algs) {
+    const key = await lib.generateKeyPair(alg)
+    t.context[alg] = key
   }
 })
 
@@ -55,7 +58,7 @@ test('issueRequestObject() - multiple resource parameters', async (t) => {
   t.deepEqual(resource, ['urn:example:resource', 'urn:example:resource-2'])
 })
 
-for (const alg of ['RS', 'ES', 'PS'].map((s) => [`${s}256`]).flat()) {
+for (const alg of algs) {
   test(`issueRequestObject() signed using ${alg}`, async (t) => {
     const sign = t.context[alg]
     const jwt = await lib.issueRequestObject(issuer, client, new URLSearchParams(), {

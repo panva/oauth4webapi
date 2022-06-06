@@ -1,40 +1,38 @@
 import test from 'ava'
 import * as lib from '../src/index.js'
 
-test('RSA', async (t) => {
-  const jwk = {
-    kty: 'RSA',
-    n: '0vx7agoebGcQSuuPiLJXZptN9nndrQmbXEps2aiAFbWhM78LhWx4cbbfAAtVT86zwu1RK7aPFFxuhDR1L6tSoc_BJECPebWKRXjBZCiFV4n3oknjhMstn64tZ_2W-5JsGY4Hc5n9yBXArwl93lqt7_RN5w6Cf0h4QyQ5v-65YGjQR0_FDW2QvzqY368QQMicAtaSqzs8KJZgnYb9c7d0zgdAZHzu6qMQvRL5hajrn1n91CbOpbISD08qNLyrdkt-bFTWhAI4vMQFh6WeZu0fM4lFd2NcRwr3XPksINHaQ-G_xBniIqbw0Ls1jF44-csFCur-kEgU8awapJzKnqDKgw',
-    e: 'AQAB',
-  }
-  const key = await crypto.subtle.importKey(
-    'jwk',
-    jwk,
-    { name: 'RSA-PSS', hash: 'SHA-256' },
-    true,
-    ['verify'],
-  )
-  const expected = 'NzbLsXh8uDCcd-6MNwXF4W_7noWXFZAfHkxZsRGC9Xs'
-  t.is(await lib.calculateJwkThumbprint(key), expected)
-})
+const vectors = {
+  RSA: {
+    jwk: {
+      kty: 'RSA',
+      n: '0vx7agoebGcQSuuPiLJXZptN9nndrQmbXEps2aiAFbWhM78LhWx4cbbfAAtVT86zwu1RK7aPFFxuhDR1L6tSoc_BJECPebWKRXjBZCiFV4n3oknjhMstn64tZ_2W-5JsGY4Hc5n9yBXArwl93lqt7_RN5w6Cf0h4QyQ5v-65YGjQR0_FDW2QvzqY368QQMicAtaSqzs8KJZgnYb9c7d0zgdAZHzu6qMQvRL5hajrn1n91CbOpbISD08qNLyrdkt-bFTWhAI4vMQFh6WeZu0fM4lFd2NcRwr3XPksINHaQ-G_xBniIqbw0Ls1jF44-csFCur-kEgU8awapJzKnqDKgw',
+      e: 'AQAB',
+    },
+    algorithm: { name: 'RSA-PSS', hash: 'SHA-256' },
+    thumbprint: 'NzbLsXh8uDCcd-6MNwXF4W_7noWXFZAfHkxZsRGC9Xs',
+  },
+  EC: {
+    jwk: {
+      crv: 'P-256',
+      kty: 'EC',
+      x: 'q3zAwR_kUwtdLEwtB2oVfucXiLHmEhu9bJUFYjJxYGs',
+      y: '8h0D-ONoU-iZqrq28TyUxEULxuGwJZGMJYTMbeMshvI',
+    },
+    algorithm: { name: 'ECDSA', namedCurve: 'P-256' },
+    thumbprint: 'ZrBaai73Hi8Fg4MElvDGzIne2NsbI75RHubOViHYE5Q',
+  },
+}
 
-test('EC', async (t) => {
-  const jwk = {
-    crv: 'P-256',
-    kty: 'EC',
-    x: 'q3zAwR_kUwtdLEwtB2oVfucXiLHmEhu9bJUFYjJxYGs',
-    y: '8h0D-ONoU-iZqrq28TyUxEULxuGwJZGMJYTMbeMshvI',
-  }
-  const key = await crypto.subtle.importKey(
-    'jwk',
-    jwk,
-    { name: 'ECDSA', namedCurve: 'P-256' },
-    true,
-    ['verify'],
-  )
-  const expected = 'ZrBaai73Hi8Fg4MElvDGzIne2NsbI75RHubOViHYE5Q'
-  t.is(await lib.calculateJwkThumbprint(key), expected)
-})
+for (const [kty, { jwk, algorithm, thumbprint }] of Object.entries(vectors)) {
+  test(kty, async (t) => {
+    t.is(
+      await lib.calculateJwkThumbprint(
+        await crypto.subtle.importKey('jwk', jwk, algorithm, true, ['verify']),
+      ),
+      thumbprint,
+    )
+  })
+}
 
 test('private key or unrecognized public key', async (t) => {
   const keypair = await crypto.subtle.generateKey({ name: 'ECDH', namedCurve: 'P-256' }, false, [])
