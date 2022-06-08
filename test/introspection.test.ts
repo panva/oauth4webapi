@@ -27,6 +27,27 @@ test.before(async (t) => {
     })
     .reply(200, {
       keys: [
+        {
+          ...(await jose.exportJWK(
+            (
+              await crypto.subtle.generateKey({ name: 'ECDH', namedCurve: 'P-256' }, false, [])
+            ).publicKey,
+          )),
+          use: 'enc',
+        },
+        {
+          ...(await jose.exportJWK(
+            (
+              await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, false, [])
+            ).publicKey,
+          )),
+          key_ops: [],
+        },
+        await jose.exportJWK(
+          (
+            await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-384' }, false, [])
+          ).publicKey,
+        ),
         await jose.exportJWK(t.context.es256.publicKey),
         await jose.exportJWK(t.context.rs256.publicKey),
       ],
