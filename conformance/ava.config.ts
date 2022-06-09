@@ -136,11 +136,9 @@ test.todo('${name}')
   }
 }
 
-const { plan: ignored, algorithm: ignored2, ...parsedVariant } = JSON.parse(VARIANT)
-
 const variant = {
   ...DEFAULTS[PLAN_NAME],
-  ...parsedVariant,
+  ...JSON.parse(VARIANT),
 }
 
 export default async () => {

@@ -56,42 +56,50 @@ jobs:
           - plan: oidcc-client-basic-certification-test-plan
 
           # client_secret_basic
-          - client_auth_type: client_secret_basic
+          - variant:
+              client_auth_type: client_secret_basic
             plan: oidcc-client-test-plan
 
           # client_secret_post
-          - client_auth_type: client_secret_post
+          - variant:
+              client_auth_type: client_secret_post
             plan: oidcc-client-test-plan
 
           # request_object
-          - request_type: request_object
+          - variant:
+              request_type: request_object
             plan: oidcc-client-test-plan
 
           # private_key_jwt
-          - client_auth_type: private_key_jwt
+          - variant:
+              client_auth_type: private_key_jwt
             plan: oidcc-client-test-plan
 
           # none
-          - client_auth_type: none
+          - variant:
+              client_auth_type: none
             plan: oidcc-client-test-plan
 
           # ES256
           - algorithm: ES256
             plan: oidcc-client-test-plan
-            request_type: request_object
-            client_auth_type: private_key_jwt
+            variant:
+              request_type: request_object
+              client_auth_type: private_key_jwt
 
           # RS256
           - algorithm: RS256
             plan: oidcc-client-test-plan
-            request_type: request_object
-            client_auth_type: private_key_jwt
+            variant:
+              request_type: request_object
+              client_auth_type: private_key_jwt
 
           # PS256
           - algorithm: PS256
             plan: oidcc-client-test-plan
-            request_type: request_object
-            client_auth_type: private_key_jwt
+            variant:
+              request_type: request_object
+              client_auth_type: private_key_jwt
 
     steps:
       - name: Checkout
@@ -129,7 +137,7 @@ jobs:
           NODE_TLS_REJECT_UNAUTHORIZED: 0
           SUITE_BASE_URL: https://localhost.emobix.co.uk:8443
           PLAN_NAME: ${{ matrix.setup.plan }}
-          VARIANT: ${{ toJSON(matrix.setup) }}
+          VARIANT: ${{ toJSON(matrix.setup.variant) }}
           JWS_ALGORITHM: ${{ matrix.setup.algorithm }}
       - run: node ./conformance/.parse-logs.mjs capture.txt
       - run: rm capture.txt
