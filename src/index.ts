@@ -5,7 +5,7 @@ if (
   navigator.userAgent?.startsWith?.('Mozilla/5.0 ') !== true
 ) {
   const NAME = 'oauth4webapi'
-  const VERSION = 'v1.0.3'
+  const VERSION = 'v1.0.4'
   USER_AGENT = `${NAME}/${VERSION}`
 }
 

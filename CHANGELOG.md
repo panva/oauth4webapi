@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.0.4](https://github.com/panva/oauth4webapi/compare/v1.0.3...v1.0.4) (2022-06-09)
+
+
+### Fixes
+
+* do not set a user-agent in CORS-enabled runtimes ([8899a6b](https://github.com/panva/oauth4webapi/commit/8899a6b58bd8ff7784db52264bb50623b2ffa07e)), closes [#13](https://github.com/panva/oauth4webapi/issues/13)
+
 ## [1.0.3](https://github.com/panva/oauth4webapi/compare/v1.0.2...v1.0.3) (2022-05-23)
 
 
