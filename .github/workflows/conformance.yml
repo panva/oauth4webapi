@@ -130,7 +130,7 @@ jobs:
           SUITE_BASE_URL: https://localhost.emobix.co.uk:8443
           PLAN_NAME: ${{ matrix.setup.plan }}
           VARIANT: ${{ toJSON(matrix.setup) }}
-          JWS_ALGORITHM: ${{ matrix.setup.algorithm || 'RS256' }}
+          JWS_ALGORITHM: ${{ matrix.setup.algorithm }}
       - run: node ./conformance/.parse-logs.mjs capture.txt
       - run: rm capture.txt
       - name: Upload test artifacts
