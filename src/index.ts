@@ -1,6 +1,13 @@
-const NAME = 'oauth4webapi'
-const VERSION = 'v1.0.3'
-const USER_AGENT = `${NAME}/${VERSION}`
+let USER_AGENT: string
+if (
+  typeof navigator === 'undefined' ||
+  // @ts-ignore
+  navigator.userAgent?.startsWith?.('Mozilla/5.0 ') !== true
+) {
+  const NAME = 'oauth4webapi'
+  const VERSION = 'v1.0.3'
+  USER_AGENT = `${NAME}/${VERSION}`
+}
 
 /**
  * @ignore
@@ -778,7 +785,7 @@ function prepareHeaders(input: unknown): Headers {
     throw new TypeError('"options.headers" must be an instance of Headers')
   }
   const headers = new Headers(input)
-  if (!headers.has('user-agent')) {
+  if (USER_AGENT && !headers.has('user-agent')) {
     headers.set('user-agent', USER_AGENT)
   }
   if (headers.has('authorization')) {
