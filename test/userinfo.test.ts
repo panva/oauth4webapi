@@ -254,3 +254,62 @@ test('processUserInfoResponse() - jwt (alg default)', async (t) => {
     t.false(response.bodyUsed)
   })
 })
+
+test('processUserInfoResponse() - alg mismatches', async (t) => {
+  const tIssuer: lib.AuthorizationServer = {
+    ...issuer,
+    jwks_uri: endpoint('jwks'),
+  }
+
+  await t.throwsAsync(
+    async () => {
+      const response = getResponse(
+        await new jose.SignJWT({ sub: 'urn:example:subject' })
+          .setProtectedHeader({ alg: 'ES256' })
+          .sign(t.context.es256.privateKey),
+        { headers: new Headers({ 'content-type': 'application/jwt' }) },
+      )
+      await lib.processUserInfoResponse(tIssuer, client, 'urn:example:subject', response)
+    },
+    { message: 'unexpected JWT "alg" header parameter' },
+  )
+
+  await t.throwsAsync(
+    async () => {
+      const response = getResponse(
+        await new jose.SignJWT({ sub: 'urn:example:subject' })
+          .setProtectedHeader({ alg: 'ES256' })
+          .sign(t.context.es256.privateKey),
+        { headers: new Headers({ 'content-type': 'application/jwt' }) },
+      )
+      await lib.processUserInfoResponse(
+        {
+          ...tIssuer,
+          userinfo_signing_alg_values_supported: ['RS256'],
+        },
+        client,
+        'urn:example:subject',
+        response,
+      )
+    },
+    { message: 'unexpected JWT "alg" header parameter' },
+  )
+
+  await t.throwsAsync(
+    async () => {
+      const response = getResponse(
+        await new jose.SignJWT({ sub: 'urn:example:subject' })
+          .setProtectedHeader({ alg: 'ES256' })
+          .sign(t.context.es256.privateKey),
+        { headers: new Headers({ 'content-type': 'application/jwt' }) },
+      )
+      await lib.processUserInfoResponse(
+        tIssuer,
+        { ...client, userinfo_signed_response_alg: 'RS256' },
+        'urn:example:subject',
+        response,
+      )
+    },
+    { message: 'unexpected JWT "alg" header parameter' },
+  )
+})

@@ -478,6 +478,79 @@ test('processAuthorizationCodeOpenIDResponse() with an ID Token (alg default)', 
   )
 })
 
+test('processAuthorizationCodeOpenIDResponse() with an ID Token (alg mismatches)', async (t) => {
+  const tIssuer: lib.AuthorizationServer = { ...issuer, jwks_uri: endpoint('jwks') }
+
+  await t.throwsAsync(
+    lib.processAuthorizationCodeOpenIDResponse(
+      tIssuer,
+      client,
+      getResponse(
+        JSON.stringify({
+          access_token: 'token',
+          token_type: 'Bearer',
+          id_token: await new jose.SignJWT({})
+            .setProtectedHeader({ alg: 'ES256' })
+            .setIssuer(issuer.issuer)
+            .setSubject('urn:example:subject')
+            .setAudience(client.client_id)
+            .setExpirationTime('5m')
+            .setIssuedAt()
+            .sign(t.context.ES256.privateKey),
+        }),
+      ),
+    ),
+    { message: 'unexpected JWT "alg" header parameter' },
+  )
+
+  await t.throwsAsync(
+    lib.processAuthorizationCodeOpenIDResponse(
+      {
+        ...tIssuer,
+        id_token_signing_alg_values_supported: ['RS256'],
+      },
+      client,
+      getResponse(
+        JSON.stringify({
+          access_token: 'token',
+          token_type: 'Bearer',
+          id_token: await new jose.SignJWT({})
+            .setProtectedHeader({ alg: 'ES256' })
+            .setIssuer(issuer.issuer)
+            .setSubject('urn:example:subject')
+            .setAudience(client.client_id)
+            .setExpirationTime('5m')
+            .setIssuedAt()
+            .sign(t.context.ES256.privateKey),
+        }),
+      ),
+    ),
+    { message: 'unexpected JWT "alg" header parameter' },
+  )
+
+  await t.throwsAsync(
+    lib.processAuthorizationCodeOpenIDResponse(
+      tIssuer,
+      { ...client, id_token_signed_response_alg: 'RS256' },
+      getResponse(
+        JSON.stringify({
+          access_token: 'token',
+          token_type: 'Bearer',
+          id_token: await new jose.SignJWT({})
+            .setProtectedHeader({ alg: 'ES256' })
+            .setIssuer(issuer.issuer)
+            .setSubject('urn:example:subject')
+            .setAudience(client.client_id)
+            .setExpirationTime('5m')
+            .setIssuedAt()
+            .sign(t.context.ES256.privateKey),
+        }),
+      ),
+    ),
+    { message: 'unexpected JWT "alg" header parameter' },
+  )
+})
+
 test('processAuthorizationCodeOpenIDResponse() with an ID Token typ: "JWT"', async (t) => {
   const tIssuer: lib.AuthorizationServer = { ...issuer, jwks_uri: endpoint('jwks') }
 

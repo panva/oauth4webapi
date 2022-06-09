@@ -10,6 +10,7 @@ test('validateAuthResponse()', (t) => {
     new URL('https://rp.example.com/cb?code=foo'),
     lib.expectNoState,
   )
+  lib.validateAuthResponse(issuer, client, new URL('https://rp.example.com/cb?code=foo'))
   lib.validateAuthResponse(
     issuer,
     client,

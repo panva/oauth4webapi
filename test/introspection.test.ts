@@ -365,6 +365,82 @@ test('processIntrospectionResponse() - alg default', async (t) => {
   )
 })
 
+test('processIntrospectionResponse() - alg mismatches', async (t) => {
+  const tIssuer: lib.AuthorizationServer = {
+    ...issuer,
+    jwks_uri: endpoint('jwks'),
+  }
+
+  await t.throwsAsync(
+    lib.processIntrospectionResponse(
+      tIssuer,
+      client,
+      getResponse(
+        await new jose.SignJWT({ token_introspection: { active: false } })
+          .setProtectedHeader({ alg: 'ES256', typ: 'token-introspection+jwt' })
+          .setIssuer(issuer.issuer)
+          .setAudience(client.client_id)
+          .setIssuedAt()
+          .sign(t.context.es256.privateKey),
+        {
+          headers: new Headers({
+            'content-type': 'application/token-introspection+jwt',
+          }),
+        },
+      ),
+    ),
+    { message: 'unexpected JWT "alg" header parameter' },
+  )
+
+  await t.throwsAsync(
+    lib.processIntrospectionResponse(
+      {
+        ...tIssuer,
+        introspection_signing_alg_values_supported: ['RS256'],
+      },
+      client,
+      getResponse(
+        await new jose.SignJWT({ token_introspection: { active: false } })
+          .setProtectedHeader({ alg: 'ES256', typ: 'token-introspection+jwt' })
+          .setIssuer(issuer.issuer)
+          .setAudience(client.client_id)
+          .setIssuedAt()
+          .sign(t.context.es256.privateKey),
+        {
+          headers: new Headers({
+            'content-type': 'application/token-introspection+jwt',
+          }),
+        },
+      ),
+    ),
+    { message: 'unexpected JWT "alg" header parameter' },
+  )
+
+  await t.throwsAsync(
+    lib.processIntrospectionResponse(
+      tIssuer,
+      {
+        ...client,
+        introspection_signed_response_alg: 'RS256',
+      },
+      getResponse(
+        await new jose.SignJWT({ token_introspection: { active: false } })
+          .setProtectedHeader({ alg: 'ES256', typ: 'token-introspection+jwt' })
+          .setIssuer(issuer.issuer)
+          .setAudience(client.client_id)
+          .setIssuedAt()
+          .sign(t.context.es256.privateKey),
+        {
+          headers: new Headers({
+            'content-type': 'application/token-introspection+jwt',
+          }),
+        },
+      ),
+    ),
+    { message: 'unexpected JWT "alg" header parameter' },
+  )
+})
+
 test('processIntrospectionResponse() - typ w/ application/ prefix', async (t) => {
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
