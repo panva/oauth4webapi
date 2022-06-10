@@ -1,9 +1,6 @@
 let USER_AGENT: string
-if (
-  typeof navigator === 'undefined' ||
-  // @ts-ignore
-  navigator.userAgent?.startsWith?.('Mozilla/5.0 ') !== true
-) {
+// @ts-ignore
+if (typeof navigator === 'undefined' || !navigator.userAgent?.startsWith?.('Mozilla/5.0 ')) {
   const NAME = 'oauth4webapi'
   const VERSION = 'v1.0.4'
   USER_AGENT = `${NAME}/${VERSION}`
