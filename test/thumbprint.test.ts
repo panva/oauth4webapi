@@ -35,7 +35,9 @@ for (const [kty, { jwk, algorithm, thumbprint }] of Object.entries(vectors)) {
 }
 
 test('private key or unrecognized public key', async (t) => {
-  const keypair = await crypto.subtle.generateKey({ name: 'ECDH', namedCurve: 'P-256' }, false, [])
+  const keypair = await crypto.subtle.generateKey({ name: 'ECDH', namedCurve: 'P-256' }, false, [
+    'deriveBits',
+  ])
   await t.throwsAsync(() => lib.calculateJwkThumbprint(keypair.publicKey), {
     name: 'UnsupportedOperationError',
   })
