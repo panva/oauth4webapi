@@ -400,7 +400,7 @@ test('processDeviceCodeResponse() without ID Tokens', async (t) => {
       getResponse(JSON.stringify({ access_token: 'token', token_type: 'Bearer', scope: null })),
     ),
     {
-      message: '"response" body "scope" property must be a non-empty string',
+      message: '"response" body "scope" property must be a string',
     },
   )
   await t.throwsAsync(
