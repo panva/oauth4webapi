@@ -38,12 +38,6 @@ export const client = <Client>{
   client_id: 'urn:example:client_id',
 }
 
-declare module 'stream' {
-  export namespace Readable {
-    function toWeb(streamReadable: Readable): ReadableStream
-  }
-}
-
 export function getResponse(
   body: Iterable<any> | AsyncIterable<any>,
   { status = 200, headers = new Headers() } = {},

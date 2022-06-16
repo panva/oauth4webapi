@@ -7,7 +7,7 @@ export default {
   nodeArguments: [
     '--enable-source-maps',
     '--experimental-global-webcrypto',
-    '--loader=ts-node/esm',
+    '--loader=@esbuild-kit/esm-loader',
     '--no-warnings',
   ],
 }
