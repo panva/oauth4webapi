@@ -41,6 +41,8 @@ jobs:
           node-version: '>=18.3.0'
       - run: npm clean-install
       - run: npm run test
+        env:
+          ESBK_DISABLE_CACHE: 1
 
   deno:
     strategy:
