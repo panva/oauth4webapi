@@ -72,7 +72,6 @@ test('validateJwtAuthResponse()', async (t) => {
     t.true(result instanceof URLSearchParams)
     t.false(lib.isOAuth2Error(result))
     if (lib.isOAuth2Error(result)) throw new Error()
-    // @ts-ignore
     t.is(result.constructor.name, 'CallbackParameters')
     t.deepEqual([...result.keys()], ['iss', 'code'])
   })
@@ -99,7 +98,6 @@ test('validateJwtAuthResponse() as URL', async (t) => {
     t.true(result instanceof URLSearchParams)
     t.false(lib.isOAuth2Error(result))
     if (lib.isOAuth2Error(result)) throw new Error()
-    // @ts-ignore
     t.is(result.constructor.name, 'CallbackParameters')
     t.deepEqual([...result.keys()], ['iss', 'code'])
   })

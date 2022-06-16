@@ -1,5 +1,5 @@
 diff --git a/examples/fapi2.ts b/examples/fapi2-message-signing.ts
-index 1fe0d39..8fdcfec 100644
+index 3717f77..8897055 100644
 --- a/examples/fapi2.ts
 +++ b/examples/fapi2-message-signing.ts
 @@ -26,7 +26,7 @@ const code_verifier = oauth.generateRandomCodeVerifier()
@@ -32,7 +32,7 @@ index 1fe0d39..8fdcfec 100644
      clientPrivateKey,
 @@ -73,7 +83,7 @@ let request_uri: string
  {
-   // @ts-ignore
+   // @ts-expect-error
    const currentUrl: URL = getCurrentUrl()
 -  const params = oauth.validateAuthResponse(as, client, currentUrl, oauth.expectNoState)
 +  const params = await oauth.validateJwtAuthResponse(as, client, currentUrl, oauth.expectNoState)

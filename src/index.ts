@@ -691,7 +691,6 @@ export class UnsupportedOperationError extends Error {
   constructor(message?: string) {
     super(message ?? 'operation not supported')
     this.name = this.constructor.name
-    // @ts-ignore
     Error.captureStackTrace?.(this, this.constructor)
   }
 }
@@ -700,7 +699,6 @@ export class OperationProcessingError extends Error {
   constructor(message: string) {
     super(message)
     this.name = this.constructor.name
-    // @ts-ignore
     Error.captureStackTrace?.(this, this.constructor)
   }
 }

@@ -81,7 +81,7 @@ let request_uri: string
 
 // one eternity later, the user lands back on the redirect_uri
 {
-  // @ts-ignore
+  // @ts-expect-error
   const currentUrl: URL = getCurrentUrl()
   const params = await oauth.validateJwtAuthResponse(as, client, currentUrl, oauth.expectNoState)
   if (oauth.isOAuth2Error(params)) {

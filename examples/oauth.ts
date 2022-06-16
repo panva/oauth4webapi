@@ -38,7 +38,7 @@ const code_challenge_method = 'S256'
 
 // one eternity later, the user lands back on the redirect_uri
 
-// @ts-ignore
+// @ts-expect-error
 const currentUrl: URL = getCurrentUrl()
 const parameters = oauth.validateAuthResponse(as, client, currentUrl, oauth.expectNoState)
 if (oauth.isOAuth2Error(parameters)) {

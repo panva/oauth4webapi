@@ -65,7 +65,7 @@ let request_uri: string
 let sub: string
 let access_token: string
 {
-  // @ts-ignore
+  // @ts-expect-error
   const currentUrl: URL = getCurrentUrl()
   const params = oauth.validateAuthResponse(as, client, currentUrl, oauth.expectNoState)
   if (oauth.isOAuth2Error(params)) {

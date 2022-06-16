@@ -1,5 +1,5 @@
 diff --git a/examples/code.ts b/examples/dpop.ts
-index 17d6b71..338f4b9 100644
+index d60ab87..f5558fd 100644
 --- a/examples/code.ts
 +++ b/examples/dpop.ts
 @@ -1,5 +1,9 @@

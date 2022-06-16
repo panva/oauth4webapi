@@ -46,7 +46,7 @@ const callbackParameters = lib.validateAuthResponse(
 if (lib.isOAuth2Error(callbackParameters)) throw new Error()
 
 function cb(arg: any): Exclude<ReturnType<typeof lib.validateAuthResponse>, lib.OAuth2Error> {
-  // @ts-ignore
+  // @ts-expect-error
   return new callbackParameters.constructor(arg)
 }
 
