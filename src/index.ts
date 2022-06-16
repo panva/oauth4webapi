@@ -2198,8 +2198,8 @@ async function processGenericAccessTokenResponse(
     throw new OPE('"response" body "refresh_token" property must be a non-empty string')
   }
 
-  if (json.scope !== undefined && !validateString(json.scope)) {
-    throw new OPE('"response" body "scope" property must be a non-empty string')
+  if (json.scope !== undefined && typeof json.scope !== 'string') {
+    throw new OPE('"response" body "scope" property must be a string')
   }
 
   if (!ignoreIdToken) {
