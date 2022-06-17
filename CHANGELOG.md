@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.0.5](https://github.com/panva/oauth4webapi/compare/v1.0.4...v1.0.5) (2022-06-17)
+
+
+### Fixes
+
+* allow zero-length scope in token endpoint responses ([#15](https://github.com/panva/oauth4webapi/issues/15)) ([d54c821](https://github.com/panva/oauth4webapi/commit/d54c821aeb578dea93690801282d3e3d44bda8b8))
+
 ## [1.0.4](https://github.com/panva/oauth4webapi/compare/v1.0.3...v1.0.4) (2022-06-09)
 
 
