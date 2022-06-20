@@ -305,6 +305,22 @@ test('processAuthorizationCodeOAuth2Response() without ID Tokens', async (t) => 
     lib.processAuthorizationCodeOAuth2Response(
       issuer,
       client,
+      getResponse(
+        JSON.stringify({
+          access_token: 'token',
+          token_type: 'unrecognized',
+          expires_in: new Date().toUTCString(),
+        }),
+      ),
+    ),
+    {
+      message: 'unsupported `token_type` value',
+    },
+  )
+  await t.throwsAsync(
+    lib.processAuthorizationCodeOAuth2Response(
+      issuer,
+      client,
       getResponse(JSON.stringify({ access_token: 'token', token_type: 'Bearer', scope: null })),
     ),
     {
@@ -824,6 +840,86 @@ test('processAuthorizationCodeOpenIDResponse() nonce checks', async (t) => {
         }),
       ),
       'random-value',
+    ),
+  )
+})
+
+test('processAuthorizationCodeOpenIDResponse() auth_time checks', async (t) => {
+  const tIssuer: lib.AuthorizationServer = { ...issuer, jwks_uri: endpoint('jwks') }
+
+  await t.throwsAsync(
+    lib.processAuthorizationCodeOpenIDResponse(
+      tIssuer,
+      {
+        ...client,
+        require_auth_time: true,
+      },
+      getResponse(
+        JSON.stringify({
+          access_token: 'token',
+          token_type: 'Bearer',
+          id_token: await new jose.SignJWT({
+            auth_time: '0',
+          })
+            .setProtectedHeader({ alg: 'RS256' })
+            .setIssuer(issuer.issuer)
+            .setSubject('urn:example:subject')
+            .setAudience(client.client_id)
+            .setExpirationTime('5m')
+            .setIssuedAt()
+            .sign(t.context.RS256.privateKey),
+        }),
+      ),
+    ),
+    { message: 'invalid ID Token "auth_time"' },
+  )
+})
+
+test('processAuthorizationCodeOpenIDResponse() azp checks', async (t) => {
+  const tIssuer: lib.AuthorizationServer = { ...issuer, jwks_uri: endpoint('jwks') }
+
+  await t.throwsAsync(
+    lib.processAuthorizationCodeOpenIDResponse(
+      tIssuer,
+      client,
+      getResponse(
+        JSON.stringify({
+          access_token: 'token',
+          token_type: 'Bearer',
+          id_token: await new jose.SignJWT({})
+            .setProtectedHeader({ alg: 'RS256' })
+            .setIssuer(issuer.issuer)
+            .setSubject('urn:example:subject')
+            .setAudience([client.client_id, 'other-aud'])
+            .setExpirationTime('5m')
+            .setIssuedAt()
+            .sign(t.context.RS256.privateKey),
+        }),
+      ),
+    ),
+    { message: 'unexpected ID Token "azp" (authorized party)' },
+  )
+
+  await t.notThrowsAsync(
+    lib.processAuthorizationCodeOpenIDResponse(
+      tIssuer,
+      client,
+      getResponse(
+        JSON.stringify({
+          access_token: 'token',
+          token_type: 'Bearer',
+          id_token: await new jose.SignJWT({
+            azp: client.client_id,
+          })
+            .setProtectedHeader({ alg: 'RS256' })
+            .setIssuer(issuer.issuer)
+            .setSubject('urn:example:subject')
+            .setAudience([client.client_id, 'other-aud'])
+            .setExpirationTime('5m')
+            .setIssuedAt()
+            .sign(t.context.RS256.privateKey),
+        }),
+      ),
     ),
   )
 })
