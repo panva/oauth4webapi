@@ -958,7 +958,7 @@ export async function calculatePKCECodeChallenge(codeVerifier: string) {
     throw new TypeError('"codeVerifier" must be a non-empty string')
   }
 
-  return b64u(await crypto.subtle.digest('SHA-256', buf(codeVerifier)))
+  return b64u(await crypto.subtle.digest({ name: 'SHA-256' }, buf(codeVerifier)))
 }
 
 interface NormalizedKeyInput {
@@ -1367,7 +1367,9 @@ async function dpopProofJwt(
       htm,
       nonce,
       htu: `${url.origin}${url.pathname}`,
-      ath: accessToken ? b64u(await crypto.subtle.digest('SHA-256', buf(accessToken))) : undefined,
+      ath: accessToken
+        ? b64u(await crypto.subtle.digest({ name: 'SHA-256' }, buf(accessToken)))
+        : undefined,
     },
     privateKey,
   )
@@ -1989,12 +1991,12 @@ async function timingSafeEqual(a: Uint8Array, b: Uint8Array) {
 }
 
 async function idTokenHash(alg: string, data: string) {
-  let algorithm: string
+  let algorithm: AlgorithmIdentifier
   switch (alg) {
     case 'RS256': // Fall through
     case 'PS256': // Fall through
     case 'ES256':
-      algorithm = 'SHA-256'
+      algorithm = { name: 'SHA-256' }
       break
     default:
       throw new UnsupportedOperationError()
@@ -3098,7 +3100,7 @@ function checkRsaKeyAlgorithm(algorithm: RsaKeyAlgorithm) {
 function subtleAlgorithm(key: CryptoKey): AlgorithmIdentifier | RsaPssParams | EcdsaParams {
   switch (key.algorithm.name) {
     case 'ECDSA':
-      return <EcdsaParams>{ name: key.algorithm.name, hash: 'SHA-256' }
+      return <EcdsaParams>{ name: key.algorithm.name, hash: { name: 'SHA-256' } }
     case 'RSA-PSS':
       checkRsaKeyAlgorithm(<RsaKeyAlgorithm>key.algorithm)
       return <RsaPssParams>{
@@ -3442,10 +3444,10 @@ async function importJwk(jwk: JWK) {
 
   switch (alg) {
     case 'PS256':
-      algorithm = { name: 'RSA-PSS', hash: 'SHA-256' }
+      algorithm = { name: 'RSA-PSS', hash: { name: 'SHA-256' } }
       break
     case 'RS256':
-      algorithm = { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }
+      algorithm = { name: 'RSASSA-PKCS1-v1_5', hash: { name: 'SHA-256' } }
       break
     case 'ES256':
       algorithm = { name: 'ECDSA', namedCurve: 'P-256' }
@@ -3690,7 +3692,7 @@ export async function generateKeyPair(
     case 'PS256':
       algorithm = {
         name: 'RSA-PSS',
-        hash: 'SHA-256',
+        hash: { name: 'SHA-256' },
         modulusLength: options?.modulusLength ?? 2048,
         publicExponent: new Uint8Array([0x01, 0x00, 0x01]),
       }
@@ -3698,7 +3700,7 @@ export async function generateKeyPair(
     case 'RS256':
       algorithm = {
         name: 'RSASSA-PKCS1-v1_5',
-        hash: 'SHA-256',
+        hash: { name: 'SHA-256' },
         modulusLength: options?.modulusLength ?? 2048,
         publicExponent: new Uint8Array([0x01, 0x00, 0x01]),
       }
@@ -3744,5 +3746,5 @@ export async function calculateJwkThumbprint(key: CryptoKey) {
       throw new UnsupportedOperationError()
   }
 
-  return b64u(await crypto.subtle.digest('SHA-256', buf(JSON.stringify(components))))
+  return b64u(await crypto.subtle.digest({ name: 'SHA-256' }, buf(JSON.stringify(components))))
 }
