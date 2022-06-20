@@ -1991,7 +1991,7 @@ async function timingSafeEqual(a: Uint8Array, b: Uint8Array) {
 }
 
 async function idTokenHash(alg: string, data: string) {
-  let algorithm: AlgorithmIdentifier
+  let algorithm: Algorithm
   switch (alg) {
     case 'RS256': // Fall through
     case 'PS256': // Fall through
@@ -3097,7 +3097,7 @@ function checkRsaKeyAlgorithm(algorithm: RsaKeyAlgorithm) {
   }
 }
 
-function subtleAlgorithm(key: CryptoKey): AlgorithmIdentifier | RsaPssParams | EcdsaParams {
+function subtleAlgorithm(key: CryptoKey): Algorithm | RsaPssParams | EcdsaParams {
   switch (key.algorithm.name) {
     case 'ECDSA':
       return <EcdsaParams>{ name: key.algorithm.name, hash: { name: 'SHA-256' } }
