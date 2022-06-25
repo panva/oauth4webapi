@@ -52,18 +52,18 @@
     "test": "ava"
   },
   "devDependencies": {
-    "@esbuild-kit/esm-loader": "^2.2.0",
+    "@esbuild-kit/esm-loader": "^2.3.1",
     "@types/node": "^18.0.0",
     "@typescript/lib-dom": "npm:@types/web",
-    "ava": "^4.2.0",
+    "ava": "^4.3.0",
     "c8": "^7.11.3",
     "jose": "^4.8.1",
     "patch-package": "^6.4.7",
-    "prettier": "^2.6.2",
+    "prettier": "^2.7.1",
     "timekeeper": "^2.2.0",
-    "typedoc": "^0.22.15",
+    "typedoc": "^0.22.18",
     "typedoc-plugin-markdown": "^3.12.1",
-    "typescript": "^4.6.4",
-    "undici": "^5.2.0"
+    "typescript": "^4.7.4",
+    "undici": "^5.5.1"
   }
 }
