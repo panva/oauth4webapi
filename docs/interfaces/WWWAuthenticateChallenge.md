@@ -32,5 +32,4 @@ ___
 
 • `Readonly` **scheme**: `string`
 
-NOTE: because the value is case insensitive it is always returned
-lowercased
+NOTE: because the value is case insensitive it is always returned lowercased

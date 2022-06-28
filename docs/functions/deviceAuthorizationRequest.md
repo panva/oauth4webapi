@@ -2,7 +2,7 @@
 
 [💗 Help the project](https://github.com/sponsors/panva)
 
-▸ **deviceAuthorizationRequest**(`as`, `client`, `parameters`, `options?`): `Promise`<`Response`\>
+▸ **deviceAuthorizationRequest**(`as`, `client`, `parameters`, `options?`): `Promise`<[`Response`]( https://developer.mozilla.org/en-US/docs/Web/API/Response )\>
 
 Performs a Device Authorization Request at the
 [`as.device_authorization_endpoint`](../interfaces/AuthorizationServer.md#device_authorization_endpoint).
@@ -15,13 +15,9 @@ Performs a Device Authorization Request at the
 | :------ | :------ | :------ |
 | `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata. |
 | `client` | [`Client`](../interfaces/Client.md) | Client Metadata. |
-| `parameters` | `URLSearchParams` | Device Authorization Request parameters. |
+| `parameters` | [`URLSearchParams`]( https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams ) | Device Authorization Request parameters. |
 | `options?` | [`DeviceAuthorizationRequestOptions`](../interfaces/DeviceAuthorizationRequestOptions.md) | - |
 
 #### Returns
 
-`Promise`<`Response`\>
-
-Resolves with
-[Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)'s
-[Response](https://developer.mozilla.org/en-US/docs/Web/API/Response).
+`Promise`<[`Response`]( https://developer.mozilla.org/en-US/docs/Web/API/Response )\>

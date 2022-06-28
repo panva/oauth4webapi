@@ -20,18 +20,17 @@ JWT Claims Set from an ID Token.
 
 ▸ **getValidatedIdTokenClaims**(`ref`): [`IDToken`](../interfaces/IDToken.md) \| `undefined`
 
-Returns ID Token claims validated during [processRefreshTokenResponse](processRefreshTokenResponse.md)
-or [processDeviceCodeResponse](processDeviceCodeResponse.md).
+Returns ID Token claims validated during [processRefreshTokenResponse](processRefreshTokenResponse.md) or
+[processDeviceCodeResponse](processDeviceCodeResponse.md).
 
 #### Parameters
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `ref` | [`TokenEndpointResponse`](../interfaces/TokenEndpointResponse.md) | Value previously resolved from [processRefreshTokenResponse](processRefreshTokenResponse.md) or [processDeviceCodeResponse](processDeviceCodeResponse.md). |
+| `ref` | [`TokenEndpointResponse`](../interfaces/TokenEndpointResponse.md) | Value previously resolved from [processRefreshTokenResponse](processRefreshTokenResponse.md) or   [processDeviceCodeResponse](processDeviceCodeResponse.md). |
 
 #### Returns
 
 [`IDToken`](../interfaces/IDToken.md) \| `undefined`
 
-JWT Claims Set from an ID Token, or undefined if there is no ID
-Token in `ref`.
+JWT Claims Set from an ID Token, or undefined if there is no ID Token in `ref`.

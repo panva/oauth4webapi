@@ -14,22 +14,19 @@
 
 ### privateKey
 
-• **privateKey**: `CryptoKey`
+• **privateKey**: [`CryptoKey`]( https://developer.mozilla.org/en-US/docs/Web/API/CryptoKey )
 
-Private
-[CryptoKey](https://developer.mozilla.org/en-US/docs/Web/API/CryptoKey)
-instance to sign the DPoP Proof JWT with.
+Private CryptoKey instance to sign the DPoP Proof JWT with.
 
-Its algorithm must be compatible with a supported
-[JWS `alg` Algorithm](../types/JWSAlgorithm.md).
+Its algorithm must be compatible with a supported [JWS `alg` Algorithm](../types/JWSAlgorithm.md).
 
 ___
 
 ### publicKey
 
-• **publicKey**: `CryptoKey`
+• **publicKey**: [`CryptoKey`]( https://developer.mozilla.org/en-US/docs/Web/API/CryptoKey )
 
-The public key corresponding to [DPoPOptions.privateKey](DPoPOptions.md#privatekey)
+The public key corresponding to [privateKey](DPoPOptions.md#privatekey)
 
 ___
 
@@ -37,6 +34,6 @@ ___
 
 • `Optional` **nonce**: `string`
 
-Server-Provided Nonce to use in the request. This option serves as an
-override in case the self-correcting mechanism does not work with a
-particular server. Previously received nonces will be used automatically.
+Server-Provided Nonce to use in the request. This option serves as an override in case the
+self-correcting mechanism does not work with a particular server. Previously received nonces
+will be used automatically.

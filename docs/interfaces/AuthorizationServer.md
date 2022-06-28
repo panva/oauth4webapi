@@ -92,8 +92,8 @@ ___
 
 • `Optional` `Readonly` **acr\_values\_supported**: `string`[]
 
-JSON array containing a list of the Authentication Context Class References
-that this authorization server supports.
+JSON array containing a list of the Authentication Context Class References that this
+authorization server supports.
 
 ___
 
@@ -101,8 +101,8 @@ ___
 
 • `Optional` `Readonly` **authorization\_encryption\_alg\_values\_supported**: `string`[]
 
-JSON array containing a list of algorithms supported by the authorization
-server for introspection response encryption (`alg` value).
+JSON array containing a list of algorithms supported by the authorization server for
+introspection response encryption (`alg` value).
 
 ___
 
@@ -110,8 +110,8 @@ ___
 
 • `Optional` `Readonly` **authorization\_encryption\_enc\_values\_supported**: `string`[]
 
-JSON array containing a list of algorithms supported by the authorization
-server for introspection response encryption (`enc` value).
+JSON array containing a list of algorithms supported by the authorization server for
+introspection response encryption (`enc` value).
 
 ___
 
@@ -127,8 +127,8 @@ ___
 
 • `Optional` `Readonly` **authorization\_response\_iss\_parameter\_supported**: `boolean`
 
-Boolean value indicating whether the authorization server provides the
-`iss` parameter in the authorization response.
+Boolean value indicating whether the authorization server provides the `iss` parameter in the
+authorization response.
 
 ___
 
@@ -136,8 +136,8 @@ ___
 
 • `Optional` `Readonly` **authorization\_signing\_alg\_values\_supported**: `string`[]
 
-JSON array containing a list of algorithms supported by the authorization
-server for introspection response signing.
+JSON array containing a list of algorithms supported by the authorization server for
+introspection response signing.
 
 ___
 
@@ -153,8 +153,8 @@ ___
 
 • `Optional` `Readonly` **backchannel\_authentication\_request\_signing\_alg\_values\_supported**: `string`[]
 
-JSON array containing a list of the JWS signing algorithms supported for
-validation of signed CIBA authentication requests.
+JSON array containing a list of the JWS signing algorithms supported for validation of signed
+CIBA authentication requests.
 
 ___
 
@@ -162,9 +162,8 @@ ___
 
 • `Optional` `Readonly` **backchannel\_logout\_session\_supported**: `boolean`
 
-Boolean value specifying whether the authorization server can pass a `sid`
-(session ID) Claim in the Logout Token to identify the RP session with the
-OP.
+Boolean value specifying whether the authorization server can pass a `sid` (session ID) Claim
+in the Logout Token to identify the RP session with the OP.
 
 ___
 
@@ -172,8 +171,7 @@ ___
 
 • `Optional` `Readonly` **backchannel\_logout\_supported**: `boolean`
 
-Boolean value specifying whether the authorization server supports
-back-channel logout.
+Boolean value specifying whether the authorization server supports back-channel logout.
 
 ___
 
@@ -189,8 +187,7 @@ ___
 
 • `Optional` `Readonly` **backchannel\_user\_code\_parameter\_supported**: `boolean`
 
-Indicates whether the authorization server supports the use of the CIBA
-`user_code` parameter.
+Indicates whether the authorization server supports the use of the CIBA `user_code` parameter.
 
 ___
 
@@ -198,9 +195,8 @@ ___
 
 • `Optional` `Readonly` **check\_session\_iframe**: `string`
 
-URL of an authorization server iframe that supports cross-origin
-communications for session state information with the RP Client, using the
-HTML5 postMessage API.
+URL of an authorization server iframe that supports cross-origin communications for session
+state information with the RP Client, using the HTML5 postMessage API.
 
 ___
 
@@ -208,8 +204,7 @@ ___
 
 • `Optional` `Readonly` **claim\_types\_supported**: `string`[]
 
-JSON array containing a list of the Claim Types that the authorization
-server supports.
+JSON array containing a list of the Claim Types that the authorization server supports.
 
 ___
 
@@ -217,8 +212,8 @@ ___
 
 • `Optional` `Readonly` **claims\_locales\_supported**: `string`[]
 
-Languages and scripts supported for values in Claims being returned,
-represented as a JSON array of RFC 5646 language tag values.
+Languages and scripts supported for values in Claims being returned, represented as a JSON
+array of RFC 5646 language tag values.
 
 ___
 
@@ -226,8 +221,7 @@ ___
 
 • `Optional` `Readonly` **claims\_parameter\_supported**: `boolean`
 
-Boolean value specifying whether the authorization server supports use of
-the `claims` parameter.
+Boolean value specifying whether the authorization server supports use of the `claims` parameter.
 
 ___
 
@@ -235,8 +229,8 @@ ___
 
 • `Optional` `Readonly` **claims\_supported**: `string`[]
 
-JSON array containing a list of the Claim Names of the Claims that the
-authorization server MAY be able to supply values for.
+JSON array containing a list of the Claim Names of the Claims that the authorization server MAY
+be able to supply values for.
 
 ___
 
@@ -260,8 +254,7 @@ ___
 
 • `Optional` `Readonly` **display\_values\_supported**: `string`[]
 
-JSON array containing a list of the `display` parameter values that the
-authorization server supports.
+JSON array containing a list of the `display` parameter values that the authorization server supports.
 
 ___
 
@@ -269,8 +262,7 @@ ___
 
 • `Optional` `Readonly` **dpop\_signing\_alg\_values\_supported**: `string`[]
 
-JSON array containing a list of the JWS algorithms supported for DPoP proof
-JWTs.
+JSON array containing a list of the JWS algorithms supported for DPoP proof JWTs.
 
 ___
 
@@ -278,8 +270,8 @@ ___
 
 • `Optional` `Readonly` **end\_session\_endpoint**: `string`
 
-URL at the authorization server to which an RP can perform a redirect to
-request that the End-User be logged out at the authorization server.
+URL at the authorization server to which an RP can perform a redirect to request that the
+End-User be logged out at the authorization server.
 
 ___
 
@@ -287,9 +279,9 @@ ___
 
 • `Optional` `Readonly` **frontchannel\_logout\_session\_supported**: `boolean`
 
-Boolean value specifying whether the authorization server can pass `iss`
-(issuer) and `sid` (session ID) query parameters to identify the RP session
-with the authorization server when the `frontchannel_logout_uri` is used.
+Boolean value specifying whether the authorization server can pass `iss` (issuer) and `sid`
+(session ID) query parameters to identify the RP session with the authorization server when the
+`frontchannel_logout_uri` is used.
 
 ___
 
@@ -297,8 +289,7 @@ ___
 
 • `Optional` `Readonly` **frontchannel\_logout\_supported**: `boolean`
 
-Boolean value specifying whether the authorization server supports
-HTTP-based logout.
+Boolean value specifying whether the authorization server supports HTTP-based logout.
 
 ___
 
@@ -306,8 +297,7 @@ ___
 
 • `Optional` `Readonly` **grant\_types\_supported**: `string`[]
 
-JSON array containing a list of the `grant_type` values that this
-authorization server supports.
+JSON array containing a list of the `grant_type` values that this authorization server supports.
 
 ___
 
@@ -315,8 +305,8 @@ ___
 
 • `Optional` `Readonly` **id\_token\_encryption\_alg\_values\_supported**: `string`[]
 
-JSON array containing a list of the JWE `alg` values supported by the
-authorization server for the ID Token.
+JSON array containing a list of the JWE `alg` values supported by the authorization server for
+the ID Token.
 
 ___
 
@@ -324,8 +314,8 @@ ___
 
 • `Optional` `Readonly` **id\_token\_encryption\_enc\_values\_supported**: `string`[]
 
-JSON array containing a list of the JWE `enc` values supported by the
-authorization server for the ID Token.
+JSON array containing a list of the JWE `enc` values supported by the authorization server for
+the ID Token.
 
 ___
 
@@ -333,8 +323,8 @@ ___
 
 • `Optional` `Readonly` **id\_token\_signing\_alg\_values\_supported**: `string`[]
 
-JSON array containing a list of the JWS `alg` values supported by the
-authorization server for the ID Token.
+JSON array containing a list of the JWS `alg` values supported by the authorization server for
+the ID Token.
 
 ___
 
@@ -342,8 +332,8 @@ ___
 
 • `Optional` `Readonly` **introspection\_encryption\_alg\_values\_supported**: `string`[]
 
-JSON array containing a list of algorithms supported by the authorization
-server for introspection response content key encryption (`alg` value).
+JSON array containing a list of algorithms supported by the authorization server for
+introspection response content key encryption (`alg` value).
 
 ___
 
@@ -351,8 +341,8 @@ ___
 
 • `Optional` `Readonly` **introspection\_encryption\_enc\_values\_supported**: `string`[]
 
-JSON array containing a list of algorithms supported by the authorization
-server for introspection response content encryption (`enc` value).
+JSON array containing a list of algorithms supported by the authorization server for
+introspection response content encryption (`enc` value).
 
 ___
 
@@ -368,8 +358,7 @@ ___
 
 • `Optional` `Readonly` **introspection\_endpoint\_auth\_methods\_supported**: `string`[]
 
-JSON array containing a list of client authentication methods supported by
-this introspection endpoint.
+JSON array containing a list of client authentication methods supported by this introspection endpoint.
 
 ___
 
@@ -377,9 +366,8 @@ ___
 
 • `Optional` `Readonly` **introspection\_endpoint\_auth\_signing\_alg\_values\_supported**: `string`[]
 
-JSON array containing a list of the JWS signing algorithms supported by the
-introspection endpoint for the signature on the JWT used to authenticate
-the client at the introspection endpoint.
+JSON array containing a list of the JWS signing algorithms supported by the introspection
+endpoint for the signature on the JWT used to authenticate the client at the introspection endpoint.
 
 ___
 
@@ -387,8 +375,8 @@ ___
 
 • `Optional` `Readonly` **introspection\_signing\_alg\_values\_supported**: `string`[]
 
-JSON array containing a list of algorithms supported by the authorization
-server for introspection response signing.
+JSON array containing a list of algorithms supported by the authorization server for
+introspection response signing.
 
 ___
 
@@ -404,9 +392,8 @@ ___
 
 • `Optional` `Readonly` **mtls\_endpoint\_aliases**: [`MTLSEndpointAliases`](MTLSEndpointAliases.md)
 
-JSON object containing alternative authorization server endpoints, which a
-client intending to do mutual TLS will use in preference to the
-conventional endpoints.
+JSON object containing alternative authorization server endpoints, which a client intending to
+do mutual TLS will use in preference to the conventional endpoints.
 
 ___
 
@@ -414,9 +401,9 @@ ___
 
 • `Optional` `Readonly` **op\_policy\_uri**: `string`
 
-URL that the authorization server provides to the person registering the
-client to read about the authorization server's requirements on how the
-client can use the data provided by the authorization server.
+URL that the authorization server provides to the person registering the client to read about
+the authorization server's requirements on how the client can use the data provided by the
+authorization server.
 
 ___
 
@@ -424,8 +411,8 @@ ___
 
 • `Optional` `Readonly` **op\_tos\_uri**: `string`
 
-URL that the authorization server provides to the person registering the
-client to read about the authorization server's terms of service.
+URL that the authorization server provides to the person registering the client to read about
+the authorization server's terms of service.
 
 ___
 
@@ -449,8 +436,8 @@ ___
 
 • `Optional` `Readonly` **request\_object\_encryption\_alg\_values\_supported**: `string`[]
 
-JSON array containing a list of the JWE `alg` values supported by the
-authorization server for Request Objects.
+JSON array containing a list of the JWE `alg` values supported by the authorization server for
+Request Objects.
 
 ___
 
@@ -458,8 +445,8 @@ ___
 
 • `Optional` `Readonly` **request\_object\_encryption\_enc\_values\_supported**: `string`[]
 
-JSON array containing a list of the JWE `enc` values supported by the
-authorization server for Request Objects.
+JSON array containing a list of the JWE `enc` values supported by the authorization server for
+Request Objects.
 
 ___
 
@@ -467,8 +454,8 @@ ___
 
 • `Optional` `Readonly` **request\_object\_signing\_alg\_values\_supported**: `string`[]
 
-JSON array containing a list of the JWS `alg` values supported by the
-authorization server for Request Objects.
+JSON array containing a list of the JWS `alg` values supported by the authorization server for
+Request Objects.
 
 ___
 
@@ -476,8 +463,7 @@ ___
 
 • `Optional` `Readonly` **request\_parameter\_supported**: `boolean`
 
-Boolean value specifying whether the authorization server supports use of
-the `request` parameter.
+Boolean value specifying whether the authorization server supports use of the `request` parameter.
 
 ___
 
@@ -485,8 +471,7 @@ ___
 
 • `Optional` `Readonly` **request\_uri\_parameter\_supported**: `boolean`
 
-Boolean value specifying whether the authorization server supports use of
-the `request_uri` parameter.
+Boolean value specifying whether the authorization server supports use of the `request_uri` parameter.
 
 ___
 
@@ -494,8 +479,7 @@ ___
 
 • `Optional` `Readonly` **require\_pushed\_authorization\_requests**: `boolean`
 
-Indicates whether the authorization server accepts authorization requests
-only via PAR.
+Indicates whether the authorization server accepts authorization requests only via PAR.
 
 ___
 
@@ -503,8 +487,8 @@ ___
 
 • `Optional` `Readonly` **require\_request\_uri\_registration**: `boolean`
 
-Boolean value specifying whether the authorization server requires any
-`request_uri` values used to be pre-registered.
+Boolean value specifying whether the authorization server requires any `request_uri` values
+used to be pre-registered.
 
 ___
 
@@ -512,8 +496,8 @@ ___
 
 • `Optional` `Readonly` **require\_signed\_request\_object**: `boolean`
 
-Indicates where authorization request needs to be protected as Request
-Object and provided through either `request` or `request_uri` parameter.
+Indicates where authorization request needs to be protected as Request Object and provided
+through either `request` or `request_uri` parameter.
 
 ___
 
@@ -521,8 +505,7 @@ ___
 
 • `Optional` `Readonly` **response\_modes\_supported**: `string`[]
 
-JSON array containing a list of the `response_mode` values that this
-authorization server supports.
+JSON array containing a list of the `response_mode` values that this authorization server supports.
 
 ___
 
@@ -530,8 +513,7 @@ ___
 
 • `Optional` `Readonly` **response\_types\_supported**: `string`[]
 
-JSON array containing a list of the `response_type` values that this
-authorization server supports.
+JSON array containing a list of the `response_type` values that this authorization server supports.
 
 ___
 
@@ -547,8 +529,7 @@ ___
 
 • `Optional` `Readonly` **revocation\_endpoint\_auth\_methods\_supported**: `string`[]
 
-JSON array containing a list of client authentication methods supported by
-this revocation endpoint.
+JSON array containing a list of client authentication methods supported by this revocation endpoint.
 
 ___
 
@@ -556,9 +537,8 @@ ___
 
 • `Optional` `Readonly` **revocation\_endpoint\_auth\_signing\_alg\_values\_supported**: `string`[]
 
-JSON array containing a list of the JWS signing algorithms supported by the
-revocation endpoint for the signature on the JWT used to authenticate the
-client at the revocation endpoint.
+JSON array containing a list of the JWS signing algorithms supported by the revocation endpoint
+for the signature on the JWT used to authenticate the client at the revocation endpoint.
 
 ___
 
@@ -566,8 +546,7 @@ ___
 
 • `Optional` `Readonly` **scopes\_supported**: `string`[]
 
-JSON array containing a list of the `scope` values that this authorization
-server supports.
+JSON array containing a list of the `scope` values that this authorization server supports.
 
 ___
 
@@ -575,8 +554,8 @@ ___
 
 • `Optional` `Readonly` **service\_documentation**: `string`
 
-URL of a page containing human-readable information that developers might
-want or need to know when using the authorization server.
+URL of a page containing human-readable information that developers might want or need to know
+when using the authorization server.
 
 ___
 
@@ -584,8 +563,7 @@ ___
 
 • `Optional` `Readonly` **signed\_metadata**: `string`
 
-Signed JWT containing metadata values about the authorization server as
-claims.
+Signed JWT containing metadata values about the authorization server as claims.
 
 ___
 
@@ -593,8 +571,7 @@ ___
 
 • `Optional` `Readonly` **subject\_types\_supported**: `string`[]
 
-JSON array containing a list of the Subject Identifier types that this
-authorization server supports.
+JSON array containing a list of the Subject Identifier types that this authorization server supports.
 
 ___
 
@@ -602,8 +579,7 @@ ___
 
 • `Optional` `Readonly` **tls\_client\_certificate\_bound\_access\_tokens**: `boolean`
 
-Indicates authorization server support for mutual-TLS client
-certificate-bound access tokens.
+Indicates authorization server support for mutual-TLS client certificate-bound access tokens.
 
 ___
 
@@ -619,8 +595,7 @@ ___
 
 • `Optional` `Readonly` **token\_endpoint\_auth\_methods\_supported**: `string`[]
 
-JSON array containing a list of client authentication methods supported by
-this token endpoint.
+JSON array containing a list of client authentication methods supported by this token endpoint.
 
 ___
 
@@ -628,9 +603,8 @@ ___
 
 • `Optional` `Readonly` **token\_endpoint\_auth\_signing\_alg\_values\_supported**: `string`[]
 
-JSON array containing a list of the JWS signing algorithms supported by the
-token endpoint for the signature on the JWT used to authenticate the client
-at the token endpoint.
+JSON array containing a list of the JWS signing algorithms supported by the token endpoint for
+the signature on the JWT used to authenticate the client at the token endpoint.
 
 ___
 
@@ -638,8 +612,8 @@ ___
 
 • `Optional` `Readonly` **ui\_locales\_supported**: `string`[]
 
-Languages and scripts supported for the user interface, represented as a
-JSON array of language tag values from RFC 5646.
+Languages and scripts supported for the user interface, represented as a JSON array of language
+tag values from RFC 5646.
 
 ___
 
@@ -647,8 +621,7 @@ ___
 
 • `Optional` `Readonly` **userinfo\_encryption\_alg\_values\_supported**: `string`[]
 
-JSON array containing a list of the JWE `alg` values supported by the
-UserInfo Endpoint.
+JSON array containing a list of the JWE `alg` values supported by the UserInfo Endpoint.
 
 ___
 
@@ -656,8 +629,7 @@ ___
 
 • `Optional` `Readonly` **userinfo\_encryption\_enc\_values\_supported**: `string`[]
 
-JSON array containing a list of the JWE `enc` values supported by the
-UserInfo Endpoint.
+JSON array containing a list of the JWE `enc` values supported by the UserInfo Endpoint.
 
 ___
 
@@ -673,5 +645,4 @@ ___
 
 • `Optional` `Readonly` **userinfo\_signing\_alg\_values\_supported**: `string`[]
 
-JSON array containing a list of the JWS `alg` values supported by the
-UserInfo Endpoint.
+JSON array containing a list of the JWS `alg` values supported by the UserInfo Endpoint.
