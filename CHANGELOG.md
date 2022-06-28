@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.1.0](https://github.com/panva/oauth4webapi/compare/v1.0.5...v1.1.0) (2022-06-28)
+
+
+### Features
+
+* allow AbortSignal-returning function as well as an instance ([90d21b8](https://github.com/panva/oauth4webapi/commit/90d21b871c00e74fbea584c700260067edea350b))
+
 ## [1.0.5](https://github.com/panva/oauth4webapi/compare/v1.0.4...v1.0.5) (2022-06-17)
 
 
