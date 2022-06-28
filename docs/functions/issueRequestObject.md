@@ -4,7 +4,7 @@
 
 ▸ **issueRequestObject**(`as`, `client`, `parameters`, `privateKey`): `Promise`<`string`\>
 
-Generates JWT-Secured Authorization Request (JAR) that is either signed, or signed and encrypted.
+Generates a signed JWT-Secured Authorization Request (JAR).
 
 **`see`** [RFC 9101 - The OAuth 2.0 Authorization Framework: JWT-Secured Authorization Request (JAR)](https://www.rfc-editor.org/rfc/rfc9101.html#name-request-object-2)
 

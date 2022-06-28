@@ -1080,7 +1080,7 @@ async function jwt(
 }
 
 /**
- * Generates JWT-Secured Authorization Request (JAR) that is either signed, or signed and encrypted.
+ * Generates a signed JWT-Secured Authorization Request (JAR).
  *
  * @param as Authorization Server Metadata.
  * @param client Client Metadata.
