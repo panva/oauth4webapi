@@ -21,12 +21,12 @@ ___
 
 ### signal
 
-• `Optional` **signal**: `AbortSignal`
+• `Optional` **signal**: `AbortSignal` \| () => `AbortSignal`
 
 An [AbortSignal](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal)
-instance to abort the underlying fetch requests.
+instance, or a factory returning one, to abort the underlying fetch requests.
 
-**`example`** Obtain a 5000ms timeout AbortSignal
+**`example`** A 5000ms timeout AbortSignal for every request
 ```js
-const signal = AbortSignal.timeout(5_000) // Note: AbortSignal.timeout may not yet be available in all runtimes.
+const signal = () => AbortSignal.timeout(5_000) // Note: AbortSignal.timeout may not yet be available in all runtimes.
 ```

@@ -726,14 +726,14 @@ const SUPPORTED_JWS_ALGS: JWSAlgorithm[] = ['PS256', 'ES256', 'RS256']
 export interface HttpRequestOptions {
   /**
    * An {@link https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal AbortSignal}
-   * instance to abort the underlying fetch requests.
+   * instance, or a factory returning one, to abort the underlying fetch requests.
    *
-   * @example Obtain a 5000ms timeout AbortSignal
+   * @example A 5000ms timeout AbortSignal for every request
    * ```js
-   * const signal = AbortSignal.timeout(5_000) // Note: AbortSignal.timeout may not yet be available in all runtimes.
+   * const signal = () => AbortSignal.timeout(5_000) // Note: AbortSignal.timeout may not yet be available in all runtimes.
    * ```
    */
-  signal?: AbortSignal
+  signal?: (() => AbortSignal) | AbortSignal
 
   /**
    * A {@link https://developer.mozilla.org/en-US/docs/Web/API/Headers Headers}
@@ -790,6 +790,10 @@ function prepareHeaders(input: unknown): Headers {
     throw new TypeError('"options.headers" must not include the "dpop" header name')
   }
   return headers
+}
+
+function signal(value: Exclude<HttpRequestOptions['signal'], undefined>): AbortSignal {
+  return typeof value === 'function' ? value() : value
 }
 
 /**
@@ -850,7 +854,7 @@ export async function discoveryRequest(
     headers,
     method: 'GET',
     redirect: 'manual',
-    signal: options?.signal,
+    signal: options?.signal ? signal(options.signal) : null,
   }).then(processDpopNonce)
 }
 
@@ -1681,7 +1685,7 @@ export async function protectedResourceRequest(
     headers,
     method,
     redirect: 'manual',
-    signal: options?.signal,
+    signal: options?.signal ? signal(options.signal) : null,
   }).then(processDpopNonce)
 }
 
@@ -2027,7 +2031,7 @@ async function authenticatedRequest(
     headers,
     method,
     redirect: 'manual',
-    signal: options?.signal,
+    signal: options?.signal ? signal(options.signal) : null,
   }).then(processDpopNonce)
 }
 
@@ -2999,7 +3003,7 @@ export async function jwksRequest(
     headers,
     method: 'GET',
     redirect: 'manual',
-    signal: options?.signal,
+    signal: options?.signal ? signal(options.signal) : null,
   }).then(processDpopNonce)
 }
 
