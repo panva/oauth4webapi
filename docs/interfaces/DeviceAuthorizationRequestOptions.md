@@ -38,6 +38,7 @@ An AbortSignal instance, or a factory returning one, to abort the HTTP Request(s
 this function's invocation.
 
 **`example`** A 5000ms timeout AbortSignal for every request
-  ```js
-  const signal = () => AbortSignal.timeout(5_000) // Note: AbortSignal.timeout may not yet be available in all runtimes.
-  ```
+
+```js
+const signal = () => AbortSignal.timeout(5_000) // Note: AbortSignal.timeout may not yet be available in all runtimes.
+```

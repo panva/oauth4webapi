@@ -62,32 +62,32 @@ export type ClientAuthenticationMethod =
 /**
  * Supported JWS `alg` Algorithm identifiers.
  *
- * @example
- *   PS256 CryptoKey algorithm
- *   ```ts
- *   interface Ps256Algorithm extends RsaHashedKeyAlgorithm {
- *     name: 'RSA-PSS'
- *     hash: { name: 'SHA-256' }
- *   }
- *   ```
+ * @example PS256 CryptoKey algorithm
  *
- * @example
- *   ES256 CryptoKey algorithm
- *   ```ts
- *   interface Es256Algorithm extends EcKeyAlgorithm {
- *     name: 'ECDSA'
- *     namedCurve: 'P-256'
- *   }
- *   ```
+ * ```ts
+ * interface Ps256Algorithm extends RsaHashedKeyAlgorithm {
+ *   name: 'RSA-PSS'
+ *   hash: { name: 'SHA-256' }
+ * }
+ * ```
  *
- * @example
- *   RS256 CryptoKey algorithm
- *   ```ts
- *   interface Rs256Algorithm extends RsaHashedKeyAlgorithm {
- *     name: 'RSASSA-PKCS1-v1_5'
- *     hash: { name: 'SHA-256' }
- *   }
- *   ```
+ * @example ES256 CryptoKey algorithm
+ *
+ * ```ts
+ * interface Es256Algorithm extends EcKeyAlgorithm {
+ *   name: 'ECDSA'
+ *   namedCurve: 'P-256'
+ * }
+ * ```
+ *
+ * @example RS256 CryptoKey algorithm
+ *
+ * ```ts
+ * interface Rs256Algorithm extends RsaHashedKeyAlgorithm {
+ *   name: 'RSASSA-PKCS1-v1_5'
+ *   hash: { name: 'SHA-256' }
+ * }
+ * ```
  */
 export type JWSAlgorithm = 'PS256' | 'ES256' | 'RS256'
 
@@ -582,11 +582,11 @@ export interface HttpRequestOptions {
    * An AbortSignal instance, or a factory returning one, to abort the HTTP Request(s) triggered by
    * this function's invocation.
    *
-   * @example
-   *   A 5000ms timeout AbortSignal for every request
-   *   ```js
-   *   const signal = () => AbortSignal.timeout(5_000) // Note: AbortSignal.timeout may not yet be available in all runtimes.
-   *   ```
+   * @example A 5000ms timeout AbortSignal for every request
+   *
+   * ```js
+   * const signal = () => AbortSignal.timeout(5_000) // Note: AbortSignal.timeout may not yet be available in all runtimes.
+   * ```
    */
   signal?: (() => AbortSignal) | AbortSignal
 

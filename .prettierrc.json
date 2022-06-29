@@ -4,9 +4,8 @@
   "printWidth": 100,
   "semi": false,
   "plugins": ["prettier-plugin-jsdoc"],
+  "tsdoc": true,
   "jsdocSeparateReturnsFromParam": true,
   "jsdocSeparateTagGroups": true,
-  "jsdocPreferCodeFences": true,
-  "jsdocKeepUnParseAbleExampleIndent": true,
   "jsdocPrintWidth": 100
 }
