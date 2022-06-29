@@ -1,5 +1,5 @@
 diff --git a/examples/code.ts b/examples/private_key_jwt.ts
-index d60ab87..fd4c77a 100644
+index 98576c1..1a69495 100644
 --- a/examples/code.ts
 +++ b/examples/private_key_jwt.ts
 @@ -1,5 +1,10 @@

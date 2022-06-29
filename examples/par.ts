@@ -16,7 +16,7 @@ const redirect_uri = 'https://example.rp.com/cb'
 
 if (as.code_challenge_methods_supported?.includes('S256') !== true) {
   // This example assumes S256 PKCE support is signalled
-  // If it isn't supported, random `nonce` should be used for CSRF protection.
+  // If it isn't supported, random `nonce` must be used for CSRF protection.
   throw new Error()
 }
 
