@@ -121,6 +121,12 @@ export function getScope(variant: Record<string, string>) {
   return variant.fapi_jarm_type === 'plain_oauth' ? 'email' : 'openid email'
 }
 
+export function logToActions(content: string) {
+  if (process.env.GITHUB_STEP_SUMMARY) {
+    writeFileSync(process.env.GITHUB_STEP_SUMMARY, `${content}\n`, { flag: 'a' })
+  }
+}
+
 function makePublicJwks(def: any) {
   const client = structuredClone(def)
   client.jwks.keys.forEach((jwk: any) => {
@@ -192,8 +198,17 @@ export default async () => {
 
   const { certificationProfileName } = await api.getTestPlanInfo(plan)
 
+  logToActions('Test Plan Details')
+  logToActions('')
+  logToActions(`- Name: **${PLAN_NAME}**`)
+  logToActions(`- ID: **\`${plan.id}\`**`)
+  logToActions(`- Variant`)
+  for (const [key, value] of Object.entries(variant)) {
+    logToActions(`  - ${key}: ${value}`)
+  }
   if (certificationProfileName) {
     console.log('CERTIFICATION PROFILE NAME:', certificationProfileName)
+    logToActions(`- Certification Profile Name: **${certificationProfileName}**`)
   }
 
   const files: Set<string> = new Set()
