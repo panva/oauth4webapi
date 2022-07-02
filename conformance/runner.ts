@@ -93,8 +93,13 @@ function usesPar(plan: Plan) {
   return plan.name.startsWith('fapi2')
 }
 
+interface TestOptions {
+  useState?: boolean
+  useNonce?: boolean
+}
+
 export const green = test.macro({
-  async exec(t, module: ModulePrescription) {
+  async exec(t, module: ModulePrescription, options?: TestOptions) {
     t.timeout(15000)
 
     const instance = await createTestFromPlan(plan, module)
@@ -147,6 +152,9 @@ export const green = test.macro({
     const code_challenge = await oauth.calculatePKCECodeChallenge(code_verifier)
     const code_challenge_method = 'S256'
 
+    const state = options?.useState ? oauth.generateRandomState() : oauth.expectNoState
+    const nonce = options?.useNonce ? oauth.generateRandomNonce() : oauth.expectNoNonce
+
     let authorizationUrl = new URL(as.authorization_endpoint!)
     if (usesRequestObject(plan.name, variant) === false) {
       authorizationUrl.searchParams.set('client_id', client.client_id)
@@ -155,6 +163,12 @@ export const green = test.macro({
       authorizationUrl.searchParams.set('redirect_uri', configuration.client.redirect_uri)
       authorizationUrl.searchParams.set('response_type', 'code')
       authorizationUrl.searchParams.set('scope', scope)
+      if (typeof state === 'string') {
+        authorizationUrl.searchParams.set('state', state)
+      }
+      if (typeof nonce === 'string') {
+        authorizationUrl.searchParams.set('nonce', nonce)
+      }
     } else {
       authorizationUrl.searchParams.set('client_id', client.client_id)
       const params = new URLSearchParams()
@@ -163,6 +177,12 @@ export const green = test.macro({
       params.set('redirect_uri', configuration.client.redirect_uri)
       params.set('response_type', 'code')
       params.set('scope', scope)
+      if (typeof state === 'string') {
+        params.set('state', state)
+      }
+      if (typeof nonce === 'string') {
+        params.set('nonce', nonce)
+      }
 
       const jwk = configuration.client.jwks.keys.find((key) => key.alg === JWS_ALGORITHM)!
       const privateKey = await importPrivateKey(JWS_ALGORITHM, jwk)
@@ -229,9 +249,9 @@ export const green = test.macro({
       let params: ReturnType<typeof oauth.validateAuthResponse>
 
       if (usesJarm(plan)) {
-        params = await oauth.validateJwtAuthResponse(as, client, currentUrl, oauth.expectNoState)
+        params = await oauth.validateJwtAuthResponse(as, client, currentUrl, state)
       } else {
-        params = oauth.validateAuthResponse(as, client, currentUrl, oauth.expectNoState)
+        params = oauth.validateAuthResponse(as, client, currentUrl, state)
       }
 
       if (oauth.isOAuth2Error(params)) {
@@ -265,7 +285,7 @@ export const green = test.macro({
         | oauth.OpenIDTokenEndpointResponse
         | oauth.OAuth2Error
       if (scope.includes('openid')) {
-        result = await oauth.processAuthorizationCodeOpenIDResponse(as, client, response)
+        result = await oauth.processAuthorizationCodeOpenIDResponse(as, client, response, nonce)
       } else {
         result = await oauth.processAuthorizationCodeOAuth2Response(as, client, response)
       }
@@ -276,7 +296,7 @@ export const green = test.macro({
           t.log('retrying with a newly obtained dpop nonce')
           response = await request()
           if (scope.includes('openid')) {
-            result = await oauth.processAuthorizationCodeOpenIDResponse(as, client, response)
+            result = await oauth.processAuthorizationCodeOpenIDResponse(as, client, response, nonce)
           } else {
             result = await oauth.processAuthorizationCodeOAuth2Response(as, client, response)
           }
@@ -385,9 +405,10 @@ export const red = test.macro({
     module: ModulePrescription,
     expectedMessage?: string | RegExp,
     expectedErrorName: string = 'OperationProcessingError',
+    options?: TestOptions,
   ) {
     await t
-      .throwsAsync(() => <any>green.exec(t, module), {
+      .throwsAsync(() => <any>green.exec(t, module, options), {
         message: expectedMessage,
         name: expectedErrorName,
       })

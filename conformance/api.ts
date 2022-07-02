@@ -138,7 +138,7 @@ export async function waitForState(
     interval = 2_000,
     timeout = 60_000,
     states = new Set(['FINISHED']),
-    results = new Set(['REVIEW', 'PASSED', 'WARNING']),
+    results = new Set(['REVIEW', 'PASSED', 'WARNING', 'SKIPPED']),
   } = {},
 ) {
   const timeoutAt = Date.now() + timeout

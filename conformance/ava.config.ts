@@ -193,6 +193,7 @@ export default async () => {
         const name = module.testModule.replace('fapi2-baseline-id2-client-test-', '')
         const path = `./build/conformance/fapi/${name}.js`
         ensureTestFile(path, name)
+        ensureTestFile(path.replace('./build/', './').replace('.js', '.ts'), name)
         files.add(path)
         break
       }
@@ -201,6 +202,7 @@ export default async () => {
         const name = module.testModule.replace('oidcc-client-test-', '')
         const path = `./build/conformance/oidc/${name}.js`
         ensureTestFile(path, name)
+        ensureTestFile(path.replace('./build/', './').replace('.js', '.ts'), name)
         files.add(path)
         break
       default:
