@@ -16,6 +16,7 @@ switch (PLAN_NAME) {
   case 'oidcc-client-basic-certification-test-plan':
   case 'oidcc-client-test-plan':
   case 'fapi2-baseline-id2-client-test-plan':
+  case 'fapi2-advanced-id1-client-test-plan':
     break
   default:
     throw new Error()
@@ -105,6 +106,15 @@ const DEFAULTS: Record<typeof PLAN_NAME, Record<string, string>> = {
     fapi_jarm_type: 'oidc', // oidc, plain_oauth
     fapi_profile: 'plain_fapi',
   },
+  'fapi2-advanced-id1-client-test-plan': {
+    client_auth_type: 'private_key_jwt',
+    sender_constrain: 'dpop',
+    // TODO: why is this called fapi_jarm_type?
+    fapi_jarm_type: 'oidc', // oidc, plain_oauth
+    fapi_profile: 'plain_fapi',
+    fapi_request_method: 'signed_non_repudiation',
+    fapi_response_mode: 'jarm',
+  },
 }
 
 export function getScope(variant: Record<string, string>) {
@@ -189,8 +199,9 @@ export default async () => {
   const files: Set<string> = new Set()
   for (const module of plan.modules) {
     switch (PLAN_NAME) {
-      case 'fapi2-baseline-id2-client-test-plan': {
-        const name = module.testModule.replace('fapi2-baseline-id2-client-test-', '')
+      case 'fapi2-baseline-id2-client-test-plan':
+      case 'fapi2-advanced-id1-client-test-plan': {
+        const name = module.testModule.replace(/fapi2-(baseline-id2|advanced-id1)-client-test-/, '')
         const path = `./build/conformance/fapi/${name}.js`
         ensureTestFile(path, name)
         ensureTestFile(path.replace('./build/', './').replace('.js', '.ts'), name)
