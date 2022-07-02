@@ -70,9 +70,35 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - build-conformance-suite
+    continue-on-error: ${{ matrix.beta-plan || false }}
     strategy:
       fail-fast: false
       matrix:
+        include:
+          # FAPI 2.0 OpenID Connect
+          - beta-plan: true
+            setup:
+              plan: fapi2-baseline-id2-client-test-plan
+
+          # FAPI 2.0 OAuth 2.0
+          - beta-plan: true
+            setup:
+              variant:
+                fapi_jarm_type: 'plain_oauth'
+              plan: fapi2-baseline-id2-client-test-plan
+
+          # FAPI 2.0 Message Signing - OpenID Connect
+          - beta-plan: true
+            setup:
+              plan: fapi2-advanced-id1-client-test-plan
+
+          # FAPI 2.0 Message Signing - OAuth 2.0
+          - beta-plan: true
+            setup:
+              variant:
+                fapi_jarm_type: 'plain_oauth'
+              plan: fapi2-advanced-id1-client-test-plan
+
         setup:
           # Core 1.0 Basic
           - plan: oidcc-client-basic-certification-test-plan
