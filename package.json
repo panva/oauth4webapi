@@ -41,7 +41,7 @@
     "build/index.d.ts"
   ],
   "scripts": {
-    "_format": "find src test examples conformance -type f -name '*.ts' -o -name '*.mjs' | xargs prettier",
+    "_format": "find src test tap examples conformance -type f -name '*.ts' -o -name '*.mjs' | xargs prettier",
     "build": "rm -rf build && tsc && tsc --declaration true --emitDeclarationOnly true --removeComments false && tsc -p test && tsc -p examples && tsc -p conformance",
     "conformance": "rm -rf build && tsc -p conformance --noEmit false && ava --config build/conformance/ava.config.js",
     "coverage": "patch-package && c8 ava",
@@ -49,18 +49,24 @@
     "format": "npm run _format -- --write",
     "format-check": "npm run _format -- --check",
     "prepack": "npm run format && npm run docs && ./examples/.update-diffs.sh && git diff --quiet && npm run test && npm run build",
+    "tap:deno": "./tap/.deno.sh",
+    "tap:edge-runtime": "./tap/.edge-runtime.sh",
+    "tap:node": "./tap/.node.sh",
     "test": "ava"
   },
   "devDependencies": {
     "@esbuild-kit/esm-loader": "^2.3.1",
     "@types/node": "^18.0.0",
+    "@types/qunit": "^2.19.1",
     "@typescript/lib-dom": "npm:@types/web",
     "ava": "^4.3.0",
     "c8": "^7.11.3",
+    "edge-runtime": "^1.1.0-beta.10",
     "jose": "^4.8.1",
     "patch-package": "^6.4.7",
     "prettier": "^2.7.1",
     "prettier-plugin-jsdoc": "^0.3.38",
+    "qunit": "^2.19.1",
     "timekeeper": "^2.2.0",
     "typedoc": "^0.23.2",
     "typedoc-plugin-markdown": "^3.13.1",

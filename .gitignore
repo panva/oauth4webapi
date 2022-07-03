@@ -125,6 +125,7 @@ dist-browser-tests
 examples/**/*.js
 conformance/**/*.js
 src/*.js
+tap/*.js
 
 *.zip
 *.txt

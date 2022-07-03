@@ -1,0 +1,11 @@
+{
+  "imports": {
+    "qunit": "https://cdnjs.cloudflare.com/ajax/libs/qunit/2.19.1/qunit.js",
+    "jose": "https://cdnjs.cloudflare.com/ajax/libs/jose/4.8.3/index.bundle.min.js",
+    "../src/index.js": "../src/index.ts",
+    "./generate.js": "./generate.ts",
+    "./request_object.js": "./request_object.ts",
+    "./run.js": "./run.ts",
+    "./thumbprint.js": "./thumbprint.ts"
+  }
+}

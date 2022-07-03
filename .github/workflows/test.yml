@@ -30,7 +30,7 @@ jobs:
       - run: ./examples/.update-diffs.sh
       - run: git diff --quiet
 
-  test:
+  node:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -43,21 +43,54 @@ jobs:
       - run: npm run test
         env:
           ESBK_DISABLE_CACHE: 1
+      - name: Run Universal Tests
+        run: npm run tap:node | tee node.tap
+        env:
+          ESBK_DISABLE_CACHE: 1
+      - id: parse
+        uses: Coderlane/tap-action@d5de2302c571f90ccb2d2e9416eaca4efe3185dd
+      - if: ${{ steps.parse.outputs.tap_fail != '0' }}
+        uses: actions/github-script@v6
+        with:
+          script: |
+              core.setFailed('npm run tap:node failed')
+
+  edge-runtime:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '>=18.3.0'
+      - run: npm clean-install
+      - name: Run Universal Tests
+        run: npm run tap:edge-runtime | tee edge-runtime.tap
+      - id: parse
+        uses: Coderlane/tap-action@d5de2302c571f90ccb2d2e9416eaca4efe3185dd
+      - if: ${{ steps.parse.outputs.tap_fail != '0' }}
+        uses: actions/github-script@v6
+        with:
+          script: |
+              core.setFailed('npm run tap:edge failed')
 
   deno:
-    strategy:
-      fail-fast: false
-      matrix:
-        deno-version:
-          - v1.21.0
-          - v1
-
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
       - uses: denoland/setup-deno@v1
         with:
-          deno-version: ${{ matrix.deno-version }}
+          deno-version: v1.x
       - name: Test Deno Definitions
         run: deno check src/index.ts
+      - name: Run Universal Tests
+        run: npm run tap:deno | tee deno.tap
+      - id: parse
+        uses: Coderlane/tap-action@d5de2302c571f90ccb2d2e9416eaca4efe3185dd
+      - if: ${{ steps.parse.outputs.tap_fail != '0' }}
+        uses: actions/github-script@v6
+        with:
+          script: |
+              core.setFailed('npm run tap:deno failed')
