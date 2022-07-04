@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.1.1](https://github.com/panva/oauth4webapi/compare/v1.1.0...v1.1.1) (2022-07-04)
+
+
+### Fixes
+
+* processing pure oauth2 code response ignores invalid ID tokens ([282705a](https://github.com/panva/oauth4webapi/commit/282705a846a5d17c3d58f566a6e9e816ee753131))
+
 ## [1.1.0](https://github.com/panva/oauth4webapi/compare/v1.0.5...v1.1.0) (2022-06-28)
 
 
