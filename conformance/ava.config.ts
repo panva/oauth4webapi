@@ -166,8 +166,6 @@ export default async () => {
     jwks: {
       keys: await generate(),
     },
-    // TODO: remove when https://gitlab.com/openid/conformance-suite/-/issues/1032 is resolved
-    request_object_signing_alg: usesRequestObject(PLAN_NAME, variant) ? JWS_ALGORITHM : undefined,
     id_token_signed_response_alg: JWS_ALGORITHM,
   }
 
