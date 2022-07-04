@@ -237,7 +237,7 @@ test('authorizationCodeGrantRequest() w/ DPoP', async (t) => {
   )
 })
 
-test('processAuthorizationCodeOAuth2Response() without ID Tokens', async (t) => {
+test('processAuthorizationCodeOAuth2Response()', async (t) => {
   await t.throwsAsync(lib.processAuthorizationCodeOAuth2Response(issuer, client, <any>null), {
     message: '"response" must be an instance of Response',
   })
@@ -339,16 +339,19 @@ test('processAuthorizationCodeOAuth2Response() without ID Tokens', async (t) => 
       message: '"response" body "refresh_token" property must be a non-empty string',
     },
   )
-  await t.throwsAsync(
-    lib.processAuthorizationCodeOAuth2Response(
-      issuer,
-      client,
-      getResponse(JSON.stringify({ access_token: 'token', token_type: 'Bearer', id_token: null })),
-    ),
-    {
-      message: '"response" body "id_token" property must be a non-empty string',
-    },
-  )
+  for (const id_token of [null, 1, '', false, {}]) {
+    t.deepEqual(
+      await lib.processAuthorizationCodeOAuth2Response(
+        issuer,
+        client,
+        getResponse(JSON.stringify({ access_token: 'token', token_type: 'Bearer', id_token })),
+      ),
+      {
+        access_token: 'token',
+        token_type: 'bearer',
+      },
+    )
+  }
 
   t.deepEqual(
     await lib.processAuthorizationCodeOAuth2Response(

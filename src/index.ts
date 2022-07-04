@@ -2336,16 +2336,20 @@ export async function processAuthorizationCodeOAuth2Response(
   client: Client,
   response: Response,
 ): Promise<OAuth2TokenEndpointResponse | OAuth2Error> {
-  const result = await processGenericAccessTokenResponse(as, client, response)
+  const result = await processGenericAccessTokenResponse(as, client, response, undefined, true)
 
   if (isOAuth2Error(result)) {
     return result
   }
 
   if (result.id_token !== undefined) {
-    throw new OPE(
-      'Unexpected ID Token returned, use processAuthorizationCodeOpenIDResponse() for OpenID Connect callback processing',
-    )
+    if (typeof result.id_token === 'string' && result.id_token.length) {
+      throw new OPE(
+        'Unexpected ID Token returned, use processAuthorizationCodeOpenIDResponse() for OpenID Connect callback processing',
+      )
+    }
+    // @ts-expect-error
+    delete result.id_token
   }
 
   return <OAuth2TokenEndpointResponse>result
