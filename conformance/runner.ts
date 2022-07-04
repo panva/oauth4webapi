@@ -2,7 +2,7 @@ import anyTest, { type TestFn } from 'ava'
 
 export const test = anyTest as TestFn<{ instance: Test }>
 
-import { getScope, usesRequestObject } from './ava.config.js'
+import { getScope } from './ava.config.js'
 import * as oauth from '../src/index.js'
 import {
   createTestFromPlan,
@@ -96,6 +96,18 @@ function usesDpop(variant: Record<string, string>) {
 
 function usesPar(plan: Plan) {
   return plan.name.startsWith('fapi2')
+}
+
+function usesRequestObject(planName: string, variant: Record<string, string>) {
+  if (planName.startsWith('fapi2-advanced')) {
+    return true
+  }
+
+  if (variant.request_type === 'request_object') {
+    return true
+  }
+
+  return false
 }
 
 interface TestOptions {

@@ -75,18 +75,6 @@ function needsSecret(variant: Record<string, string>) {
   }
 }
 
-export function usesRequestObject(planName: string, variant: Record<string, string>) {
-  if (planName.startsWith('fapi2-advanced')) {
-    return true
-  }
-
-  if (variant.request_type === 'request_object') {
-    return true
-  }
-
-  return false
-}
-
 const DEFAULTS: Record<typeof PLAN_NAME, Record<string, string>> = {
   'oidcc-client-test-plan': {
     response_mode: 'default',
