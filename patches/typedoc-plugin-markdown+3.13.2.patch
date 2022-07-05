@@ -1,3 +1,16 @@
+diff --git a/node_modules/typedoc-plugin-markdown/dist/resources/helpers/comments.js b/node_modules/typedoc-plugin-markdown/dist/resources/helpers/comments.js
+index c4251af..892533a 100644
+--- a/node_modules/typedoc-plugin-markdown/dist/resources/helpers/comments.js
++++ b/node_modules/typedoc-plugin-markdown/dist/resources/helpers/comments.js
+@@ -12,7 +12,7 @@ function default_1() {
+         if ((_a = comment.blockTags) === null || _a === void 0 ? void 0 : _a.length) {
+             const tags = comment.blockTags
+                 .filter((tag) => tag.tag !== '@returns')
+-                .map((tag) => `**\`${(0, utils_1.camelToTitleCase)(tag.tag.substring(1))}\`**\n\n ${Handlebars.helpers.comment(tag.content)}`);
++                .map((tag) => `**\`${tag.tag.substring(1)}\`** ${Handlebars.helpers.comment(tag.content)}`);
+             md.push(tags.join('\n\n'));
+         }
+         return md.join('\n\n');
 diff --git a/node_modules/typedoc-plugin-markdown/dist/resources/helpers/toc.js b/node_modules/typedoc-plugin-markdown/dist/resources/helpers/toc.js
 index ca0cf27..95be471 100644
 --- a/node_modules/typedoc-plugin-markdown/dist/resources/helpers/toc.js
@@ -80,7 +93,7 @@ index f642b49..3743b65 100644
  
  #### Defined in
 diff --git a/node_modules/typedoc-plugin-markdown/dist/resources/partials/title.hbs b/node_modules/typedoc-plugin-markdown/dist/resources/partials/title.hbs
-index 68b4dba..0c97f46 100644
+index 68b4dba..4391d89 100644
 --- a/node_modules/typedoc-plugin-markdown/dist/resources/partials/title.hbs
 +++ b/node_modules/typedoc-plugin-markdown/dist/resources/partials/title.hbs
 @@ -5,3 +5,5 @@

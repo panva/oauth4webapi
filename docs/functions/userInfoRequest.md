@@ -8,9 +8,9 @@ Performs a UserInfo Request at the [`as.userinfo_endpoint`](../interfaces/Author
 
 Authorization Header is used to transmit the Access Token value.
 
-**`see`** 
- - [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#UserInfo)
- - [draft-ietf-oauth-dpop-09 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)](https://www.ietf.org/archive/id/draft-ietf-oauth-dpop-09.html#name-protected-resource-access)
+**`see`** [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#UserInfo)
+
+**`see`** [draft-ietf-oauth-dpop-09 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)](https://www.ietf.org/archive/id/draft-ietf-oauth-dpop-09.html#name-protected-resource-access)
 
 #### Parameters
 

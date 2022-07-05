@@ -7,9 +7,9 @@
 (OpenID Connect only) Validates Authorization Code Grant Response instance to be one coming from
 the [`as.token_endpoint`](../interfaces/AuthorizationServer.md#token_endpoint).
 
-**`see`** 
- - [RFC 6749 - The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html#section-4.1)
- - [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#CodeFlowAuth)
+**`see`** [RFC 6749 - The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html#section-4.1)
+
+**`see`** [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#CodeFlowAuth)
 
 #### Parameters
 
