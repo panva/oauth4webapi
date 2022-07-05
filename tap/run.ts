@@ -5,6 +5,7 @@ export default (QUnit: QUnit, done?: (details: QUnit.DoneDetails) => void) => {
   QUnit.config.autostart = false
 
   return Promise.all([
+    import('./code_flow.js'),
     import('./generate.js'),
     import('./request_object.js'),
     import('./thumbprint.js'),
