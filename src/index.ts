@@ -1166,6 +1166,7 @@ async function dpopProofJwt(
     throw new TypeError('"DPoP.publicKey.extractable" must be true')
   }
 
+  const now = epochTime()
   const proof = await jwt(
     {
       alg: determineJWSAlgorithm(privateKey),
@@ -1173,7 +1174,7 @@ async function dpopProofJwt(
       jwk: await publicJwk(publicKey),
     },
     {
-      iat: epochTime(),
+      iat: now,
       jti: randomBytes(),
       htm,
       nonce,
@@ -2290,7 +2291,7 @@ export async function processAuthorizationCodeOpenIDResponse(
     }
 
     const now = epochTime()
-    const tolerance = 30 // TODO: tolerance config
+    const tolerance = 30
     if (claims.auth_time! + maxAge < now - tolerance) {
       throw new OPE('too much time has elapsed since the last End-User authentication')
     }
@@ -2863,7 +2864,7 @@ async function validateJwt(
   }
 
   const now = epochTime()
-  const tolerance = 30 // TODO: tolerance config
+  const tolerance = 30
 
   if (claims.exp !== undefined) {
     if (typeof claims.exp !== 'number') {
