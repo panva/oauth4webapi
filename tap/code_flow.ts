@@ -6,7 +6,7 @@ export default (QUnit: QUnit) => {
   const { module, test } = QUnit
   module('code_flow.ts')
   test('Discovery, Code Flow, OpenID Connect, JAR, JARM, PAR', async (t) => {
-    const { client, issuerIdentifier, clientPrivateKey } = await setup()
+    const { client, issuerIdentifier, clientPrivateKey, exposed } = await setup()
     const DPoP = await lib.generateKeyPair('ES256')
 
     const as = await lib
@@ -60,8 +60,8 @@ export default (QUnit: QUnit) => {
         const authorizationUrl = new URL(as.authorization_endpoint!)
         authorizationUrl.searchParams.set('client_id', client.client_id)
         authorizationUrl.searchParams.set('request_uri', request_uri)
-        const response = await fetch(authorizationUrl, { redirect: 'manual' })
-        currentUrl = new URL(response.headers.get('location')!)
+        await fetch(authorizationUrl, { redirect: 'manual' })
+        currentUrl = new URL((await exposed()).authorization_endpoint_response_redirect)
       }
 
       {

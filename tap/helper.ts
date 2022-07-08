@@ -11,6 +11,7 @@ export default async function setup(): Promise<{
   accountsEndpoint: URL
   issuerIdentifier: URL
   clientPrivateKey: lib.PrivateKey
+  exposed: () => Promise<Record<string, string>>
 }> {
   const uuid = crypto.randomUUID()
 
@@ -97,8 +98,6 @@ export default async function setup(): Promise<{
 
   const test = await response.json()
 
-  await new Promise((resolve) => setTimeout(resolve, 3500))
-
   response = await fetch(url(`/api/runner/${test.id}`))
 
   if (response.status !== 200) {
@@ -110,6 +109,15 @@ export default async function setup(): Promise<{
   } = await response.json()
 
   return {
+    async exposed() {
+      const response = await fetch(url(`/api/runner/${test.id}`))
+      if (response.status !== 200) {
+        throw new Error(await response.text())
+      }
+
+      const { exposed } = await response.json()
+      return exposed
+    },
     client: {
       client_id: uuid,
       token_endpoint_auth_method: 'private_key_jwt',
