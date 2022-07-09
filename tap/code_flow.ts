@@ -57,10 +57,20 @@ export default (QUnit: QUnit) => {
 
       let currentUrl: URL
       {
+        let options: Record<string, string>
+        // @ts-ignore
+        if (
+          typeof navigator === 'undefined' ||
+          !navigator.userAgent?.startsWith?.('Mozilla/5.0 ')
+        ) {
+          options = { redirect: 'manual' }
+        } else {
+          options = { redirect: 'follow', mode: 'no-cors' }
+        }
         const authorizationUrl = new URL(as.authorization_endpoint!)
         authorizationUrl.searchParams.set('client_id', client.client_id)
         authorizationUrl.searchParams.set('request_uri', request_uri)
-        await fetch(authorizationUrl, { redirect: 'manual' })
+        await fetch(authorizationUrl, options).catch(() => {})
         currentUrl = new URL((await exposed()).authorization_endpoint_response_redirect)
       }
 
