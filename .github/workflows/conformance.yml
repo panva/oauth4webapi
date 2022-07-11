@@ -169,9 +169,11 @@ jobs:
         run: |
           docker-compose -f docker-compose-dev.yml up -d
           while ! curl -skfail https://localhost.emobix.co.uk:8443/api/runner/available >/dev/null; do sleep 2; done
-      - uses: actions/setup-node@v3
+      - name: Setup node
+        uses: actions/setup-node@v3
         with:
-          node-version: '>=18.3.0'
+          node-version: 18
+          cache: 'npm'
       - run: npm clean-install
       - name: npm run conformance
         run: |

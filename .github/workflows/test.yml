@@ -15,6 +15,9 @@ jobs:
         uses: actions/checkout@v3
       - name: Setup node
         uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
       - run: npm clean-install
       - run: npm run build
 
@@ -25,6 +28,9 @@ jobs:
         uses: actions/checkout@v3
       - name: Setup node
         uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
       - run: npm clean-install
       - run: npm run format-check
       - run: ./examples/.update-diffs.sh
@@ -38,7 +44,8 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v3
         with:
-          node-version: '>=18.3.0'
+          node-version: 18
+          cache: 'npm'
       - run: npm clean-install
       - run: npm run test
         env:
@@ -63,7 +70,8 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v3
         with:
-          node-version: '>=18.3.0'
+          node-version: 18
+          cache: 'npm'
       - run: npm clean-install
       - name: Run Universal Tests
         run: npm run tap:edge-runtime | tee edge-runtime.tap
