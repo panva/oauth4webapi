@@ -41,8 +41,7 @@ export default (QUnit: QUnit) => {
         DPoP,
         clientPrivateKey,
       })
-      let challenges: lib.WWWAuthenticateChallenge[] | undefined
-      if ((challenges = lib.parseWwwAuthenticateChallenges(response))) {
+      if (lib.parseWwwAuthenticateChallenges(response)) {
         t.ok(0)
         throw new Error()
       }
@@ -58,7 +57,6 @@ export default (QUnit: QUnit) => {
       let currentUrl: URL
       {
         let options: Record<string, string>
-        // @ts-ignore
         if (
           typeof navigator === 'undefined' ||
           !navigator.userAgent?.startsWith?.('Mozilla/5.0 ')
@@ -93,8 +91,7 @@ export default (QUnit: QUnit) => {
           },
         )
 
-        let challenges: lib.WWWAuthenticateChallenge[] | undefined
-        if ((challenges = lib.parseWwwAuthenticateChallenges(response))) {
+        if (lib.parseWwwAuthenticateChallenges(response)) {
           t.ok(0)
           throw new Error()
         }
@@ -111,8 +108,7 @@ export default (QUnit: QUnit) => {
         {
           const response = await lib.userInfoRequest(as, client, access_token, { DPoP })
 
-          let challenges: lib.WWWAuthenticateChallenge[] | undefined
-          if ((challenges = lib.parseWwwAuthenticateChallenges(response))) {
+          if (lib.parseWwwAuthenticateChallenges(response)) {
             t.ok(0)
             throw new Error()
           }
