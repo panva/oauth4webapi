@@ -720,7 +720,7 @@ test('processAuthorizationCodeOpenIDResponse() with an ID Token w/ at_hash', asy
         }),
       ),
     ),
-    { message: 'invalid ID Token "at_hash"' },
+    { message: 'unexpected ID Token "at_hash" claim value received' },
   )
 })
 

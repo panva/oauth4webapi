@@ -2006,7 +2006,7 @@ async function processGenericAccessTokenResponse(
           typeof claims.at_hash !== 'string' ||
           !(await idTokenHashMatches(header.alg, json.access_token, claims.at_hash))
         ) {
-          throw new OPE('invalid ID Token "at_hash"')
+          throw new OPE('unexpected ID Token "at_hash" claim value received')
         }
       }
 
