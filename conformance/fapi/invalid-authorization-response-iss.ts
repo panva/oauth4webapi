@@ -5,6 +5,6 @@ if (plan.name.startsWith('fapi2-advanced')) {
   test.todo('invalid-authorization-response-iss')
 } else {
   for (const module of modules('invalid-authorization-response-iss')) {
-    test.serial(red, module, 'unexpected "iss" issuer parameter value')
+    test.serial(red, module, 'unexpected "iss" (issuer) response parameter value')
   }
 }

@@ -1994,11 +1994,11 @@ async function processGenericAccessTokenResponse(
         .then(validateAudience.bind(undefined, client.client_id))
 
       if (Array.isArray(claims.aud) && claims.aud.length !== 1 && claims.azp !== client.client_id) {
-        throw new OPE('unexpected ID Token "azp" (authorized party)')
+        throw new OPE('unexpected ID Token "azp" (authorized party) claim value')
       }
 
       if (client.require_auth_time && typeof claims.auth_time !== 'number') {
-        throw new OPE('invalid ID Token "auth_time"')
+        throw new OPE('unexpected ID Token "auth_time" (authentication time) claim value')
       }
 
       if (claims.at_hash !== undefined) {
@@ -2006,7 +2006,7 @@ async function processGenericAccessTokenResponse(
           typeof claims.at_hash !== 'string' ||
           !(await idTokenHashMatches(header.alg, json.access_token, claims.at_hash))
         ) {
-          throw new OPE('unexpected ID Token "at_hash" claim value received')
+          throw new OPE('unexpected ID Token "at_hash" (access token hash) claim value')
         }
       }
 
@@ -2050,10 +2050,10 @@ function validateOptionalAudience(expected: string, result: ParsedJWT) {
 function validateAudience(expected: string, result: ParsedJWT) {
   if (Array.isArray(result.claims.aud)) {
     if (!result.claims.aud.includes(expected)) {
-      throw new OPE('unexpected JWT "aud" (audience)')
+      throw new OPE('unexpected JWT "aud" (audience) claim value')
     }
   } else if (result.claims.aud !== expected) {
-    throw new OPE('unexpected JWT "aud" (audience)')
+    throw new OPE('unexpected JWT "aud" (audience) claim value')
   }
 
   return result
@@ -2068,7 +2068,7 @@ function validateOptionalIssuer(expected: string, result: ParsedJWT) {
 
 function validateIssuer(expected: string, result: ParsedJWT) {
   if (result.claims.iss !== expected) {
-    throw new OPE('unexpected JWT "iss" (issuer)')
+    throw new OPE('unexpected JWT "iss" (issuer) claim value')
   }
   return result
 }
@@ -2116,7 +2116,7 @@ export async function authorizationCodeGrantRequest(
 
   const code = getURLSearchParameter(callbackParameters, 'code')
   if (!code) {
-    throw new OPE('no authorization code received')
+    throw new OPE('no authorization code in "callbackParameters"')
   }
 
   const parameters = new URLSearchParams(options?.additionalParameters)
@@ -2174,7 +2174,7 @@ const claimNames = {
 function validatePresence(required: (keyof typeof claimNames)[], result: ParsedJWT) {
   for (const claim of required) {
     if (result.claims[claim] === undefined) {
-      throw new OPE(`missing JWT "${claim}" (${claimNames[claim]})`)
+      throw new OPE(`JWT "${claim}" (${claimNames[claim]}) claim missing`)
     }
   }
   return result
@@ -2282,7 +2282,7 @@ export async function processAuthorizationCodeOpenIDResponse(
     (client.require_auth_time || maxAge !== skipAuthTimeCheck) &&
     claims.auth_time === undefined
   ) {
-    throw new OPE('missing ID Token "auth_time" claims')
+    throw new OPE('ID Token "auth_time" (authentication time) claim missing')
   }
 
   if (maxAge !== skipAuthTimeCheck) {
@@ -2301,7 +2301,7 @@ export async function processAuthorizationCodeOpenIDResponse(
     case undefined:
     case expectNoNonce:
       if (claims.nonce !== undefined) {
-        throw new OPE('unexpected ID Token "nonce" claim value received')
+        throw new OPE('unexpected ID Token "nonce" claim value')
       }
       break
     default:
@@ -2312,7 +2312,7 @@ export async function processAuthorizationCodeOpenIDResponse(
         throw new OPE('ID Token "nonce" claim missing')
       }
       if (claims.nonce !== expectedNonce) {
-        throw new OPE('unexpected ID Token "nonce" claim value received')
+        throw new OPE('unexpected ID Token "nonce" claim value')
       }
   }
 
@@ -2868,38 +2868,38 @@ async function validateJwt(
 
   if (claims.exp !== undefined) {
     if (typeof claims.exp !== 'number') {
-      throw new OPE('invalid JWT "exp" (expiration time)')
+      throw new OPE('unexpected JWT "exp" (expiration time) claim type')
     }
 
     if (claims.exp <= now - tolerance) {
-      throw new OPE('JWT "exp" (expiration time) timestamp is <= now()')
+      throw new OPE('unexpected JWT "exp" (expiration time) claim value, timestamp is <= now()')
     }
   }
 
   if (claims.iat !== undefined) {
     if (typeof claims.iat !== 'number') {
-      throw new OPE('invalid JWT "iat" (issued at)')
+      throw new OPE('unexpected JWT "iat" (issued at) claim type')
     }
   }
 
   if (claims.iss !== undefined) {
     if (typeof claims.iss !== 'string') {
-      throw new OPE('invalid JWT "iss" (issuer)')
+      throw new OPE('unexpected JWT "iss" (issuer) claim type')
     }
   }
 
   if (claims.nbf !== undefined) {
     if (typeof claims.nbf !== 'number') {
-      throw new OPE('invalid JWT "nbf" (not before)')
+      throw new OPE('unexpected JWT "nbf" (not before) claim type')
     }
     if (claims.nbf > now + tolerance) {
-      throw new OPE('JWT "nbf" (not before) timestamp is > now()')
+      throw new OPE('unexpected JWT "nbf" (not before) claim value, timestamp is > now()')
     }
   }
 
   if (claims.aud !== undefined) {
     if (typeof claims.aud !== 'string' && !Array.isArray(claims.aud)) {
-      throw new OPE('invalid JWT "aud" (audience)')
+      throw new OPE('unexpected JWT "aud" (audience) claim type')
     }
   }
 
@@ -3072,18 +3072,18 @@ export function validateAuthResponse(
   const state = getURLSearchParameter(parameters, 'state')
 
   if (!iss && as.authorization_response_iss_parameter_supported) {
-    throw new OPE('"iss" issuer parameter expected')
+    throw new OPE('response parameter "iss" (issuer) missing')
   }
 
   if (iss && iss !== as.issuer) {
-    throw new OPE('unexpected "iss" issuer parameter value')
+    throw new OPE('unexpected "iss" (issuer) response parameter value')
   }
 
   switch (expectedState) {
     case undefined:
     case expectNoState:
       if (state !== undefined) {
-        throw new OPE('unexpected "state" parameter received')
+        throw new OPE('unexpected "state" response parameter encountered')
       }
       break
     case skipStateCheck:
@@ -3093,10 +3093,10 @@ export function validateAuthResponse(
         throw new OPE('"expectedState" must be a non-empty string')
       }
       if (state === undefined) {
-        throw new OPE('"state" callback parameter missing')
+        throw new OPE('response parameter "state" missing')
       }
       if (state !== expectedState) {
-        throw new OPE('unexpected "state" parameter value received')
+        throw new OPE('unexpected "state" response parameter value')
       }
   }
 

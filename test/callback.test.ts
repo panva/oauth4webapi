@@ -71,7 +71,7 @@ test('validateAuthResponse() error conditions', (t) => {
         new URL('https://rp.example.com/cb?code=foo'),
         lib.expectNoState,
       ),
-    { message: '"iss" issuer parameter expected' },
+    { message: 'response parameter "iss" (issuer) missing' },
   )
   t.throws(
     () =>
@@ -81,7 +81,7 @@ test('validateAuthResponse() error conditions', (t) => {
         new URL('https://rp.example.com/cb?code=foo&iss=foo'),
         lib.expectNoState,
       ),
-    { message: 'unexpected "iss" issuer parameter value' },
+    { message: 'unexpected "iss" (issuer) response parameter value' },
   )
   t.throws(
     () =>
@@ -91,7 +91,7 @@ test('validateAuthResponse() error conditions', (t) => {
         new URL('https://rp.example.com/cb?code=foo&state=bar'),
         'foo',
       ),
-    { message: 'unexpected "state" parameter value received' },
+    { message: 'unexpected "state" response parameter value' },
   )
   t.throws(
     () =>
@@ -101,7 +101,7 @@ test('validateAuthResponse() error conditions', (t) => {
         new URLSearchParams('code=foo&state=foo'),
         lib.expectNoState,
       ),
-    { message: 'unexpected "state" parameter received' },
+    { message: 'unexpected "state" response parameter encountered' },
   )
   t.throws(
     () =>
@@ -114,7 +114,7 @@ test('validateAuthResponse() error conditions', (t) => {
     { message: '"expectedState" must be a non-empty string' },
   )
   t.throws(() => lib.validateAuthResponse(issuer, client, new URLSearchParams('code=foo'), 'foo'), {
-    message: '"state" callback parameter missing',
+    message: 'response parameter "state" missing',
   })
   t.throws(
     () =>

@@ -507,6 +507,6 @@ test('processRefreshTokenResponse() with an ID Token w/ at_hash', async (t) => {
         }),
       ),
     ),
-    { message: 'unexpected ID Token "at_hash" claim value received' },
+    { message: 'unexpected ID Token "at_hash" (access token hash) claim value' },
   )
 })

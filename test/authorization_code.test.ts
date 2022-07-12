@@ -101,7 +101,7 @@ test('authorizationCodeGrantRequest()', async (t) => {
   await t.throwsAsync(
     lib.authorizationCodeGrantRequest(issuer, tClient, cb(''), 'redirect_uri', 'veirfier'),
     {
-      message: 'no authorization code received',
+      message: 'no authorization code in "callbackParameters"',
     },
   )
 
@@ -720,7 +720,7 @@ test('processAuthorizationCodeOpenIDResponse() with an ID Token w/ at_hash', asy
         }),
       ),
     ),
-    { message: 'unexpected ID Token "at_hash" claim value received' },
+    { message: 'unexpected ID Token "at_hash" (access token hash) claim value' },
   )
 })
 
@@ -748,7 +748,7 @@ test('processAuthorizationCodeOpenIDResponse() nonce checks', async (t) => {
         }),
       ),
     ),
-    { message: 'unexpected ID Token "nonce" claim value received' },
+    { message: 'unexpected ID Token "nonce" claim value' },
   )
 
   await t.throwsAsync(
@@ -773,7 +773,7 @@ test('processAuthorizationCodeOpenIDResponse() nonce checks', async (t) => {
       ),
       'anotherrandom-value',
     ),
-    { message: 'unexpected ID Token "nonce" claim value received' },
+    { message: 'unexpected ID Token "nonce" claim value' },
   )
 
   await t.throwsAsync(
@@ -874,7 +874,7 @@ test('processAuthorizationCodeOpenIDResponse() auth_time checks', async (t) => {
         }),
       ),
     ),
-    { message: 'invalid ID Token "auth_time"' },
+    { message: 'unexpected ID Token "auth_time" (authentication time) claim value' },
   )
 })
 
@@ -900,7 +900,7 @@ test('processAuthorizationCodeOpenIDResponse() azp checks', async (t) => {
         }),
       ),
     ),
-    { message: 'unexpected ID Token "azp" (authorized party)' },
+    { message: 'unexpected ID Token "azp" (authorized party) claim value' },
   )
 
   await t.notThrowsAsync(

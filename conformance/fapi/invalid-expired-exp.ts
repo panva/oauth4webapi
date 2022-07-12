@@ -4,7 +4,7 @@ for (const module of modules('invalid-expired-exp')) {
   test.serial(
     red,
     module,
-    'JWT "exp" (expiration time) timestamp is <= now()',
+    'unexpected JWT "exp" (expiration time) claim value, timestamp is <= now()',
     'OperationProcessingError',
   )
 }

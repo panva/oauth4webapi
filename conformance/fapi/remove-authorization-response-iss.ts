@@ -5,6 +5,6 @@ if (plan.name.startsWith('fapi2-advanced')) {
   test.todo('remove-authorization-response-iss')
 } else {
   for (const module of modules('remove-authorization-response-iss')) {
-    test.serial(red, module, '"iss" issuer parameter expected')
+    test.serial(red, module, 'response parameter "iss" (issuer) missing')
   }
 }
