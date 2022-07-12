@@ -34,17 +34,14 @@ test.before(async (t) => {
 })
 
 test('validateJwtAuthResponse() error conditions', async (t) => {
-  await t.throwsAsync(() => lib.validateJwtAuthResponse(issuer, client, <any>null, 'state'), {
+  await t.throwsAsync(() => lib.validateJwtAuthResponse(issuer, client, <any>null), {
     message: '"parameters" must be an instance of URLSearchParams, or URL',
   })
+  await t.throwsAsync(() => lib.validateJwtAuthResponse(issuer, client, new URLSearchParams()), {
+    message: '"parameters" does not contain a JARM response',
+  })
   await t.throwsAsync(
-    () => lib.validateJwtAuthResponse(issuer, client, new URLSearchParams(), 'state'),
-    {
-      message: '"parameters" does not contain a JARM response',
-    },
-  )
-  await t.throwsAsync(
-    () => lib.validateJwtAuthResponse(issuer, client, new URLSearchParams('response=foo'), 'state'),
+    () => lib.validateJwtAuthResponse(issuer, client, new URLSearchParams('response=foo')),
     {
       message: '"issuer.jwks_uri" must be a string',
     },
@@ -70,8 +67,11 @@ test('validateJwtAuthResponse()', async (t) => {
   await t.notThrowsAsync(async () => {
     const result = await lib.validateJwtAuthResponse(tIssuer, client, params, lib.expectNoState)
     t.true(result instanceof URLSearchParams)
-    t.false(lib.isOAuth2Error(result))
-    if (lib.isOAuth2Error(result)) throw new Error()
+    const isError = lib.isOAuth2Error(result)
+    if (isError) {
+      t.fail()
+      throw new Error()
+    }
     t.is(result.constructor.name, 'CallbackParameters')
     t.deepEqual([...result.keys()], ['iss', 'code'])
   })
@@ -96,8 +96,11 @@ test('validateJwtAuthResponse() as URL', async (t) => {
   await t.notThrowsAsync(async () => {
     const result = await lib.validateJwtAuthResponse(tIssuer, client, params, lib.expectNoState)
     t.true(result instanceof URLSearchParams)
-    t.false(lib.isOAuth2Error(result))
-    if (lib.isOAuth2Error(result)) throw new Error()
+    const isError = lib.isOAuth2Error(result)
+    if (isError) {
+      t.fail()
+      throw new Error()
+    }
     t.is(result.constructor.name, 'CallbackParameters')
     t.deepEqual([...result.keys()], ['iss', 'code'])
   })
