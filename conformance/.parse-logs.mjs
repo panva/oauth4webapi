@@ -37,7 +37,7 @@ rl.on('line', (line) => {
 
   fs.writeFileSync(currentFile, `${line}\n`, { flag: 'a' })
 
-  if (line.includes('Test Finished')) {
+  if (line.includes('Test Finished') || line.includes('Test result is SKIPPED')) {
     fs.renameSync(currentFile, `${testName}-${testId}.txt`)
     currentFile = testName = testId = null
   }

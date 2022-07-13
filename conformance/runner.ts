@@ -7,6 +7,7 @@ import * as oauth from '../src/index.js'
 import {
   createTestFromPlan,
   waitForState,
+  getTestExposed,
   type ModulePrescription,
   type Plan,
   type Test,
@@ -110,13 +111,8 @@ function usesRequestObject(planName: string, variant: Record<string, string>) {
   return false
 }
 
-interface TestOptions {
-  useState?: boolean
-  useNonce?: boolean
-}
-
 export const green = test.macro({
-  async exec(t, module: ModulePrescription, options?: TestOptions) {
+  async exec(t, module: ModulePrescription) {
     t.timeout(15000)
 
     const instance = await createTestFromPlan(plan, module)
@@ -131,7 +127,13 @@ export const green = test.macro({
     }
     t.log('variant', variant)
 
-    const issuer = new URL(instance.issuer)
+    const { issuer: issuerIdentifier, accounts_endpoint } = await getTestExposed(instance)
+
+    if (!issuerIdentifier) {
+      throw new Error()
+    }
+
+    const issuer = new URL(issuerIdentifier)
 
     const as = await oauth
       .discoveryRequest(issuer)
@@ -169,9 +171,6 @@ export const green = test.macro({
     const code_challenge = await oauth.calculatePKCECodeChallenge(code_verifier)
     const code_challenge_method = 'S256'
 
-    const state = options?.useState ? oauth.generateRandomState() : oauth.expectNoState
-    const nonce = options?.useNonce ? oauth.generateRandomNonce() : oauth.expectNoNonce
-
     let authorizationUrl = new URL(as.authorization_endpoint!)
     if (usesRequestObject(plan.name, variant) === false) {
       authorizationUrl.searchParams.set('client_id', client.client_id)
@@ -180,12 +179,6 @@ export const green = test.macro({
       authorizationUrl.searchParams.set('redirect_uri', configuration.client.redirect_uri)
       authorizationUrl.searchParams.set('response_type', 'code')
       authorizationUrl.searchParams.set('scope', scope)
-      if (typeof state === 'string') {
-        authorizationUrl.searchParams.set('state', state)
-      }
-      if (typeof nonce === 'string') {
-        authorizationUrl.searchParams.set('nonce', nonce)
-      }
     } else {
       authorizationUrl.searchParams.set('client_id', client.client_id)
       const params = new URLSearchParams()
@@ -194,12 +187,6 @@ export const green = test.macro({
       params.set('redirect_uri', configuration.client.redirect_uri)
       params.set('response_type', 'code')
       params.set('scope', scope)
-      if (typeof state === 'string') {
-        params.set('state', state)
-      }
-      if (typeof nonce === 'string') {
-        params.set('nonce', nonce)
-      }
 
       const jwk = configuration.client.jwks.keys.find((key) => key.alg === JWS_ALGORITHM)!
       const privateKey = await importPrivateKey(JWS_ALGORITHM, jwk)
@@ -254,11 +241,16 @@ export const green = test.macro({
       authorizationUrl.searchParams.set('request_uri', result.request_uri)
     }
 
-    const response = await fetch(authorizationUrl.href, { redirect: 'manual' })
+    await Promise.allSettled([fetch(authorizationUrl.href, { redirect: 'manual' })])
 
     t.log('redirect with', Object.fromEntries(authorizationUrl.searchParams.entries()))
 
-    const currentUrl = new URL(response.headers.get('location')!)
+    const { authorization_endpoint_response_redirect } = await getTestExposed(instance)
+    if (!authorization_endpoint_response_redirect) {
+      throw new Error()
+    }
+
+    const currentUrl = new URL(authorization_endpoint_response_redirect)
 
     let sub: string
     let access_token: string
@@ -266,9 +258,9 @@ export const green = test.macro({
       let params: ReturnType<typeof oauth.validateAuthResponse>
 
       if (usesJarm(plan)) {
-        params = await oauth.validateJwtAuthResponse(as, client, currentUrl, state)
+        params = await oauth.validateJwtAuthResponse(as, client, currentUrl)
       } else {
-        params = oauth.validateAuthResponse(as, client, currentUrl, state)
+        params = oauth.validateAuthResponse(as, client, currentUrl)
       }
 
       if (oauth.isOAuth2Error(params)) {
@@ -302,7 +294,7 @@ export const green = test.macro({
         | oauth.OpenIDTokenEndpointResponse
         | oauth.OAuth2Error
       if (scope.includes('openid')) {
-        result = await oauth.processAuthorizationCodeOpenIDResponse(as, client, response, nonce)
+        result = await oauth.processAuthorizationCodeOpenIDResponse(as, client, response)
       } else {
         result = await oauth.processAuthorizationCodeOAuth2Response(as, client, response)
       }
@@ -313,7 +305,7 @@ export const green = test.macro({
           t.log('retrying with a newly obtained dpop nonce')
           response = await request()
           if (scope.includes('openid')) {
-            result = await oauth.processAuthorizationCodeOpenIDResponse(as, client, response, nonce)
+            result = await oauth.processAuthorizationCodeOpenIDResponse(as, client, response)
           } else {
             result = await oauth.processAuthorizationCodeOAuth2Response(as, client, response)
           }
@@ -364,13 +356,13 @@ export const green = test.macro({
       t.log('userinfo response passed validation')
     }
 
-    if (instance.accounts_endpoint) {
+    if (accounts_endpoint) {
       const request = () => {
-        t.log('fetching', instance.accounts_endpoint)
+        t.log('fetching', accounts_endpoint)
         return oauth.protectedResourceRequest(
           access_token,
           'GET',
-          new URL(instance.accounts_endpoint!),
+          new URL(accounts_endpoint),
           new Headers(),
           null,
           { DPoP },
@@ -422,10 +414,9 @@ export const red = test.macro({
     module: ModulePrescription,
     expectedMessage?: string | RegExp,
     expectedErrorName: string = 'OperationProcessingError',
-    options?: TestOptions,
   ) {
     await t
-      .throwsAsync(() => <any>green.exec(t, module, options), {
+      .throwsAsync(() => <any>green.exec(t, module), {
         message: expectedMessage,
         name: expectedErrorName,
       })
@@ -440,6 +431,17 @@ export const red = test.macro({
 
     await waitForState(t.context.instance)
     t.log('Test Finished')
+    t.pass()
+  },
+  title: <any>green.title,
+})
+
+export const skipped = test.macro({
+  async exec(t, module: ModulePrescription) {
+    await Promise.allSettled([green.exec(t, module)])
+
+    await waitForState(t.context.instance, { results: new Set(['SKIPPED']) })
+    t.log('Test result is SKIPPED')
     t.pass()
   },
   title: <any>green.title,

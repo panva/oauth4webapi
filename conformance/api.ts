@@ -11,8 +11,6 @@ export interface Test {
   id: string
   name: string
   url: string
-  issuer: string
-  accounts_endpoint?: string
 }
 
 export interface ModuleInfo {
@@ -74,6 +72,21 @@ export async function getTestPlanInfo(plan: Plan) {
   return <PlanInfo>await response.json()
 }
 
+export async function getTestExposed(test: Test): Promise<Record<string, string>> {
+  const response = await fetch(url(`/api/runner/${test.id}`), {
+    method: 'GET',
+    headers: headers(),
+  })
+
+  if (response.status !== 200) {
+    throw new Error(await response.text())
+  }
+
+  const { exposed = {} } = await response.json()
+
+  return exposed
+}
+
 export async function createTestFromPlan(plan: Plan, module: ModulePrescription) {
   const search = { test: module.testModule, plan: plan.id }
 
@@ -93,20 +106,6 @@ export async function createTestFromPlan(plan: Plan, module: ModulePrescription)
   const test: Test = await response.json()
 
   await waitForState(test, { states: new Set(['WAITING']), results: new Set() })
-
-  await fetch(url(`/api/runner/${test.id}`), {
-    method: 'GET',
-    headers: headers(),
-  })
-    .then((response) => response.json())
-    .then((json) => {
-      const exposed = {
-        issuer: <string>json.exposed.issuer,
-        accounts_endpoint: <string | undefined>json.exposed.accounts_endpoint,
-      }
-
-      Object.assign(test, exposed)
-    })
 
   return test
 }
@@ -135,7 +134,7 @@ export async function downloadArtifact(plan: Plan) {
 export async function waitForState(
   test: Test,
   {
-    interval = 2_000,
+    interval = 150,
     timeout = 60_000,
     states = new Set(['FINISHED']),
     results = new Set(['REVIEW', 'PASSED', 'WARNING', 'SKIPPED']),
