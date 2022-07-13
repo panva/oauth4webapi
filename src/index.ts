@@ -1752,7 +1752,7 @@ export async function processUserInfoResponse(
   return json
 }
 
-async function timingSafeEqual(a: Uint8Array, b: Uint8Array) {
+function timingSafeEqual(a: Uint8Array, b: Uint8Array) {
   if (a.byteLength !== b.byteLength) {
     return false
   }
