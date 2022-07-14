@@ -43,7 +43,7 @@
   "scripts": {
     "_format": "find src test tap examples conformance -type f -name '*.ts' -o -name '*.mjs' | xargs prettier",
     "build": "rm -rf build && tsc && tsc --declaration true --emitDeclarationOnly true --removeComments false && tsc -p test && tsc -p examples && tsc -p conformance && tsc -p tap",
-    "conformance": "rm -rf build && tsc -p conformance --noEmit false && ava --config build/conformance/ava.config.js",
+    "conformance": "patch-package && NODE_OPTIONS='--no-warnings --loader=@esbuild-kit/esm-loader' ava --config conformance/ava.config.ts",
     "coverage": "patch-package && c8 ava",
     "docs": "patch-package && typedoc",
     "format": "npm run _format -- --write",

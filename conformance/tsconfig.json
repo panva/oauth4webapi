@@ -2,7 +2,6 @@
   "include": ["**/*.ts"],
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
-    "outDir": "../build",
     "target": "ES2022",
     "module": "ES2022",
     "moduleResolution": "Node",

@@ -203,18 +203,16 @@ export default async () => {
       case 'fapi2-baseline-id2-client-test-plan':
       case 'fapi2-advanced-id1-client-test-plan': {
         const name = module.testModule.replace(/fapi2-(baseline-id2|advanced-id1)-client-test-/, '')
-        const path = `./build/conformance/fapi/${name}.js`
+        const path = `./conformance/fapi/${name}.ts`
         ensureTestFile(path, name)
-        ensureTestFile(path.replace('./build/', './').replace('.js', '.ts'), name)
         files.add(path)
         break
       }
       case 'oidcc-client-test-plan':
       case 'oidcc-client-basic-certification-test-plan':
         const name = module.testModule.replace('oidcc-client-test-', '')
-        const path = `./build/conformance/oidc/${name}.js`
+        const path = `./conformance/oidc/${name}.ts`
         ensureTestFile(path, name)
-        ensureTestFile(path.replace('./build/', './').replace('.js', '.ts'), name)
         files.add(path)
         break
       default:
@@ -231,7 +229,11 @@ export default async () => {
       }),
     },
     concurrency: 1,
-    files: [...files, './build/conformance/download_archive.js'],
-    nodeArguments: ['--enable-source-maps', '--experimental-global-webcrypto', '--no-warnings'],
+    extensions: {
+      ts: 'module',
+      mjs: true,
+    },
+    files: [...files, './conformance/download_archive.ts'],
+    nodeArguments: ['--enable-source-maps', '--experimental-global-webcrypto'],
   }
 }
