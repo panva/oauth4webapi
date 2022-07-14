@@ -173,6 +173,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
+          check-latest: true
           cache: 'npm'
       - run: npm clean-install
       - name: npm run conformance

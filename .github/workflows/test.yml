@@ -17,6 +17,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
+          check-latest: true
           cache: 'npm'
       - run: npm clean-install
       - run: npm run build
@@ -30,6 +31,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
+          check-latest: true
           cache: 'npm'
       - run: npm clean-install
       - run: npm run format-check
@@ -45,6 +47,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
+          check-latest: true
           cache: 'npm'
       - run: npm clean-install
       - run: npm run test
@@ -71,6 +74,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
+          check-latest: true
           cache: 'npm'
       - run: npm clean-install
       - name: Run Universal Tests
