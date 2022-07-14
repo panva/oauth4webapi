@@ -39,10 +39,10 @@ export const client = <Client>{
 }
 
 export function getResponse(
-  body: Iterable<any> | AsyncIterable<any>,
+  body: string,
   { status = 200, headers = new Headers() } = {},
 ): Response {
-  const stream = Readable.toWeb(Readable.from(body))
+  const stream = Readable.toWeb(Readable.from(Buffer.from(body)))
   return new Response(stream, { status, headers })
 }
 
