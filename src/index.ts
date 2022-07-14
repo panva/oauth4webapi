@@ -1752,12 +1752,16 @@ export async function processUserInfoResponse(
   return json
 }
 
-function timingSafeEqual(a: Uint8Array, b: Uint8Array) {
-  if (a.byteLength !== b.byteLength) {
-    return false
-  }
+function padded(buf: Uint8Array, length: number) {
+  const out = new Uint8Array(length)
+  out.set(buf)
+  return out
+}
 
-  const len = a.byteLength
+function timingSafeEqual(a: Uint8Array, b: Uint8Array) {
+  const len = Math.max(a.byteLength, b.byteLength)
+  a = padded(a, len)
+  b = padded(b, len)
   let out = 0
   let i = -1
   while (++i < len) {
