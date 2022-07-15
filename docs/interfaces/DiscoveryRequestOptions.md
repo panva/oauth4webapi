@@ -14,7 +14,7 @@
 
 ### algorithm
 
-• `Optional` **algorithm**: [`ProcessingMode`](../types/ProcessingMode.md)
+• `Optional` **algorithm**: ``"oidc"`` \| ``"oauth2"``
 
 The issuer transformation algorithm to use.
 

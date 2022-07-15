@@ -573,8 +573,6 @@ function isPublicKey(key: unknown): key is CryptoKey {
   return isCryptoKey(key) && key.type === 'public'
 }
 
-export type ProcessingMode = 'oidc' | 'oauth2'
-
 const SUPPORTED_JWS_ALGS: JWSAlgorithm[] = ['PS256', 'ES256', 'RS256']
 
 export interface HttpRequestOptions {
@@ -596,7 +594,7 @@ export interface HttpRequestOptions {
 
 export interface DiscoveryRequestOptions extends HttpRequestOptions {
   /** The issuer transformation algorithm to use. */
-  algorithm?: ProcessingMode
+  algorithm?: 'oidc' | 'oauth2'
 }
 
 function preserveBodyStream(response: Response) {
@@ -652,9 +650,6 @@ function signal(value: Exclude<HttpRequestOptions['signal'], undefined>): AbortS
  *
  * - `oidc` (default) as defined by OpenID Connect Discovery 1.0.
  * - `oauth2` as defined by RFC 8414.
- *
- * The difference between these two algorithms is in their handling of path components in the Issuer
- * Identifier.
  *
  * @param issuerIdentifier Issuer Identifier to resolve the well-known discovery URI for.
  *

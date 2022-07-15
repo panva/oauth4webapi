@@ -81,7 +81,6 @@
 
 - [ClientAuthenticationMethod](types/ClientAuthenticationMethod.md)
 - [JWSAlgorithm](types/JWSAlgorithm.md)
-- [ProcessingMode](types/ProcessingMode.md)
 
 ### Variables
 

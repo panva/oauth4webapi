@@ -2,7 +2,7 @@ import * as oauth from '../src/index.js'
 
 const issuer = new URL('https://example.as.com')
 const as = await oauth
-  .discoveryRequest(issuer)
+  .discoveryRequest(issuer, { algorithm: 'oauth2' })
   .then((response) => oauth.processDiscoveryResponse(issuer, response))
 
 const client: oauth.Client = {
