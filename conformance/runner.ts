@@ -49,7 +49,7 @@ switch (plan.name) {
     throw new Error()
 }
 
-const algorithms: Map<string, RsaHashedImportParams | EcKeyImportParams> = new Map([
+const algorithms: Map<string, RsaHashedImportParams | EcKeyImportParams | Algorithm> = new Map([
   [
     'PS256',
     {
@@ -71,6 +71,7 @@ const algorithms: Map<string, RsaHashedImportParams | EcKeyImportParams> = new M
       hash: { name: 'SHA-256' },
     },
   ],
+  ['EdDSA', { name: 'Ed25519' }],
 ])
 
 function importPrivateKey(alg: string, jwk: JsonWebKey) {

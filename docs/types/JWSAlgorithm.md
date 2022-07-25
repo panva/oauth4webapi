@@ -2,7 +2,7 @@
 
 [💗 Help the project](https://github.com/sponsors/panva)
 
-Ƭ **JWSAlgorithm**: ``"PS256"`` \| ``"ES256"`` \| ``"RS256"``
+Ƭ **JWSAlgorithm**: ``"PS256"`` \| ``"ES256"`` \| ``"RS256"`` \| ``"EdDSA"``
 
 Supported JWS `alg` Algorithm identifiers.
 
@@ -30,5 +30,13 @@ interface Es256Algorithm extends EcKeyAlgorithm {
 interface Rs256Algorithm extends RsaHashedKeyAlgorithm {
   name: 'RSASSA-PKCS1-v1_5'
   hash: { name: 'SHA-256' }
+}
+```
+
+**`example`** EdDSA CryptoKey algorithm
+
+```ts
+interface EdDSAAlgorithm extends KeyAlgorithm {
+  name: 'Ed25519'
 }
 ```

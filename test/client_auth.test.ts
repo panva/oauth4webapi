@@ -9,7 +9,7 @@ const test = anyTest as TestFn<Context & { [alg: string]: CryptoKeyPair }>
 test.before(setup)
 test.after(teardown)
 
-const algs: lib.JWSAlgorithm[] = ['RS256', 'ES256', 'PS256']
+const algs: lib.JWSAlgorithm[] = ['RS256', 'ES256', 'PS256', 'EdDSA']
 
 test.before(async (t) => {
   for (const alg of algs) {

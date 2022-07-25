@@ -21,6 +21,15 @@ const vectors = {
     algorithm: { name: 'ECDSA', namedCurve: 'P-256' },
     thumbprint: 'ZrBaai73Hi8Fg4MElvDGzIne2NsbI75RHubOViHYE5Q',
   },
+  OKP: {
+    jwk: {
+      crv: 'Ed25519',
+      kty: 'OKP',
+      x: '5fL1GDeyNTIxtuzTeFnvZTo4Oz0EkMfAdhIJA-EFn0w',
+    },
+    algorithm: 'Ed25519',
+    thumbprint: '1OzNmMHhNzbSJyoePAtdoVedRZlFvER3K3RAzCrfX0k',
+  },
 }
 
 for (const [kty, { jwk, algorithm, thumbprint }] of Object.entries(vectors)) {
