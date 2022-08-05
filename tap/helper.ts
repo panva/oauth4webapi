@@ -48,7 +48,7 @@ export default async function setup(): Promise<{
       variant: JSON.stringify({
         client_auth_type: 'private_key_jwt',
         sender_constrain: 'dpop',
-        fapi_jarm_type: 'oidc',
+        fapi_client_type: 'oidc',
         fapi_profile: 'plain_fapi',
         fapi_request_method: 'signed_non_repudiation',
         fapi_response_mode: 'jarm',

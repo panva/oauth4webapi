@@ -90,15 +90,13 @@ const DEFAULTS: Record<typeof PLAN_NAME, Record<string, string>> = {
   'fapi2-baseline-id2-client-test-plan': {
     client_auth_type: 'private_key_jwt',
     sender_constrain: 'dpop',
-    // TODO: why is this called fapi_jarm_type?
-    fapi_jarm_type: 'oidc', // oidc, plain_oauth
+    fapi_client_type: 'oidc', // oidc, plain_oauth
     fapi_profile: 'plain_fapi',
   },
   'fapi2-advanced-id1-client-test-plan': {
     client_auth_type: 'private_key_jwt',
     sender_constrain: 'dpop',
-    // TODO: why is this called fapi_jarm_type?
-    fapi_jarm_type: 'oidc', // oidc, plain_oauth
+    fapi_client_type: 'oidc', // oidc, plain_oauth
     fapi_profile: 'plain_fapi',
     fapi_request_method: 'signed_non_repudiation',
     fapi_response_mode: 'jarm',
@@ -106,7 +104,7 @@ const DEFAULTS: Record<typeof PLAN_NAME, Record<string, string>> = {
 }
 
 export function getScope(variant: Record<string, string>) {
-  return variant.fapi_jarm_type === 'plain_oauth' ? 'email' : 'openid email'
+  return variant.fapi_client_type === 'plain_oauth' ? 'email' : 'openid email'
 }
 
 export function logToActions(content: string) {
