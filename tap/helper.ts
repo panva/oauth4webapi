@@ -1,7 +1,7 @@
 import * as lib from '../src/index.js'
 
 function url(pathname: string, search?: Record<string, string>) {
-  const target = new URL(pathname, 'https://obscure-mesa-34474.herokuapp.com')
+  const target = new URL(pathname, 'https://obscure-mesa-34474.deno.dev')
   target.search = new URLSearchParams(search).toString()
   return target.href
 }
@@ -89,6 +89,7 @@ export default async function setup(): Promise<{
     url('/api/runner', { test: 'fapi2-baseline-id2-client-test-happy-path', plan: plan.id }),
     {
       method: 'POST',
+      headers: { 'content-type': 'application/json;charset=utf-8' },
     },
   )
 
