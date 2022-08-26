@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.1.4](https://github.com/panva/oauth4webapi/compare/v1.1.3...v1.1.4) (2022-08-26)
+
+
+### Fixes
+
+* **typescript:** resolve ts4.8 issue ([572c6de](https://github.com/panva/oauth4webapi/commit/572c6dec99915fd52c958725d1cf15b8bbea4ab4))
+
 ## [1.1.3](https://github.com/panva/oauth4webapi/compare/v1.1.2...v1.1.3) (2022-07-20)
 
 ## [1.1.2](https://github.com/panva/oauth4webapi/compare/v1.1.1...v1.1.2) (2022-07-12)
