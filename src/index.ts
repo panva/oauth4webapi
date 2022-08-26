@@ -616,7 +616,7 @@ function normalizeTyp(value: string) {
   return value.toLowerCase().replace(/^application\//, '')
 }
 
-function isJsonObject<T = JsonObject>(input: JsonValue): input is T {
+function isJsonObject<T = JsonObject>(input: unknown): input is T {
   if (input === null || typeof input !== 'object' || Array.isArray(input)) {
     return false
   }
