@@ -41,7 +41,8 @@ export interface PrivateKey {
  *   {@link Client.client_id `client_id`} and {@link Client.client_secret `client_secret`} in an
  *   `Authorization` HTTP Header.
  * - **`client_secret_post`** uses the HTTP request body to send {@link Client.client_id `client_id`}
- *   and {@link Client.client_secret `client_secret`} as `application/x-www-form-urlencoded` body parameters.
+ *   and {@link Client.client_secret `client_secret`} as `application/x-www-form-urlencoded` body
+ *   parameters.
  * - **`private_key_jwt`** uses the HTTP request body to send {@link Client.client_id `client_id`},
  *   `client_assertion_type`, and `client_assertion` as `application/x-www-form-urlencoded` body
  *   parameters. The `client_assertion` is signed using a private key supplied as an
@@ -147,11 +148,20 @@ export interface AuthorizationServer {
   readonly registration_endpoint?: string
   /** JSON array containing a list of the `scope` values that this authorization server supports. */
   readonly scopes_supported?: string[]
-  /** JSON array containing a list of the `response_type` values that this authorization server supports. */
+  /**
+   * JSON array containing a list of the `response_type` values that this authorization server
+   * supports.
+   */
   readonly response_types_supported?: string[]
-  /** JSON array containing a list of the `response_mode` values that this authorization server supports. */
+  /**
+   * JSON array containing a list of the `response_mode` values that this authorization server
+   * supports.
+   */
   readonly response_modes_supported?: string[]
-  /** JSON array containing a list of the `grant_type` values that this authorization server supports. */
+  /**
+   * JSON array containing a list of the `grant_type` values that this authorization server
+   * supports.
+   */
   readonly grant_types_supported?: string[]
   /** JSON array containing a list of client authentication methods supported by this token endpoint. */
   readonly token_endpoint_auth_methods_supported?: string[]
@@ -183,7 +193,10 @@ export interface AuthorizationServer {
   readonly op_tos_uri?: string
   /** URL of the authorization server's revocation endpoint. */
   readonly revocation_endpoint?: string
-  /** JSON array containing a list of client authentication methods supported by this revocation endpoint. */
+  /**
+   * JSON array containing a list of client authentication methods supported by this revocation
+   * endpoint.
+   */
   readonly revocation_endpoint_auth_methods_supported?: string[]
   /**
    * JSON array containing a list of the JWS signing algorithms supported by the revocation endpoint
@@ -192,11 +205,15 @@ export interface AuthorizationServer {
   readonly revocation_endpoint_auth_signing_alg_values_supported?: string[]
   /** URL of the authorization server's introspection endpoint. */
   readonly introspection_endpoint?: string
-  /** JSON array containing a list of client authentication methods supported by this introspection endpoint. */
+  /**
+   * JSON array containing a list of client authentication methods supported by this introspection
+   * endpoint.
+   */
   readonly introspection_endpoint_auth_methods_supported?: string[]
   /**
    * JSON array containing a list of the JWS signing algorithms supported by the introspection
-   * endpoint for the signature on the JWT used to authenticate the client at the introspection endpoint.
+   * endpoint for the signature on the JWT used to authenticate the client at the introspection
+   * endpoint.
    */
   readonly introspection_endpoint_auth_signing_alg_values_supported?: string[]
   /** PKCE code challenge methods supported by this authorization server. */
@@ -219,7 +236,10 @@ export interface AuthorizationServer {
    * authorization server supports.
    */
   readonly acr_values_supported?: string[]
-  /** JSON array containing a list of the Subject Identifier types that this authorization server supports. */
+  /**
+   * JSON array containing a list of the Subject Identifier types that this authorization server
+   * supports.
+   */
   readonly subject_types_supported?: string[]
   /**
    * JSON array containing a list of the JWS `alg` values supported by the authorization server for
@@ -257,7 +277,10 @@ export interface AuthorizationServer {
    * Request Objects.
    */
   readonly request_object_encryption_enc_values_supported?: string[]
-  /** JSON array containing a list of the `display` parameter values that the authorization server supports. */
+  /**
+   * JSON array containing a list of the `display` parameter values that the authorization server
+   * supports.
+   */
   readonly display_values_supported?: string[]
   /** JSON array containing a list of the Claim Types that the authorization server supports. */
   readonly claim_types_supported?: string[]
@@ -271,11 +294,20 @@ export interface AuthorizationServer {
    * array of RFC 5646 language tag values.
    */
   readonly claims_locales_supported?: string[]
-  /** Boolean value specifying whether the authorization server supports use of the `claims` parameter. */
+  /**
+   * Boolean value specifying whether the authorization server supports use of the `claims`
+   * parameter.
+   */
   readonly claims_parameter_supported?: boolean
-  /** Boolean value specifying whether the authorization server supports use of the `request` parameter. */
+  /**
+   * Boolean value specifying whether the authorization server supports use of the `request`
+   * parameter.
+   */
   readonly request_parameter_supported?: boolean
-  /** Boolean value specifying whether the authorization server supports use of the `request_uri` parameter. */
+  /**
+   * Boolean value specifying whether the authorization server supports use of the `request_uri`
+   * parameter.
+   */
   readonly request_uri_parameter_supported?: boolean
   /**
    * Boolean value specifying whether the authorization server requires any `request_uri` values
@@ -590,7 +622,10 @@ export interface HttpRequestOptions {
    */
   signal?: (() => AbortSignal) | AbortSignal
 
-  /** A Headers instance to additionally send with the HTTP Request(s) triggered by this function's invocation. */
+  /**
+   * A Headers instance to additionally send with the HTTP Request(s) triggered by this function's
+   * invocation.
+   */
   headers?: Headers
 }
 
@@ -704,7 +739,8 @@ function validateString(input: unknown): input is string {
 }
 
 /**
- * Validates Response instance to be one coming from the authorization server's well-known discovery endpoint.
+ * Validates Response instance to be one coming from the authorization server's well-known discovery
+ * endpoint.
  *
  * @param expectedIssuerIdentifier Expected Issuer Identifier value.
  * @param response Resolved value from {@link discoveryRequest}.
@@ -1428,7 +1464,7 @@ export interface ProtectedResourceRequestOptions
  * @param method The HTTP method for the request.
  * @param url Target URL for the request.
  * @param headers Headers for the request.
- * @param body See [Fetch API documentation](https://developer.mozilla.org/en-US/docs/Web/API/fetch#body).
+ * @param body Request body compatible with the Fetch API and the request's method.
  *
  * @see [RFC 6750 - The OAuth 2.0 Authorization Framework: Bearer Token Usage](https://www.rfc-editor.org/rfc/rfc6750.html#section-2.1)
  * @see [draft-ietf-oauth-dpop-10 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)](https://www.ietf.org/archive/id/draft-ietf-oauth-dpop-10.html#name-protected-resource-access)
@@ -1470,7 +1506,8 @@ export async function protectedResourceRequest(
 export interface UserInfoRequestOptions extends HttpRequestOptions, DPoPRequestOptions {}
 
 /**
- * Performs a UserInfo Request at the {@link AuthorizationServer.userinfo_endpoint `as.userinfo_endpoint`}.
+ * Performs a UserInfo Request at the
+ * {@link AuthorizationServer.userinfo_endpoint `as.userinfo_endpoint`}.
  *
  * Authorization Header is used to transmit the Access Token value.
  *
@@ -2251,7 +2288,8 @@ export const skipAuthTimeCheck = Symbol()
  * @param maxAge ID Token {@link IDToken.auth_time `auth_time`} claim value will be checked to be
  *   present and conform to the `maxAge` value. Use of this option is required if you sent a
  *   `max_age` parameter in an authorization request. Default is
- *   {@link Client.default_max_age `client.default_max_age`} and falls back to {@link skipAuthTimeCheck}.
+ *   {@link Client.default_max_age `client.default_max_age`} and falls back to
+ *   {@link skipAuthTimeCheck}.
  *
  * @returns Resolves with an object representing the parsed successful response, or an object
  *   representing an OAuth 2.0 protocol style error. Use {@link isOAuth2Error} to determine if an
@@ -2513,7 +2551,8 @@ export interface IntrospectionRequestOptions
    * {@link AuthorizationServer.introspection_endpoint `as.introspection_endpoint`}. Default is
    *
    * - True when
-   *   {@link Client.introspection_signed_response_alg `client.introspection_signed_response_alg`} is set
+   *   {@link Client.introspection_signed_response_alg `client.introspection_signed_response_alg`} is
+   *   set
    * - False otherwise
    */
   requestJwtResponse?: boolean
@@ -2717,7 +2756,8 @@ export interface JsonWebKeySet {
 }
 
 /**
- * Validates Response instance to be one coming from the {@link AuthorizationServer.jwks_uri `as.jwks_uri`}.
+ * Validates Response instance to be one coming from the
+ * {@link AuthorizationServer.jwks_uri `as.jwks_uri`}.
  *
  * @ignore
  *

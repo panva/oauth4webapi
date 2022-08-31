@@ -4,7 +4,8 @@
 
 ▸ **processDiscoveryResponse**(`expectedIssuerIdentifier`, `response`): `Promise`<[`AuthorizationServer`](../interfaces/AuthorizationServer.md)\>
 
-Validates Response instance to be one coming from the authorization server's well-known discovery endpoint.
+Validates Response instance to be one coming from the authorization server's well-known discovery
+endpoint.
 
 **`see`** [RFC 8414 - OAuth 2.0 Authorization Server Metadata](https://www.rfc-editor.org/rfc/rfc8414.html#section-3)
 

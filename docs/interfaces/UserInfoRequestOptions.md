@@ -24,7 +24,8 @@ ___
 
 • `Optional` **headers**: [`Headers`]( https://developer.mozilla.org/en-US/docs/Web/API/Headers )
 
-A Headers instance to additionally send with the HTTP Request(s) triggered by this function's invocation.
+A Headers instance to additionally send with the HTTP Request(s) triggered by this function's
+invocation.
 
 ___
 

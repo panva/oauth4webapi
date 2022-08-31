@@ -221,7 +221,8 @@ ___
 
 • `Optional` `Readonly` **claims\_parameter\_supported**: `boolean`
 
-Boolean value specifying whether the authorization server supports use of the `claims` parameter.
+Boolean value specifying whether the authorization server supports use of the `claims`
+parameter.
 
 ___
 
@@ -254,7 +255,8 @@ ___
 
 • `Optional` `Readonly` **display\_values\_supported**: `string`[]
 
-JSON array containing a list of the `display` parameter values that the authorization server supports.
+JSON array containing a list of the `display` parameter values that the authorization server
+supports.
 
 ___
 
@@ -297,7 +299,8 @@ ___
 
 • `Optional` `Readonly` **grant\_types\_supported**: `string`[]
 
-JSON array containing a list of the `grant_type` values that this authorization server supports.
+JSON array containing a list of the `grant_type` values that this authorization server
+supports.
 
 ___
 
@@ -358,7 +361,8 @@ ___
 
 • `Optional` `Readonly` **introspection\_endpoint\_auth\_methods\_supported**: `string`[]
 
-JSON array containing a list of client authentication methods supported by this introspection endpoint.
+JSON array containing a list of client authentication methods supported by this introspection
+endpoint.
 
 ___
 
@@ -367,7 +371,8 @@ ___
 • `Optional` `Readonly` **introspection\_endpoint\_auth\_signing\_alg\_values\_supported**: `string`[]
 
 JSON array containing a list of the JWS signing algorithms supported by the introspection
-endpoint for the signature on the JWT used to authenticate the client at the introspection endpoint.
+endpoint for the signature on the JWT used to authenticate the client at the introspection
+endpoint.
 
 ___
 
@@ -463,7 +468,8 @@ ___
 
 • `Optional` `Readonly` **request\_parameter\_supported**: `boolean`
 
-Boolean value specifying whether the authorization server supports use of the `request` parameter.
+Boolean value specifying whether the authorization server supports use of the `request`
+parameter.
 
 ___
 
@@ -471,7 +477,8 @@ ___
 
 • `Optional` `Readonly` **request\_uri\_parameter\_supported**: `boolean`
 
-Boolean value specifying whether the authorization server supports use of the `request_uri` parameter.
+Boolean value specifying whether the authorization server supports use of the `request_uri`
+parameter.
 
 ___
 
@@ -505,7 +512,8 @@ ___
 
 • `Optional` `Readonly` **response\_modes\_supported**: `string`[]
 
-JSON array containing a list of the `response_mode` values that this authorization server supports.
+JSON array containing a list of the `response_mode` values that this authorization server
+supports.
 
 ___
 
@@ -513,7 +521,8 @@ ___
 
 • `Optional` `Readonly` **response\_types\_supported**: `string`[]
 
-JSON array containing a list of the `response_type` values that this authorization server supports.
+JSON array containing a list of the `response_type` values that this authorization server
+supports.
 
 ___
 
@@ -529,7 +538,8 @@ ___
 
 • `Optional` `Readonly` **revocation\_endpoint\_auth\_methods\_supported**: `string`[]
 
-JSON array containing a list of client authentication methods supported by this revocation endpoint.
+JSON array containing a list of client authentication methods supported by this revocation
+endpoint.
 
 ___
 
@@ -571,7 +581,8 @@ ___
 
 • `Optional` `Readonly` **subject\_types\_supported**: `string`[]
 
-JSON array containing a list of the Subject Identifier types that this authorization server supports.
+JSON array containing a list of the Subject Identifier types that this authorization server
+supports.
 
 ___
 

@@ -36,7 +36,8 @@ ___
 
 • `Optional` **headers**: [`Headers`]( https://developer.mozilla.org/en-US/docs/Web/API/Headers )
 
-A Headers instance to additionally send with the HTTP Request(s) triggered by this function's invocation.
+A Headers instance to additionally send with the HTTP Request(s) triggered by this function's
+invocation.
 
 ___
 
@@ -48,7 +49,8 @@ Request a JWT Response from the
 [`as.introspection_endpoint`](AuthorizationServer.md#introspection_endpoint). Default is
 
 - True when
-  [`client.introspection_signed_response_alg`](Client.md#introspection_signed_response_alg) is set
+  [`client.introspection_signed_response_alg`](Client.md#introspection_signed_response_alg) is
+  set
 - False otherwise
 
 ___
