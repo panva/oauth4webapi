@@ -12,6 +12,7 @@ export default async function setup(): Promise<{
   issuerIdentifier: URL
   clientPrivateKey: lib.PrivateKey
   exposed: () => Promise<Record<string, string>>
+  cleanup: () => Promise<void>
 }> {
   const uuid = crypto.randomUUID()
 
@@ -118,6 +119,11 @@ export default async function setup(): Promise<{
 
       const { exposed } = await response.json()
       return exposed
+    },
+    async cleanup() {
+      await fetch(url(`/api/plan/${plan.id}`), {
+        method: 'DELETE',
+      })
     },
     client: {
       client_id: uuid,
