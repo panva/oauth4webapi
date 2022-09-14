@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.0](https://github.com/panva/oauth4webapi/compare/v1.1.4...v1.2.0) (2022-09-14)
+
+
+### Features
+
+* add experimental EdDSA (Ed25519) JWS algorithm support ([f70d4d5](https://github.com/panva/oauth4webapi/commit/f70d4d52fb5473644c2c4b4c01cb4c8938f83f4d))
+
 ## [1.1.4](https://github.com/panva/oauth4webapi/compare/v1.1.3...v1.1.4) (2022-08-26)
 
 
