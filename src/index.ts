@@ -94,8 +94,7 @@ export type ClientAuthenticationMethod =
  *
  * Runtime support for this algorithm is very limited, it depends on the [Secure Curves in the Web
  * Cryptography API](https://wicg.github.io/webcrypto-secure-curves/) proposal which is yet to be
- * widely adopted. If the proposal changes this implementation will follow up with a minor patch
- * release.
+ * widely adopted. If the proposal changes this implementation will follow up with a minor release.
  *
  * ```ts
  * interface EdDSAAlgorithm extends KeyAlgorithm {
