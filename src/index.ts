@@ -1822,7 +1822,7 @@ function timingSafeEqual(a: Uint8Array, b: Uint8Array) {
   return out === 0
 }
 
-async function idTokenHash(alg: string, data: string) {
+async function idTokenHash(alg: JWSAlgorithm, data: string) {
   let algorithm: Algorithm
   switch (alg) {
     case 'RS256': // Fall through
@@ -1841,7 +1841,7 @@ async function idTokenHash(alg: string, data: string) {
   return b64u(digest.slice(0, digest.byteLength / 2))
 }
 
-async function idTokenHashMatches(alg: string, data: string, actual: string) {
+async function idTokenHashMatches(alg: JWSAlgorithm, data: string, actual: string) {
   const expected = await idTokenHash(alg, data)
   return timingSafeEqual(buf(actual), buf(expected))
 }
