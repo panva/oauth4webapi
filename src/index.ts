@@ -1118,7 +1118,7 @@ async function jwt(
 ) {
   if (!key.usages.includes('sign')) {
     throw new TypeError(
-      'private CryptoKey instances used for signing assertions must include "sign" in their "usages"',
+      'CryptoKey instances used for signing assertions must include "sign" in their "usages"',
     )
   }
   const input = `${b64u(buf(JSON.stringify(header)))}.${b64u(buf(JSON.stringify(claimsSet)))}`
