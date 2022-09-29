@@ -18,7 +18,14 @@ export default (QUnit: QUnit) => {
     await t.rejects(lib.generateKeyPair(<any>'foo'), /UnsupportedOperationError/)
   })
 
-  for (const alg of <lib.JWSAlgorithm[]>['RS256', 'PS256', 'ES256']) {
+  const algs = <lib.JWSAlgorithm[]>['RS256', 'PS256', 'ES256']
+
+  // @ts-ignore
+  if (typeof Deno !== 'undefined' || typeof process !== 'undefined') {
+    algs.push('EdDSA')
+  }
+
+  for (const alg of algs) {
     test(`${alg} defaults`, async (t) => {
       const { publicKey, privateKey } = await lib.generateKeyPair(alg)
       t.deepEqual(publicKey.usages, ['verify'])

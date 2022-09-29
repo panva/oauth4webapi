@@ -4,11 +4,36 @@ import * as jose from 'jose'
 
 const issuer = { issuer: 'https://op.example.com' }
 const client = { client_id: 'client_id' }
+const rsa = {
+  hash: { name: 'SHA-256' },
+  modulusLength: 2048,
+  publicExponent: new Uint8Array([0x01, 0x00, 0x01]),
+}
+const usages: KeyUsage[] = ['sign', 'verify']
 
 const keys: Record<string, CryptoKeyPair> = {
-  RS256: await lib.generateKeyPair('RS256'),
-  PS256: await lib.generateKeyPair('PS256'),
-  ES256: await lib.generateKeyPair('ES256'),
+  RS256: await crypto.subtle.generateKey(
+    {
+      name: 'RSASSA-PKCS1-v1_5',
+      ...rsa,
+    },
+    false,
+    usages,
+  ),
+  PS256: await crypto.subtle.generateKey(
+    {
+      name: 'RSA-PSS',
+      ...rsa,
+    },
+    false,
+    usages,
+  ),
+  ES256: await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, false, usages),
+}
+
+// @ts-ignore
+if (typeof Deno !== 'undefined' || typeof process !== 'undefined') {
+  keys.EdDSA = <CryptoKeyPair>await crypto.subtle.generateKey({ name: 'Ed25519' }, false, usages)
 }
 
 export default (QUnit: QUnit) => {
