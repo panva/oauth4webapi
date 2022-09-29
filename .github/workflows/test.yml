@@ -90,3 +90,18 @@ jobs:
         run: deno check src/index.ts
       - name: Run Universal Tests
         run: npm run tap:deno
+
+  workers:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          check-latest: true
+          cache: 'npm'
+      - run: npm clean-install
+      - name: Run Universal Tests
+        run: npm run tap:workers

@@ -36,12 +36,18 @@ export default (QUnit: QUnit) => {
       if (isRSA(alg)) {
         // @ts-expect-error
         t.equal(publicKey.algorithm.modulusLength, 2048)
-        // @ts-expect-error
-        t.deepEqual(publicKey.algorithm.publicExponent, new Uint8Array([0x01, 0x00, 0x01]))
+        t.deepEqual(
+          // @ts-expect-error
+          new Uint8Array(publicKey.algorithm.publicExponent),
+          new Uint8Array([0x01, 0x00, 0x01]),
+        )
         // @ts-expect-error
         t.equal(privateKey.algorithm.modulusLength, 2048)
-        // @ts-expect-error
-        t.deepEqual(privateKey.algorithm.publicExponent, new Uint8Array([0x01, 0x00, 0x01]))
+        t.deepEqual(
+          // @ts-expect-error
+          new Uint8Array(privateKey.algorithm.publicExponent),
+          new Uint8Array([0x01, 0x00, 0x01]),
+        )
       }
     })
 
