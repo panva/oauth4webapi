@@ -52,9 +52,10 @@ jobs:
           check-latest: true
           cache: 'npm'
       - run: npm clean-install
-      - run: npm run test
-      - name: Run Universal Tests
+      - name: Run Test Suite
         run: npm run tap:node
+      - name: Run Network Tests
+        run: npm run test
 
   edge-runtime:
     runs-on: ubuntu-latest
@@ -68,7 +69,7 @@ jobs:
           check-latest: true
           cache: 'npm'
       - run: npm clean-install
-      - name: Run Universal Tests
+      - name: Run Test Suite
         run: npm run tap:edge-runtime | tee edge-runtime.tap
       - id: parse
         uses: Coderlane/tap-action@d5de2302c571f90ccb2d2e9416eaca4efe3185dd
@@ -88,7 +89,7 @@ jobs:
           deno-version: v1.x
       - name: Test Deno Definitions
         run: deno check src/index.ts
-      - name: Run Universal Tests
+      - name: Run Test Suite
         run: npm run tap:deno
 
   workers:
@@ -103,5 +104,5 @@ jobs:
           check-latest: true
           cache: 'npm'
       - run: npm clean-install
-      - name: Run Universal Tests
+      - name: Run Test Suite
         run: npm run tap:workers

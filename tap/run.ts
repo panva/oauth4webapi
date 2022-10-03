@@ -6,14 +6,17 @@ export default (QUnit: QUnit, done?: (details: QUnit.DoneDetails) => void) => {
   QUnit.config.autostart = false
 
   return Promise.all([
+    import('./callback.js'),
     import('./code_flow.js'),
     import('./generate.js'),
+    import('./modulus_length.js'),
     import('./request_object.js'),
+    import('./random.js'),
     import('./thumbprint.js'),
   ])
-    .then((modules) => {
+    .then(async (modules) => {
       for (const { default: module } of modules) {
-        module(QUnit)
+        await module(QUnit)
       }
     })
     .then(() => {

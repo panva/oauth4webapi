@@ -1,14 +1,21 @@
 import type QUnit from 'qunit'
 import * as lib from '../src/index.js'
 
-const vectors = {
+const vectors: Record<
+  string,
+  {
+    jwk: JsonWebKey
+    algorithm: AlgorithmIdentifier | RsaHashedKeyAlgorithm | EcKeyAlgorithm
+    thumbprint: string
+  }
+> = {
   RSA: {
     jwk: {
       kty: 'RSA',
       n: '0vx7agoebGcQSuuPiLJXZptN9nndrQmbXEps2aiAFbWhM78LhWx4cbbfAAtVT86zwu1RK7aPFFxuhDR1L6tSoc_BJECPebWKRXjBZCiFV4n3oknjhMstn64tZ_2W-5JsGY4Hc5n9yBXArwl93lqt7_RN5w6Cf0h4QyQ5v-65YGjQR0_FDW2QvzqY368QQMicAtaSqzs8KJZgnYb9c7d0zgdAZHzu6qMQvRL5hajrn1n91CbOpbISD08qNLyrdkt-bFTWhAI4vMQFh6WeZu0fM4lFd2NcRwr3XPksINHaQ-G_xBniIqbw0Ls1jF44-csFCur-kEgU8awapJzKnqDKgw',
       e: 'AQAB',
     },
-    algorithm: { name: 'RSA-PSS', hash: 'SHA-256' },
+    algorithm: { name: 'RSA-PSS', hash: { name: 'SHA-256' } },
     thumbprint: 'NzbLsXh8uDCcd-6MNwXF4W_7noWXFZAfHkxZsRGC9Xs',
   },
   EC: {
@@ -21,6 +28,20 @@ const vectors = {
     algorithm: { name: 'ECDSA', namedCurve: 'P-256' },
     thumbprint: 'ZrBaai73Hi8Fg4MElvDGzIne2NsbI75RHubOViHYE5Q',
   },
+}
+
+// TODO: enable Deno when import works
+// @ts-ignore
+if (typeof process !== 'undefined') {
+  vectors.OKP = {
+    jwk: {
+      crv: 'Ed25519',
+      kty: 'OKP',
+      x: '5fL1GDeyNTIxtuzTeFnvZTo4Oz0EkMfAdhIJA-EFn0w',
+    },
+    algorithm: 'Ed25519',
+    thumbprint: '1OzNmMHhNzbSJyoePAtdoVedRZlFvER3K3RAzCrfX0k',
+  }
 }
 
 export default (QUnit: QUnit) => {
