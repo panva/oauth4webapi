@@ -1,5 +1,6 @@
 import type QUnit from 'qunit'
 import * as lib from '../src/index.js'
+import { isNode } from './env.js'
 import * as jose from 'jose'
 
 const issuer = { issuer: 'https://op.example.com' }
@@ -31,8 +32,7 @@ const keys: Record<string, CryptoKeyPair> = {
   ES256: await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, false, usages),
 }
 
-// @ts-ignore
-if (typeof Deno !== 'undefined' || typeof process !== 'undefined') {
+if (isNode) {
   keys.EdDSA = <CryptoKeyPair>await crypto.subtle.generateKey({ name: 'Ed25519' }, false, usages)
 }
 
@@ -89,7 +89,7 @@ export default (QUnit: QUnit) => {
       const jwt = await lib.issueRequestObject(issuer, client, new URLSearchParams(), {
         key: kp.privateKey,
       })
-      const protectedHeader = jose.decodeProtectedHeader(jwt)
+      const { protectedHeader } = await jose.jwtVerify(jwt, kp.publicKey)
       t.equal(protectedHeader.alg, alg)
     })
   }

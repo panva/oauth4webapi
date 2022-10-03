@@ -1,5 +1,6 @@
 import type QUnit from 'qunit'
 import * as lib from '../src/index.js'
+import { isNode } from './env.js'
 
 const vectors: Record<
   string,
@@ -30,9 +31,7 @@ const vectors: Record<
   },
 }
 
-// TODO: enable Deno when import works
-// @ts-ignore
-if (typeof process !== 'undefined') {
+if (isNode) {
   vectors.OKP = {
     jwk: {
       crv: 'Ed25519',
