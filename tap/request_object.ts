@@ -1,6 +1,6 @@
 import type QUnit from 'qunit'
 import * as lib from '../src/index.js'
-import { isNode } from './env.js'
+import { isDeno, isNode } from './env.js'
 import * as jose from 'jose'
 
 const issuer = { issuer: 'https://op.example.com' }
@@ -32,7 +32,7 @@ const keys: Record<string, CryptoKeyPair> = {
   ES256: await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, false, usages),
 }
 
-if (isNode) {
+if (isNode || isDeno) {
   keys.EdDSA = <CryptoKeyPair>await crypto.subtle.generateKey({ name: 'Ed25519' }, false, usages)
 }
 

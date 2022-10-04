@@ -1,6 +1,6 @@
 import type QUnit from 'qunit'
 import * as lib from '../src/index.js'
-import { isNode } from './env.js'
+import { isDeno, isNode } from './env.js'
 
 const vectors: Record<
   string,
@@ -31,7 +31,7 @@ const vectors: Record<
   },
 }
 
-if (isNode) {
+if (isNode || isDeno) {
   vectors.OKP = {
     jwk: {
       crv: 'Ed25519',
