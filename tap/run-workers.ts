@@ -1,14 +1,15 @@
 import QUnit from 'qunit'
 import run from './run.js'
 
-addEventListener('fetch', (event) => {
-  // @ts-ignore
-  event.respondWith(
-    new Promise((resolve) => {
+export default {
+  async fetch() {
+    const results = await new Promise((resolve) => {
       run(QUnit, (results) => {
-        // @ts-ignore
-        resolve(Response.json({ ...results }))
+        resolve(results)
       })
-    }),
-  )
-})
+    })
+
+    // @ts-ignore
+    return Response.json({ ...results })
+  },
+}

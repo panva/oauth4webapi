@@ -2,7 +2,7 @@ using Workerd = import "/workerd/workerd.capnp";
 
 const config :Workerd.Config = (
   services = [
-    (name = "main", worker = .mainWorker),
+    (name = "main", worker = .tapWorker),
   ],
 
   sockets = [
@@ -15,7 +15,9 @@ const config :Workerd.Config = (
   ]
 );
 
-const mainWorker :Workerd.Worker = (
-  serviceWorkerScript = embed "run-workers.js",
+const tapWorker :Workerd.Worker = (
+  modules = [
+    (name = "worker", esModule = embed "run-workers.js")
+  ],
   compatibilityDate = "2022-09-16",
 );
