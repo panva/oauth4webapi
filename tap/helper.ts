@@ -1,4 +1,5 @@
 import * as lib from '../src/index.js'
+import * as jose from 'jose'
 
 function url(pathname: string, search?: Record<string, string>) {
   const target = new URL(pathname, 'https://obscure-mesa-34474.deno.dev')
@@ -14,7 +15,7 @@ export default async function setup(): Promise<{
   exposed: () => Promise<Record<string, string>>
   cleanup: () => Promise<void>
 }> {
-  const uuid = crypto.randomUUID()
+  const uuid = jose.base64url.encode(crypto.getRandomValues(new Uint8Array(16)))
 
   const serverKey = {
     ...(await crypto.subtle.exportKey(
@@ -25,7 +26,7 @@ export default async function setup(): Promise<{
     )),
     alg: 'ES256',
     use: 'sig',
-    kid: crypto.randomUUID(),
+    kid: jose.base64url.encode(crypto.getRandomValues(new Uint8Array(16))),
     key_ops: undefined,
     ext: undefined,
   }
@@ -35,7 +36,7 @@ export default async function setup(): Promise<{
     ...(await crypto.subtle.exportKey('jwk', clientKeyPair.publicKey)),
     alg: 'ES256',
     use: 'sig',
-    kid: crypto.randomUUID(),
+    kid: jose.base64url.encode(crypto.getRandomValues(new Uint8Array(16))),
     key_ops: undefined,
     ext: undefined,
   }

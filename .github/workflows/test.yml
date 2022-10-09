@@ -106,3 +106,23 @@ jobs:
       - run: npm clean-install
       - name: Run Test Suite
         run: npm run tap:workers
+
+  browsers:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        browser:
+          - chrome:headless
+          - firefox:headless
+          - edge:headless
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup node
+        uses: actions/setup-node@v3
+      - run: npm clean-install
+      - name: Run Test Suite
+        run: npm run tap:browsers
+        env:
+          BROWSER: ${{ matrix.browser }}

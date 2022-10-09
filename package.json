@@ -53,6 +53,7 @@
     "tap:edge-runtime": "./tap/.edge-runtime.sh",
     "tap:node": "./tap/.node.sh",
     "tap:workers": "./tap/.workers.sh",
+    "tap:browsers": "./tap/.browsers.sh",
     "test": "ava"
   },
   "devDependencies": {
@@ -67,6 +68,8 @@
     "prettier": "^2.7.1",
     "prettier-plugin-jsdoc": "^0.4.2",
     "qunit": "^2.19.1",
+    "testcafe": "^2.0.1",
+    "testcafe-browser-provider-browserstack": "^1.14.0",
     "timekeeper": "^2.2.0",
     "typedoc": "^0.23.15",
     "typedoc-plugin-markdown": "^3.13.6",

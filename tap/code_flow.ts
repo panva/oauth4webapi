@@ -1,7 +1,6 @@
 import type QUnit from 'qunit'
 import setup from './helper.js'
 import * as lib from '../src/index.js'
-import { isBrowser } from './env.js'
 
 export default (QUnit: QUnit) => {
   const { module, test } = QUnit
@@ -58,16 +57,10 @@ export default (QUnit: QUnit) => {
 
         let currentUrl: URL
         {
-          let options: Record<string, string>
-          if (isBrowser) {
-            options = { redirect: 'follow', mode: 'no-cors' }
-          } else {
-            options = { redirect: 'manual' }
-          }
           const authorizationUrl = new URL(as.authorization_endpoint!)
           authorizationUrl.searchParams.set('client_id', client.client_id)
           authorizationUrl.searchParams.set('request_uri', request_uri)
-          await fetch(authorizationUrl, options).catch(() => {})
+          await fetch(authorizationUrl, { redirect: 'manual' }).catch(() => {})
           currentUrl = new URL((await exposed()).authorization_endpoint_response_redirect)
         }
 
