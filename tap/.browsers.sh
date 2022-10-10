@@ -7,7 +7,7 @@ if [[ -z $CI ]]; then
 else
   if [[ "$BROWSER" == "browserstack"* ]]; then
     BROWSER=$(node ./tap/browserstack.mjs $BROWSER)
-    npx testcafe "$BROWSER" --skip-js-errors --ssl 'key=./letsencrypt/config/live/panva.me/privkey.pem;cert=./letsencrypt/config/live/panva.me/cert.pem;rejectUnauthorized=true;' --hostname 'panva.me' tap/.browser.ts
+    npx testcafe "$BROWSER" --skip-js-errors --ssl 'key=./letsencrypt/config/live/oauth4webapi.panva.me/privkey.pem;cert=./letsencrypt/config/live/oauth4webapi.panva.me/cert.pem;rejectUnauthorized=true;' --hostname 'oauth4webapi.panva.me' tap/.browser.ts
   else
     xvfb-run --server-args="-screen 0 1280x720x24" npx testcafe "$BROWSER" --skip-js-errors --hostname localhost tap/.browser.ts
   fi
