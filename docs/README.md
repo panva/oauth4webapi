@@ -1,4 +1,4 @@
-# @panva/oauth4webapi
+# oauth4webapi
 
 [💗 Help the project](https://github.com/sponsors/panva)
 
