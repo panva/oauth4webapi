@@ -121,6 +121,10 @@ jobs:
         uses: actions/checkout@v3
       - name: Setup node
         uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          check-latest: true
+          cache: 'npm'
       - run: npm clean-install
       - name: Run Test Suite
         run: npm run tap:browsers
