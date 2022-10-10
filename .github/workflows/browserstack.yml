@@ -31,7 +31,7 @@ jobs:
         with:
           format: YYYYMM
       - name: Cache letsencrypt
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: cert
         with:
           path: letsencrypt
@@ -82,7 +82,7 @@ jobs:
           format: YYYYMM
       - name: Cache letsencrypt
         id: cert
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: letsencrypt
           key: letsencrypt-${{ steps.current-time.outputs.formattedTime }}
