@@ -4,6 +4,8 @@ on:
   push:
   pull_request:
   pull_request_target:
+    types:
+      - labeled
   schedule:
     - cron: 0 12 * * 1-5
   workflow_dispatch:
