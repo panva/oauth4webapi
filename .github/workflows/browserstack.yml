@@ -64,8 +64,6 @@ jobs:
       fail-fast: false
       matrix:
         browser:
-          - browserstack:chrome
-          - browserstack:firefox
           - browserstack:ios
           - browserstack:safari
     steps:

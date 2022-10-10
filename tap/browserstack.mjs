@@ -16,16 +16,6 @@ switch (identifier) {
       (id) => !!new RegExp(`safari@\\\d+\\\.\\\d+:OS X Monterey`).exec(id),
     )
     break
-  case 'browserstack:firefox':
-    ;[result] = browserlist.filter(
-      (id) => !!new RegExp(`firefox@\\\d+\\\.\\\d+:Windows 11`).exec(id),
-    )
-    break
-  case 'browserstack:chrome':
-    ;[result] = browserlist.filter(
-      (id) => !!new RegExp(`chrome@\\\d+\\\.\\\d+:Windows 11`).exec(id),
-    )
-    break
   case 'browserstack:ios':
     ;[result] = browserlist
       .filter((id) => id.startsWith('iPhone'))
