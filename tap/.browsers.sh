@@ -2,8 +2,8 @@
 npx esbuild --format=esm --bundle --target=esnext tap/run-browser.ts > tap/run-browser.js
 
 if [[ -z $CI ]]; then
-  browsers="chrome:headless"
-  npx testcafe chrome:headless --skip-js-errors --hostname localhost tap/.browser.ts
+  BROWSER="chrome:headless"
+  npx testcafe "$BROWSER" --skip-js-errors --hostname localhost tap/.browser.ts
 else
   if [[ "$BROWSER" == "browserstack"* ]]; then
     BROWSER=$(node ./tap/browserstack.mjs $BROWSER)
