@@ -1,11 +1,11 @@
 import type QUnit from 'qunit'
 
-export default (QUnit: QUnit, done?: (details: QUnit.DoneDetails) => void) => {
+export default async (QUnit: QUnit, done?: (details: QUnit.DoneDetails) => void) => {
   // @ts-ignore
   QUnit.reporters.tap.init(QUnit)
   QUnit.config.autostart = false
 
-  return Promise.all([
+  const modules = await Promise.all([
     import('./callback.js'),
     import('./code_flow.js'),
     import('./generate.js'),
@@ -14,15 +14,11 @@ export default (QUnit: QUnit, done?: (details: QUnit.DoneDetails) => void) => {
     import('./random.js'),
     import('./thumbprint.js'),
   ])
-    .then(async (modules) => {
-      for (const { default: module } of modules) {
-        await module(QUnit)
-      }
-    })
-    .then(() => {
-      QUnit.start()
-      if (done) {
-        QUnit.done(done)
-      }
-    })
+  for (const { default: module } of modules) {
+    await module(QUnit)
+  }
+  QUnit.start()
+  if (done) {
+    QUnit.done(done)
+  }
 }

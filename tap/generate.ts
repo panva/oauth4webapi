@@ -1,5 +1,6 @@
 import type QUnit from 'qunit'
 import * as lib from '../src/index.js'
+import * as env from './env.js'
 
 function isRSA(alg: string) {
   return alg.startsWith('RS') || alg.startsWith('PS')
@@ -20,8 +21,7 @@ export default (QUnit: QUnit) => {
 
   const algs = <lib.JWSAlgorithm[]>['RS256', 'PS256', 'ES256']
 
-  // @ts-ignore
-  if (typeof Deno !== 'undefined' || typeof process !== 'undefined') {
+  if (env.isDeno || env.isNode) {
     algs.push('EdDSA')
   }
 
