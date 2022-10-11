@@ -127,8 +127,7 @@ export async function downloadArtifact(plan: Plan) {
     headers: headers(),
   })
 
-  const blob = await response.blob()
-  await fs.writeFile(`${plan.id}.zip`, blob.stream(), { flag: 'w' })
+  await fs.writeFile(`${plan.id}.zip`, new Uint8Array(await response.arrayBuffer()), { flag: 'w' })
 }
 
 export async function waitForState(

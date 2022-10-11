@@ -689,7 +689,7 @@ function prepareHeaders(input: unknown): Headers {
 }
 
 function signal(value: Exclude<HttpRequestOptions['signal'], undefined>): AbortSignal {
-  return typeof value === 'function' ? value() : value
+  return value instanceof AbortSignal ? value : value()
 }
 
 /**

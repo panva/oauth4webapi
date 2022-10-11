@@ -58,7 +58,7 @@
   },
   "devDependencies": {
     "@esbuild-kit/esm-loader": "^2.5.0",
-    "@types/node": "^18.8.3",
+    "@types/node": "^18.8.4",
     "@types/qunit": "^2.19.3",
     "ava": "^4.3.3",
     "c8": "^7.12.0",
@@ -71,7 +71,7 @@
     "testcafe": "^2.0.1",
     "testcafe-browser-provider-browserstack": "^1.14.0",
     "timekeeper": "^2.2.0",
-    "typedoc": "^0.23.15",
+    "typedoc": "^0.23.16",
     "typedoc-plugin-markdown": "^3.13.6",
     "typescript": "^4.8.4",
     "undici": "^5.11.0",
