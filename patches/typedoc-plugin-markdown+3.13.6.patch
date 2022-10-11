@@ -33,7 +33,7 @@ index ca0cf27..8ef50c6 100644
                  if (group.categories) {
                      group.categories.forEach((category) => {
 diff --git a/node_modules/typedoc-plugin-markdown/dist/resources/partials/member.declaration.hbs b/node_modules/typedoc-plugin-markdown/dist/resources/partials/member.declaration.hbs
-index 32c9e62..9b363a5 100644
+index 32c9e62..03a30b0 100644
 --- a/node_modules/typedoc-plugin-markdown/dist/resources/partials/member.declaration.hbs
 +++ b/node_modules/typedoc-plugin-markdown/dist/resources/partials/member.declaration.hbs
 @@ -16,20 +16,6 @@
@@ -58,7 +58,7 @@ index 32c9e62..9b363a5 100644
  
  {{#if type.declaration.children}}
 diff --git a/node_modules/typedoc-plugin-markdown/dist/resources/partials/member.sources.hbs b/node_modules/typedoc-plugin-markdown/dist/resources/partials/member.sources.hbs
-index f642b49..195a9a4 100644
+index f642b49..3743b65 100644
 --- a/node_modules/typedoc-plugin-markdown/dist/resources/partials/member.sources.hbs
 +++ b/node_modules/typedoc-plugin-markdown/dist/resources/partials/member.sources.hbs
 @@ -10,30 +10,6 @@
@@ -93,17 +93,18 @@ index f642b49..195a9a4 100644
  
  #### Defined in
 diff --git a/node_modules/typedoc-plugin-markdown/dist/resources/partials/title.hbs b/node_modules/typedoc-plugin-markdown/dist/resources/partials/title.hbs
-index 68b4dba..0c97f46 100644
+index 68b4dba..ece55a4 100644
 --- a/node_modules/typedoc-plugin-markdown/dist/resources/partials/title.hbs
 +++ b/node_modules/typedoc-plugin-markdown/dist/resources/partials/title.hbs
-@@ -5,3 +5,5 @@
+@@ -4,4 +4,4 @@
+ 
  {{/ifShowPageTitle}}
  
- {{{reflectionPath}}}
-+
+-{{{reflectionPath}}}
+\ No newline at end of file
 +[💗 Help the project](https://github.com/sponsors/panva)
 diff --git a/node_modules/typedoc-plugin-markdown/dist/resources/templates/reflection.hbs b/node_modules/typedoc-plugin-markdown/dist/resources/templates/reflection.hbs
-index 6a29bf7..38fa318 100644
+index 6a29bf7..f9dcbc4 100644
 --- a/node_modules/typedoc-plugin-markdown/dist/resources/templates/reflection.hbs
 +++ b/node_modules/typedoc-plugin-markdown/dist/resources/templates/reflection.hbs
 @@ -24,18 +24,6 @@
