@@ -19,7 +19,7 @@ const tClient: lib.Client = { ...client, client_secret: 'foo' }
 
 test('clientCredentialsGrantRequest()', async (t) => {
   await t.throwsAsync(lib.clientCredentialsGrantRequest(issuer, tClient, new URLSearchParams()), {
-    message: '"issuer.token_endpoint" must be a string',
+    message: '"as.token_endpoint" must be a string',
   })
 
   const tIssuer: lib.AuthorizationServer = {

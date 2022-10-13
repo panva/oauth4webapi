@@ -102,7 +102,7 @@ test('userInfoRequest() w/ jwt signal', async (t) => {
 test('userInfoRequest() requires userinfo_endpoint', async (t) => {
   await t.throwsAsync(lib.userInfoRequest(issuer, client, 'token'), {
     name: 'TypeError',
-    message: '"issuer.userinfo_endpoint" must be a string',
+    message: '"as.userinfo_endpoint" must be a string',
   })
 })
 
@@ -189,7 +189,7 @@ test('processUserInfoResponse() - jwt (alg signalled)', async (t) => {
       getResponse('', { headers: new Headers({ 'content-type': 'application/jwt' }) }),
     ),
     {
-      message: '"issuer.jwks_uri" must be a string',
+      message: '"as.jwks_uri" must be a string',
     },
   )
 

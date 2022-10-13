@@ -66,7 +66,7 @@ const tClient: lib.Client = { ...client, client_secret: 'foo' }
 
 test('introspectionRequest()', async (t) => {
   await t.throwsAsync(lib.introspectionRequest(issuer, tClient, 'token'), {
-    message: '"issuer.introspection_endpoint" must be a string',
+    message: '"as.introspection_endpoint" must be a string',
   })
 
   await t.throwsAsync(lib.introspectionRequest(issuer, tClient, <any>null), {

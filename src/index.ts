@@ -710,7 +710,7 @@ export async function discoveryRequest(
   options?: DiscoveryRequestOptions,
 ): Promise<Response> {
   if (!(issuerIdentifier instanceof URL)) {
-    throw new TypeError('"issuer" must be an instance of URL')
+    throw new TypeError('"issuerIdentifier" must be an instance of URL')
   }
 
   if (issuerIdentifier.protocol !== 'https:' && issuerIdentifier.protocol !== 'http:') {
@@ -1010,11 +1010,11 @@ async function privateKeyJwt(
 
 function assertIssuer(metadata: AuthorizationServer): metadata is AuthorizationServer {
   if (typeof metadata !== 'object' || metadata === null) {
-    throw new TypeError('"issuer" must be an object')
+    throw new TypeError('"as" must be an object')
   }
 
   if (!validateString(metadata.issuer)) {
-    throw new TypeError('"issuer.issuer" property must be a non-empty string')
+    throw new TypeError('"as.issuer" property must be a non-empty string')
   }
   return true
 }
@@ -1267,7 +1267,7 @@ export async function pushedAuthorizationRequest(
   }
 
   if (typeof as.pushed_authorization_request_endpoint !== 'string') {
-    throw new TypeError('"issuer.pushed_authorization_request_endpoint" must be a string')
+    throw new TypeError('"as.pushed_authorization_request_endpoint" must be a string')
   }
 
   const url = new URL(as.pushed_authorization_request_endpoint)
@@ -1542,7 +1542,7 @@ export async function userInfoRequest(
   assertClient(client)
 
   if (typeof as.userinfo_endpoint !== 'string') {
-    throw new TypeError('"issuer.userinfo_endpoint" must be a string')
+    throw new TypeError('"as.userinfo_endpoint" must be a string')
   }
 
   const url = new URL(as.userinfo_endpoint)
@@ -1753,7 +1753,7 @@ export async function processUserInfoResponse(
   let json: JsonValue
   if (getContentType(response) === 'application/jwt') {
     if (typeof as.jwks_uri !== 'string') {
-      throw new TypeError('"issuer.jwks_uri" must be a string')
+      throw new TypeError('"as.jwks_uri" must be a string')
     }
 
     const { claims } = await validateJwt(
@@ -1882,7 +1882,7 @@ async function tokenEndpointRequest(
   options?: Omit<TokenEndpointRequestOptions, 'additionalParameters'>,
 ): Promise<Response> {
   if (typeof as.token_endpoint !== 'string') {
-    throw new TypeError('"issuer.token_endpoint" must be a string')
+    throw new TypeError('"as.token_endpoint" must be a string')
   }
 
   const url = new URL(as.token_endpoint)
@@ -2036,7 +2036,7 @@ async function processGenericAccessTokenResponse(
 
     if (json.id_token) {
       if (typeof as.jwks_uri !== 'string') {
-        throw new TypeError('"issuer.jwks_uri" must be a string')
+        throw new TypeError('"as.jwks_uri" must be a string')
       }
 
       const { header, claims } = await validateJwt(
@@ -2520,7 +2520,7 @@ export async function revocationRequest(
   }
 
   if (typeof as.revocation_endpoint !== 'string') {
-    throw new TypeError('"issuer.revocation_endpoint" must be a string')
+    throw new TypeError('"as.revocation_endpoint" must be a string')
   }
 
   const url = new URL(as.revocation_endpoint)
@@ -2610,7 +2610,7 @@ export async function introspectionRequest(
   }
 
   if (typeof as.introspection_endpoint !== 'string') {
-    throw new TypeError('"issuer.introspection_endpoint" must be a string')
+    throw new TypeError('"as.introspection_endpoint" must be a string')
   }
 
   const url = new URL(as.introspection_endpoint)
@@ -2689,7 +2689,7 @@ export async function processIntrospectionResponse(
   let json: JsonValue
   if (getContentType(response) === 'application/token-introspection+jwt') {
     if (typeof as.jwks_uri !== 'string') {
-      throw new TypeError('"issuer.jwks_uri" must be a string')
+      throw new TypeError('"as.jwks_uri" must be a string')
     }
 
     const { claims } = await validateJwt(
@@ -2749,7 +2749,7 @@ export async function jwksRequest(
   assertIssuer(as)
 
   if (typeof as.jwks_uri !== 'string') {
-    throw new TypeError('"issuer.jwks_uri" must be a string')
+    throw new TypeError('"as.jwks_uri" must be a string')
   }
 
   const url = new URL(as.jwks_uri)
@@ -3006,7 +3006,7 @@ export async function validateJwtAuthResponse(
   }
 
   if (typeof as.jwks_uri !== 'string') {
-    throw new TypeError('"issuer.jwks_uri" must be a string')
+    throw new TypeError('"as.jwks_uri" must be a string')
   }
 
   const { claims } = await validateJwt(
@@ -3247,7 +3247,7 @@ export async function deviceAuthorizationRequest(
   }
 
   if (typeof as.device_authorization_endpoint !== 'string') {
-    throw new TypeError('"issuer.device_authorization_endpoint" must be a string')
+    throw new TypeError('"as.device_authorization_endpoint" must be a string')
   }
 
   const url = new URL(as.device_authorization_endpoint)

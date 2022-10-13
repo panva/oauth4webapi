@@ -60,7 +60,7 @@ test('authorizationCodeGrantRequest()', async (t) => {
       'verifier',
     ),
     {
-      message: '"issuer.token_endpoint" must be a string',
+      message: '"as.token_endpoint" must be a string',
     },
   )
 
@@ -408,7 +408,7 @@ test('processAuthorizationCodeOpenIDResponse() with an ID Token (alg signalled)'
       ),
     ),
     {
-      message: '"issuer.jwks_uri" must be a string',
+      message: '"as.jwks_uri" must be a string',
     },
   )
 

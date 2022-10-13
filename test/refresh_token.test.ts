@@ -37,7 +37,7 @@ const tClient: lib.Client = { ...client, client_secret: 'foo' }
 
 test('refreshTokenGrantRequest()', async (t) => {
   await t.throwsAsync(lib.refreshTokenGrantRequest(issuer, tClient, 'refresh_token'), {
-    message: '"issuer.token_endpoint" must be a string',
+    message: '"as.token_endpoint" must be a string',
   })
 
   await t.throwsAsync(lib.refreshTokenGrantRequest(issuer, tClient, <any>null), {
@@ -287,7 +287,7 @@ test('processRefreshTokenResponse() with an ID Token (alg signalled)', async (t)
       ),
     ),
     {
-      message: '"issuer.jwks_uri" must be a string',
+      message: '"as.jwks_uri" must be a string',
     },
   )
 

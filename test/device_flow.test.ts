@@ -37,7 +37,7 @@ const tClient: lib.Client = { ...client, token_endpoint_auth_method: 'none' }
 
 test('deviceAuthorizationRequest()', async (t) => {
   await t.throwsAsync(lib.deviceAuthorizationRequest(issuer, tClient, new URLSearchParams()), {
-    message: '"issuer.device_authorization_endpoint" must be a string',
+    message: '"as.device_authorization_endpoint" must be a string',
   })
 
   await t.throwsAsync(lib.deviceAuthorizationRequest(issuer, tClient, <any>null), {
@@ -233,7 +233,7 @@ test('processDeviceAuthorizationResponse()', async (t) => {
 
 test('deviceCodeGrantRequest()', async (t) => {
   await t.throwsAsync(lib.deviceCodeGrantRequest(issuer, tClient, 'device_code'), {
-    message: '"issuer.token_endpoint" must be a string',
+    message: '"as.token_endpoint" must be a string',
   })
 
   await t.throwsAsync(lib.deviceCodeGrantRequest(issuer, tClient, <any>null), {
@@ -481,7 +481,7 @@ test('processDeviceCodeResponse() with an ID Token (alg signalled)', async (t) =
       ),
     ),
     {
-      message: '"issuer.jwks_uri" must be a string',
+      message: '"as.jwks_uri" must be a string',
     },
   )
 

@@ -19,7 +19,7 @@ const tClient: lib.Client = { ...client, client_secret: 'foo' }
 
 test('pushedAuthorizationRequest()', async (t) => {
   await t.throwsAsync(lib.pushedAuthorizationRequest(issuer, tClient, new URLSearchParams()), {
-    message: '"issuer.pushed_authorization_request_endpoint" must be a string',
+    message: '"as.pushed_authorization_request_endpoint" must be a string',
   })
 
   await t.throwsAsync(lib.pushedAuthorizationRequest(issuer, tClient, <any>null), {

@@ -19,7 +19,7 @@ const tClient: lib.Client = { ...client, client_secret: 'foo' }
 
 test('revocationRequest()', async (t) => {
   await t.throwsAsync(lib.revocationRequest(issuer, tClient, 'token'), {
-    message: '"issuer.revocation_endpoint" must be a string',
+    message: '"as.revocation_endpoint" must be a string',
   })
 
   await t.throwsAsync(lib.revocationRequest(issuer, tClient, <any>null), {

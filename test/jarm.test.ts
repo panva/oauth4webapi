@@ -43,7 +43,7 @@ test('validateJwtAuthResponse() error conditions', async (t) => {
   await t.throwsAsync(
     () => lib.validateJwtAuthResponse(issuer, client, new URLSearchParams('response=foo')),
     {
-      message: '"issuer.jwks_uri" must be a string',
+      message: '"as.jwks_uri" must be a string',
     },
   )
 })
