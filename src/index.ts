@@ -1008,23 +1008,23 @@ async function privateKeyJwt(
   )
 }
 
-function assertIssuer(metadata: AuthorizationServer): metadata is AuthorizationServer {
-  if (typeof metadata !== 'object' || metadata === null) {
+function assertAs(as: AuthorizationServer): as is AuthorizationServer {
+  if (typeof as !== 'object' || as === null) {
     throw new TypeError('"as" must be an object')
   }
 
-  if (!validateString(metadata.issuer)) {
+  if (!validateString(as.issuer)) {
     throw new TypeError('"as.issuer" property must be a non-empty string')
   }
   return true
 }
 
-function assertClient(metadata: Client): metadata is Client {
-  if (typeof metadata !== 'object' || metadata === null) {
+function assertClient(client: Client): client is Client {
+  if (typeof client !== 'object' || client === null) {
     throw new TypeError('"client" must be an object')
   }
 
-  if (!validateString(metadata.client_id)) {
+  if (!validateString(client.client_id)) {
     throw new TypeError('"client.client_id" property must be a non-empty string')
   }
   return true
@@ -1141,7 +1141,7 @@ export async function issueRequestObject(
   parameters: URLSearchParams,
   privateKey: CryptoKey | PrivateKey,
 ) {
-  assertIssuer(as)
+  assertAs(as)
   assertClient(client)
 
   if (!(parameters instanceof URLSearchParams)) {
@@ -1259,7 +1259,7 @@ export async function pushedAuthorizationRequest(
   parameters: URLSearchParams,
   options?: PushedAuthorizationRequestOptions,
 ): Promise<Response> {
-  assertIssuer(as)
+  assertAs(as)
   assertClient(client)
 
   if (!(parameters instanceof URLSearchParams)) {
@@ -1428,7 +1428,7 @@ export async function processPushedAuthorizationResponse(
   client: Client,
   response: Response,
 ): Promise<PushedAuthorizationResponse | OAuth2Error> {
-  assertIssuer(as)
+  assertAs(as)
   assertClient(client)
 
   if (!(response instanceof Response)) {
@@ -1538,7 +1538,7 @@ export async function userInfoRequest(
   accessToken: string,
   options?: UserInfoRequestOptions,
 ): Promise<Response> {
-  assertIssuer(as)
+  assertAs(as)
   assertClient(client)
 
   if (typeof as.userinfo_endpoint !== 'string') {
@@ -1739,7 +1739,7 @@ export async function processUserInfoResponse(
   response: Response,
   options?: HttpRequestOptions,
 ): Promise<UserInfoResponse> {
-  assertIssuer(as)
+  assertAs(as)
   assertClient(client)
 
   if (!(response instanceof Response)) {
@@ -1916,7 +1916,7 @@ export async function refreshTokenGrantRequest(
   refreshToken: string,
   options?: TokenEndpointRequestOptions,
 ): Promise<Response> {
-  assertIssuer(as)
+  assertAs(as)
   assertClient(client)
 
   if (!validateString(refreshToken)) {
@@ -1969,7 +1969,7 @@ async function processGenericAccessTokenResponse(
   ignoreIdToken = false,
   ignoreRefreshToken = false,
 ): Promise<TokenEndpointResponse | OAuth2Error> {
-  assertIssuer(as)
+  assertAs(as)
   assertClient(client)
 
   if (!(response instanceof Response)) {
@@ -2156,7 +2156,7 @@ export async function authorizationCodeGrantRequest(
   codeVerifier: string,
   options?: TokenEndpointRequestOptions,
 ): Promise<Response> {
-  assertIssuer(as)
+  assertAs(as)
   assertClient(client)
 
   if (!(callbackParameters instanceof CallbackParameters)) {
@@ -2445,7 +2445,7 @@ export async function clientCredentialsGrantRequest(
   parameters: URLSearchParams,
   options?: ClientCredentialsGrantRequestOptions,
 ): Promise<Response> {
-  assertIssuer(as)
+  assertAs(as)
   assertClient(client)
 
   return tokenEndpointRequest(
@@ -2512,7 +2512,7 @@ export async function revocationRequest(
   token: string,
   options?: RevocationRequestOptions,
 ): Promise<Response> {
-  assertIssuer(as)
+  assertAs(as)
   assertClient(client)
 
   if (!validateString(token)) {
@@ -2602,7 +2602,7 @@ export async function introspectionRequest(
   token: string,
   options?: IntrospectionRequestOptions,
 ): Promise<Response> {
-  assertIssuer(as)
+  assertAs(as)
   assertClient(client)
 
   if (!validateString(token)) {
@@ -2671,7 +2671,7 @@ export async function processIntrospectionResponse(
   response: Response,
   options?: HttpRequestOptions,
 ): Promise<IntrospectionResponse | OAuth2Error> {
-  assertIssuer(as)
+  assertAs(as)
   assertClient(client)
 
   if (!(response instanceof Response)) {
@@ -2746,7 +2746,7 @@ export async function jwksRequest(
   as: AuthorizationServer,
   options?: JwksRequestOptions,
 ): Promise<Response> {
-  assertIssuer(as)
+  assertAs(as)
 
   if (typeof as.jwks_uri !== 'string') {
     throw new TypeError('"as.jwks_uri" must be a string')
@@ -2989,7 +2989,7 @@ export async function validateJwtAuthResponse(
   expectedState?: string | typeof expectNoState | typeof skipStateCheck,
   options?: HttpRequestOptions,
 ): Promise<CallbackParameters | OAuth2Error> {
-  assertIssuer(as)
+  assertAs(as)
   assertClient(client)
 
   if (parameters instanceof URL) {
@@ -3115,7 +3115,7 @@ export function validateAuthResponse(
   parameters: URLSearchParams | URL,
   expectedState?: string | typeof expectNoState | typeof skipStateCheck,
 ): CallbackParameters | OAuth2Error {
-  assertIssuer(as)
+  assertAs(as)
   assertClient(client)
 
   if (parameters instanceof URL) {
@@ -3239,7 +3239,7 @@ export async function deviceAuthorizationRequest(
   parameters: URLSearchParams,
   options?: DeviceAuthorizationRequestOptions,
 ): Promise<Response> {
-  assertIssuer(as)
+  assertAs(as)
   assertClient(client)
 
   if (!(parameters instanceof URLSearchParams)) {
@@ -3290,7 +3290,7 @@ export async function processDeviceAuthorizationResponse(
   client: Client,
   response: Response,
 ): Promise<DeviceAuthorizationResponse | OAuth2Error> {
-  assertIssuer(as)
+  assertAs(as)
   assertClient(client)
 
   if (!(response instanceof Response)) {
@@ -3363,7 +3363,7 @@ export async function deviceCodeGrantRequest(
   deviceCode: string,
   options?: TokenEndpointRequestOptions,
 ): Promise<Response> {
-  assertIssuer(as)
+  assertAs(as)
   assertClient(client)
 
   if (!validateString(deviceCode)) {
