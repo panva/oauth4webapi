@@ -18,7 +18,7 @@ Validates Refresh Token Grant Response instance to be one coming from the
 | `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata. |
 | `client` | [`Client`](../interfaces/Client.md) | Client Metadata. |
 | `response` | [`Response`]( https://developer.mozilla.org/en-US/docs/Web/API/Response ) | Resolved value from [refreshTokenGrantRequest](refreshTokenGrantRequest.md). |
-| `options?` | [`HttpRequestOptions`](../interfaces/HttpRequestOptions.md) | - |
+| `options?` | [`ProcessRefreshTokenResponseOptions`](../interfaces/ProcessRefreshTokenResponseOptions.md) | - |
 
 #### Returns
 

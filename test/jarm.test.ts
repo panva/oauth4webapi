@@ -2,6 +2,7 @@ import anyTest, { type TestFn } from 'ava'
 import setup, { type Context, teardown, client, issuer, endpoint } from './_setup.js'
 import * as jose from 'jose'
 import * as lib from '../src/index.js'
+import * as tools from './_tools.js'
 
 const test = anyTest as TestFn<Context & { es256: CryptoKeyPair; rs256: CryptoKeyPair }>
 
@@ -160,6 +161,38 @@ test('validateJwtAuthResponse() - state ignored', async (t) => {
     .sign(kp.privateKey)
   const params = new URLSearchParams({ response })
   await t.notThrowsAsync(lib.validateJwtAuthResponse(tIssuer, client, params, lib.skipStateCheck))
+})
+
+test('validateJwtAuthResponse() - invalid signature', async (t) => {
+  const tIssuer: lib.AuthorizationServer = {
+    ...issuer,
+    jwks_uri: endpoint('jwks'),
+    authorization_signing_alg_values_supported: ['ES256'],
+  }
+  const kp = t.context.es256
+
+  const response = tools.mangleJwtSignature(
+    await new jose.SignJWT({
+      iss: issuer.issuer,
+      aud: client.client_id,
+    })
+      .setExpirationTime('30s')
+      .setProtectedHeader({ alg: 'ES256', kid: 'es256' })
+      .sign(kp.privateKey),
+  )
+  const params = new URLSearchParams({ response })
+  await t.throwsAsync(lib.validateJwtAuthResponse(tIssuer, client, params, lib.expectNoState), {
+    message: 'JWT signature verification failed',
+  })
+  await t.throwsAsync(
+    lib.validateJwtAuthResponse(tIssuer, client, params, lib.expectNoState, {
+      // @ts-ignore
+      skipJwtSignatureCheck: true,
+    }),
+    {
+      message: 'JWT signature verification failed',
+    },
+  )
 })
 
 test('validateJwtAuthResponse() - alg signalled', async (t) => {

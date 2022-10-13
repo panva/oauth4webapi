@@ -10,6 +10,7 @@ import setup, {
 } from './_setup.js'
 import * as lib from '../src/index.js'
 import * as jose from 'jose'
+import * as tools from './_tools.js'
 
 const test = anyTest as TestFn<Context & { es256: CryptoKeyPair; rs256: CryptoKeyPair }>
 
@@ -180,19 +181,55 @@ test('processUserInfoResponse() - json', async (t) => {
   )
 })
 
-test('processUserInfoResponse() - jwt (alg signalled)', async (t) => {
-  await t.throwsAsync(
-    lib.processUserInfoResponse(
-      issuer,
-      client,
-      'sub',
-      getResponse('', { headers: new Headers({ 'content-type': 'application/jwt' }) }),
-    ),
-    {
-      message: '"as.jwks_uri" must be a string',
-    },
-  )
+test('processUserInfoResponse() - invalid signature', async (t) => {
+  const tIssuer: lib.AuthorizationServer = {
+    ...issuer,
+    jwks_uri: endpoint('jwks'),
+    userinfo_signing_alg_values_supported: ['ES256'],
+  }
+  const kp = t.context.es256
 
+  await t.throwsAsync(
+    async () => {
+      const response = getResponse(
+        tools.mangleJwtSignature(
+          await new jose.SignJWT({ sub: 'urn:example:subject' })
+            .setProtectedHeader({ alg: 'ES256' })
+            .sign(kp.privateKey),
+        ),
+        { headers: new Headers({ 'content-type': 'application/jwt' }) },
+      )
+      await lib.processUserInfoResponse(tIssuer, client, 'urn:example:subject', response)
+      t.false(response.bodyUsed)
+    },
+    { message: 'JWT signature verification failed' },
+  )
+})
+
+test('processUserInfoResponse() - ignore signatures', async (t) => {
+  const kp = t.context.es256
+
+  await t.notThrowsAsync(async () => {
+    const response = getResponse(
+      tools.mangleJwtSignature(
+        await new jose.SignJWT({ sub: 'urn:example:subject' })
+          .setProtectedHeader({ alg: 'ES256' })
+          .sign(kp.privateKey),
+      ),
+      { headers: new Headers({ 'content-type': 'application/jwt' }) },
+    )
+    await lib.processUserInfoResponse(
+      { ...issuer, userinfo_signing_alg_values_supported: ['ES256'] },
+      client,
+      'urn:example:subject',
+      response,
+      { skipJwtSignatureCheck: true },
+    )
+    t.false(response.bodyUsed)
+  })
+})
+
+test('processUserInfoResponse() - jwt (alg signalled)', async (t) => {
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
     jwks_uri: endpoint('jwks'),

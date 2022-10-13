@@ -11,6 +11,7 @@ import setup, {
 } from './_setup.js'
 import * as jose from 'jose'
 import * as lib from '../src/index.js'
+import * as tools from './_tools.js'
 
 const test = anyTest as TestFn<Context & { [alg: string]: CryptoKeyPair }>
 
@@ -397,21 +398,79 @@ test('processAuthorizationCodeOAuth2Response()', async (t) => {
   )
 })
 
-test('processAuthorizationCodeOpenIDResponse() with an ID Token (alg signalled)', async (t) => {
+test('processAuthorizationCodeOpenIDResponse() - invalid signature', async (t) => {
   const tIssuer: lib.AuthorizationServer = { ...issuer, jwks_uri: endpoint('jwks') }
   await t.throwsAsync(
-    lib.processAuthorizationCodeOpenIDResponse(
-      issuer,
-      client,
-      getResponse(
-        JSON.stringify({ access_token: 'token', token_type: 'Bearer', id_token: 'id_token' }),
-      ),
-    ),
-    {
-      message: '"as.jwks_uri" must be a string',
-    },
+    lib
+      .processAuthorizationCodeOpenIDResponse(
+        { ...tIssuer, id_token_signing_alg_values_supported: ['ES256'] },
+        client,
+        getResponse(
+          JSON.stringify({
+            access_token: 'token',
+            token_type: 'Bearer',
+            id_token: tools.mangleJwtSignature(
+              await new jose.SignJWT({})
+                .setProtectedHeader({ alg: 'ES256' })
+                .setIssuer(issuer.issuer)
+                .setSubject('urn:example:subject')
+                .setAudience(client.client_id)
+                .setExpirationTime('5m')
+                .setIssuedAt()
+                .sign(t.context.ES256.privateKey),
+            ),
+          }),
+        ),
+      )
+      .then(async (result) => {
+        if (lib.isOAuth2Error(result)) {
+          t.fail()
+        } else {
+          t.throws(() => lib.getValidatedIdTokenClaims(result))
+        }
+      }),
+    { message: 'JWT signature verification failed' },
   )
+})
 
+test('processAuthorizationCodeOpenIDResponse() - ignore signatures', async (t) => {
+  await t.notThrowsAsync(
+    lib
+      .processAuthorizationCodeOpenIDResponse(
+        { ...issuer, id_token_signing_alg_values_supported: ['ES256'] },
+        client,
+        getResponse(
+          JSON.stringify({
+            access_token: 'token',
+            token_type: 'Bearer',
+            id_token: tools.mangleJwtSignature(
+              await new jose.SignJWT({})
+                .setProtectedHeader({ alg: 'ES256' })
+                .setIssuer(issuer.issuer)
+                .setSubject('urn:example:subject')
+                .setAudience(client.client_id)
+                .setExpirationTime('5m')
+                .setIssuedAt()
+                .sign(t.context.ES256.privateKey),
+            ),
+          }),
+        ),
+        undefined,
+        undefined,
+        { skipJwtSignatureCheck: true },
+      )
+      .then(async (result) => {
+        if (lib.isOAuth2Error(result)) {
+          t.fail()
+        } else {
+          t.assert(lib.getValidatedIdTokenClaims(result))
+        }
+      }),
+  )
+})
+
+test('processAuthorizationCodeOpenIDResponse() with an ID Token (alg signalled)', async (t) => {
+  const tIssuer: lib.AuthorizationServer = { ...issuer, jwks_uri: endpoint('jwks') }
   await t.notThrowsAsync(
     lib
       .processAuthorizationCodeOpenIDResponse(
@@ -628,20 +687,6 @@ for (const alg of algs) {
       jwks_uri: endpoint('jwks'),
     }
 
-    let at_hash: string
-    switch (alg) {
-      case 'RS256':
-      case 'PS256':
-      case 'ES256':
-        at_hash = 'xsZZrUssMXjL3FBlzoSh2g'
-        break
-      case 'EdDSA':
-        at_hash = 'p2LHG4H-8pYDc0hyVOo3iIHvZJUqe9tbj3jESOuXbkY'
-        break
-      default:
-        throw new Error('not implemented')
-    }
-
     await t.notThrowsAsync(
       lib.processAuthorizationCodeOpenIDResponse(
         tIssuer,
@@ -651,7 +696,7 @@ for (const alg of algs) {
             access_token:
               'YmJiZTAwYmYtMzgyOC00NzhkLTkyOTItNjJjNDM3MGYzOWIy9sFhvH8K_x8UIHj1osisS57f5DduL',
             token_type: 'Bearer',
-            id_token: await new jose.SignJWT({ at_hash })
+            id_token: await new jose.SignJWT({})
               .setProtectedHeader({ alg })
               .setIssuer(issuer.issuer)
               .setSubject('urn:example:subject')
@@ -673,59 +718,6 @@ for (const alg of algs) {
     )
   })
 }
-
-test('processAuthorizationCodeOpenIDResponse() with an ID Token w/ at_hash', async (t) => {
-  const tIssuer: lib.AuthorizationServer = { ...issuer, jwks_uri: endpoint('jwks') }
-
-  await t.notThrowsAsync(
-    lib.processAuthorizationCodeOpenIDResponse(
-      tIssuer,
-      client,
-      getResponse(
-        JSON.stringify({
-          access_token:
-            'YmJiZTAwYmYtMzgyOC00NzhkLTkyOTItNjJjNDM3MGYzOWIy9sFhvH8K_x8UIHj1osisS57f5DduL-ar_qw5jl3lthwpMjm283aVMQXDmoqqqydDSqJfbhptzw8rUVwkuQbolw',
-          token_type: 'Bearer',
-          id_token: await new jose.SignJWT({
-            at_hash: 'x7vk7f6BvQj0jQHYFIk4ag',
-          })
-            .setProtectedHeader({ alg: 'RS256' })
-            .setIssuer(issuer.issuer)
-            .setSubject('urn:example:subject')
-            .setAudience(client.client_id)
-            .setExpirationTime('5m')
-            .setIssuedAt()
-            .sign(t.context.RS256.privateKey),
-        }),
-      ),
-    ),
-  )
-
-  await t.throwsAsync(
-    lib.processAuthorizationCodeOpenIDResponse(
-      tIssuer,
-      client,
-      getResponse(
-        JSON.stringify({
-          access_token:
-            'YmJiZTAwYmYtMzgyOC00NzhkLTkyOTItNjJjNDM3MGYzOWIy9sFhvH8K_x8UIHj1osisS57f5DduL-ar_qw5jl3lthwpMjm283aVMQXDmoqqqydDSqJfbhptzw8rUVwkuQbolw',
-          token_type: 'Bearer',
-          id_token: await new jose.SignJWT({
-            at_hash: 'x7vk7f6BvQj0jQHYFIk4ag-invalid',
-          })
-            .setProtectedHeader({ alg: 'RS256' })
-            .setIssuer(issuer.issuer)
-            .setSubject('urn:example:subject')
-            .setAudience(client.client_id)
-            .setExpirationTime('5m')
-            .setIssuedAt()
-            .sign(t.context.RS256.privateKey),
-        }),
-      ),
-    ),
-    { message: 'unexpected ID Token "at_hash" (access token hash) claim value' },
-  )
-})
 
 test('processAuthorizationCodeOpenIDResponse() nonce checks', async (t) => {
   const tIssuer: lib.AuthorizationServer = { ...issuer, jwks_uri: endpoint('jwks') }

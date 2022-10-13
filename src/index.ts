@@ -1724,6 +1724,34 @@ function getContentType(response: Response) {
   return response.headers.get('content-type')?.split(';')[0]
 }
 
+export interface SkipJWTSignatureCheckOptions {
+  /**
+   * DANGER ZONE
+   *
+   * When JWT assertions are received via direct communication between the Client and the
+   * Token/UserInfo/Introspection endpoint (which they are in this library's supported profiles and
+   * exposed functions) the TLS server validation MAY be used to validate the issuer in place of
+   * checking the assertion's signature.
+   *
+   * Set this to `true` to omit verifying the JWT assertion's signature (e.g. ID Token, JWT Signed
+   * Introspection, or JWT Signed UserInfo Response).
+   *
+   * Setting this to `true` also means that:
+   *
+   * - The Authorization Server's JSON Web Key Set will not be requested. That is useful for
+   *   javascript runtimes that execute on the edge and cannot reliably share an in-memory cache of
+   *   the JSON Web Key Set in between invocations.
+   * - Any JWS Algorithm may be used, not just the {@link JWSAlgorithm supported ones}.
+   *
+   * Default is `false`.
+   */
+  skipJwtSignatureCheck?: boolean
+}
+
+export interface ProcessUserInfoResponseOptions
+  extends HttpRequestOptions,
+    SkipJWTSignatureCheckOptions {}
+
 /**
  * Validates Response instance to be one coming from the
  * {@link AuthorizationServer.userinfo_endpoint `as.userinfo_endpoint`}.
@@ -1745,7 +1773,7 @@ export async function processUserInfoResponse(
   client: Client,
   expectedSubject: string | typeof skipSubjectCheck,
   response: Response,
-  options?: HttpRequestOptions,
+  options?: ProcessUserInfoResponseOptions,
 ): Promise<UserInfoResponse> {
   assertAs(as)
   assertClient(client)
@@ -1760,10 +1788,6 @@ export async function processUserInfoResponse(
 
   let json: JsonValue
   if (getContentType(response) === 'application/jwt') {
-    if (typeof as.jwks_uri !== 'string') {
-      throw new TypeError('"as.jwks_uri" must be a string')
-    }
-
     const { claims } = await validateJwt(
       await preserveBodyStream(response).text(),
       checkSigningAlgorithm.bind(
@@ -1771,7 +1795,9 @@ export async function processUserInfoResponse(
         client.userinfo_signed_response_alg,
         as.userinfo_signing_alg_values_supported,
       ),
-      getPublicSigKeyFromIssuerJwksUri.bind(undefined, as, options),
+      options?.skipJwtSignatureCheck !== true
+        ? getPublicSigKeyFromIssuerJwksUri.bind(undefined, as, options)
+        : noSignatureCheck,
     )
       .then(validateOptionalAudience.bind(undefined, client.client_id))
       .then(validateOptionalIssuer.bind(undefined, as.issuer))
@@ -1810,48 +1836,6 @@ export async function processUserInfoResponse(
   }
 
   return json
-}
-
-function padded(buf: Uint8Array, length: number) {
-  const out = new Uint8Array(length)
-  out.set(buf)
-  return out
-}
-
-function timingSafeEqual(a: Uint8Array, b: Uint8Array) {
-  const len = Math.max(a.byteLength, b.byteLength)
-  a = padded(a, len)
-  b = padded(b, len)
-  let out = 0
-  let i = -1
-  while (++i < len) {
-    out |= a[i] ^ b[i]
-  }
-  return out === 0
-}
-
-async function idTokenHash(alg: JWSAlgorithm, data: string) {
-  let algorithm: Algorithm
-  switch (alg) {
-    case 'RS256': // Fall through
-    case 'PS256': // Fall through
-    case 'ES256':
-      algorithm = { name: 'SHA-256' }
-      break
-    case 'EdDSA':
-      algorithm = { name: 'SHA-512' }
-      break
-    default:
-      throw new UnsupportedOperationError()
-  }
-
-  const digest = await crypto.subtle.digest(algorithm, buf(data))
-  return b64u(digest.slice(0, digest.byteLength / 2))
-}
-
-async function idTokenHashMatches(alg: JWSAlgorithm, data: string, actual: string) {
-  const expected = await idTokenHash(alg, data)
-  return timingSafeEqual(buf(actual), buf(expected))
 }
 
 async function authenticatedRequest(
@@ -1976,6 +1960,7 @@ async function processGenericAccessTokenResponse(
   options?: HttpRequestOptions,
   ignoreIdToken = false,
   ignoreRefreshToken = false,
+  skipSignatureCheck = false,
 ): Promise<TokenEndpointResponse | OAuth2Error> {
   assertAs(as)
   assertClient(client)
@@ -2043,18 +2028,16 @@ async function processGenericAccessTokenResponse(
     }
 
     if (json.id_token) {
-      if (typeof as.jwks_uri !== 'string') {
-        throw new TypeError('"as.jwks_uri" must be a string')
-      }
-
-      const { header, claims } = await validateJwt(
+      const { claims } = await validateJwt(
         json.id_token,
         checkSigningAlgorithm.bind(
           undefined,
           client.id_token_signed_response_alg,
           as.id_token_signing_alg_values_supported,
         ),
-        getPublicSigKeyFromIssuerJwksUri.bind(undefined, as, options),
+        skipSignatureCheck !== true
+          ? getPublicSigKeyFromIssuerJwksUri.bind(undefined, as, options)
+          : noSignatureCheck,
       )
         .then(validatePresence.bind(undefined, ['aud', 'exp', 'iat', 'iss', 'sub']))
         .then(validateIssuer.bind(undefined, as.issuer))
@@ -2068,21 +2051,16 @@ async function processGenericAccessTokenResponse(
         throw new OPE('unexpected ID Token "auth_time" (authentication time) claim value')
       }
 
-      if (claims.at_hash !== undefined) {
-        if (
-          typeof claims.at_hash !== 'string' ||
-          !(await idTokenHashMatches(header.alg, json.access_token, claims.at_hash))
-        ) {
-          throw new OPE('unexpected ID Token "at_hash" (access token hash) claim value')
-        }
-      }
-
       idTokenClaims.set(json, <IDToken>claims)
     }
   }
 
   return json
 }
+
+export interface ProcessRefreshTokenResponseOptions
+  extends HttpRequestOptions,
+    SkipJWTSignatureCheckOptions {}
 
 /**
  * Validates Refresh Token Grant Response instance to be one coming from the
@@ -2102,9 +2080,17 @@ export async function processRefreshTokenResponse(
   as: AuthorizationServer,
   client: Client,
   response: Response,
-  options?: HttpRequestOptions,
+  options?: ProcessRefreshTokenResponseOptions,
 ): Promise<TokenEndpointResponse | OAuth2Error> {
-  return processGenericAccessTokenResponse(as, client, response, options)
+  return processGenericAccessTokenResponse(
+    as,
+    client,
+    response,
+    options,
+    undefined,
+    undefined,
+    options?.skipJwtSignatureCheck === true,
+  )
 }
 
 function validateOptionalAudience(expected: string, result: ParsedJWT) {
@@ -2228,6 +2214,7 @@ interface CompactJWSHeaderParameters {
 interface ParsedJWT {
   header: CompactJWSHeaderParameters
   claims: JWTPayload
+  signature: Uint8Array
 }
 
 const claimNames = {
@@ -2306,6 +2293,10 @@ export const expectNoNonce = Symbol()
  */
 export const skipAuthTimeCheck = Symbol()
 
+export interface ProcessAuthorizationCodeOpenIDResponseOptions
+  extends HttpRequestOptions,
+    SkipJWTSignatureCheckOptions {}
+
 /**
  * (OpenID Connect only) Validates Authorization Code Grant Response instance to be one coming from
  * the {@link AuthorizationServer.token_endpoint `as.token_endpoint`}.
@@ -2332,9 +2323,17 @@ export async function processAuthorizationCodeOpenIDResponse(
   response: Response,
   expectedNonce?: string | typeof expectNoNonce,
   maxAge?: number | typeof skipAuthTimeCheck,
-  options?: HttpRequestOptions,
+  options?: ProcessAuthorizationCodeOpenIDResponseOptions,
 ): Promise<OpenIDTokenEndpointResponse | OAuth2Error> {
-  const result = await processGenericAccessTokenResponse(as, client, response, options)
+  const result = await processGenericAccessTokenResponse(
+    as,
+    client,
+    response,
+    options,
+    undefined,
+    undefined,
+    options?.skipJwtSignatureCheck === true,
+  )
 
   if (isOAuth2Error(result)) {
     return result
@@ -2659,6 +2658,10 @@ export interface IntrospectionResponse {
   readonly [claim: string]: JsonValue | undefined
 }
 
+export interface ProcessIntrospectionResponseOptions
+  extends HttpRequestOptions,
+    SkipJWTSignatureCheckOptions {}
+
 /**
  * Validates Response instance to be one coming from the
  * {@link AuthorizationServer.introspection_endpoint `as.introspection_endpoint`}.
@@ -2677,7 +2680,7 @@ export async function processIntrospectionResponse(
   as: AuthorizationServer,
   client: Client,
   response: Response,
-  options?: HttpRequestOptions,
+  options?: ProcessIntrospectionResponseOptions,
 ): Promise<IntrospectionResponse | OAuth2Error> {
   assertAs(as)
   assertClient(client)
@@ -2696,10 +2699,6 @@ export async function processIntrospectionResponse(
 
   let json: JsonValue
   if (getContentType(response) === 'application/token-introspection+jwt') {
-    if (typeof as.jwks_uri !== 'string') {
-      throw new TypeError('"as.jwks_uri" must be a string')
-    }
-
     const { claims } = await validateJwt(
       await preserveBodyStream(response).text(),
       checkSigningAlgorithm.bind(
@@ -2707,7 +2706,9 @@ export async function processIntrospectionResponse(
         client.introspection_signed_response_alg,
         as.introspection_signing_alg_values_supported,
       ),
-      getPublicSigKeyFromIssuerJwksUri.bind(undefined, as, options),
+      options?.skipJwtSignatureCheck !== true
+        ? getPublicSigKeyFromIssuerJwksUri.bind(undefined, as, options)
+        : noSignatureCheck,
     )
       .then(checkJwtType.bind(undefined, 'token-introspection+jwt'))
       .then(validatePresence.bind(undefined, ['aud', 'iat', 'iss']))
@@ -2883,13 +2884,15 @@ function subtleAlgorithm(key: CryptoKey): Algorithm | RsaPssParams | EcdsaParams
   throw new UnsupportedOperationError()
 }
 
+const noSignatureCheck = Symbol()
+
 /** Minimal JWT validation implementation. */
 async function validateJwt(
   jws: string,
   checkAlg: (h: CompactJWSHeaderParameters) => void,
-  getKey: (h: CompactJWSHeaderParameters) => Promise<CryptoKey>,
+  getKey: ((h: CompactJWSHeaderParameters) => Promise<CryptoKey>) | typeof noSignatureCheck,
 ): Promise<ParsedJWT> {
-  const { 0: protectedHeader, 1: payload, 2: signature, length } = jws.split('.')
+  const { 0: protectedHeader, 1: payload, 2: encodedSignature, length } = jws.split('.')
   if (length === 5) {
     throw new UnsupportedOperationError('JWE structure JWTs are not supported')
   }
@@ -2912,16 +2915,15 @@ async function validateJwt(
   if (header.crit !== undefined) {
     throw new OPE('unexpected JWT "crit" header parameter')
   }
-  const key = await getKey(header)
-  const input = `${protectedHeader}.${payload}`
-  const verified = await crypto.subtle.verify(
-    subtleAlgorithm(key),
-    key,
-    b64u(signature),
-    buf(input),
-  )
-  if (!verified) {
-    throw new OPE('JWT signature verification failed')
+
+  const signature = b64u(encodedSignature)
+  if (getKey !== noSignatureCheck) {
+    const key = await getKey(header)
+    const input = `${protectedHeader}.${payload}`
+    const verified = await crypto.subtle.verify(subtleAlgorithm(key), key, signature, buf(input))
+    if (!verified) {
+      throw new OPE('JWT signature verification failed')
+    }
   }
 
   let claims: JsonValue
@@ -2975,7 +2977,7 @@ async function validateJwt(
     }
   }
 
-  return { header, claims }
+  return { header, claims, signature }
 }
 
 /**
@@ -3389,6 +3391,10 @@ export async function deviceCodeGrantRequest(
   )
 }
 
+export interface ProcessDeviceCodeResponseOptions
+  extends HttpRequestOptions,
+    SkipJWTSignatureCheckOptions {}
+
 /**
  * Validates Device Authorization Grant Response instance to be one coming from the
  * {@link AuthorizationServer.token_endpoint `as.token_endpoint`}.
@@ -3406,9 +3412,17 @@ export async function processDeviceCodeResponse(
   as: AuthorizationServer,
   client: Client,
   response: Response,
-  options?: HttpRequestOptions,
+  options?: ProcessDeviceCodeResponseOptions,
 ): Promise<TokenEndpointResponse | OAuth2Error> {
-  return processGenericAccessTokenResponse(as, client, response, options)
+  return processGenericAccessTokenResponse(
+    as,
+    client,
+    response,
+    options,
+    undefined,
+    undefined,
+    options?.skipJwtSignatureCheck === true,
+  )
 }
 
 export interface GenerateKeyPairOptions {

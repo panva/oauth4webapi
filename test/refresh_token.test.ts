@@ -10,6 +10,7 @@ import setup, {
 } from './_setup.js'
 import * as jose from 'jose'
 import * as lib from '../src/index.js'
+import * as tools from './_tools.js'
 
 const test = anyTest as TestFn<Context & { es256: CryptoKeyPair; rs256: CryptoKeyPair }>
 
@@ -276,20 +277,78 @@ test('processRefreshTokenResponse() without ID Tokens', async (t) => {
   )
 })
 
+test('processRefreshTokenResponse() - invalid signature', async (t) => {
+  const tIssuer: lib.AuthorizationServer = { ...issuer, jwks_uri: endpoint('jwks') }
+
+  await t.throwsAsync(
+    lib
+      .processRefreshTokenResponse(
+        { ...tIssuer, id_token_signing_alg_values_supported: ['ES256'] },
+        client,
+        getResponse(
+          JSON.stringify({
+            access_token: 'token',
+            token_type: 'Bearer',
+            id_token: tools.mangleJwtSignature(
+              await new jose.SignJWT({})
+                .setProtectedHeader({ alg: 'ES256' })
+                .setIssuer(issuer.issuer)
+                .setSubject('urn:example:subject')
+                .setAudience(client.client_id)
+                .setExpirationTime('5m')
+                .setIssuedAt()
+                .sign(t.context.es256.privateKey),
+            ),
+          }),
+        ),
+      )
+      .then(async (result) => {
+        if (lib.isOAuth2Error(result)) {
+          t.fail()
+        } else {
+          t.throws(() => lib.getValidatedIdTokenClaims(result))
+        }
+      }),
+    { message: 'JWT signature verification failed' },
+  )
+})
+
+test('processRefreshTokenResponse() - ignore signatures', async (t) => {
+  await t.notThrowsAsync(
+    lib
+      .processRefreshTokenResponse(
+        { ...issuer, id_token_signing_alg_values_supported: ['ES256'] },
+        client,
+        getResponse(
+          JSON.stringify({
+            access_token: 'token',
+            token_type: 'Bearer',
+            id_token: tools.mangleJwtSignature(
+              await new jose.SignJWT({})
+                .setProtectedHeader({ alg: 'ES256' })
+                .setIssuer(issuer.issuer)
+                .setSubject('urn:example:subject')
+                .setAudience(client.client_id)
+                .setExpirationTime('5m')
+                .setIssuedAt()
+                .sign(t.context.es256.privateKey),
+            ),
+          }),
+        ),
+        { skipJwtSignatureCheck: true },
+      )
+      .then(async (result) => {
+        if (lib.isOAuth2Error(result)) {
+          t.fail()
+        } else {
+          t.assert(lib.getValidatedIdTokenClaims(result))
+        }
+      }),
+  )
+})
+
 test('processRefreshTokenResponse() with an ID Token (alg signalled)', async (t) => {
   const tIssuer: lib.AuthorizationServer = { ...issuer, jwks_uri: endpoint('jwks') }
-  await t.throwsAsync(
-    lib.processRefreshTokenResponse(
-      issuer,
-      client,
-      getResponse(
-        JSON.stringify({ access_token: 'token', token_type: 'Bearer', id_token: 'id_token' }),
-      ),
-    ),
-    {
-      message: '"as.jwks_uri" must be a string',
-    },
-  )
 
   await t.notThrowsAsync(
     lib
@@ -455,58 +514,5 @@ test('processRefreshTokenResponse() with an ID Token (alg mismatches)', async (t
     {
       message: 'unexpected JWT "alg" header parameter',
     },
-  )
-})
-
-test('processRefreshTokenResponse() with an ID Token w/ at_hash', async (t) => {
-  const tIssuer: lib.AuthorizationServer = { ...issuer, jwks_uri: endpoint('jwks') }
-
-  await t.notThrowsAsync(
-    lib.processRefreshTokenResponse(
-      tIssuer,
-      client,
-      getResponse(
-        JSON.stringify({
-          access_token:
-            'YmJiZTAwYmYtMzgyOC00NzhkLTkyOTItNjJjNDM3MGYzOWIy9sFhvH8K_x8UIHj1osisS57f5DduL-ar_qw5jl3lthwpMjm283aVMQXDmoqqqydDSqJfbhptzw8rUVwkuQbolw',
-          token_type: 'Bearer',
-          id_token: await new jose.SignJWT({
-            at_hash: 'x7vk7f6BvQj0jQHYFIk4ag',
-          })
-            .setProtectedHeader({ alg: 'RS256' })
-            .setIssuer(issuer.issuer)
-            .setSubject('urn:example:subject')
-            .setAudience(client.client_id)
-            .setExpirationTime('5m')
-            .setIssuedAt()
-            .sign(t.context.rs256.privateKey),
-        }),
-      ),
-    ),
-  )
-
-  await t.throwsAsync(
-    lib.processRefreshTokenResponse(
-      tIssuer,
-      client,
-      getResponse(
-        JSON.stringify({
-          access_token:
-            'YmJiZTAwYmYtMzgyOC00NzhkLTkyOTItNjJjNDM3MGYzOWIy9sFhvH8K_x8UIHj1osisS57f5DduL-ar_qw5jl3lthwpMjm283aVMQXDmoqqqydDSqJfbhptzw8rUVwkuQbolw',
-          token_type: 'Bearer',
-          id_token: await new jose.SignJWT({
-            at_hash: 'x7vk7f6BvQj0jQHYFIk4ag-invalid',
-          })
-            .setProtectedHeader({ alg: 'RS256' })
-            .setIssuer(issuer.issuer)
-            .setSubject('urn:example:subject')
-            .setAudience(client.client_id)
-            .setExpirationTime('5m')
-            .setIssuedAt()
-            .sign(t.context.rs256.privateKey),
-        }),
-      ),
-    ),
-    { message: 'unexpected ID Token "at_hash" (access token hash) claim value' },
   )
 })

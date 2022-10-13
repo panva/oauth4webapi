@@ -18,7 +18,7 @@ Validates Response instance to be one coming from the
 | `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata. |
 | `client` | [`Client`](../interfaces/Client.md) | Client Metadata. |
 | `response` | [`Response`]( https://developer.mozilla.org/en-US/docs/Web/API/Response ) | Resolved value from [introspectionRequest](introspectionRequest.md). |
-| `options?` | [`HttpRequestOptions`](../interfaces/HttpRequestOptions.md) | - |
+| `options?` | [`ProcessIntrospectionResponseOptions`](../interfaces/ProcessIntrospectionResponseOptions.md) | - |
 
 #### Returns
 
