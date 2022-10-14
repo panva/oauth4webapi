@@ -67,7 +67,7 @@ The supported JavaScript runtimes include ones that
 - These are (not an exhaustive list):
   - Browsers
   - Cloudflare Workers
-  - Deno (^1.21.0)
+  - Deno
   - Electron
   - Next.js Middlewares
   - Node.js ([runtime flags may be needed](https://github.com/panva/oauth4webapi/issues/8))
