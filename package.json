@@ -67,7 +67,7 @@
     "patch-package": "^6.4.7",
     "prettier": "^2.7.1",
     "prettier-plugin-jsdoc": "^0.4.2",
-    "qunit": "^2.19.1",
+    "qunit": "^2.19.2",
     "testcafe": "^2.0.1",
     "testcafe-browser-provider-browserstack": "^1.14.0",
     "timekeeper": "^2.2.0",
