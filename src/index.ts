@@ -877,7 +877,7 @@ export interface DPoPOptions extends CryptoKeyPair {
    */
   privateKey: CryptoKey
 
-  /** The public key corresponding to {@link DPoPOptions.privateKey} */
+  /** The public key corresponding to {@link DPoPOptions.privateKey}. */
   publicKey: CryptoKey
 
   /**
