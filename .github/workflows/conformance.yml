@@ -173,6 +173,7 @@ jobs:
         with:
           node-version: 18 # lts/hydrogen
           cache: 'npm'
+          check-latest: true
       - run: npm clean-install
       - name: npm run conformance
         run: |
