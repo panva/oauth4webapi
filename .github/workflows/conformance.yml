@@ -2,15 +2,7 @@ name: Conformance Checks
 
 on:
   push:
-    paths:
-      - 'src/**'
-      - 'conformance/**'
-      - '.github/workflows/conformance.yml'
   pull_request:
-    paths:
-      - 'src/**'
-      - 'conformance/**'
-      - '.github/workflows/conformance.yml'
   schedule:
     - cron: 0 12 * * 1-5
   workflow_dispatch:
@@ -179,8 +171,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v3
         with:
-          node-version: 18
-          check-latest: true
+          node-version: 18 # lts/hydrogen
           cache: 'npm'
       - run: npm clean-install
       - name: npm run conformance

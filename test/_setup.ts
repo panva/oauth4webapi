@@ -42,8 +42,13 @@ export function getResponse(
   body: string,
   { status = 200, headers = new Headers() } = {},
 ): Response {
-  const stream = Readable.toWeb(Readable.from(Buffer.from(body)))
-  return new Response(stream, { status, headers })
+  let bodyInit: BodyInit
+  if (process.version.startsWith('v16')) {
+    bodyInit = Buffer.from(body)
+  } else {
+    bodyInit = Readable.toWeb(Readable.from(Buffer.from(body)))
+  }
+  return new Response(bodyInit, { status, headers })
 }
 
 export const UA = /^oauth4webapi\/v\d+\.\d+\.\d+$/

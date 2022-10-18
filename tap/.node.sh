@@ -1,2 +1,2 @@
-export NODE_OPTIONS='--loader=@esbuild-kit/esm-loader --experimental-global-webcrypto --no-warnings'
+source .node_flags.sh
 node tap/run-node.ts

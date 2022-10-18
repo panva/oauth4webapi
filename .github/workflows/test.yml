@@ -1,4 +1,4 @@
-name: Continuous Integration
+name: Test
 
 on:
   push:
@@ -16,8 +16,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v3
         with:
-          node-version: 18
-          check-latest: true
+          node-version: 18 # lts/hydrogen
           cache: 'npm'
       - run: npm clean-install
       - run: npm run build
@@ -30,8 +29,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v3
         with:
-          node-version: 18
-          check-latest: true
+          node-version: 18 # lts/hydrogen
           cache: 'npm'
       - run: npm clean-install
       - run: npm run format-check
@@ -42,14 +40,20 @@ jobs:
     runs-on: ubuntu-latest
     env:
       ESBK_DISABLE_CACHE: 1
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version:
+          - lts/gallium # 16
+          - 18 # lts/hydrogen
+          - current
     steps:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Setup node
         uses: actions/setup-node@v3
         with:
-          node-version: 18
-          check-latest: true
+          node-version: ${{ matrix.node-version }}
           cache: 'npm'
       - run: npm clean-install
       - name: Run Test Suite
@@ -65,8 +69,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v3
         with:
-          node-version: 18
-          check-latest: true
+          node-version: 18 # lts/hydrogen
           cache: 'npm'
       - run: npm clean-install
       - name: Run Test Suite
@@ -93,8 +96,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v3
         with:
-          node-version: 18
-          check-latest: true
+          node-version: 18 # lts/hydrogen
           cache: 'npm'
       - run: npm clean-install
       - name: Run Test Suite
@@ -115,8 +117,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v3
         with:
-          node-version: 18
-          check-latest: true
+          node-version: 18 # lts/hydrogen
           cache: 'npm'
       - run: npm clean-install
       - name: Run Test Suite

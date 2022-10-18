@@ -243,6 +243,6 @@ export default async () => {
       mjs: true,
     },
     files: [...files, './conformance/download_archive.ts'],
-    nodeArguments: ['--enable-source-maps', '--experimental-global-webcrypto'],
+    nodeArguments: ['--enable-source-maps'],
   }
 }

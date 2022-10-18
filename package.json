@@ -43,25 +43,23 @@
   "scripts": {
     "_format": "find src test tap examples conformance -type f -name '*.ts' -o -name '*.mjs' | xargs prettier",
     "build": "rm -rf build && tsc && tsc --declaration true --emitDeclarationOnly true --removeComments false && tsc -p test && tsc -p examples && tsc -p conformance && tsc -p tap",
-    "conformance": "patch-package && NODE_OPTIONS='--no-warnings --loader=@esbuild-kit/esm-loader' ava --config conformance/ava.config.ts",
-    "coverage": "patch-package && c8 ava",
+    "conformance": "bash -c 'patch-package && source .node_flags.sh && ava --config conformance/ava.config.ts'",
     "docs": "patch-package && typedoc",
     "format": "npm run _format -- --write",
     "format-check": "npm run _format -- --check",
     "prepack": "npm run format && npm run docs && ./examples/.update-diffs.sh && git diff --quiet && npm run test && npm run build",
     "tap:deno": "./tap/.deno.sh",
     "tap:edge-runtime": "./tap/.edge-runtime.sh",
-    "tap:node": "./tap/.node.sh",
+    "tap:node": "bash -c './tap/.node.sh'",
     "tap:workers": "./tap/.workers.sh",
     "tap:browsers": "./tap/.browsers.sh",
-    "test": "ava"
+    "test": "bash -c 'source .node_flags.sh && ava'"
   },
   "devDependencies": {
     "@esbuild-kit/esm-loader": "^2.5.0",
     "@types/node": "^18.11.0",
     "@types/qunit": "^2.19.3",
     "ava": "^4.3.3",
-    "c8": "^7.12.0",
     "edge-runtime": "^1.1.0-beta.40",
     "jose": "^4.10.0",
     "patch-package": "^6.4.7",

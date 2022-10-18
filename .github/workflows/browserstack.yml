@@ -72,8 +72,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v3
         with:
-          node-version: 18
-          check-latest: true
+          node-version: 18 # lts/hydrogen
           cache: 'npm'
       - name: Cache letsencrypt
         id: cert
