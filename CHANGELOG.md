@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.2](https://github.com/panva/oauth4webapi/compare/v1.2.1...v1.2.2) (2022-10-20)
+
+
+### Refactor
+
+* add a type check on AbortSignal ([b013fef](https://github.com/panva/oauth4webapi/commit/b013fef2a4bcbee9da558748b13a022182ebe214))
+* align argument and function names in assert functions ([8ea65f6](https://github.com/panva/oauth4webapi/commit/8ea65f6a22af523ca1a75565d0ce28e05b1224b9))
+* update "as" error messages ([3e894f5](https://github.com/panva/oauth4webapi/commit/3e894f59e573588c0608c95cc4e2d3465a7d08f3))
+
 ## [1.2.1](https://github.com/panva/oauth4webapi/compare/v1.2.0...v1.2.1) (2022-10-10)
 
 ## [1.2.0](https://github.com/panva/oauth4webapi/compare/v1.1.4...v1.2.0) (2022-09-14)
