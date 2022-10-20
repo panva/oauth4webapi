@@ -62,35 +62,10 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - build-conformance-suite
-    continue-on-error: ${{ matrix.beta-plan || false }}
+    continue-on-error: ${{ startsWith(matrix.plan, 'fapi2') }}
     strategy:
       fail-fast: false
       matrix:
-        include:
-          # FAPI 2.0 OpenID Connect
-          - beta-plan: true
-            setup:
-              plan: fapi2-baseline-id2-client-test-plan
-
-          # FAPI 2.0 OAuth 2.0
-          - beta-plan: true
-            setup:
-              variant:
-                fapi_jarm_type: 'plain_oauth'
-              plan: fapi2-baseline-id2-client-test-plan
-
-          # FAPI 2.0 Message Signing - OpenID Connect
-          - beta-plan: true
-            setup:
-              plan: fapi2-advanced-id1-client-test-plan
-
-          # FAPI 2.0 Message Signing - OAuth 2.0
-          - beta-plan: true
-            setup:
-              variant:
-                fapi_jarm_type: 'plain_oauth'
-              plan: fapi2-advanced-id1-client-test-plan
-
         setup:
           # Core 1.0 Basic
           - plan: oidcc-client-basic-certification-test-plan
@@ -147,6 +122,22 @@ jobs:
             variant:
               request_type: request_object
               client_auth_type: private_key_jwt
+
+          # FAPI 2.0 OpenID Connect
+          - plan: fapi2-baseline-id2-client-test-plan
+
+          # FAPI 2.0 OAuth 2.0
+          - plan: fapi2-baseline-id2-client-test-plan
+            variant:
+              fapi_jarm_type: 'plain_oauth'
+
+          # FAPI 2.0 Message Signing - OpenID Connect
+          - plan: fapi2-advanced-id1-client-test-plan
+
+          # FAPI 2.0 Message Signing - OAuth 2.0
+          - plan: fapi2-advanced-id1-client-test-plan
+            variant:
+              fapi_jarm_type: 'plain_oauth'
 
     steps:
       - name: Checkout
