@@ -1,5 +1,6 @@
 #!/bin/bash
 ./node_modules/.bin/esbuild \
+  --log-level=warning \
   --format=esm \
   --bundle \
   --minify-syntax \
