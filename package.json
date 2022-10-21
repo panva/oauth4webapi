@@ -57,11 +57,11 @@
   },
   "devDependencies": {
     "@esbuild-kit/esm-loader": "^2.5.0",
-    "@types/node": "^18.11.2",
+    "@types/node": "^18.11.3",
     "@types/qunit": "^2.19.3",
     "ava": "^4.3.3",
     "edge-runtime": "^1.1.0-beta.40",
-    "jose": "^4.10.0",
+    "jose": "^4.10.3",
     "patch-package": "^6.4.7",
     "prettier": "^2.7.1",
     "prettier-plugin-jsdoc": "^0.4.2",
