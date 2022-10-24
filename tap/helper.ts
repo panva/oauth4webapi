@@ -7,6 +7,8 @@ function url(pathname: string, search?: Record<string, string>) {
   return target.href
 }
 
+const random = () => jose.base64url.encode(crypto.getRandomValues(new Uint8Array(16)))
+
 export default async function setup(): Promise<{
   client: lib.Client
   accountsEndpoint: URL
@@ -15,7 +17,7 @@ export default async function setup(): Promise<{
   exposed: () => Promise<Record<string, string>>
   cleanup: () => Promise<void>
 }> {
-  const uuid = jose.base64url.encode(crypto.getRandomValues(new Uint8Array(16)))
+  const uid = random()
 
   const serverKey = {
     ...(await crypto.subtle.exportKey(
@@ -26,7 +28,7 @@ export default async function setup(): Promise<{
     )),
     alg: 'ES256',
     use: 'sig',
-    kid: jose.base64url.encode(crypto.getRandomValues(new Uint8Array(16))),
+    kid: random(),
     key_ops: undefined,
     ext: undefined,
   }
@@ -36,13 +38,13 @@ export default async function setup(): Promise<{
     ...(await crypto.subtle.exportKey('jwk', clientKeyPair.publicKey)),
     alg: 'ES256',
     use: 'sig',
-    kid: jose.base64url.encode(crypto.getRandomValues(new Uint8Array(16))),
+    kid: random(),
     key_ops: undefined,
     ext: undefined,
   }
 
   const scope = 'openid email'
-  const redirect_uri = `https://rp.example.com/${uuid}/cb`
+  const redirect_uri = `https://rp.example.com/${uid}/cb`
 
   let response = await fetch(
     url('/api/plan', {
@@ -60,9 +62,9 @@ export default async function setup(): Promise<{
       method: 'POST',
       headers: { 'content-type': 'application/json;charset=utf-8' },
       body: JSON.stringify({
-        alias: uuid,
+        alias: uid,
         client: {
-          client_id: uuid,
+          client_id: uid,
           token_endpoint_auth_method: 'private_key_jwt',
           scope,
           redirect_uri,
@@ -127,7 +129,7 @@ export default async function setup(): Promise<{
       })
     },
     client: {
-      client_id: uuid,
+      client_id: uid,
       token_endpoint_auth_method: 'private_key_jwt',
       id_token_signed_response_alg: 'ES256',
       scope,
