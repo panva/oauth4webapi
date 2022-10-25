@@ -52,26 +52,20 @@ import * as oauth2 from 'https://deno.land/x/oauth4webapi/src/index.ts'
 - FAPI 2.0 (Private Key JWT, PAR, DPoP) - [source](examples/fapi2.ts)
 - FAPI 2.0 Message Signing (Private Key JWT, PAR, DPoP, JAR, JARM) - [source](examples/fapi2-message-signing.ts) | [diff](examples/fapi2-message-signing.diff)
 
-## Runtime requirements
+## Supported Runtimes
 
 The supported JavaScript runtimes include ones that
 
-- are reasonably up to date ECMAScript (targets ES2020, but may be further transpiled for compatibility)
-- support required Web API globals and standard built-in objects
-  - [Fetch API][] and its related globals [fetch][], [Response][], [Headers][]
-  - [Web Crypto API][] and its related globals [crypto][], [CryptoKey][]
-  - [Encoding API][] and its related globals [TextEncoder][], [TextDecoder][]
-  - [URL API][] and its related globals [URL][], [URLSearchParams][]
-  - [atob][] and [btoa][]
-  - [Uint8Array][]
-- These are (not an exhaustive list):
+- support the utilized Web API globals and standard built-in objects
+- These are
+  - _(This is not an exhaustive list)_
   - Browsers
   - Cloudflare Workers
   - Deno
   - Electron
-  - Next.js Middlewares
+  - Netlify Edge
   - Node.js ([runtime flags may be needed](https://github.com/panva/oauth4webapi/issues/8))
-  - Vercel Edge Functions
+  - Vercel's Edge Runtime
 
 ## Out of scope
 
@@ -81,20 +75,3 @@ The supported JavaScript runtimes include ones that
 - JSON Web Encryption (JWE)
 - JSON Web Signature (JWS) rarely used algorithms and HMAC
 - Automatic polyfills of any kind
-
-[web crypto api]: https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API
-[fetch api]: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API
-[fetch]: https://developer.mozilla.org/en-US/docs/Web/API/fetch
-[textdecoder]: https://developer.mozilla.org/en-US/docs/Web/API/TextDecoder
-[textencoder]: https://developer.mozilla.org/en-US/docs/Web/API/TextEncoder
-[btoa]: https://developer.mozilla.org/en-US/docs/Web/API/btoa
-[atob]: https://developer.mozilla.org/en-US/docs/Web/API/atob
-[uint8array]: https://developer.mozilla.org/en-US/docs/Web/API/Uint8Array
-[response]: https://developer.mozilla.org/en-US/docs/Web/API/Response
-[headers]: https://developer.mozilla.org/en-US/docs/Web/API/Headers
-[crypto]: https://developer.mozilla.org/en-US/docs/Web/API/crypto
-[cryptokey]: https://developer.mozilla.org/en-US/docs/Web/API/CryptoKey
-[urlsearchparams]: https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams
-[encoding api]: https://developer.mozilla.org/en-US/docs/Web/API/Encoding_API
-[url api]: https://developer.mozilla.org/en-US/docs/Web/API/URL_API
-[url]: https://developer.mozilla.org/en-US/docs/Web/API/URL
