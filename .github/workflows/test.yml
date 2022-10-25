@@ -16,7 +16,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v3
         with:
-          node-version: 18 # lts/hydrogen
+          node-version: lts/hydrogen # 18
           cache: 'npm'
           check-latest: true
       - run: npm clean-install
@@ -30,7 +30,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v3
         with:
-          node-version: 18 # lts/hydrogen
+          node-version: lts/hydrogen # 18
           cache: 'npm'
           check-latest: true
       - run: npm clean-install
@@ -40,14 +40,13 @@ jobs:
 
   node:
     runs-on: ubuntu-latest
-    env:
-      ESBK_DISABLE_CACHE: 1
+    continue-on-error: ${{ !startsWith(matrix.node-version, 'lts') }}
     strategy:
       fail-fast: false
       matrix:
         node-version:
           - lts/gallium # 16
-          - 18 # lts/hydrogen
+          - lts/hydrogen # 18
           - current
     steps:
       - name: Checkout
@@ -72,7 +71,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v3
         with:
-          node-version: 18 # lts/hydrogen
+          node-version: lts/hydrogen # 18
           cache: 'npm'
           check-latest: true
       - run: npm clean-install
@@ -100,7 +99,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v3
         with:
-          node-version: 18 # lts/hydrogen
+          node-version: lts/hydrogen # 18
           cache: 'npm'
           check-latest: true
       - run: npm clean-install
@@ -122,7 +121,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v3
         with:
-          node-version: 18 # lts/hydrogen
+          node-version: lts/hydrogen # 18
           cache: 'npm'
           check-latest: true
       - run: npm clean-install
