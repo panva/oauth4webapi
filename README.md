@@ -54,18 +54,16 @@ import * as oauth2 from 'https://deno.land/x/oauth4webapi/src/index.ts'
 
 ## Supported Runtimes
 
-The supported JavaScript runtimes include ones that
+The supported JavaScript runtimes include ones that support the utilized Web API globals and standard built-in objects
 
-- support the utilized Web API globals and standard built-in objects
-- These are
-  - _(This is not an exhaustive list)_
-  - Browsers
-  - Cloudflare Workers
-  - Deno
-  - Electron
-  - Netlify Edge
-  - Node.js ([runtime flags may be needed](https://github.com/panva/oauth4webapi/issues/8))
-  - Vercel's Edge Runtime
+These are _(this is not an exhaustive list)_:
+- Browsers
+- Cloudflare Workers
+- Deno
+- Electron
+- Netlify Edge
+- Node.js ([runtime flags may be needed](https://github.com/panva/oauth4webapi/issues/8))
+- Vercel's Edge Runtime
 
 ## Out of scope
 
