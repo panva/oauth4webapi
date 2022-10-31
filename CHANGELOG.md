@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.3.0](https://github.com/panva/oauth4webapi/compare/v1.2.2...v1.3.0) (2022-10-31)
+
+
+### Features
+
+* allow to skip JWT signature validation on select responses ([44d9114](https://github.com/panva/oauth4webapi/commit/44d9114e72e8c26e9ece195d5f92e776c7efef7e))
+
 ## [1.2.2](https://github.com/panva/oauth4webapi/compare/v1.2.1...v1.2.2) (2022-10-20)
 
 
