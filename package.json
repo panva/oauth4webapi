@@ -61,7 +61,7 @@
   },
   "devDependencies": {
     "@esbuild-kit/esm-loader": "^2.5.0",
-    "@types/node": "^18.11.7",
+    "@types/node": "^18.11.8",
     "@types/qunit": "^2.19.3",
     "ava": "^5.0.1",
     "edge-runtime": "^2.0.0",
@@ -70,7 +70,7 @@
     "prettier": "^2.7.1",
     "prettier-plugin-jsdoc": "^0.4.2",
     "qunit": "^2.19.3",
-    "testcafe": "^2.0.1",
+    "testcafe": "^2.0.2",
     "testcafe-browser-provider-browserstack": "^1.14.0",
     "timekeeper": "^2.2.0",
     "typedoc": "^0.23.19",
