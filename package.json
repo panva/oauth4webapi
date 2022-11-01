@@ -47,7 +47,7 @@
   "scripts": {
     "_format": "find src test tap examples conformance -type f -name '*.ts' -o -name '*.mjs' | xargs prettier",
     "build": "rm -rf build && tsc && tsc --declaration true --emitDeclarationOnly true --removeComments false && tsc -p test && tsc -p examples && tsc -p conformance && tsc -p tap",
-    "conformance": "bash -c 'patch-package && source .node_flags.sh && ava --config conformance/ava.config.ts'",
+    "conformance": "bash -c 'source .node_flags.sh && ava --config conformance/ava.config.mjs'",
     "docs": "patch-package && typedoc",
     "format": "npm run _format -- --write",
     "format-check": "npm run _format -- --check",

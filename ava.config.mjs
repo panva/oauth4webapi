@@ -4,7 +4,5 @@ export default {
     mjs: true,
   },
   files: ['test/**/*.ts', '!test/**/_*.ts'],
-  nodeArguments: [
-    '--enable-source-maps',
-  ],
+  nodeArguments: ['--enable-source-maps'],
 }
