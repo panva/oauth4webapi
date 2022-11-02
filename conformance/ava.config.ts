@@ -243,6 +243,7 @@ export default async () => {
       mjs: true,
     },
     files: [...files, './conformance/download_archive.ts'],
+    workerThreads: false,
     nodeArguments: ['--enable-source-maps'],
   }
 }
