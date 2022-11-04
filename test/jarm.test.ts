@@ -186,7 +186,7 @@ test('validateJwtAuthResponse() - invalid signature', async (t) => {
   })
   await t.throwsAsync(
     lib.validateJwtAuthResponse(tIssuer, client, params, lib.expectNoState, {
-      // @ts-ignore
+      // @ts-expect-error
       skipJwtSignatureCheck: true,
     }),
     {

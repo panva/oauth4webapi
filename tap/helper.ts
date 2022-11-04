@@ -1,5 +1,8 @@
 import * as lib from '../src/index.js'
 import * as jose from 'jose'
+import * as env from './env.js'
+
+const runtime = Object.values(env).find(Boolean)
 
 function url(pathname: string, search?: Record<string, string>) {
   const target = new URL(pathname, 'https://obscure-mesa-34474.deno.dev')
@@ -8,6 +11,9 @@ function url(pathname: string, search?: Record<string, string>) {
 }
 
 const random = () => jose.base64url.encode(crypto.getRandomValues(new Uint8Array(16)))
+
+// @ts-ignore
+import packageJson from '../package.json' assert { type: 'json' }
 
 export default async function setup(): Promise<{
   client: lib.Client
@@ -74,6 +80,8 @@ export default async function setup(): Promise<{
           },
         },
         waitTimeoutSeconds: 2,
+        // @ts-ignore
+        description: `${packageJson.name}/${packageJson.version} (${runtime})`,
         server: {
           jwks: {
             keys: [serverKey],

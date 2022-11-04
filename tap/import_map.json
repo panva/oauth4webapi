@@ -1,6 +1,7 @@
 {
   "imports": {
     "qunit": "https://cdnjs.cloudflare.com/ajax/libs/qunit/2.19.3/qunit.js",
+    "bowser": "https://cdn.jsdelivr.net/npm/bowser@2.11.0/src/bowser.js",
     "jose": "https://deno.land/x/jose/index.ts",
     "../src/index.js": "../src/index.ts",
     "./callback.js": "./callback.ts",
