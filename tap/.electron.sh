@@ -10,4 +10,4 @@
   tap/run-electron.ts
 
 source .electron_flags.sh
-xvfb-maybe electron tap/run-electron.cjs
+electron tap/run-electron.cjs
