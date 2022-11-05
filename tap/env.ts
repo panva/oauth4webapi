@@ -2,18 +2,28 @@ import Bowser from 'bowser'
 // @ts-ignore
 import * as packageLock from '../package-lock.json' assert { type: 'json' }
 
-// @ts-expect-error
+// @ts-ignore
 export const isBun = typeof Bun !== 'undefined' ? navigator.userAgent : false
 
-// @ts-expect-error
+// @ts-ignore
 export const isDeno = typeof Deno !== 'undefined' ? navigator.userAgent : false
 
+export const isElectron =
+  // @ts-ignore
+  typeof process !== 'undefined' && process.versions.electron
+    ? // @ts-ignore
+      `Electron/${process.versions.electron}; Node.js/${process.versions.node}`
+    : false
+
 export const isNode =
-  // @ts-expect-error
-  !isBun && typeof process !== 'undefined' ? `Node.js/${process.versions.node}` : false
+  // @ts-ignore
+  !isBun && !isElectron && typeof process !== 'undefined'
+    ? // @ts-ignore
+      `Node.js/${process.versions.node}`
+    : false
 
 export const isEdgeRuntime =
-  // @ts-expect-error
+  // @ts-ignore
   typeof EdgeRuntime !== 'undefined'
     ? `edge-runtime/${packageLock.packages['node_modules/edge-runtime'].version}`
     : false

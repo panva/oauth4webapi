@@ -126,6 +126,7 @@ examples/**/*.js
 conformance/**/*.js
 src/*.js
 tap/*.js
+tap/run-*.cjs
 
 *.zip
 *.txt
