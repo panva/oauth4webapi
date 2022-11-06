@@ -1,6 +1,6 @@
 import type QUnit from 'qunit'
 
-export default async (QUnit: QUnit, done?: (details: QUnit.DoneDetails) => void) => {
+export default async (QUnit: QUnit, done: (details: QUnit.DoneDetails) => void) => {
   // @ts-ignore
   QUnit.reporters.tap.init(QUnit)
   QUnit.config.autostart = false
@@ -18,7 +18,5 @@ export default async (QUnit: QUnit, done?: (details: QUnit.DoneDetails) => void)
     await module(QUnit)
   }
   QUnit.start()
-  if (done) {
-    QUnit.done(done)
-  }
+  QUnit.done(done)
 }

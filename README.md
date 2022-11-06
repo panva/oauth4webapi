@@ -58,6 +58,7 @@ The supported JavaScript runtimes include ones that support the utilized Web API
 
 These are _(this is not an exhaustive list)_:
 - Browsers
+- Bun
 - Cloudflare Workers
 - Deno
 - Electron

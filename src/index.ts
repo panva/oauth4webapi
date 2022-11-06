@@ -1848,6 +1848,7 @@ async function authenticatedRequest(
   options?: Omit<HttpRequestOptions, 'headers'> & AuthenticatedRequestOptions,
 ) {
   await clientAuthentication(as, client, body, headers, options?.clientPrivateKey)
+  headers.set('content-type', 'application/x-www-form-urlencoded;charset=UTF-8')
 
   return fetch(url.href, {
     body,

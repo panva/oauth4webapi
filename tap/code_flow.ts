@@ -60,7 +60,7 @@ export default (QUnit: QUnit) => {
           const authorizationUrl = new URL(as.authorization_endpoint!)
           authorizationUrl.searchParams.set('client_id', client.client_id)
           authorizationUrl.searchParams.set('request_uri', request_uri)
-          await fetch(authorizationUrl, { redirect: 'manual' }).catch(() => {})
+          await fetch(authorizationUrl.href, { redirect: 'manual' }).catch(() => {})
           currentUrl = new URL((await exposed()).authorization_endpoint_response_redirect)
         }
 

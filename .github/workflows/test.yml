@@ -122,6 +122,23 @@ jobs:
       - name: Run Test Suite
         run: npm run tap:workers
 
+  bun:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - run: curl https://bun.sh/install | bash
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: lts/hydrogen # 18
+          cache: 'npm'
+          check-latest: true
+      - run: npm clean-install
+      - name: Run Test Suite
+        run: npm run tap:bun
+
   browsers:
     runs-on: ubuntu-latest
     strategy:
