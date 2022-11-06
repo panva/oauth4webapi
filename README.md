@@ -61,7 +61,6 @@ These are _(this is not an exhaustive list)_:
 - Cloudflare Workers
 - Deno
 - Electron
-- Netlify Edge
 - Node.js ([runtime flags may be needed](https://github.com/panva/oauth4webapi/issues/8))
 - Vercel's Edge Runtime
 
