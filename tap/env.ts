@@ -1,4 +1,3 @@
-import Bowser from 'bowser'
 // @ts-ignore
 import * as packageLock from '../package-lock.json' assert { type: 'json' }
 
@@ -30,7 +29,7 @@ export const isEdgeRuntime =
 
 export const isBrowser =
   typeof navigator !== 'undefined' && navigator.userAgent?.startsWith?.('Mozilla/5.0 ')
-    ? browser()
+    ? await browser()
     : false
 
 export const isWorkers =
@@ -38,7 +37,11 @@ export const isWorkers =
     ? `workerd/${packageLock.packages['node_modules/workerd'].version}`
     : false
 
-function browser() {
+async function browser() {
+  const { default: Bowser } = await import(
+    // @ts-ignore
+    'https://cdn.jsdelivr.net/npm/bowser@2.11.0/src/bowser.js'
+  )
   const parsed = Bowser.parse(window.navigator.userAgent)
   let result = `${parsed.browser.name}/${parsed.browser.version}`
   if (parsed.platform.type !== 'desktop') {
