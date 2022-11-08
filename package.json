@@ -68,7 +68,7 @@
     "@types/qunit": "^2.19.3",
     "ava": "^5.0.1",
     "edge-runtime": "^2.0.1",
-    "jose": "^4.10.4",
+    "jose": "^4.11.0",
     "patch-package": "^6.5.0",
     "prettier": "^2.7.1",
     "prettier-plugin-jsdoc": "^0.4.2",
