@@ -1,8 +1,15 @@
 import type { ExecutionContext } from 'ava'
 import * as undici from 'undici'
 import { Readable } from 'node:stream'
+import * as jose from 'jose'
 
 import type { AuthorizationServer, Client } from '../src/index.js'
+
+const ALGS = ['ES256', 'RS256', 'EdDSA', 'PS256']
+interface ContextAlgs {
+  [key: string]: CryptoKeyPair
+}
+export type ContextWithAlgs = Context & ContextAlgs
 
 export interface Context {
   mock: undici.MockAgent
@@ -17,6 +24,29 @@ export default (t: ExecutionContext<Context>) => {
 
   t.context.mock ||= mockAgent
   t.context.intercept ||= undici.MockPool.prototype.intercept.bind(pool)
+}
+
+export async function setupJwks(t: ExecutionContext<ContextWithAlgs>) {
+  await Promise.all(
+    ALGS.map((alg) =>
+      jose.generateKeyPair(alg).then((kp) => {
+        t.context[alg] = <CryptoKeyPair>kp
+      }),
+    ),
+  )
+
+  t.context
+    .intercept({
+      path: '/jwks',
+      method: 'GET',
+    })
+    .reply(200, {
+      keys: await Promise.all(
+        ALGS.map((alg) =>
+          jose.exportJWK(t.context[alg].publicKey).then((jwk) => ({ ...jwk, alg })),
+        ),
+      ),
+    })
 }
 
 export async function teardown(t: ExecutionContext<Context>) {

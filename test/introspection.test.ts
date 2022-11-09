@@ -1,67 +1,23 @@
 import anyTest, { type TestFn } from 'ava'
 import setup, {
-  type Context,
-  teardown,
-  issuer,
-  endpoint,
   client,
+  endpoint,
   getResponse,
+  issuer,
+  setupJwks,
+  teardown,
+  type ContextWithAlgs,
   UA,
 } from './_setup.js'
 import * as jose from 'jose'
 import * as lib from '../src/index.js'
 import * as tools from './_tools.js'
 
-const test = anyTest as TestFn<Context & { es256: CryptoKeyPair; rs256: CryptoKeyPair }>
+const test = anyTest as TestFn<ContextWithAlgs>
 
 test.before(setup)
 test.after(teardown)
-
-test.before(async (t) => {
-  t.context.es256 = await lib.generateKeyPair('ES256')
-  t.context.rs256 = await lib.generateKeyPair('RS256')
-
-  t.context
-    .intercept({
-      path: '/jwks',
-      method: 'GET',
-    })
-    .reply(200, {
-      keys: [
-        {
-          ...(await jose.exportJWK(
-            (
-              await crypto.subtle.generateKey({ name: 'ECDH', namedCurve: 'P-256' }, false, [
-                'deriveBits',
-              ])
-            ).publicKey,
-          )),
-          use: 'enc',
-        },
-        {
-          ...(await jose.exportJWK(
-            (
-              await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, false, [
-                'sign',
-                'verify',
-              ])
-            ).publicKey,
-          )),
-          key_ops: [],
-        },
-        await jose.exportJWK(
-          (
-            await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-384' }, false, [
-              'sign',
-              'verify',
-            ])
-          ).publicKey,
-        ),
-        await jose.exportJWK(t.context.es256.publicKey),
-        await jose.exportJWK(t.context.rs256.publicKey),
-      ],
-    })
-})
+test.before(setupJwks)
 
 const tClient: lib.Client = { ...client, client_secret: 'foo' }
 
@@ -310,7 +266,7 @@ test('processIntrospectionResponse() - invalid signature', async (t) => {
             .setIssuer(issuer.issuer)
             .setAudience(client.client_id)
             .setIssuedAt()
-            .sign(t.context.es256.privateKey),
+            .sign(t.context.ES256.privateKey),
         ),
         {
           headers: new Headers({
@@ -335,7 +291,7 @@ test('processIntrospectionResponse() - ignore signatures', async (t) => {
             .setIssuer(issuer.issuer)
             .setAudience(client.client_id)
             .setIssuedAt()
-            .sign(t.context.es256.privateKey),
+            .sign(t.context.ES256.privateKey),
         ),
         {
           headers: new Headers({
@@ -365,7 +321,7 @@ test('processIntrospectionResponse() - alg signalled', async (t) => {
           .setIssuer(issuer.issuer)
           .setAudience(client.client_id)
           .setIssuedAt()
-          .sign(t.context.es256.privateKey),
+          .sign(t.context.ES256.privateKey),
         {
           headers: new Headers({
             'content-type': 'application/token-introspection+jwt',
@@ -392,7 +348,7 @@ test('processIntrospectionResponse() - alg defined', async (t) => {
           .setIssuer(issuer.issuer)
           .setAudience(client.client_id)
           .setIssuedAt()
-          .sign(t.context.es256.privateKey),
+          .sign(t.context.ES256.privateKey),
         {
           headers: new Headers({
             'content-type': 'application/token-introspection+jwt',
@@ -419,7 +375,7 @@ test('processIntrospectionResponse() - alg default', async (t) => {
           .setIssuer(issuer.issuer)
           .setAudience(client.client_id)
           .setIssuedAt()
-          .sign(t.context.rs256.privateKey),
+          .sign(t.context.RS256.privateKey),
         {
           headers: new Headers({
             'content-type': 'application/token-introspection+jwt',
@@ -446,7 +402,7 @@ test('processIntrospectionResponse() - alg mismatches', async (t) => {
           .setIssuer(issuer.issuer)
           .setAudience(client.client_id)
           .setIssuedAt()
-          .sign(t.context.es256.privateKey),
+          .sign(t.context.ES256.privateKey),
         {
           headers: new Headers({
             'content-type': 'application/token-introspection+jwt',
@@ -470,7 +426,7 @@ test('processIntrospectionResponse() - alg mismatches', async (t) => {
           .setIssuer(issuer.issuer)
           .setAudience(client.client_id)
           .setIssuedAt()
-          .sign(t.context.es256.privateKey),
+          .sign(t.context.ES256.privateKey),
         {
           headers: new Headers({
             'content-type': 'application/token-introspection+jwt',
@@ -494,7 +450,7 @@ test('processIntrospectionResponse() - alg mismatches', async (t) => {
           .setIssuer(issuer.issuer)
           .setAudience(client.client_id)
           .setIssuedAt()
-          .sign(t.context.es256.privateKey),
+          .sign(t.context.ES256.privateKey),
         {
           headers: new Headers({
             'content-type': 'application/token-introspection+jwt',
@@ -522,7 +478,7 @@ test('processIntrospectionResponse() - typ w/ application/ prefix', async (t) =>
           .setIssuer(issuer.issuer)
           .setAudience(client.client_id)
           .setIssuedAt()
-          .sign(t.context.rs256.privateKey),
+          .sign(t.context.RS256.privateKey),
         {
           headers: new Headers({
             'content-type': 'application/token-introspection+jwt',

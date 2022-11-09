@@ -1,7 +1,6 @@
 import anyTest, { type TestFn } from 'ava'
-import { createPrivateKey } from 'node:crypto'
 import setup, {
-  type Context,
+  type ContextWithAlgs,
   teardown,
   issuer,
   endpoint,
@@ -13,7 +12,7 @@ import * as jose from 'jose'
 import * as lib from '../src/index.js'
 import * as tools from './_tools.js'
 
-const test = anyTest as TestFn<Context & { [alg: string]: CryptoKeyPair }>
+const test = anyTest as TestFn<ContextWithAlgs>
 
 test.before(setup)
 test.after(teardown)
@@ -703,15 +702,7 @@ for (const alg of algs) {
               .setAudience(client.client_id)
               .setExpirationTime('5m')
               .setIssuedAt()
-              .sign(
-                createPrivateKey({
-                  key: await crypto.subtle
-                    .exportKey('pkcs8', t.context[alg].privateKey)
-                    .then(Buffer.from),
-                  format: 'der',
-                  type: 'pkcs8',
-                }),
-              ),
+              .sign(t.context[alg].privateKey),
           }),
         ),
       ),

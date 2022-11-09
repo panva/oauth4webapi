@@ -1,38 +1,21 @@
 import anyTest, { type TestFn } from 'ava'
-import setup, { type Context, teardown, client, issuer, endpoint } from './_setup.js'
+import setup, {
+  client,
+  endpoint,
+  issuer,
+  setupJwks,
+  teardown,
+  type ContextWithAlgs,
+} from './_setup.js'
 import * as jose from 'jose'
 import * as lib from '../src/index.js'
 import * as tools from './_tools.js'
 
-const test = anyTest as TestFn<Context & { es256: CryptoKeyPair; rs256: CryptoKeyPair }>
+const test = anyTest as TestFn<ContextWithAlgs>
 
 test.before(setup)
 test.after(teardown)
-
-test.before(async (t) => {
-  t.context.es256 = await lib.generateKeyPair('ES256')
-  t.context.rs256 = await lib.generateKeyPair('RS256')
-
-  t.context
-    .intercept({
-      path: '/jwks',
-      method: 'GET',
-    })
-    .reply(200, {
-      keys: [
-        {
-          kid: 'es256',
-          ...(await jose.exportJWK(t.context.es256.publicKey)),
-          use: 'sig',
-        },
-        {
-          kid: 'rs256',
-          ...(await jose.exportJWK(t.context.rs256.publicKey)),
-          key_ops: ['verify'],
-        },
-      ],
-    })
-})
+test.before(setupJwks)
 
 test('validateJwtAuthResponse() error conditions', async (t) => {
   await t.throwsAsync(() => lib.validateJwtAuthResponse(issuer, client, <any>null), {
@@ -54,7 +37,7 @@ test('validateJwtAuthResponse()', async (t) => {
     ...issuer,
     jwks_uri: endpoint('jwks'),
   }
-  const kp = t.context.rs256
+  const kp = t.context.RS256
 
   const response = await new jose.SignJWT({
     iss: issuer.issuer,
@@ -62,7 +45,7 @@ test('validateJwtAuthResponse()', async (t) => {
     code: 'code',
   })
     .setExpirationTime('30s')
-    .setProtectedHeader({ alg: 'RS256', kid: 'rs256' })
+    .setProtectedHeader({ alg: 'RS256' })
     .sign(kp.privateKey)
   const params = new URLSearchParams({ response })
   await t.notThrowsAsync(async () => {
@@ -83,7 +66,7 @@ test('validateJwtAuthResponse() as URL', async (t) => {
     ...issuer,
     jwks_uri: endpoint('jwks'),
   }
-  const kp = t.context.rs256
+  const kp = t.context.RS256
 
   const response = await new jose.SignJWT({
     iss: issuer.issuer,
@@ -91,7 +74,7 @@ test('validateJwtAuthResponse() as URL', async (t) => {
     code: 'code',
   })
     .setExpirationTime('30s')
-    .setProtectedHeader({ alg: 'RS256', kid: 'rs256' })
+    .setProtectedHeader({ alg: 'RS256' })
     .sign(kp.privateKey)
   const params = new URL(`https://rp.example.com/cb?response=${response}`)
   await t.notThrowsAsync(async () => {
@@ -112,7 +95,7 @@ test('validateJwtAuthResponse() - state value', async (t) => {
     ...issuer,
     jwks_uri: endpoint('jwks'),
   }
-  const kp = t.context.rs256
+  const kp = t.context.RS256
 
   const response = await new jose.SignJWT({
     iss: issuer.issuer,
@@ -131,7 +114,7 @@ test('validateJwtAuthResponse() - state not present', async (t) => {
     ...issuer,
     jwks_uri: endpoint('jwks'),
   }
-  const kp = t.context.rs256
+  const kp = t.context.RS256
 
   const response = await new jose.SignJWT({
     iss: issuer.issuer,
@@ -149,7 +132,7 @@ test('validateJwtAuthResponse() - state ignored', async (t) => {
     ...issuer,
     jwks_uri: endpoint('jwks'),
   }
-  const kp = t.context.rs256
+  const kp = t.context.RS256
 
   const response = await new jose.SignJWT({
     iss: issuer.issuer,
@@ -169,7 +152,7 @@ test('validateJwtAuthResponse() - invalid signature', async (t) => {
     jwks_uri: endpoint('jwks'),
     authorization_signing_alg_values_supported: ['ES256'],
   }
-  const kp = t.context.es256
+  const kp = t.context.ES256
 
   const response = tools.mangleJwtSignature(
     await new jose.SignJWT({
@@ -177,7 +160,7 @@ test('validateJwtAuthResponse() - invalid signature', async (t) => {
       aud: client.client_id,
     })
       .setExpirationTime('30s')
-      .setProtectedHeader({ alg: 'ES256', kid: 'es256' })
+      .setProtectedHeader({ alg: 'ES256' })
       .sign(kp.privateKey),
   )
   const params = new URLSearchParams({ response })
@@ -201,14 +184,14 @@ test('validateJwtAuthResponse() - alg signalled', async (t) => {
     jwks_uri: endpoint('jwks'),
     authorization_signing_alg_values_supported: ['ES256'],
   }
-  const kp = t.context.es256
+  const kp = t.context.ES256
 
   const response = await new jose.SignJWT({
     iss: issuer.issuer,
     aud: client.client_id,
   })
     .setExpirationTime('30s')
-    .setProtectedHeader({ alg: 'ES256', kid: 'es256' })
+    .setProtectedHeader({ alg: 'ES256' })
     .sign(kp.privateKey)
   const params = new URLSearchParams({ response })
   await t.notThrowsAsync(lib.validateJwtAuthResponse(tIssuer, client, params, lib.expectNoState))
@@ -219,7 +202,7 @@ test('validateJwtAuthResponse() - alg defined', async (t) => {
     ...issuer,
     jwks_uri: endpoint('jwks'),
   }
-  const kp = t.context.es256
+  const kp = t.context.ES256
 
   const response = await new jose.SignJWT({
     iss: issuer.issuer,
@@ -244,7 +227,7 @@ test('validateJwtAuthResponse() - alg default', async (t) => {
     ...issuer,
     jwks_uri: endpoint('jwks'),
   }
-  const kp = t.context.rs256
+  const kp = t.context.RS256
 
   const response = await new jose.SignJWT({
     iss: issuer.issuer,
@@ -270,7 +253,7 @@ test('validateJwtAuthResponse() - alg mismatches', async (t) => {
     })
       .setExpirationTime('30s')
       .setProtectedHeader({ alg: 'ES256' })
-      .sign(t.context.es256.privateKey)
+      .sign(t.context.ES256.privateKey)
     const params = new URLSearchParams({ response })
     await t.throwsAsync(lib.validateJwtAuthResponse(tIssuer, client, params, lib.expectNoState), {
       message: 'unexpected JWT "alg" header parameter',
@@ -284,7 +267,7 @@ test('validateJwtAuthResponse() - alg mismatches', async (t) => {
     })
       .setExpirationTime('30s')
       .setProtectedHeader({ alg: 'ES256' })
-      .sign(t.context.es256.privateKey)
+      .sign(t.context.ES256.privateKey)
     const params = new URLSearchParams({ response })
     await t.throwsAsync(
       lib.validateJwtAuthResponse(
@@ -309,7 +292,7 @@ test('validateJwtAuthResponse() - alg mismatches', async (t) => {
     })
       .setExpirationTime('30s')
       .setProtectedHeader({ alg: 'ES256' })
-      .sign(t.context.es256.privateKey)
+      .sign(t.context.ES256.privateKey)
     const params = new URLSearchParams({ response })
     await t.throwsAsync(
       lib.validateJwtAuthResponse(

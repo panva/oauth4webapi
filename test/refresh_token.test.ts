@@ -1,38 +1,23 @@
 import anyTest, { type TestFn } from 'ava'
 import setup, {
-  type Context,
-  teardown,
-  issuer,
-  endpoint,
   client,
+  endpoint,
   getResponse,
+  issuer,
+  setupJwks,
+  teardown,
+  type ContextWithAlgs,
   UA,
 } from './_setup.js'
 import * as jose from 'jose'
 import * as lib from '../src/index.js'
 import * as tools from './_tools.js'
 
-const test = anyTest as TestFn<Context & { es256: CryptoKeyPair; rs256: CryptoKeyPair }>
+const test = anyTest as TestFn<ContextWithAlgs>
 
 test.before(setup)
 test.after(teardown)
-
-test.before(async (t) => {
-  t.context.es256 = await lib.generateKeyPair('ES256')
-  t.context.rs256 = await lib.generateKeyPair('RS256')
-
-  t.context
-    .intercept({
-      path: '/jwks',
-      method: 'GET',
-    })
-    .reply(200, {
-      keys: [
-        await jose.exportJWK(t.context.es256.publicKey),
-        await jose.exportJWK(t.context.rs256.publicKey),
-      ],
-    })
-})
+test.before(setupJwks)
 
 const tClient: lib.Client = { ...client, client_secret: 'foo' }
 
@@ -297,7 +282,7 @@ test('processRefreshTokenResponse() - invalid signature', async (t) => {
                 .setAudience(client.client_id)
                 .setExpirationTime('5m')
                 .setIssuedAt()
-                .sign(t.context.es256.privateKey),
+                .sign(t.context.ES256.privateKey),
             ),
           }),
         ),
@@ -331,7 +316,7 @@ test('processRefreshTokenResponse() - ignore signatures', async (t) => {
                 .setAudience(client.client_id)
                 .setExpirationTime('5m')
                 .setIssuedAt()
-                .sign(t.context.es256.privateKey),
+                .sign(t.context.ES256.privateKey),
             ),
           }),
         ),
@@ -366,7 +351,7 @@ test('processRefreshTokenResponse() with an ID Token (alg signalled)', async (t)
               .setAudience(client.client_id)
               .setExpirationTime('5m')
               .setIssuedAt()
-              .sign(t.context.es256.privateKey),
+              .sign(t.context.ES256.privateKey),
           }),
         ),
       )
@@ -403,7 +388,7 @@ test('processRefreshTokenResponse() with an ID Token (alg specified)', async (t)
             .setAudience(client.client_id)
             .setExpirationTime('5m')
             .setIssuedAt()
-            .sign(t.context.es256.privateKey),
+            .sign(t.context.ES256.privateKey),
         }),
       ),
     ),
@@ -428,7 +413,7 @@ test('processRefreshTokenResponse() with an ID Token (alg default)', async (t) =
             .setAudience(client.client_id)
             .setExpirationTime('5m')
             .setIssuedAt()
-            .sign(t.context.rs256.privateKey),
+            .sign(t.context.RS256.privateKey),
         }),
       ),
     ),
@@ -453,7 +438,7 @@ test('processRefreshTokenResponse() with an ID Token (alg mismatches)', async (t
             .setAudience(client.client_id)
             .setExpirationTime('5m')
             .setIssuedAt()
-            .sign(t.context.es256.privateKey),
+            .sign(t.context.ES256.privateKey),
         }),
       ),
     ),
@@ -480,7 +465,7 @@ test('processRefreshTokenResponse() with an ID Token (alg mismatches)', async (t
             .setAudience(client.client_id)
             .setExpirationTime('5m')
             .setIssuedAt()
-            .sign(t.context.es256.privateKey),
+            .sign(t.context.ES256.privateKey),
         }),
       ),
     ),
@@ -507,7 +492,7 @@ test('processRefreshTokenResponse() with an ID Token (alg mismatches)', async (t
             .setAudience(client.client_id)
             .setExpirationTime('5m')
             .setIssuedAt()
-            .sign(t.context.es256.privateKey),
+            .sign(t.context.ES256.privateKey),
         }),
       ),
     ),

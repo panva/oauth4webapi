@@ -1,38 +1,23 @@
 import anyTest, { type TestFn } from 'ava'
 import setup, {
-  type Context,
-  teardown,
   client,
-  issuer,
   endpoint,
   getResponse,
+  issuer,
+  setupJwks,
+  teardown,
+  type ContextWithAlgs,
   UA,
 } from './_setup.js'
 import * as lib from '../src/index.js'
 import * as jose from 'jose'
 import * as tools from './_tools.js'
 
-const test = anyTest as TestFn<Context & { es256: CryptoKeyPair; rs256: CryptoKeyPair }>
+const test = anyTest as TestFn<ContextWithAlgs>
 
 test.before(setup)
 test.after(teardown)
-
-test.before(async (t) => {
-  t.context.es256 = await lib.generateKeyPair('ES256')
-  t.context.rs256 = await lib.generateKeyPair('RS256')
-
-  t.context
-    .intercept({
-      path: '/jwks',
-      method: 'GET',
-    })
-    .reply(200, {
-      keys: [
-        await jose.exportJWK(t.context.es256.publicKey),
-        await jose.exportJWK(t.context.rs256.publicKey),
-      ],
-    })
-})
+test.before(setupJwks)
 
 test('userInfoRequest()', async (t) => {
   const data = { sub: 'urn:example:subject' }
@@ -187,7 +172,7 @@ test('processUserInfoResponse() - invalid signature', async (t) => {
     jwks_uri: endpoint('jwks'),
     userinfo_signing_alg_values_supported: ['ES256'],
   }
-  const kp = t.context.es256
+  const kp = t.context.ES256
 
   await t.throwsAsync(
     async () => {
@@ -207,7 +192,7 @@ test('processUserInfoResponse() - invalid signature', async (t) => {
 })
 
 test('processUserInfoResponse() - ignore signatures', async (t) => {
-  const kp = t.context.es256
+  const kp = t.context.ES256
 
   await t.notThrowsAsync(async () => {
     const response = getResponse(
@@ -235,7 +220,7 @@ test('processUserInfoResponse() - jwt (alg signalled)', async (t) => {
     jwks_uri: endpoint('jwks'),
     userinfo_signing_alg_values_supported: ['ES256'],
   }
-  const kp = t.context.es256
+  const kp = t.context.ES256
 
   await t.notThrowsAsync(async () => {
     const response = getResponse(
@@ -254,7 +239,7 @@ test('processUserInfoResponse() - jwt (alg defined)', async (t) => {
     ...issuer,
     jwks_uri: endpoint('jwks'),
   }
-  const kp = t.context.es256
+  const kp = t.context.ES256
 
   await t.notThrowsAsync(async () => {
     const response = getResponse(
@@ -278,7 +263,7 @@ test('processUserInfoResponse() - jwt (alg default)', async (t) => {
     ...issuer,
     jwks_uri: endpoint('jwks'),
   }
-  const kp = t.context.rs256
+  const kp = t.context.RS256
 
   await t.notThrowsAsync(async () => {
     const response = getResponse(
@@ -303,7 +288,7 @@ test('processUserInfoResponse() - alg mismatches', async (t) => {
       const response = getResponse(
         await new jose.SignJWT({ sub: 'urn:example:subject' })
           .setProtectedHeader({ alg: 'ES256' })
-          .sign(t.context.es256.privateKey),
+          .sign(t.context.ES256.privateKey),
         { headers: new Headers({ 'content-type': 'application/jwt' }) },
       )
       await lib.processUserInfoResponse(tIssuer, client, 'urn:example:subject', response)
@@ -316,7 +301,7 @@ test('processUserInfoResponse() - alg mismatches', async (t) => {
       const response = getResponse(
         await new jose.SignJWT({ sub: 'urn:example:subject' })
           .setProtectedHeader({ alg: 'ES256' })
-          .sign(t.context.es256.privateKey),
+          .sign(t.context.ES256.privateKey),
         { headers: new Headers({ 'content-type': 'application/jwt' }) },
       )
       await lib.processUserInfoResponse(
@@ -337,7 +322,7 @@ test('processUserInfoResponse() - alg mismatches', async (t) => {
       const response = getResponse(
         await new jose.SignJWT({ sub: 'urn:example:subject' })
           .setProtectedHeader({ alg: 'ES256' })
-          .sign(t.context.es256.privateKey),
+          .sign(t.context.ES256.privateKey),
         { headers: new Headers({ 'content-type': 'application/jwt' }) },
       )
       await lib.processUserInfoResponse(

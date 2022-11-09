@@ -1,10 +1,9 @@
 import anyTest, { type TestFn } from 'ava'
-import { createPublicKey } from 'node:crypto'
-import setup, { client, issuer, endpoint, type Context, teardown } from './_setup.js'
+import setup, { client, issuer, endpoint, type ContextWithAlgs, teardown } from './_setup.js'
 import * as jose from 'jose'
 import * as lib from '../src/index.js'
 
-const test = anyTest as TestFn<Context & { [alg: string]: CryptoKeyPair }>
+const test = anyTest as TestFn<ContextWithAlgs>
 
 test.before(setup)
 test.after(teardown)
@@ -12,10 +11,13 @@ test.after(teardown)
 const algs: lib.JWSAlgorithm[] = ['RS256', 'ES256', 'PS256', 'EdDSA']
 
 test.before(async (t) => {
-  for (const alg of algs) {
-    const key = await lib.generateKeyPair(alg)
-    t.context[alg] = key
-  }
+  await Promise.all(
+    algs.map((alg) =>
+      jose.generateKeyPair(alg).then((kp) => {
+        t.context[alg] = <CryptoKeyPair>kp
+      }),
+    ),
+  )
 })
 
 test('client_secret_basic', async (t) => {
@@ -350,14 +352,7 @@ for (const alg of algs) {
         clientPrivateKey: { key: t.context[alg].privateKey },
       },
     )
-    await jose.compactVerify(
-      assertion,
-      createPublicKey({
-        format: 'der',
-        key: await crypto.subtle.exportKey('spki', t.context[alg].publicKey).then(Buffer.from),
-        type: 'spki',
-      }),
-    )
+    await jose.compactVerify(assertion, t.context[alg].publicKey)
     t.pass()
   })
 }

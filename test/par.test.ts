@@ -1,16 +1,16 @@
 import anyTest, { type TestFn } from 'ava'
 import setup, {
-  type Context,
-  teardown,
-  issuer,
-  endpoint,
   client,
+  endpoint,
   getResponse,
+  issuer,
+  teardown,
+  type ContextWithAlgs,
   UA,
 } from './_setup.js'
 import * as lib from '../src/index.js'
 
-const test = anyTest as TestFn<Context & { es256: CryptoKeyPair; rs256: CryptoKeyPair }>
+const test = anyTest as TestFn<ContextWithAlgs>
 
 test.before(setup)
 test.after(teardown)
