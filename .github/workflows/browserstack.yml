@@ -85,10 +85,9 @@ jobs:
         if: ${{ steps.cert.outputs.cache-hit != 'true' }}
         uses: actions/github-script@v6
         with:
-          script: |
-              core.setFailed('cert cache hit failed')
+          script: core.setFailed('cert cache hit failed')
       - run: npm clean-install
-      - run: npm install --save-dev testcafe-browser-provider-browserstack@1
+      - run: npm install --global testcafe@2 testcafe-browser-provider-browserstack@1
       - name: BrowserStack Env Setup
         uses: browserstack/github-actions/setup-env@00ce173eae311a7838f80682a5fad5144c4219ad
         with:

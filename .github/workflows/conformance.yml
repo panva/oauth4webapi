@@ -152,8 +152,7 @@ jobs:
         if: ${{ steps.cache.outputs.cache-hit != 'true' }}
         uses: actions/github-script@v6
         with:
-          script: |
-              core.setFailed('Conformance Suite cache hit failed')
+          script: core.setFailed('Conformance Suite cache hit failed')
       - name: Run Conformance Suite
         working-directory: ./conformance-suite
         run: |

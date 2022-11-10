@@ -46,7 +46,7 @@
     "build/index.d.ts"
   ],
   "scripts": {
-    "_format": "find src test tap examples conformance -type f -name '*.ts' -o -name '*.mjs' | xargs prettier",
+    "_format": "find src test tap examples conformance -type f -name '*.ts' -o -name '*.mjs' -name '*.cjs' | xargs prettier",
     "build": "rm -rf build && tsc && tsc --declaration true --emitDeclarationOnly true --removeComments false && tsc -p test && tsc -p examples && tsc -p conformance && tsc -p tap",
     "conformance": "bash -c 'source .node_flags.sh && ava --config conformance/ava.config.mjs'",
     "docs": "patch-package && typedoc",
@@ -73,7 +73,6 @@
     "prettier": "^2.7.1",
     "prettier-plugin-jsdoc": "^0.4.2",
     "qunit": "^2.19.3",
-    "testcafe": "^2.0.2",
     "timekeeper": "^2.2.0",
     "typedoc": "^0.23.20",
     "typedoc-plugin-markdown": "^3.13.6",

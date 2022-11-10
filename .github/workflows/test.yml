@@ -158,6 +158,7 @@ jobs:
           cache: 'npm'
           check-latest: true
       - run: npm clean-install
+      - run: npm install --global testcafe@2
       - name: Run Test Suite
         run: npm run tap:browsers
         env:
