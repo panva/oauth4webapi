@@ -67,7 +67,7 @@
     "@types/node": "^18.11.9",
     "@types/qunit": "^2.19.3",
     "ava": "^5.0.1",
-    "edge-runtime": "^2.0.1",
+    "edge-runtime": "^2.0.2",
     "jose": "^4.11.0",
     "patch-package": "^6.5.0",
     "prettier": "^2.7.1",
