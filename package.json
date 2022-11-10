@@ -74,7 +74,6 @@
     "prettier-plugin-jsdoc": "^0.4.2",
     "qunit": "^2.19.3",
     "testcafe": "^2.0.2",
-    "testcafe-browser-provider-browserstack": "^1.14.0",
     "timekeeper": "^2.2.0",
     "typedoc": "^0.23.20",
     "typedoc-plugin-markdown": "^3.13.6",
