@@ -15,9 +15,47 @@ const random = () => jose.base64url.encode(crypto.getRandomValues(new Uint8Array
 // @ts-ignore
 import packageJson from '../package.json' assert { type: 'json' }
 
-export default async function setup(): Promise<{
+export async function fapi2(alg: lib.JWSAlgorithm, kp: CryptoKeyPair) {
+  return setup(
+    'fapi2-advanced-id1-client-test-plan',
+    'fapi2-baseline-id2-client-test-happy-path',
+    {
+      client_auth_type: 'private_key_jwt',
+      sender_constrain: 'dpop',
+      fapi_client_type: 'oidc',
+      fapi_profile: 'plain_fapi',
+      fapi_request_method: 'signed_non_repudiation',
+      fapi_response_mode: 'jarm',
+    },
+    alg,
+    kp,
+  )
+}
+
+export async function oidcc(alg: lib.JWSAlgorithm, kp: CryptoKeyPair) {
+  return setup(
+    'oidcc-client-test-plan',
+    'oidcc-client-test',
+    {
+      client_auth_type: 'private_key_jwt',
+      request_type: 'request_object',
+      response_type: 'code',
+      response_mode: 'default',
+      client_registration: 'static_client',
+    },
+    alg,
+    kp,
+  )
+}
+
+async function setup(
+  planName: string,
+  testName: string,
+  variant: Record<string, string>,
+  alg: lib.JWSAlgorithm,
+  kp: CryptoKeyPair,
+): Promise<{
   client: lib.Client
-  accountsEndpoint: URL
   issuerIdentifier: URL
   clientPrivateKey: lib.PrivateKey
   exposed: () => Promise<Record<string, string>>
@@ -29,20 +67,20 @@ export default async function setup(): Promise<{
     ...(await crypto.subtle.exportKey(
       'jwk',
       (
-        await lib.generateKeyPair('ES256', { extractable: true })
+        await lib.generateKeyPair(alg, { extractable: true })
       ).privateKey,
     )),
-    alg: 'ES256',
+    alg,
     use: 'sig',
     kid: random(),
     key_ops: undefined,
     ext: undefined,
   }
 
-  const clientKeyPair = await lib.generateKeyPair('ES256')
+  const clientKeyPair = kp
   const clientJwk = {
     ...(await crypto.subtle.exportKey('jwk', clientKeyPair.publicKey)),
-    alg: 'ES256',
+    alg,
     use: 'sig',
     kid: random(),
     key_ops: undefined,
@@ -54,15 +92,8 @@ export default async function setup(): Promise<{
 
   let response = await fetch(
     url('/api/plan', {
-      planName: 'fapi2-advanced-id1-client-test-plan',
-      variant: JSON.stringify({
-        client_auth_type: 'private_key_jwt',
-        sender_constrain: 'dpop',
-        fapi_client_type: 'oidc',
-        fapi_profile: 'plain_fapi',
-        fapi_request_method: 'signed_non_repudiation',
-        fapi_response_mode: 'jarm',
-      }),
+      planName,
+      variant: JSON.stringify(variant),
     }),
     {
       method: 'POST',
@@ -74,7 +105,7 @@ export default async function setup(): Promise<{
           token_endpoint_auth_method: 'private_key_jwt',
           scope,
           redirect_uri,
-          id_token_signed_response_alg: 'ES256',
+          id_token_signed_response_alg: alg,
           jwks: {
             keys: [clientJwk],
           },
@@ -97,13 +128,10 @@ export default async function setup(): Promise<{
 
   const plan = await response.json()
 
-  response = await fetch(
-    url('/api/runner', { test: 'fapi2-baseline-id2-client-test-happy-path', plan: plan.id }),
-    {
-      method: 'POST',
-      headers: { 'content-type': 'application/json;charset=utf-8' },
-    },
-  )
+  response = await fetch(url('/api/runner', { test: testName, plan: plan.id }), {
+    method: 'POST',
+    headers: { 'content-type': 'application/json;charset=utf-8' },
+  })
 
   if (response.status !== 201) {
     throw new Error(await response.text())
@@ -117,20 +145,36 @@ export default async function setup(): Promise<{
     throw new Error(await response.text())
   }
 
-  const {
-    exposed: { issuer, accounts_endpoint },
-  } = await response.json()
+  async function exposed() {
+    const response = await fetch(url(`/api/runner/${test.id}`))
+    if (response.status !== 200) {
+      throw new Error(await response.text())
+    }
+
+    const { exposed } = await response.json()
+    return exposed
+  }
+
+  const { issuer } = await exposed()
+
+  let ready = false
+  do {
+    const response = await fetch(url(`/api/info/${test.id}`))
+    if (response.status !== 200) {
+      throw new Error(await response.text())
+    }
+
+    const { status } = await response.json()
+
+    if (status === 'WAITING') {
+      ready = true
+    } else {
+      await new Promise((resolve) => setTimeout(resolve, 200))
+    }
+  } while (!ready)
 
   return {
-    async exposed() {
-      const response = await fetch(url(`/api/runner/${test.id}`))
-      if (response.status !== 200) {
-        throw new Error(await response.text())
-      }
-
-      const { exposed } = await response.json()
-      return exposed
-    },
+    exposed,
     async cleanup() {
       await fetch(url(`/api/plan/${plan.id}`), {
         method: 'DELETE',
@@ -139,7 +183,7 @@ export default async function setup(): Promise<{
     client: {
       client_id: uid,
       token_endpoint_auth_method: 'private_key_jwt',
-      id_token_signed_response_alg: 'ES256',
+      id_token_signed_response_alg: alg,
       scope,
       redirect_uri,
     },
@@ -148,6 +192,5 @@ export default async function setup(): Promise<{
       key: clientKeyPair.privateKey,
     },
     issuerIdentifier: new URL(issuer),
-    accountsEndpoint: new URL(accounts_endpoint),
   }
 }

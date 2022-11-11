@@ -1,6 +1,6 @@
 import type QUnit from 'qunit'
 import * as lib from '../src/index.js'
-import * as env from './env.js'
+import { fails, keys } from './keys.js'
 
 function isRSA(alg: string) {
   return alg.startsWith('RS') || alg.startsWith('PS')
@@ -19,60 +19,42 @@ export default (QUnit: QUnit) => {
     await t.rejects(lib.generateKeyPair(<any>'foo'), /UnsupportedOperationError/)
   })
 
-  const algs = <lib.JWSAlgorithm[]>['RS256', 'PS256', 'ES256']
-
-  if (env.isDeno || env.isNode) {
-    algs.push('EdDSA')
+  for (const alg of fails) {
+    test(`[not supported] ${alg} fails to generate`, async (t) => {
+      await t.rejects(lib.generateKeyPair(alg))
+    })
   }
 
-  for (const alg of algs) {
+  for (const [alg, kp] of Object.entries(keys)) {
     test(`${alg} defaults`, async (t) => {
-      const { publicKey, privateKey } = await lib.generateKeyPair(alg)
+      const { publicKey, privateKey } = await kp
       t.deepEqual(publicKey.usages, ['verify'])
       t.deepEqual(privateKey.usages, ['sign'])
       t.equal(publicKey.extractable, true)
       t.equal(privateKey.extractable, false)
 
-      if (isRSA(alg)) {
-        // @ts-expect-error
-        t.equal(publicKey.algorithm.modulusLength, 2048)
-        t.deepEqual(
-          // @ts-expect-error
-          new Uint8Array(publicKey.algorithm.publicExponent),
-          new Uint8Array([0x01, 0x00, 0x01]),
-        )
-        // @ts-expect-error
-        t.equal(privateKey.algorithm.modulusLength, 2048)
-        t.deepEqual(
-          // @ts-expect-error
-          new Uint8Array(privateKey.algorithm.publicExponent),
-          new Uint8Array([0x01, 0x00, 0x01]),
-        )
+      for (const key of [privateKey, publicKey]) {
+        switch (alg.slice(0, 2)) {
+          case 'Ed':
+            t.equal(key.algorithm.name, 'Ed25519')
+            break
+          case 'PS':
+            t.equal(key.algorithm.name, 'RSA-PSS')
+            break
+          case 'ES':
+            t.equal(key.algorithm.name, 'ECDSA')
+            break
+          case 'RS':
+            t.equal(key.algorithm.name, 'RSASSA-PKCS1-v1_5')
+            break
+        }
+
+        if (isRSA(alg)) {
+          const algorithm = <RsaHashedKeyAlgorithm>key.algorithm
+          t.equal(algorithm.modulusLength, 2048)
+          t.deepEqual(new Uint8Array(algorithm.publicExponent), new Uint8Array([0x01, 0x00, 0x01]))
+        }
       }
     })
-
-    test(`${alg} extractable`, async (t) => {
-      {
-        const { publicKey, privateKey } = await lib.generateKeyPair(alg, { extractable: false })
-        t.equal(publicKey.extractable, true)
-        t.equal(privateKey.extractable, false)
-      }
-
-      {
-        const { publicKey, privateKey } = await lib.generateKeyPair(alg, { extractable: true })
-        t.equal(publicKey.extractable, true)
-        t.equal(privateKey.extractable, true)
-      }
-    })
-
-    if (isRSA(alg)) {
-      test(`${alg} modulusLength`, async (t) => {
-        const { publicKey, privateKey } = await lib.generateKeyPair(alg, { modulusLength: 3072 })
-        // @ts-expect-error
-        t.equal(publicKey.algorithm.modulusLength, 3072)
-        // @ts-expect-error
-        t.equal(privateKey.algorithm.modulusLength, 3072)
-      })
-    }
   }
 }

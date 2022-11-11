@@ -1,72 +1,44 @@
 import type QUnit from 'qunit'
 import * as lib from '../src/index.js'
-import { isDeno, isNode } from './env.js'
 import * as jose from 'jose'
 
 const issuer = { issuer: 'https://op.example.com' }
 const client = { client_id: 'client_id' }
-const rsa = {
-  hash: { name: 'SHA-256' },
-  modulusLength: 2048,
-  publicExponent: new Uint8Array([0x01, 0x00, 0x01]),
-}
-const usages: KeyUsage[] = ['sign', 'verify']
-
-const keys: Record<string, CryptoKeyPair> = {
-  RS256: await crypto.subtle.generateKey(
-    {
-      name: 'RSASSA-PKCS1-v1_5',
-      ...rsa,
-    },
-    false,
-    usages,
-  ),
-  PS256: await crypto.subtle.generateKey(
-    {
-      name: 'RSA-PSS',
-      ...rsa,
-    },
-    false,
-    usages,
-  ),
-  ES256: await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, false, usages),
-}
-
-if (isNode || isDeno) {
-  keys.EdDSA = <CryptoKeyPair>await crypto.subtle.generateKey({ name: 'Ed25519' }, false, usages)
-}
+import { keys } from './keys.js'
 
 export default (QUnit: QUnit) => {
   const { module, test } = QUnit
   module('request_object.ts')
 
-  test('issueRequestObject()', async (t) => {
-    const kp = keys.ES256
-    const jwt = await lib.issueRequestObject(
-      issuer,
-      client,
-      new URLSearchParams({ response_type: 'code', resource: 'urn:example:resource' }),
-      { key: kp.privateKey },
-    )
+  for (const [alg, kp] of Object.entries(keys)) {
+    test(`issueRequestObject() - ${alg}`, async (t) => {
+      const { privateKey, publicKey } = await kp
+      const jwt = await lib.issueRequestObject(
+        issuer,
+        client,
+        new URLSearchParams({ response_type: 'code', resource: 'urn:example:resource' }),
+        { key: privateKey },
+      )
 
-    const { payload, protectedHeader } = await jose.jwtVerify(jwt, kp.publicKey)
-    t.propEqual(protectedHeader, { alg: 'ES256', typ: 'oauth-authz-req+jwt' })
-    const { exp, iat, nbf, jti, ...claims } = payload
-    t.equal(typeof exp, 'number')
-    t.equal(typeof nbf, 'number')
-    t.equal(typeof iat, 'number')
-    t.equal(typeof jti, 'string')
-    t.propEqual(claims, {
-      iss: client.client_id,
-      aud: issuer.issuer,
-      response_type: 'code',
-      resource: 'urn:example:resource',
-      client_id: client.client_id,
+      const { payload, protectedHeader } = await jose.jwtVerify(jwt, publicKey)
+      t.propEqual(protectedHeader, { alg, typ: 'oauth-authz-req+jwt' })
+      const { exp, iat, nbf, jti, ...claims } = payload
+      t.equal(typeof exp, 'number')
+      t.equal(typeof nbf, 'number')
+      t.equal(typeof iat, 'number')
+      t.equal(typeof jti, 'string')
+      t.propEqual(claims, {
+        iss: client.client_id,
+        aud: issuer.issuer,
+        response_type: 'code',
+        resource: 'urn:example:resource',
+        client_id: client.client_id,
+      })
     })
-  })
+  }
 
   test('issueRequestObject() - multiple resource parameters', async (t) => {
-    const kp = keys.ES256
+    const kp = await keys.ES256
     const jwt = await lib.issueRequestObject(
       issuer,
       client,
@@ -83,19 +55,8 @@ export default (QUnit: QUnit) => {
     t.propEqual(resource, ['urn:example:resource', 'urn:example:resource-2'])
   })
 
-  for (const alg of Object.keys(keys)) {
-    test(`issueRequestObject() signed using ${alg}`, async (t) => {
-      const kp = keys[alg]
-      const jwt = await lib.issueRequestObject(issuer, client, new URLSearchParams(), {
-        key: kp.privateKey,
-      })
-      const { protectedHeader } = await jose.jwtVerify(jwt, kp.publicKey)
-      t.equal(protectedHeader.alg, alg)
-    })
-  }
-
   test('issueRequestObject() signature kid', async (t) => {
-    const kp = keys.ES256
+    const kp = await keys.ES256
     const jwt = await lib.issueRequestObject(issuer, client, new URLSearchParams(), {
       key: kp.privateKey,
       kid: 'kid-1',

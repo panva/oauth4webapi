@@ -1,11 +1,13 @@
 import anyTest, { type TestFn } from 'ava'
 import setup, {
-  type ContextWithAlgs,
-  teardown,
-  issuer,
-  endpoint,
+  ALGS,
   client,
+  endpoint,
   getResponse,
+  issuer,
+  setupJwks,
+  teardown,
+  type ContextWithAlgs,
   UA,
 } from './_setup.js'
 import * as jose from 'jose'
@@ -16,24 +18,7 @@ const test = anyTest as TestFn<ContextWithAlgs>
 
 test.before(setup)
 test.after(teardown)
-
-const algs: lib.JWSAlgorithm[] = ['RS256', 'ES256', 'PS256', 'EdDSA']
-
-test.before(async (t) => {
-  const keys = []
-  for (const alg of algs) {
-    const key = await lib.generateKeyPair(alg, { extractable: true })
-    t.context[alg] = key
-    keys.push(await crypto.subtle.exportKey('jwk', key.publicKey))
-  }
-
-  t.context
-    .intercept({
-      path: '/jwks',
-      method: 'GET',
-    })
-    .reply(200, { keys })
-})
+test.before(setupJwks)
 
 const tClient: lib.Client = { ...client, client_secret: 'foo' }
 
@@ -678,7 +663,7 @@ test('processAuthorizationCodeOpenIDResponse() with an ID Token typ: "applicatio
   )
 })
 
-for (const alg of algs) {
+for (const alg of ALGS) {
   test(`processAuthorizationCodeOpenIDResponse() with an ${alg} ID Token`, async (t) => {
     const tIssuer: lib.AuthorizationServer = {
       ...issuer,

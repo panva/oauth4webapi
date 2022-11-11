@@ -1,5 +1,13 @@
 import anyTest, { type TestFn } from 'ava'
-import setup, { client, issuer, endpoint, type ContextWithAlgs, teardown } from './_setup.js'
+import setup, {
+  ALGS,
+  client,
+  endpoint,
+  issuer,
+  setupContextKeys,
+  teardown,
+  type ContextWithAlgs,
+} from './_setup.js'
 import * as jose from 'jose'
 import * as lib from '../src/index.js'
 
@@ -7,18 +15,7 @@ const test = anyTest as TestFn<ContextWithAlgs>
 
 test.before(setup)
 test.after(teardown)
-
-const algs: lib.JWSAlgorithm[] = ['RS256', 'ES256', 'PS256', 'EdDSA']
-
-test.before(async (t) => {
-  await Promise.all(
-    algs.map((alg) =>
-      jose.generateKeyPair(alg).then((kp) => {
-        t.context[alg] = <CryptoKeyPair>kp
-      }),
-    ),
-  )
-})
+test.before(setupContextKeys)
 
 test('client_secret_basic', async (t) => {
   t.context
@@ -327,7 +324,7 @@ test('private_key_jwt (CryptoKey)', async (t) => {
   t.pass()
 })
 
-for (const alg of algs) {
+for (const alg of ALGS) {
   test(`private_key_jwt using ${alg}`, async (t) => {
     let assertion!: string
     t.context

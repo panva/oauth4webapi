@@ -3,9 +3,9 @@ import * as undici from 'undici'
 import { Readable } from 'node:stream'
 import * as jose from 'jose'
 
-import type { AuthorizationServer, Client } from '../src/index.js'
+import type { AuthorizationServer, Client, JWSAlgorithm } from '../src/index.js'
 
-const ALGS = ['ES256', 'RS256', 'EdDSA', 'PS256']
+export const ALGS: JWSAlgorithm[] = ['ES256', 'RS256', 'PS256', 'EdDSA']
 interface ContextAlgs {
   [key: string]: CryptoKeyPair
 }
@@ -26,7 +26,7 @@ export default (t: ExecutionContext<Context>) => {
   t.context.intercept ||= undici.MockPool.prototype.intercept.bind(pool)
 }
 
-export async function setupJwks(t: ExecutionContext<ContextWithAlgs>) {
+export async function setupContextKeys(t: ExecutionContext<ContextWithAlgs>) {
   await Promise.all(
     ALGS.map((alg) =>
       jose.generateKeyPair(alg).then((kp) => {
@@ -34,6 +34,10 @@ export async function setupJwks(t: ExecutionContext<ContextWithAlgs>) {
       }),
     ),
   )
+}
+
+export async function setupJwks(t: ExecutionContext<ContextWithAlgs>) {
+  await setupContextKeys(t)
 
   t.context
     .intercept({

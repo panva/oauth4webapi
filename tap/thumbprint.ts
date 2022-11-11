@@ -1,6 +1,7 @@
 import type QUnit from 'qunit'
 import * as lib from '../src/index.js'
 import { isDeno, isNode } from './env.js'
+import { keys } from './keys.js'
 
 const vectors: Record<
   string,
@@ -55,6 +56,13 @@ export default (QUnit: QUnit) => {
         ),
         thumbprint,
       )
+    })
+  }
+
+  for (const [alg, kp] of Object.entries(keys)) {
+    test(alg, async (t) => {
+      await lib.calculateJwkThumbprint((await kp).publicKey)
+      t.ok(1)
     })
   }
 

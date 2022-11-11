@@ -7,11 +7,11 @@ export default async (QUnit: QUnit, done: (details: QUnit.DoneDetails) => void) 
 
   const modules = await Promise.all([
     import('./callback.js'),
-    import('./code_flow.js'),
+    import('./end2end.js'),
     import('./generate.js'),
     import('./modulus_length.js'),
-    import('./request_object.js'),
     import('./random.js'),
+    import('./request_object.js'),
     import('./thumbprint.js'),
   ])
   for (const { default: module } of modules) {
