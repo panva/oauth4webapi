@@ -2860,7 +2860,7 @@ function checkSupportedJwsAlg(alg: unknown) {
   return <JWSAlgorithm>alg
 }
 
-function checkRsaKeyAlgorithm(algorithm: RsaKeyAlgorithm) {
+function checkRsaKeyAlgorithm(algorithm: RsaHashedKeyAlgorithm) {
   if (typeof algorithm.modulusLength !== 'number' || algorithm.modulusLength < 2048) {
     throw new OPE(`${algorithm.name} modulusLength must be at least 2048 bits`)
   }
@@ -2871,13 +2871,13 @@ function subtleAlgorithm(key: CryptoKey): Algorithm | RsaPssParams | EcdsaParams
     case 'ECDSA':
       return <EcdsaParams>{ name: key.algorithm.name, hash: { name: 'SHA-256' } }
     case 'RSA-PSS':
-      checkRsaKeyAlgorithm(<RsaKeyAlgorithm>key.algorithm)
+      checkRsaKeyAlgorithm(<RsaHashedKeyAlgorithm>key.algorithm)
       return <RsaPssParams>{
         name: key.algorithm.name,
         saltLength: 256 >> 3,
       }
     case 'RSASSA-PKCS1-v1_5':
-      checkRsaKeyAlgorithm(<RsaKeyAlgorithm>key.algorithm)
+      checkRsaKeyAlgorithm(<RsaHashedKeyAlgorithm>key.algorithm)
       return { name: key.algorithm.name }
     case 'Ed25519':
       return { name: key.algorithm.name }
