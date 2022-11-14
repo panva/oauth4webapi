@@ -48,7 +48,7 @@
   "scripts": {
     "_format": "find src test tap examples conformance -type f -name '*.ts' -o -name '*.mjs' -name '*.cjs' | xargs prettier",
     "build": "rm -rf build && tsc && tsc --declaration true --emitDeclarationOnly true --removeComments false && tsc -p test && tsc -p examples && tsc -p conformance && tsc -p tap",
-    "conformance": "bash -c 'source .node_flags.sh && ava --config conformance/ava.config.mjs'",
+    "conformance": "bash -c 'source .node_flags.sh && ava --config conformance/ava.config.ts'",
     "docs": "patch-package && typedoc",
     "format": "npm run _format -- --write",
     "format-check": "npm run _format -- --check",
@@ -66,7 +66,7 @@
     "@esbuild-kit/esm-loader": "^2.5.0",
     "@types/node": "^18.11.9",
     "@types/qunit": "^2.19.3",
-    "ava": "^5.0.1",
+    "ava": "^5.1.0",
     "edge-runtime": "^2.0.2",
     "jose": "^4.11.0",
     "patch-package": "^6.5.0",
