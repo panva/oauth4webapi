@@ -51,6 +51,7 @@ export async function setupJwks(t: ExecutionContext<ContextWithAlgs>) {
         ),
       ),
     })
+    .persist()
 }
 
 export async function teardown(t: ExecutionContext<Context>) {
