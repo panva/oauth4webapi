@@ -34,7 +34,8 @@ export const isBrowser =
 
 export const isWorkers =
   typeof navigator !== 'undefined' && navigator.userAgent === 'Cloudflare-Workers'
-    ? `workerd/${packageLock.packages['node_modules/workerd'].version}`
+    ? // @ts-ignore
+      `workerd/${WORKERD_VERSION}`
     : false
 
 async function browser() {

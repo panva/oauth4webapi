@@ -108,7 +108,7 @@ jobs:
         run: npm run tap:deno
 
   workers:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -119,6 +119,7 @@ jobs:
           cache: 'npm'
           check-latest: true
       - run: npm clean-install
+      - run: npm install --global workerd
       - name: Run Test Suite
         run: npm run tap:workers
 
