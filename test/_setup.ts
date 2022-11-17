@@ -1,6 +1,5 @@
 import type { ExecutionContext } from 'ava'
 import * as undici from 'undici'
-import { Readable } from 'node:stream'
 import * as jose from 'jose'
 
 import type { AuthorizationServer, Client, JWSAlgorithm } from '../src/index.js'
@@ -73,17 +72,8 @@ export const client = <Client>{
   client_id: 'urn:example:client_id',
 }
 
-export function getResponse(
-  body: string,
-  { status = 200, headers = new Headers() } = {},
-): Response {
-  let bodyInit: BodyInit
-  if (process.version.startsWith('v16')) {
-    bodyInit = Buffer.from(body)
-  } else {
-    bodyInit = Readable.toWeb(Readable.from(Buffer.from(body)))
-  }
-  return new Response(bodyInit, { status, headers })
+export function getResponse(body: string, { status = 200, headers = new Headers() } = {}) {
+  return new Response(Buffer.from(body), { status, headers })
 }
 
 export const UA = /^oauth4webapi\/v\d+\.\d+\.\d+$/
