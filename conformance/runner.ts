@@ -38,7 +38,6 @@ switch (plan.name) {
     prefix = 'fapi2-baseline-id2-client-test-'
     break
   case 'fapi2-advanced-id1-client-test-plan':
-    // TODO: https://gitlab.com/openid/conformance-suite/-/merge_requests/1173#note_1014001397
     prefix = 'fapi2-baseline-id2-client-test-'
     break
   case 'oidcc-client-test-plan':

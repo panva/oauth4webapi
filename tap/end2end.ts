@@ -2,6 +2,7 @@ import type QUnit from 'qunit'
 import { oidcc, fapi2 } from './helper.js'
 import * as lib from '../src/index.js'
 import { keys } from './keys.js'
+import * as env from './env.js'
 
 export default (QUnit: QUnit) => {
   const { module, test } = QUnit
@@ -129,22 +130,23 @@ export default (QUnit: QUnit) => {
           await lib.processUserInfoResponse(as, client, sub, response)
         }
 
+        const { accounts_endpoint } = await exposed()
         // TODO: https://gitlab.com/openid/conformance-suite/-/issues/1060
-        // {
-        //   const response = await lib.protectedResourceRequest(
-        //     access_token,
-        //     'GET',
-        //     new URL((await exposed()).accounts_endpoint),
-        //     new Headers(),
-        //     null,
-        //     { DPoP },
-        //   )
+        if (accounts_endpoint && !(env.isBun || env.isDeno || env.isWorkers)) {
+          const response = await lib.protectedResourceRequest(
+            access_token,
+            'GET',
+            new URL(accounts_endpoint),
+            new Headers(),
+            null,
+            { DPoP },
+          )
 
-        //   if (lib.parseWwwAuthenticateChallenges(response)) {
-        //     t.ok(0)
-        //     throw new Error()
-        //   }
-        // }
+          if (lib.parseWwwAuthenticateChallenges(response)) {
+            t.ok(0)
+            throw new Error()
+          }
+        }
       }
 
       t.ok(1)
