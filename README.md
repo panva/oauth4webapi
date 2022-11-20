@@ -39,7 +39,7 @@ import * as oauth2 from 'oauth4webapi'
 **`example`** Deno import
 
 ```js
-import * as oauth2 from 'https://deno.land/x/oauth4webapi/src/index.ts'
+import * as oauth2 from 'https://deno.land/x/oauth4webapi/mod.ts'
 ```
 
 - Authorization Code Flow - OpenID Connect [source](examples/code.ts), or plain OAuth 2 [source](examples/oauth.ts)

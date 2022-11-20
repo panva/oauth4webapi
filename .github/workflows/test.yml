@@ -103,7 +103,7 @@ jobs:
         with:
           deno-version: v1.x
       - name: Test Deno Definitions
-        run: deno check src/index.ts
+        run: deno check mod.ts
       - name: Run Test Suite
         run: npm run tap:deno
 
