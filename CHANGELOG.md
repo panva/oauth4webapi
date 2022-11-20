@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0](https://github.com/panva/oauth4webapi/compare/v1.4.1...v2.0.0) (2022-11-20)
+
+
+### ⚠ BREAKING CHANGES
+
+* Use the TLS server validation in `processAuthorizationCodeOpenIDResponse` to validate the issuer instead of checking the ID Token's signature. The function's `options` argument was removed.
+* Use the TLS server validation in `processDeviceCodeResponse` to validate the issuer instead of checking the optional ID Token's signature. The function's `options` argument was removed.
+* Use the TLS server validation in `processIntrospectionResponse` to validate the issuer instead of checking the optional JWT Introspection Response signature. The function's `options` argument was removed.
+* Use the TLS server validation in `processRefreshTokenResponse` to validate the issuer instead of checking the optional ID Token's signature. The function's `options` argument was removed.
+* Use the TLS server validation in `processUserInfoResponse` to validate the issuer instead of checking the optional JWT UserInfo Response signature. The function's `options` argument was removed.
+* PAR w/ DPoP no longer automatically adds `dpop_jkt` to the authorization request.
+* Removed `calculateJwkThumbprint` function export.
+* Removed `jwksRequest` function export.
+* Removed `processJwksResponse` function export.
+
+### Refactor
+
+* remove ignored and unused exports ([4a545df](https://github.com/panva/oauth4webapi/commit/4a545df452840c183b377809cd5ac9f5b87c2aed))
+* use TLS server validation instead of jwt signature validations ([f728110](https://github.com/panva/oauth4webapi/commit/f72811023f8816e3e1a5915a99a0fa7de9163069))
+
 ## [1.4.1](https://github.com/panva/oauth4webapi/compare/v1.4.0...v1.4.1) (2022-11-20)
 
 
