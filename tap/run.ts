@@ -12,7 +12,6 @@ export default async (QUnit: QUnit, done: (details: QUnit.DoneDetails) => void) 
     import('./modulus_length.js'),
     import('./random.js'),
     import('./request_object.js'),
-    import('./thumbprint.js'),
   ])
   for (const { default: module } of modules) {
     await module(QUnit)

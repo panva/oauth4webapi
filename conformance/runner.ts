@@ -202,10 +202,6 @@ export const green = test.macro({
     let DPoP!: CryptoKeyPair
     if (usesDpop(variant)) {
       DPoP = await oauth.generateKeyPair(<oauth.JWSAlgorithm>JWS_ALGORITHM)
-      authorizationUrl.searchParams.set(
-        'dpop_jkt',
-        await oauth.calculateJwkThumbprint(DPoP.publicKey),
-      )
     }
 
     if (usesPar(plan)) {

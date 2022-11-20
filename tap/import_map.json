@@ -11,7 +11,6 @@
     "./modulus_length.js": "./modulus_length.ts",
     "./random.js": "./random.ts",
     "./request_object.js": "./request_object.ts",
-    "./run.js": "./run.ts",
-    "./thumbprint.js": "./thumbprint.ts"
+    "./run.js": "./run.ts"
   }
 }

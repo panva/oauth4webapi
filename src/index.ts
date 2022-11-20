@@ -6,14 +6,10 @@ if (typeof navigator === 'undefined' || !navigator.userAgent?.startsWith?.('Mozi
   USER_AGENT = `${NAME}/${VERSION}`
 }
 
-/** @ignore */
-export type JsonObject = { [Key in string]?: JsonValue }
-/** @ignore */
-export type JsonArray = JsonValue[]
-/** @ignore */
-export type JsonPrimitive = string | number | boolean | null
-/** @ignore */
-export type JsonValue = JsonPrimitive | JsonObject | JsonArray
+type JsonObject = { [Key in string]?: JsonValue }
+type JsonArray = JsonValue[]
+type JsonPrimitive = string | number | boolean | null
+type JsonValue = JsonPrimitive | JsonObject | JsonArray
 
 /**
  * Interface to pass an asymmetric private key and, optionally, its associated JWK Key ID to be
@@ -104,39 +100,16 @@ export type ClientAuthenticationMethod =
  */
 export type JWSAlgorithm = 'PS256' | 'ES256' | 'RS256' | 'EdDSA'
 
-/**
- * JSON Web Key
- *
- * @ignore
- */
-export interface JWK {
-  /** Key Type */
+interface JWK {
   readonly kty?: string
-  /** Key ID */
   readonly kid?: string
-  /** Algorithm */
   readonly alg?: string
-  /** Public Key Use */
   readonly use?: string
-  /** Key Operations */
   readonly key_ops?: string[]
-  /** (RSA) Exponent */
   readonly e?: string
-  /** (RSA) Modulus */
   readonly n?: string
-  /**
-   * (EC) Curve
-   *
-   * (OKP) The subtype of key pair
-   */
   readonly crv?: string
-  /**
-   * (EC) X Coordinate
-   *
-   * (OKP) The public key
-   */
   readonly x?: string
-  /** (EC) Y Coordinate */
   readonly y?: string
 
   readonly [parameter: string]: JsonValue | undefined
@@ -1288,9 +1261,6 @@ export async function pushedAuthorizationRequest(
 
   if (options?.DPoP !== undefined) {
     await dpopProofJwt(headers, options.DPoP, url, 'POST')
-    if (!body.has('dpop_jkt')) {
-      body.set('dpop_jkt', await calculateJwkThumbprint(options.DPoP.publicKey))
-    }
   }
 
   return authenticatedRequest(as, client, 'POST', url, body, headers, options)
@@ -2738,23 +2708,9 @@ export async function processIntrospectionResponse(
   return <IntrospectionResponse>json
 }
 
-/** @ignore */
-export interface JwksRequestOptions extends HttpRequestOptions {}
-
-/**
- * Performs a request to the {@link AuthorizationServer.jwks_uri `as.jwks_uri`}.
- *
- * @ignore
- *
- * @param as Authorization Server Metadata.
- *
- * @see [JWK Set Format](https://www.rfc-editor.org/rfc/rfc7517.html#section-5)
- * @see [RFC 8414 - OAuth 2.0 Authorization Server Metadata](https://www.rfc-editor.org/rfc/rfc8414.html#section-3)
- * @see [OpenID Connect Discovery 1.0](https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfig)
- */
-export async function jwksRequest(
+async function jwksRequest(
   as: AuthorizationServer,
-  options?: JwksRequestOptions,
+  options?: HttpRequestOptions,
 ): Promise<Response> {
   assertAs(as)
 
@@ -2776,29 +2732,11 @@ export async function jwksRequest(
   }).then(processDpopNonce)
 }
 
-/**
- * JSON Web Key Set
- *
- * @ignore
- */
-export interface JsonWebKeySet {
-  /** Array of JWK Values */
+interface JsonWebKeySet {
   readonly keys: JWK[]
 }
 
-/**
- * Validates Response instance to be one coming from the
- * {@link AuthorizationServer.jwks_uri `as.jwks_uri`}.
- *
- * @ignore
- *
- * @param response Resolved value from {@link jwksRequest}.
- *
- * @returns Resolves with an object representing the parsed successful response.
- *
- * @see [JWK Set Format](https://www.rfc-editor.org/rfc/rfc7517.html#section-5)
- */
-export async function processJwksResponse(response: Response): Promise<JsonWebKeySet> {
+async function processJwksResponse(response: Response): Promise<JsonWebKeySet> {
   if (!(response instanceof Response)) {
     throw new TypeError('"response" must be an instance of Response')
   }
@@ -3476,40 +3414,4 @@ export async function generateKeyPair(alg: JWSAlgorithm, options?: GenerateKeyPa
   return <Promise<CryptoKeyPair>>(
     crypto.subtle.generateKey(algorithm, options?.extractable ?? false, ['sign', 'verify'])
   )
-}
-
-/**
- * Calculates a base64url-encoded SHA-256 JWK Thumbprint.
- *
- * @ignore
- *
- * @param key A public extractable CryptoKey.
- *
- * @see [RFC 7638 - JSON Web Key (JWK) Thumbprint](https://www.rfc-editor.org/rfc/rfc7638.html)
- */
-export async function calculateJwkThumbprint(key: CryptoKey) {
-  if (!isPublicKey(key) || !key.extractable) {
-    throw new TypeError('"key" must be an extractable public CryptoKey')
-  }
-
-  // checks that the key is a supported one
-  determineJWSAlgorithm(key)
-
-  const jwk = await crypto.subtle.exportKey('jwk', key)
-  let components: JsonValue
-  switch (jwk.kty) {
-    case 'EC':
-      components = { crv: jwk.crv, kty: jwk.kty, x: jwk.x, y: jwk.y }
-      break
-    case 'OKP':
-      components = { crv: jwk.crv, kty: jwk.kty, x: jwk.x }
-      break
-    case 'RSA':
-      components = { e: jwk.e, kty: jwk.kty, n: jwk.n }
-      break
-    default:
-      throw new UnsupportedOperationError()
-  }
-
-  return b64u(await crypto.subtle.digest({ name: 'SHA-256' }, buf(JSON.stringify(components))))
 }
