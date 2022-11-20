@@ -62,7 +62,7 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - build-conformance-suite
-    continue-on-error: ${{ startsWith(matrix.plan, 'fapi2') }}
+    continue-on-error: ${{ startsWith(matrix.setup.plan, 'fapi2') }}
     strategy:
       fail-fast: false
       matrix:
