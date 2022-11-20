@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.4.1](https://github.com/panva/oauth4webapi/compare/v1.4.0...v1.4.1) (2022-11-20)
+
+
+### Refactor
+
+* **deno:** add mod.ts to deno.land/x ([0778278](https://github.com/panva/oauth4webapi/commit/07782786053da9a2f58fbac933832a14fdf7c613))
+* use RsaHashedKeyAlgorithm in checkRsaKeyAlgorithm ([94aa31c](https://github.com/panva/oauth4webapi/commit/94aa31c7ef7729ecddb52e6e47a6edc3db3c961d))
+
 ## [1.4.0](https://github.com/panva/oauth4webapi/compare/v1.3.0...v1.4.0) (2022-11-08)
 
 
