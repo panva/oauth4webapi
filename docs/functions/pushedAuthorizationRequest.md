@@ -9,7 +9,7 @@ Performs a Pushed Authorization Request at the
 
 **`see`** [RFC 9126 - OAuth 2.0 Pushed Authorization Requests](https://www.rfc-editor.org/rfc/rfc9126.html#name-pushed-authorization-reques)
 
-**`see`** [draft-ietf-oauth-dpop-10 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)](https://www.ietf.org/archive/id/draft-ietf-oauth-dpop-10.html#name-dpop-with-pushed-authorizat)
+**`see`** [draft-ietf-oauth-dpop-11 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)](https://www.ietf.org/archive/id/draft-ietf-oauth-dpop-11.html#name-dpop-with-pushed-authorizat)
 
 #### Parameters
 

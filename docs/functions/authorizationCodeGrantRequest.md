@@ -13,7 +13,7 @@ Performs an Authorization Code grant request at the
 
 **`see`** [RFC 7636 - Proof Key for Code Exchange by OAuth Public Clients (PKCE)](https://www.rfc-editor.org/rfc/rfc7636.html#section-4)
 
-**`see`** [draft-ietf-oauth-dpop-10 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)](https://www.ietf.org/archive/id/draft-ietf-oauth-dpop-10.html#name-dpop-access-token-request)
+**`see`** [draft-ietf-oauth-dpop-11 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)](https://www.ietf.org/archive/id/draft-ietf-oauth-dpop-11.html#name-dpop-access-token-request)
 
 #### Parameters
 
