@@ -456,42 +456,7 @@ test('processDeviceCodeResponse() without ID Tokens', async (t) => {
   )
 })
 
-test('processDeviceCodeResponse() - invalid signature', async (t) => {
-  const tIssuer: lib.AuthorizationServer = { ...issuer, jwks_uri: endpoint('jwks') }
-  await t.throwsAsync(
-    lib
-      .processDeviceCodeResponse(
-        { ...tIssuer, id_token_signing_alg_values_supported: ['ES256'] },
-        client,
-        getResponse(
-          JSON.stringify({
-            access_token: 'token',
-            token_type: 'Bearer',
-            id_token: tools.mangleJwtSignature(
-              await new jose.SignJWT({})
-                .setProtectedHeader({ alg: 'ES256' })
-                .setIssuer(issuer.issuer)
-                .setSubject('urn:example:subject')
-                .setAudience(client.client_id)
-                .setExpirationTime('5m')
-                .setIssuedAt()
-                .sign(t.context.ES256.privateKey),
-            ),
-          }),
-        ),
-      )
-      .then(async (result) => {
-        if (lib.isOAuth2Error(result)) {
-          t.fail()
-        } else {
-          t.throws(() => lib.getValidatedIdTokenClaims(result))
-        }
-      }),
-    { message: 'JWT signature verification failed' },
-  )
-})
-
-test('processDeviceCodeResponse() - ignore signatures', async (t) => {
+test('processDeviceCodeResponse() - ignores signatures', async (t) => {
   await t.notThrowsAsync(
     lib
       .processDeviceCodeResponse(
@@ -513,7 +478,6 @@ test('processDeviceCodeResponse() - ignore signatures', async (t) => {
             ),
           }),
         ),
-        { skipJwtSignatureCheck: true },
       )
       .then(async (result) => {
         if (lib.isOAuth2Error(result)) {

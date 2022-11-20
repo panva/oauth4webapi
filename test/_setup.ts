@@ -54,7 +54,10 @@ export async function setupJwks(t: ExecutionContext<ContextWithAlgs>) {
 }
 
 export async function teardown(t: ExecutionContext<Context>) {
-  t.context.mock.assertNoPendingInterceptors()
+  const pending = t.context.mock.pendingInterceptors()
+  if (!(pending.length === 1 && pending[0].persist === true)) {
+    t.context.mock.assertNoPendingInterceptors()
+  }
   await t.context.mock.close()
 }
 

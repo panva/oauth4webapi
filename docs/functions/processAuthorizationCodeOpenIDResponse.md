@@ -2,7 +2,7 @@
 
 [💗 Help the project](https://github.com/sponsors/panva)
 
-▸ **processAuthorizationCodeOpenIDResponse**(`as`, `client`, `response`, `expectedNonce?`, `maxAge?`, `options?`): `Promise`<[`OpenIDTokenEndpointResponse`](../interfaces/OpenIDTokenEndpointResponse.md) \| [`OAuth2Error`](../interfaces/OAuth2Error.md)\>
+▸ **processAuthorizationCodeOpenIDResponse**(`as`, `client`, `response`, `expectedNonce?`, `maxAge?`): `Promise`<[`OpenIDTokenEndpointResponse`](../interfaces/OpenIDTokenEndpointResponse.md) \| [`OAuth2Error`](../interfaces/OAuth2Error.md)\>
 
 (OpenID Connect only) Validates Authorization Code Grant Response instance to be one coming from
 the [`as.token_endpoint`](../interfaces/AuthorizationServer.md#token_endpoint).
@@ -20,7 +20,6 @@ the [`as.token_endpoint`](../interfaces/AuthorizationServer.md#token_endpoint).
 | `response` | [`Response`]( https://developer.mozilla.org/en-US/docs/Web/API/Response ) | Resolved value from [authorizationCodeGrantRequest](authorizationCodeGrantRequest.md). |
 | `expectedNonce?` | `string` \| typeof [`expectNoNonce`](../variables/expectNoNonce.md) | Expected ID Token `nonce` claim value. Default is [expectNoNonce](../variables/expectNoNonce.md). |
 | `maxAge?` | `number` \| typeof [`skipAuthTimeCheck`](../variables/skipAuthTimeCheck.md) | ID Token [`auth_time`](../interfaces/IDToken.md#auth_time) claim value will be checked to be   present and conform to the `maxAge` value. Use of this option is required if you sent a   `max_age` parameter in an authorization request. Default is   [`client.default_max_age`](../interfaces/Client.md#default_max_age) and falls back to   [skipAuthTimeCheck](../variables/skipAuthTimeCheck.md). |
-| `options?` | [`ProcessAuthorizationCodeOpenIDResponseOptions`](../interfaces/ProcessAuthorizationCodeOpenIDResponseOptions.md) | - |
 
 #### Returns
 

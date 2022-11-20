@@ -248,38 +248,7 @@ test('processIntrospectionResponse()', async (t) => {
   )
 })
 
-test('processIntrospectionResponse() - invalid signature', async (t) => {
-  const tIssuer: lib.AuthorizationServer = {
-    ...issuer,
-    jwks_uri: endpoint('jwks'),
-    introspection_signing_alg_values_supported: ['ES256'],
-  }
-
-  await t.throwsAsync(
-    lib.processIntrospectionResponse(
-      tIssuer,
-      client,
-      getResponse(
-        tools.mangleJwtSignature(
-          await new jose.SignJWT({ token_introspection: { active: false } })
-            .setProtectedHeader({ alg: 'ES256', typ: 'token-introspection+jwt' })
-            .setIssuer(issuer.issuer)
-            .setAudience(client.client_id)
-            .setIssuedAt()
-            .sign(t.context.ES256.privateKey),
-        ),
-        {
-          headers: new Headers({
-            'content-type': 'application/token-introspection+jwt',
-          }),
-        },
-      ),
-    ),
-    { message: 'JWT signature verification failed' },
-  )
-})
-
-test('processIntrospectionResponse() - ignore signatures', async (t) => {
+test('processIntrospectionResponse() - ignores signatures', async (t) => {
   await t.notThrowsAsync(
     lib.processIntrospectionResponse(
       { ...issuer, introspection_signing_alg_values_supported: ['ES256'] },
@@ -299,7 +268,6 @@ test('processIntrospectionResponse() - ignore signatures', async (t) => {
           }),
         },
       ),
-      { skipJwtSignatureCheck: true },
     ),
   )
 })

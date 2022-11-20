@@ -415,11 +415,11 @@ export interface Client {
   token_endpoint_auth_method?: ClientAuthenticationMethod
   /**
    * JWS `alg` algorithm required for signing the ID Token issued to this Client. When not
-   * configured the default is to allow only {@link JWSAlgorithm supported algorithms} listed in
+   * configured the default is to allow only algorithms listed in
    * {@link AuthorizationServer.id_token_signing_alg_values_supported `as.id_token_signing_alg_values_supported`}
    * and fall back to `RS256` when the authorization server metadata is not set.
    */
-  id_token_signed_response_alg?: JWSAlgorithm
+  id_token_signed_response_alg?: string
   /**
    * JWS `alg` algorithm required for signing authorization responses. When not configured the
    * default is to allow only {@link JWSAlgorithm supported algorithms} listed in
@@ -434,18 +434,18 @@ export interface Client {
   require_auth_time?: boolean
   /**
    * JWS `alg` algorithm REQUIRED for signing UserInfo Responses. When not configured the default is
-   * to allow only {@link JWSAlgorithm supported algorithms} listed in
+   * to allow only algorithms listed in
    * {@link AuthorizationServer.userinfo_signing_alg_values_supported `as.userinfo_signing_alg_values_supported`}
    * and fall back to `RS256` when the authorization server metadata is not set.
    */
-  userinfo_signed_response_alg?: JWSAlgorithm
+  userinfo_signed_response_alg?: string
   /**
    * JWS `alg` algorithm REQUIRED for signed introspection responses. When not configured the
-   * default is to allow only {@link JWSAlgorithm supported algorithms} listed in
+   * default is to allow only algorithms listed in
    * {@link AuthorizationServer.introspection_signing_alg_values_supported `as.introspection_signing_alg_values_supported`}
    * and fall back to `RS256` when the authorization server metadata is not set.
    */
-  introspection_signed_response_alg?: JWSAlgorithm
+  introspection_signed_response_alg?: string
   /** Default Maximum Authentication Age. */
   default_max_age?: number
 
@@ -1567,11 +1567,15 @@ export interface UserInfoResponse {
   readonly [claim: string]: JsonValue | undefined
 }
 
-const jwksCache = new LRU<string, { jwks: JsonWebKeySet; iat: number; age: number }>(20)
-const cryptoKeyCaches: Record<string, WeakMap<JWK, CryptoKey>> = {}
+const jwksCache = Symbol()
+interface JWKSCache {
+  jwks: JsonWebKeySet
+  iat: number
+  age: number
+}
 
 async function getPublicSigKeyFromIssuerJwksUri(
-  as: AuthorizationServer,
+  as: AuthorizationServer & { [jwksCache]?: JWKSCache },
   options: HttpRequestOptions | undefined,
   header: CompactJWSHeaderParameters,
 ): Promise<CryptoKey> {
@@ -1580,23 +1584,23 @@ async function getPublicSigKeyFromIssuerJwksUri(
 
   let jwks: JsonWebKeySet
   let age: number
-  if (jwksCache.has(as.jwks_uri!)) {
-    ;({ jwks, age } = jwksCache.get(as.jwks_uri!)!)
+  if (as[jwksCache]) {
+    ;({ jwks, age } = as[jwksCache])
     if (age >= 300) {
       // force a re-fetch every 5 minutes
-      jwksCache.delete(as.jwks_uri!)
+      as[jwksCache] = undefined
       return getPublicSigKeyFromIssuerJwksUri(as, options, header)
     }
   } else {
     jwks = await jwksRequest(as, options).then(processJwksResponse)
     age = 0
-    jwksCache.set(as.jwks_uri!, {
+    as[jwksCache] = {
       jwks,
       iat: epochTime(),
       get age() {
         return epochTime() - this.iat
       },
-    })
+    }
   }
 
   let kty: string
@@ -1656,7 +1660,7 @@ async function getPublicSigKeyFromIssuerJwksUri(
   if (!length) {
     if (age >= 60) {
       // allow re-fetch if cache is at least 1 minute old
-      jwksCache.delete(as.jwks_uri!)
+      as[jwksCache] = undefined
       return getPublicSigKeyFromIssuerJwksUri(as, options, header)
     }
     throw new OPE('error when selecting a JWT verification key, no applicable keys found')
@@ -1666,15 +1670,9 @@ async function getPublicSigKeyFromIssuerJwksUri(
     )
   }
 
-  cryptoKeyCaches[alg] ||= new WeakMap()
-
-  let key = cryptoKeyCaches[alg].get(jwk)
-  if (!key) {
-    key = await importJwk({ ...jwk, alg })
-    if (key.type !== 'public') {
-      throw new OPE('jwks_uri must only contain public keys')
-    }
-    cryptoKeyCaches[alg].set(jwk, key)
+  const key = await importJwk(alg, jwk)
+  if (key.type !== 'public') {
+    throw new OPE('jwks_uri must only contain public keys')
   }
 
   return key
@@ -1693,34 +1691,6 @@ export const skipSubjectCheck = Symbol()
 function getContentType(response: Response) {
   return response.headers.get('content-type')?.split(';')[0]
 }
-
-export interface SkipJWTSignatureCheckOptions {
-  /**
-   * DANGER ZONE
-   *
-   * When JWT assertions are received via direct communication between the Client and the
-   * Token/UserInfo/Introspection endpoint (which they are in this library's supported profiles and
-   * exposed functions) the TLS server validation MAY be used to validate the issuer in place of
-   * checking the assertion's signature.
-   *
-   * Set this to `true` to omit verifying the JWT assertion's signature (e.g. ID Token, JWT Signed
-   * Introspection, or JWT Signed UserInfo Response).
-   *
-   * Setting this to `true` also means that:
-   *
-   * - The Authorization Server's JSON Web Key Set will not be requested. That is useful for
-   *   javascript runtimes that execute on the edge and cannot reliably share an in-memory cache of
-   *   the JSON Web Key Set in between invocations.
-   * - Any JWS Algorithm may be used, not just the {@link JWSAlgorithm supported ones}.
-   *
-   * Default is `false`.
-   */
-  skipJwtSignatureCheck?: boolean
-}
-
-export interface ProcessUserInfoResponseOptions
-  extends HttpRequestOptions,
-    SkipJWTSignatureCheckOptions {}
 
 /**
  * Validates Response instance to be one coming from the
@@ -1743,7 +1713,6 @@ export async function processUserInfoResponse(
   client: Client,
   expectedSubject: string | typeof skipSubjectCheck,
   response: Response,
-  options?: ProcessUserInfoResponseOptions,
 ): Promise<UserInfoResponse> {
   assertAs(as)
   assertClient(client)
@@ -1765,9 +1734,7 @@ export async function processUserInfoResponse(
         client.userinfo_signed_response_alg,
         as.userinfo_signing_alg_values_supported,
       ),
-      options?.skipJwtSignatureCheck !== true
-        ? getPublicSigKeyFromIssuerJwksUri.bind(undefined, as, options)
-        : noSignatureCheck,
+      noSignatureCheck,
     )
       .then(validateOptionalAudience.bind(undefined, client.client_id))
       .then(validateOptionalIssuer.bind(undefined, as.issuer))
@@ -1928,10 +1895,8 @@ async function processGenericAccessTokenResponse(
   as: AuthorizationServer,
   client: Client,
   response: Response,
-  options?: HttpRequestOptions,
   ignoreIdToken = false,
   ignoreRefreshToken = false,
-  skipSignatureCheck = false,
 ): Promise<TokenEndpointResponse | OAuth2Error> {
   assertAs(as)
   assertClient(client)
@@ -2006,9 +1971,7 @@ async function processGenericAccessTokenResponse(
           client.id_token_signed_response_alg,
           as.id_token_signing_alg_values_supported,
         ),
-        skipSignatureCheck !== true
-          ? getPublicSigKeyFromIssuerJwksUri.bind(undefined, as, options)
-          : noSignatureCheck,
+        noSignatureCheck,
       )
         .then(validatePresence.bind(undefined, ['aud', 'exp', 'iat', 'iss', 'sub']))
         .then(validateIssuer.bind(undefined, as.issuer))
@@ -2029,10 +1992,6 @@ async function processGenericAccessTokenResponse(
   return json
 }
 
-export interface ProcessRefreshTokenResponseOptions
-  extends HttpRequestOptions,
-    SkipJWTSignatureCheckOptions {}
-
 /**
  * Validates Refresh Token Grant Response instance to be one coming from the
  * {@link AuthorizationServer.token_endpoint `as.token_endpoint`}.
@@ -2051,17 +2010,8 @@ export async function processRefreshTokenResponse(
   as: AuthorizationServer,
   client: Client,
   response: Response,
-  options?: ProcessRefreshTokenResponseOptions,
 ): Promise<TokenEndpointResponse | OAuth2Error> {
-  return processGenericAccessTokenResponse(
-    as,
-    client,
-    response,
-    options,
-    undefined,
-    undefined,
-    options?.skipJwtSignatureCheck === true,
-  )
+  return processGenericAccessTokenResponse(as, client, response)
 }
 
 function validateOptionalAudience(expected: string, result: ParsedJWT) {
@@ -2264,10 +2214,6 @@ export const expectNoNonce = Symbol()
  */
 export const skipAuthTimeCheck = Symbol()
 
-export interface ProcessAuthorizationCodeOpenIDResponseOptions
-  extends HttpRequestOptions,
-    SkipJWTSignatureCheckOptions {}
-
 /**
  * (OpenID Connect only) Validates Authorization Code Grant Response instance to be one coming from
  * the {@link AuthorizationServer.token_endpoint `as.token_endpoint`}.
@@ -2294,17 +2240,8 @@ export async function processAuthorizationCodeOpenIDResponse(
   response: Response,
   expectedNonce?: string | typeof expectNoNonce,
   maxAge?: number | typeof skipAuthTimeCheck,
-  options?: ProcessAuthorizationCodeOpenIDResponseOptions,
 ): Promise<OpenIDTokenEndpointResponse | OAuth2Error> {
-  const result = await processGenericAccessTokenResponse(
-    as,
-    client,
-    response,
-    options,
-    undefined,
-    undefined,
-    options?.skipJwtSignatureCheck === true,
-  )
+  const result = await processGenericAccessTokenResponse(as, client, response)
 
   if (isOAuth2Error(result)) {
     return result
@@ -2375,7 +2312,7 @@ export async function processAuthorizationCodeOAuth2Response(
   client: Client,
   response: Response,
 ): Promise<OAuth2TokenEndpointResponse | OAuth2Error> {
-  const result = await processGenericAccessTokenResponse(as, client, response, undefined, true)
+  const result = await processGenericAccessTokenResponse(as, client, response, true)
 
   if (isOAuth2Error(result)) {
     return result
@@ -2453,14 +2390,7 @@ export async function processClientCredentialsResponse(
   client: Client,
   response: Response,
 ): Promise<ClientCredentialsGrantResponse | OAuth2Error> {
-  const result = await processGenericAccessTokenResponse(
-    as,
-    client,
-    response,
-    undefined,
-    true,
-    true,
-  )
+  const result = await processGenericAccessTokenResponse(as, client, response, true, true)
 
   if (isOAuth2Error(result)) {
     return result
@@ -2629,10 +2559,6 @@ export interface IntrospectionResponse {
   readonly [claim: string]: JsonValue | undefined
 }
 
-export interface ProcessIntrospectionResponseOptions
-  extends HttpRequestOptions,
-    SkipJWTSignatureCheckOptions {}
-
 /**
  * Validates Response instance to be one coming from the
  * {@link AuthorizationServer.introspection_endpoint `as.introspection_endpoint`}.
@@ -2651,7 +2577,6 @@ export async function processIntrospectionResponse(
   as: AuthorizationServer,
   client: Client,
   response: Response,
-  options?: ProcessIntrospectionResponseOptions,
 ): Promise<IntrospectionResponse | OAuth2Error> {
   assertAs(as)
   assertClient(client)
@@ -2677,9 +2602,7 @@ export async function processIntrospectionResponse(
         client.introspection_signed_response_alg,
         as.introspection_signing_alg_values_supported,
       ),
-      options?.skipJwtSignatureCheck !== true
-        ? getPublicSigKeyFromIssuerJwksUri.bind(undefined, as, options)
-        : noSignatureCheck,
+      noSignatureCheck,
     )
       .then(checkJwtType.bind(undefined, 'token-introspection+jwt'))
       .then(validatePresence.bind(undefined, ['aud', 'iat', 'iss']))
@@ -3143,8 +3066,8 @@ type ReturnTypes =
   | URLSearchParams
   | UserInfoResponse
 
-async function importJwk(jwk: JWK) {
-  const { alg, ext, key_ops, use, ...key } = jwk
+async function importJwk(alg: JWSAlgorithm, jwk: JWK) {
+  const { ext, key_ops, use, ...key } = jwk
 
   let algorithm: RsaHashedImportParams | EcKeyImportParams | Algorithm
 
@@ -3330,10 +3253,6 @@ export async function deviceCodeGrantRequest(
   )
 }
 
-export interface ProcessDeviceCodeResponseOptions
-  extends HttpRequestOptions,
-    SkipJWTSignatureCheckOptions {}
-
 /**
  * Validates Device Authorization Grant Response instance to be one coming from the
  * {@link AuthorizationServer.token_endpoint `as.token_endpoint`}.
@@ -3351,17 +3270,8 @@ export async function processDeviceCodeResponse(
   as: AuthorizationServer,
   client: Client,
   response: Response,
-  options?: ProcessDeviceCodeResponseOptions,
 ): Promise<TokenEndpointResponse | OAuth2Error> {
-  return processGenericAccessTokenResponse(
-    as,
-    client,
-    response,
-    options,
-    undefined,
-    undefined,
-    options?.skipJwtSignatureCheck === true,
-  )
+  return processGenericAccessTokenResponse(as, client, response)
 }
 
 export interface GenerateKeyPairOptions {

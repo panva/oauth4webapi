@@ -166,32 +166,7 @@ test('processUserInfoResponse() - json', async (t) => {
   )
 })
 
-test('processUserInfoResponse() - invalid signature', async (t) => {
-  const tIssuer: lib.AuthorizationServer = {
-    ...issuer,
-    jwks_uri: endpoint('jwks'),
-    userinfo_signing_alg_values_supported: ['ES256'],
-  }
-  const kp = t.context.ES256
-
-  await t.throwsAsync(
-    async () => {
-      const response = getResponse(
-        tools.mangleJwtSignature(
-          await new jose.SignJWT({ sub: 'urn:example:subject' })
-            .setProtectedHeader({ alg: 'ES256' })
-            .sign(kp.privateKey),
-        ),
-        { headers: new Headers({ 'content-type': 'application/jwt' }) },
-      )
-      await lib.processUserInfoResponse(tIssuer, client, 'urn:example:subject', response)
-      t.false(response.bodyUsed)
-    },
-    { message: 'JWT signature verification failed' },
-  )
-})
-
-test('processUserInfoResponse() - ignore signatures', async (t) => {
+test('processUserInfoResponse() - ignores signatures', async (t) => {
   const kp = t.context.ES256
 
   await t.notThrowsAsync(async () => {
@@ -208,7 +183,6 @@ test('processUserInfoResponse() - ignore signatures', async (t) => {
       client,
       'urn:example:subject',
       response,
-      { skipJwtSignatureCheck: true },
     )
     t.false(response.bodyUsed)
   })

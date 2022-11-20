@@ -59,10 +59,10 @@ ___
 
 ### id\_token\_signed\_response\_alg
 
-• `Optional` **id\_token\_signed\_response\_alg**: [`JWSAlgorithm`](../types/JWSAlgorithm.md)
+• `Optional` **id\_token\_signed\_response\_alg**: `string`
 
 JWS `alg` algorithm required for signing the ID Token issued to this Client. When not
-configured the default is to allow only [supported algorithms](../types/JWSAlgorithm.md) listed in
+configured the default is to allow only algorithms listed in
 [`as.id_token_signing_alg_values_supported`](AuthorizationServer.md#id_token_signing_alg_values_supported)
 and fall back to `RS256` when the authorization server metadata is not set.
 
@@ -70,10 +70,10 @@ ___
 
 ### introspection\_signed\_response\_alg
 
-• `Optional` **introspection\_signed\_response\_alg**: [`JWSAlgorithm`](../types/JWSAlgorithm.md)
+• `Optional` **introspection\_signed\_response\_alg**: `string`
 
 JWS `alg` algorithm REQUIRED for signed introspection responses. When not configured the
-default is to allow only [supported algorithms](../types/JWSAlgorithm.md) listed in
+default is to allow only algorithms listed in
 [`as.introspection_signing_alg_values_supported`](AuthorizationServer.md#introspection_signing_alg_values_supported)
 and fall back to `RS256` when the authorization server metadata is not set.
 
@@ -99,9 +99,9 @@ ___
 
 ### userinfo\_signed\_response\_alg
 
-• `Optional` **userinfo\_signed\_response\_alg**: [`JWSAlgorithm`](../types/JWSAlgorithm.md)
+• `Optional` **userinfo\_signed\_response\_alg**: `string`
 
 JWS `alg` algorithm REQUIRED for signing UserInfo Responses. When not configured the default is
-to allow only [supported algorithms](../types/JWSAlgorithm.md) listed in
+to allow only algorithms listed in
 [`as.userinfo_signing_alg_values_supported`](AuthorizationServer.md#userinfo_signing_alg_values_supported)
 and fall back to `RS256` when the authorization server metadata is not set.

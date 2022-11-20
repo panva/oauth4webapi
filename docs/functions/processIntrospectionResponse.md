@@ -2,7 +2,7 @@
 
 [💗 Help the project](https://github.com/sponsors/panva)
 
-▸ **processIntrospectionResponse**(`as`, `client`, `response`, `options?`): `Promise`<[`IntrospectionResponse`](../interfaces/IntrospectionResponse.md) \| [`OAuth2Error`](../interfaces/OAuth2Error.md)\>
+▸ **processIntrospectionResponse**(`as`, `client`, `response`): `Promise`<[`IntrospectionResponse`](../interfaces/IntrospectionResponse.md) \| [`OAuth2Error`](../interfaces/OAuth2Error.md)\>
 
 Validates Response instance to be one coming from the
 [`as.introspection_endpoint`](../interfaces/AuthorizationServer.md#introspection_endpoint).
@@ -18,7 +18,6 @@ Validates Response instance to be one coming from the
 | `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata. |
 | `client` | [`Client`](../interfaces/Client.md) | Client Metadata. |
 | `response` | [`Response`]( https://developer.mozilla.org/en-US/docs/Web/API/Response ) | Resolved value from [introspectionRequest](introspectionRequest.md). |
-| `options?` | [`ProcessIntrospectionResponseOptions`](../interfaces/ProcessIntrospectionResponseOptions.md) | - |
 
 #### Returns
 
