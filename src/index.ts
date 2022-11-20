@@ -2991,7 +2991,7 @@ async function validateJwt(
  *
  * @returns Validated Authorization Response parameters or Authorization Error Response.
  *
- * @see [openid-financial-api-jarm-ID1 - JWT Secured Authorization Response Mode for OAuth 2.0 (JARM)](https://openid.net/specs/openid-financial-api-jarm-ID1.html)
+ * @see [JWT Secured Authorization Response Mode for OAuth 2.0 (JARM)](https://openid.net/specs/openid-financial-api-jarm.html)
  */
 export async function validateJwtAuthResponse(
   as: AuthorizationServer,

@@ -6,7 +6,7 @@
 
 Same as [validateAuthResponse](validateAuthResponse.md) but for signed JARM responses.
 
-**`see`** [openid-financial-api-jarm-ID1 - JWT Secured Authorization Response Mode for OAuth 2.0 (JARM)](https://openid.net/specs/openid-financial-api-jarm-ID1.html)
+**`see`** [JWT Secured Authorization Response Mode for OAuth 2.0 (JARM)](https://openid.net/specs/openid-financial-api-jarm.html)
 
 #### Parameters
 
