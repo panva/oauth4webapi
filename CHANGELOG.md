@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.1](https://github.com/panva/oauth4webapi/compare/v2.0.0...v2.0.1) (2022-11-21)
+
+
+### Fixes
+
+* claims parameter encoding in issued request objects ([3eb165a](https://github.com/panva/oauth4webapi/commit/3eb165a425212a12cf9e48f899a999d32dd9ec86))
+
+
+### Performance
+
+* cache public DPoP CryptoKey's JWK representation for re-use ([2858d06](https://github.com/panva/oauth4webapi/commit/2858d069325da31d72bfb45dad637b5ec54e4850))
+
 ## [2.0.0](https://github.com/panva/oauth4webapi/compare/v1.4.1...v2.0.0) (2022-11-20)
 
 
