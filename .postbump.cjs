@@ -9,4 +9,11 @@ writeFileSync(
     `const VERSION = 'v${version}'`,
   ),
 )
-execSync('git add src/index.ts', { stdio: 'inherit' })
+writeFileSync(
+  './README.md',
+  readFileSync('./README.md', { encoding: 'utf-8' }).replace(
+    /oauth4webapi@v\d+\.\d+\.\d+/gm,
+    `oauth4webapi@v${version}`,
+  ),
+)
+execSync('git add README.md', { stdio: 'inherit' })
