@@ -71,5 +71,4 @@ These are _(this is not an exhaustive list)_:
 - Implicit, Hybrid, and Resource Owner Password Credentials Flows
 - Mutual-TLS Client Authentication and Certificate-Bound Access Tokens
 - JSON Web Encryption (JWE)
-- JSON Web Signature (JWS) rarely used algorithms and HMAC
 - Automatic polyfills of any kind
