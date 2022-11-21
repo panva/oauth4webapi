@@ -1233,10 +1233,15 @@ async function dpopProofJwt(
   headers.set('dpop', proof)
 }
 
+const jwkCache = Symbol()
 /** Exports an asymmetric crypto key as bare JWK */
-async function publicJwk(key: CryptoKey) {
+async function publicJwk(key: CryptoKey & { [jwkCache]?: JWK }) {
+  if (key[jwkCache]) {
+    return key[jwkCache]
+  }
   const { kty, e, n, x, y, crv } = await crypto.subtle.exportKey('jwk', key)
-  return { kty, crv, e, n, x, y }
+  const jwk = (key[jwkCache] = { kty, e, n, x, y, crv })
+  return jwk
 }
 
 /**
