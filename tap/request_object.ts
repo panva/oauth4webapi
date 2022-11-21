@@ -49,10 +49,56 @@ export default (QUnit: QUnit) => {
       { key: kp.privateKey },
     )
 
-    const { payload, protectedHeader } = await jose.jwtVerify(jwt, kp.publicKey)
-    t.propEqual(protectedHeader, { alg: 'ES256', typ: 'oauth-authz-req+jwt' })
+    const { payload } = await jose.jwtVerify(jwt, kp.publicKey)
     const { resource } = payload
     t.propEqual(resource, ['urn:example:resource', 'urn:example:resource-2'])
+  })
+
+  test('issueRequestObject() - claims parameter', async (t) => {
+    const kp = await keys.ES256
+
+    await t.rejects(
+      lib.issueRequestObject(issuer, client, new URLSearchParams([['claims', <string>{}]]), {
+        key: kp.privateKey,
+      }),
+      /must be passed as a UTF-8 encoded JSON/,
+    )
+
+    await t.rejects(
+      lib.issueRequestObject(issuer, client, new URLSearchParams([['claims', '"']]), {
+        key: kp.privateKey,
+      }),
+      /failed to parse the "claims" parameter as JSON/,
+    )
+
+    await t.rejects(
+      lib.issueRequestObject(issuer, client, new URLSearchParams([['claims', 'null']]), {
+        key: kp.privateKey,
+      }),
+      /parameter must be a top level object/,
+    )
+
+    const jwt = await lib.issueRequestObject(
+      issuer,
+      client,
+      new URLSearchParams([
+        [
+          'claims',
+          JSON.stringify({
+            userinfo: { nickname: null },
+            id_token: { email: null },
+          }),
+        ],
+      ]),
+      { key: kp.privateKey },
+    )
+
+    const { payload } = await jose.jwtVerify(jwt, kp.publicKey)
+    const { claims } = payload
+    t.propEqual(claims, {
+      userinfo: { nickname: null },
+      id_token: { email: null },
+    })
   })
 
   test('issueRequestObject() signature kid', async (t) => {

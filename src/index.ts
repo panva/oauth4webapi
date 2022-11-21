@@ -1157,6 +1157,22 @@ export async function issueRequestObject(
     claims.resource = resource
   }
 
+  if (parameters.has('claims')) {
+    const value = parameters.get('claims')!
+    if (value === '[object Object]') {
+      throw new OPE('"claims" parameter must be passed as a UTF-8 encoded JSON')
+    }
+    try {
+      claims.claims = JSON.parse(value)
+    } catch {
+      throw new OPE('failed to parse the "claims" parameter as JSON')
+    }
+
+    if (!isJsonObject(claims.claims)) {
+      throw new OPE('"claims" parameter must be a top level object')
+    }
+  }
+
   return jwt(
     {
       alg: determineJWSAlgorithm(key),
