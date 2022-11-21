@@ -9,6 +9,7 @@ writeFileSync(
     `const VERSION = 'v${version}'`,
   ),
 )
+execSync('git add src/index.ts', { stdio: 'inherit' })
 writeFileSync(
   './README.md',
   readFileSync('./README.md', { encoding: 'utf-8' }).replace(
