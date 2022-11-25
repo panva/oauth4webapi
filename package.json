@@ -52,7 +52,6 @@
     "docs": "patch-package && typedoc",
     "format": "npm run _format -- --write",
     "format-check": "npm run _format -- --check",
-    "prepack": "npm run format && npm run docs && ./examples/.update-diffs.sh && git diff --quiet && npm run test && npm run build",
     "tap:browsers": "./tap/.browsers.sh",
     "tap:bun": "./tap/.bun.sh",
     "tap:deno": "./tap/.deno.sh",
