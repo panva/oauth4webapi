@@ -62,21 +62,21 @@
     "test": "bash -c 'source .node_flags.sh && ava'"
   },
   "devDependencies": {
-    "@esbuild-kit/esm-loader": "^2.5.0",
+    "@esbuild-kit/esm-loader": "^2.5.1",
     "@types/node": "^18.11.9",
     "@types/qunit": "^2.19.3",
     "ava": "^5.1.0",
     "edge-runtime": "^2.0.2",
-    "esbuild": "^0.15.14",
-    "jose": "^4.11.0",
+    "esbuild": "^0.15.15",
+    "jose": "^4.11.1",
     "patch-package": "^6.5.0",
-    "prettier": "^2.7.1",
+    "prettier": "^2.8.0",
     "prettier-plugin-jsdoc": "^0.4.2",
     "qunit": "^2.19.3",
     "timekeeper": "^2.2.0",
-    "typedoc": "^0.23.20",
+    "typedoc": "^0.23.21",
     "typedoc-plugin-markdown": "^3.13.6",
-    "typescript": "^4.8.4",
-    "undici": "^5.12.0"
+    "typescript": "^4.9.3",
+    "undici": "^5.13.0"
   }
 }
