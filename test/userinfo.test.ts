@@ -131,7 +131,6 @@ test('processUserInfoResponse() - json', async (t) => {
   await t.notThrowsAsync(async () => {
     const response = getResponse(JSON.stringify({ sub: 'urn:example:subject' }))
     await lib.processUserInfoResponse(tIssuer, client, 'urn:example:subject', response)
-    t.false(response.bodyUsed)
   })
   await t.notThrowsAsync(async () => {
     const response = getResponse(JSON.stringify({ sub: 'urn:example:subject' }))
@@ -141,7 +140,6 @@ test('processUserInfoResponse() - json', async (t) => {
     async () => {
       const response = getResponse(JSON.stringify({ sub: 'urn:example:subject' }))
       await lib.processUserInfoResponse(tIssuer, client, <any>null, response)
-      t.false(response.bodyUsed)
     },
     { message: '"expectedSubject" must be a non-empty string' },
   )
@@ -184,7 +182,6 @@ test('processUserInfoResponse() - ignores signatures', async (t) => {
       'urn:example:subject',
       response,
     )
-    t.false(response.bodyUsed)
   })
 })
 
@@ -204,7 +201,6 @@ test('processUserInfoResponse() - jwt (alg signalled)', async (t) => {
       { headers: new Headers({ 'content-type': 'application/jwt' }) },
     )
     await lib.processUserInfoResponse(tIssuer, client, 'urn:example:subject', response)
-    t.false(response.bodyUsed)
   })
 })
 
@@ -228,7 +224,6 @@ test('processUserInfoResponse() - jwt (alg defined)', async (t) => {
       'urn:example:subject',
       response,
     )
-    t.false(response.bodyUsed)
   })
 })
 
@@ -247,7 +242,6 @@ test('processUserInfoResponse() - jwt (alg default)', async (t) => {
       { headers: new Headers({ 'content-type': 'application/jwt' }) },
     )
     await lib.processUserInfoResponse(tIssuer, client, 'urn:example:subject', response)
-    t.false(response.bodyUsed)
   })
 })
 

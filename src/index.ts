@@ -619,11 +619,6 @@ export interface DiscoveryRequestOptions extends HttpRequestOptions {
   algorithm?: 'oidc' | 'oauth2'
 }
 
-function preserveBodyStream(response: Response) {
-  assertReadableResponse(response)
-  return response.clone()
-}
-
 function processDpopNonce(response: Response) {
   const url = new URL(response.url)
   if (response.headers.has('dpop-nonce')) {
@@ -759,9 +754,10 @@ export async function processDiscoveryResponse(
     throw new OPE('"response" is not a conform Authorization Server Metadata response')
   }
 
+  assertReadableResponse(response)
   let json: JsonValue
   try {
-    json = await preserveBodyStream(response).json()
+    json = await response.json()
   } catch {
     throw new OPE('failed to parse "response" body as JSON')
   }
@@ -1442,9 +1438,10 @@ export async function processPushedAuthorizationResponse(
     throw new OPE('"response" is not a conform Pushed Authorization Request Endpoint response')
   }
 
+  assertReadableResponse(response)
   let json: JsonValue
   try {
-    json = await preserveBodyStream(response).json()
+    json = await response.json()
   } catch {
     throw new OPE('failed to parse "response" body as JSON')
   }
@@ -1748,8 +1745,9 @@ export async function processUserInfoResponse(
 
   let json: JsonValue
   if (getContentType(response) === 'application/jwt') {
+    assertReadableResponse(response)
     const { claims } = await validateJwt(
-      await preserveBodyStream(response).text(),
+      await response.text(),
       checkSigningAlgorithm.bind(
         undefined,
         client.userinfo_signed_response_alg,
@@ -1766,8 +1764,9 @@ export async function processUserInfoResponse(
       throw new OPE('JWT UserInfo Response expected')
     }
 
+    assertReadableResponse(response)
     try {
-      json = await preserveBodyStream(response).json()
+      json = await response.json()
     } catch {
       throw new OPE('failed to parse "response" body as JSON')
     }
@@ -1934,9 +1933,10 @@ async function processGenericAccessTokenResponse(
     throw new OPE('"response" is not a conform Token Endpoint response')
   }
 
+  assertReadableResponse(response)
   let json: JsonValue
   try {
-    json = await preserveBodyStream(response).json()
+    json = await response.json()
   } catch {
     throw new OPE('failed to parse "response" body as JSON')
   }
@@ -2616,8 +2616,9 @@ export async function processIntrospectionResponse(
 
   let json: JsonValue
   if (getContentType(response) === 'application/token-introspection+jwt') {
+    assertReadableResponse(response)
     const { claims } = await validateJwt(
-      await preserveBodyStream(response).text(),
+      await response.text(),
       checkSigningAlgorithm.bind(
         undefined,
         client.introspection_signed_response_alg,
@@ -2635,8 +2636,9 @@ export async function processIntrospectionResponse(
       throw new OPE('JWT "token_introspection" claim must be a JSON object')
     }
   } else {
+    assertReadableResponse(response)
     try {
-      json = await preserveBodyStream(response).json()
+      json = await response.json()
     } catch {
       throw new OPE('failed to parse "response" body as JSON')
     }
@@ -2689,9 +2691,10 @@ async function processJwksResponse(response: Response): Promise<JsonWebKeySet> {
     throw new OPE('"response" is not a conform JSON Web Key Set response')
   }
 
+  assertReadableResponse(response)
   let json: JsonValue
   try {
-    json = await preserveBodyStream(response).json()
+    json = await response.json()
   } catch {
     throw new OPE('failed to parse "response" body as JSON')
   }
@@ -2713,8 +2716,9 @@ async function processJwksResponse(response: Response): Promise<JsonWebKeySet> {
 
 async function handleOAuthBodyError(response: Response): Promise<OAuth2Error | undefined> {
   if (response.status > 399 && response.status < 500) {
+    assertReadableResponse(response)
     try {
-      const json: JsonValue = await preserveBodyStream(response).json()
+      const json: JsonValue = await response.json()
       if (isJsonObject(json) && typeof json.error === 'string' && json.error.length) {
         if (json.error_description !== undefined && typeof json.error_description !== 'string') {
           delete json.error_description
@@ -3198,9 +3202,10 @@ export async function processDeviceAuthorizationResponse(
     throw new OPE('"response" is not a conform Device Authorization Endpoint response')
   }
 
+  assertReadableResponse(response)
   let json: JsonValue
   try {
-    json = await preserveBodyStream(response).json()
+    json = await response.json()
   } catch {
     throw new OPE('failed to parse "response" body as JSON')
   }

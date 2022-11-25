@@ -290,9 +290,9 @@ export const green = test.macro({
         | oauth.OpenIDTokenEndpointResponse
         | oauth.OAuth2Error
       if (scope.includes('openid')) {
-        result = await oauth.processAuthorizationCodeOpenIDResponse(as, client, response)
+        result = await oauth.processAuthorizationCodeOpenIDResponse(as, client, response.clone())
       } else {
-        result = await oauth.processAuthorizationCodeOAuth2Response(as, client, response)
+        result = await oauth.processAuthorizationCodeOAuth2Response(as, client, response.clone())
       }
 
       if (oauth.isOAuth2Error(result)) {
@@ -301,9 +301,17 @@ export const green = test.macro({
           t.log('retrying with a newly obtained dpop nonce')
           response = await request()
           if (scope.includes('openid')) {
-            result = await oauth.processAuthorizationCodeOpenIDResponse(as, client, response)
+            result = await oauth.processAuthorizationCodeOpenIDResponse(
+              as,
+              client,
+              response.clone(),
+            )
           } else {
-            result = await oauth.processAuthorizationCodeOAuth2Response(as, client, response)
+            result = await oauth.processAuthorizationCodeOAuth2Response(
+              as,
+              client,
+              response.clone(),
+            )
           }
         }
         throw new Error() // Handle OAuth 2.0 response body error
