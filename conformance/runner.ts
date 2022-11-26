@@ -221,13 +221,13 @@ export const green = test.macro({
         throw new Error()
       }
 
-      let result = await oauth.processPushedAuthorizationResponse(as, client, par)
+      let result = await oauth.processPushedAuthorizationResponse(as, client, par.clone())
       if (oauth.isOAuth2Error(result)) {
         t.log('error', result)
         if (result.error === 'use_dpop_nonce') {
           t.log('retrying with a newly obtained dpop nonce')
           par = await request()
-          result = await oauth.processPushedAuthorizationResponse(as, client, par)
+          result = await oauth.processPushedAuthorizationResponse(as, client, par.clone())
         }
         throw new Error() // Handle OAuth 2.0 response body error
       }
