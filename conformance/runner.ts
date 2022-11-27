@@ -221,17 +221,17 @@ export const green = test.macro({
         throw new Error()
       }
 
-      let result = await oauth.processPushedAuthorizationResponse(as, client, par.clone())
+      let result = await oauth.processPushedAuthorizationResponse(as, client, par)
       if (oauth.isOAuth2Error(result)) {
         t.log('error', result)
         if (result.error === 'use_dpop_nonce') {
           t.log('retrying with a newly obtained dpop nonce')
           par = await request()
-          result = await oauth.processPushedAuthorizationResponse(as, client, par.clone())
+          result = await oauth.processPushedAuthorizationResponse(as, client, par)
         }
         throw new Error() // Handle OAuth 2.0 response body error
       }
-      t.log('PAR response', await par.clone().json())
+      t.log('PAR response', { ...result })
       authorizationUrl = new URL(as.authorization_endpoint!)
       authorizationUrl.searchParams.set('client_id', client.client_id)
       authorizationUrl.searchParams.set('request_uri', result.request_uri)
@@ -290,9 +290,9 @@ export const green = test.macro({
         | oauth.OpenIDTokenEndpointResponse
         | oauth.OAuth2Error
       if (scope.includes('openid')) {
-        result = await oauth.processAuthorizationCodeOpenIDResponse(as, client, response.clone())
+        result = await oauth.processAuthorizationCodeOpenIDResponse(as, client, response)
       } else {
-        result = await oauth.processAuthorizationCodeOAuth2Response(as, client, response.clone())
+        result = await oauth.processAuthorizationCodeOAuth2Response(as, client, response)
       }
 
       if (oauth.isOAuth2Error(result)) {
@@ -301,23 +301,15 @@ export const green = test.macro({
           t.log('retrying with a newly obtained dpop nonce')
           response = await request()
           if (scope.includes('openid')) {
-            result = await oauth.processAuthorizationCodeOpenIDResponse(
-              as,
-              client,
-              response.clone(),
-            )
+            result = await oauth.processAuthorizationCodeOpenIDResponse(as, client, response)
           } else {
-            result = await oauth.processAuthorizationCodeOAuth2Response(
-              as,
-              client,
-              response.clone(),
-            )
+            result = await oauth.processAuthorizationCodeOAuth2Response(as, client, response)
           }
         }
         throw new Error() // Handle OAuth 2.0 response body error
       }
 
-      t.log('token endpoint response body', await response.clone().json())
+      t.log('token endpoint response body', { ...result })
       ;({ access_token } = result)
       if (result.id_token) {
         const claims = oauth.getValidatedIdTokenClaims(result)
@@ -350,14 +342,8 @@ export const green = test.macro({
         }
       }
 
-      try {
-        t.log('userinfo endpoint response body', await response.clone().json())
-      } catch {
-        t.log('userinfo endpoint response body', await response.clone().text())
-      }
-
-      await oauth.processUserInfoResponse(as, client, sub!, response)
-      t.log('userinfo response passed validation')
+      const result = await oauth.processUserInfoResponse(as, client, sub!, response)
+      t.log('userinfo endpoint response', { ...result })
     }
 
     if (accounts_endpoint) {
@@ -390,10 +376,11 @@ export const green = test.macro({
         }
       }
 
+      const result = await accounts.text()
       try {
-        t.log('accounts endpoint response body', await accounts.clone().json())
+        t.log('accounts endpoint response', JSON.parse(result))
       } catch {
-        t.log('accounts endpoint response body', await accounts.clone().text())
+        t.log('accounts endpoint response body', result)
       }
     }
 
