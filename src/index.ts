@@ -1229,14 +1229,16 @@ async function dpopProofJwt(
   headers.set('dpop', proof)
 }
 
-const jwkCache = Symbol()
+let jwkCache: WeakMap<CryptoKey, JWK>
 /** Exports an asymmetric crypto key as bare JWK */
-async function publicJwk(key: CryptoKey & { [jwkCache]?: JWK }) {
-  if (key[jwkCache]) {
-    return key[jwkCache]
+async function publicJwk(key: CryptoKey) {
+  jwkCache ||= new WeakMap()
+  if (jwkCache.has(key)) {
+    return jwkCache.get(key)!
   }
   const { kty, e, n, x, y, crv } = await crypto.subtle.exportKey('jwk', key)
-  const jwk = (key[jwkCache] = { kty, e, n, x, y, crv })
+  const jwk = { kty, e, n, x, y, crv }
+  jwkCache.set(key, jwk)
   return jwk
 }
 
@@ -1585,7 +1587,7 @@ export interface UserInfoResponse {
   readonly [claim: string]: JsonValue | undefined
 }
 
-const jwksCache = Symbol()
+let jwksCache: WeakMap<AuthorizationServer, JWKSCache>
 interface JWKSCache {
   jwks: JsonWebKeySet
   iat: number
@@ -1593,7 +1595,7 @@ interface JWKSCache {
 }
 
 async function getPublicSigKeyFromIssuerJwksUri(
-  as: AuthorizationServer & { [jwksCache]?: JWKSCache },
+  as: AuthorizationServer,
   options: HttpRequestOptions | undefined,
   header: CompactJWSHeaderParameters,
 ): Promise<CryptoKey> {
@@ -1602,23 +1604,24 @@ async function getPublicSigKeyFromIssuerJwksUri(
 
   let jwks: JsonWebKeySet
   let age: number
-  if (as[jwksCache]) {
-    ;({ jwks, age } = as[jwksCache])
+  jwksCache ||= new WeakMap()
+  if (jwksCache.has(as)) {
+    ;({ jwks, age } = jwksCache.get(as)!)
     if (age >= 300) {
       // force a re-fetch every 5 minutes
-      as[jwksCache] = undefined
+      jwksCache.delete(as)
       return getPublicSigKeyFromIssuerJwksUri(as, options, header)
     }
   } else {
     jwks = await jwksRequest(as, options).then(processJwksResponse)
     age = 0
-    as[jwksCache] = {
+    jwksCache.set(as, {
       jwks,
       iat: epochTime(),
       get age() {
         return epochTime() - this.iat
       },
-    }
+    })
   }
 
   let kty: string
@@ -1678,7 +1681,7 @@ async function getPublicSigKeyFromIssuerJwksUri(
   if (!length) {
     if (age >= 60) {
       // allow re-fetch if cache is at least 1 minute old
-      as[jwksCache] = undefined
+      jwksCache.delete(as)
       return getPublicSigKeyFromIssuerJwksUri(as, options, header)
     }
     throw new OPE('error when selecting a JWT verification key, no applicable keys found')
