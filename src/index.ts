@@ -2,7 +2,7 @@ let USER_AGENT: string
 // @ts-ignore
 if (typeof navigator === 'undefined' || !navigator.userAgent?.startsWith?.('Mozilla/5.0 ')) {
   const NAME = 'oauth4webapi'
-  const VERSION = 'v2.0.3'
+  const VERSION = 'v2.0.4'
   USER_AGENT = `${NAME}/${VERSION}`
 }
 

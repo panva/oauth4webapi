@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.4](https://github.com/panva/oauth4webapi/compare/v2.0.3...v2.0.4) (2022-11-27)
+
+
+### Refactor
+
+* weak maps instead of symbols ([e551edc](https://github.com/panva/oauth4webapi/commit/e551edc7f1a43df01895161fd27d0b19e5a827d4))
+
 ## [2.0.3](https://github.com/panva/oauth4webapi/compare/v2.0.1...v2.0.3) (2022-11-25)
 
 
