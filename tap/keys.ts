@@ -4,7 +4,7 @@ import * as env from './env.js'
 export const algs = <lib.JWSAlgorithm[]>['RS256', 'PS256', 'ES256']
 export const fails = <lib.JWSAlgorithm[]>[]
 
-if (env.isDeno || env.isNode) {
+if (env.isDeno || env.isNode || env.isElectron) {
   algs.push('EdDSA')
 } else {
   fails.push('EdDSA')
