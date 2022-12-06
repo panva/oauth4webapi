@@ -27,7 +27,7 @@ Returns ID Token claims validated during [processRefreshTokenResponse](processRe
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `ref` | [`TokenEndpointResponse`](../interfaces/TokenEndpointResponse.md) | Value previously resolved from [processRefreshTokenResponse](processRefreshTokenResponse.md) or   [processDeviceCodeResponse](processDeviceCodeResponse.md). |
+| `ref` | [`TokenEndpointResponse`](../interfaces/TokenEndpointResponse.md) | Value previously resolved from [processRefreshTokenResponse](processRefreshTokenResponse.md) or [processDeviceCodeResponse](processDeviceCodeResponse.md). |
 
 #### Returns
 

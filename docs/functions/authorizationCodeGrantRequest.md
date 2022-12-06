@@ -21,7 +21,7 @@ Performs an Authorization Code grant request at the
 | :------ | :------ | :------ |
 | `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata. |
 | `client` | [`Client`](../interfaces/Client.md) | Client Metadata. |
-| `callbackParameters` | `CallbackParameters` | Parameters obtained from the callback to redirect_uri, this is returned   from [validateAuthResponse](validateAuthResponse.md), or [validateJwtAuthResponse](validateJwtAuthResponse.md). |
+| `callbackParameters` | `CallbackParameters` | Parameters obtained from the callback to redirect_uri, this is returned from [validateAuthResponse](validateAuthResponse.md), or [validateJwtAuthResponse](validateJwtAuthResponse.md). |
 | `redirectUri` | `string` | `redirect_uri` value used in the authorization request. |
 | `codeVerifier` | `string` | PKCE `code_verifier` to send to the token endpoint. |
 | `options?` | [`TokenEndpointRequestOptions`](../interfaces/TokenEndpointRequestOptions.md) | - |

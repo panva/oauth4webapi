@@ -17,7 +17,7 @@ Performs an Introspection Request at the
 | :------ | :------ | :------ |
 | `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata. |
 | `client` | [`Client`](../interfaces/Client.md) | Client Metadata. |
-| `token` | `string` | Token to introspect. You can provide the `token_type_hint` parameter via   [options](../interfaces/IntrospectionRequestOptions.md#additionalparameters). |
+| `token` | `string` | Token to introspect. You can provide the `token_type_hint` parameter via [options](../interfaces/IntrospectionRequestOptions.md#additionalparameters). |
 | `options?` | [`IntrospectionRequestOptions`](../interfaces/IntrospectionRequestOptions.md) | - |
 
 #### Returns

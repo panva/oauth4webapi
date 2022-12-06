@@ -15,7 +15,7 @@ Performs a Revocation Request at the
 | :------ | :------ | :------ |
 | `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata. |
 | `client` | [`Client`](../interfaces/Client.md) | Client Metadata. |
-| `token` | `string` | Token to revoke. You can provide the `token_type_hint` parameter via   [options](../interfaces/RevocationRequestOptions.md#additionalparameters). |
+| `token` | `string` | Token to revoke. You can provide the `token_type_hint` parameter via [options](../interfaces/RevocationRequestOptions.md#additionalparameters). |
 | `options?` | [`RevocationRequestOptions`](../interfaces/RevocationRequestOptions.md) | - |
 
 #### Returns
