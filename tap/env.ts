@@ -1,5 +1,5 @@
 // @ts-ignore
-import * as packageLock from '../package-lock.json' assert { type: 'json' }
+import packageLock from '../package-lock.json' assert { type: 'json' }
 
 // @ts-ignore
 export const isBun = typeof Bun !== 'undefined' ? navigator.userAgent : false
