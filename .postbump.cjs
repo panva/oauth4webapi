@@ -4,10 +4,11 @@ const { version } = require('./package.json')
 
 const updates = [
   ['./src/index.ts', /const VERSION = 'v\d+\.\d+\.\d+'/gm, `const VERSION = 'v${version}'`],
+  ['./build/index.js', /const VERSION = 'v\d+\.\d+\.\d+'/gm, `const VERSION = 'v${version}'`, false],
   ['./README.md', /oauth4webapi@v\d+\.\d+\.\d+/gm, `oauth4webapi@v${version}`],
 ]
 
-for (const [path, regex, replace] of updates) {
+for (const [path, regex, replace, gitAdd = true] of updates) {
   writeFileSync(path, readFileSync(path, { encoding: 'utf-8' }).replace(regex, replace))
-  execSync(`git add ${path}`, { stdio: 'inherit' })
+  if (gitAdd) execSync(`git add ${path}`, { stdio: 'inherit' })
 }
