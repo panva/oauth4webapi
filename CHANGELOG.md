@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.6](https://github.com/panva/oauth4webapi/compare/v2.0.5...v2.0.6) (2022-12-16)
+
+
+### Fixes
+
+* **build:** fixup user agent version after version bump ([e1c3ed8](https://github.com/panva/oauth4webapi/commit/e1c3ed876c6e1f1baf9b260661ba33688f89b31c))
+
 ## [2.0.5](https://github.com/panva/oauth4webapi/compare/v2.0.4...v2.0.5) (2022-12-11)
 
 ## [2.0.4](https://github.com/panva/oauth4webapi/compare/v2.0.3...v2.0.4) (2022-11-27)
