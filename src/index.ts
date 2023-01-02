@@ -1456,7 +1456,7 @@ export async function processPushedAuthorizationResponse(
     throw new OPE('"response" body "request_uri" property must be a non-empty string')
   }
 
-  if (typeof json.expires_in !== 'number' || json.expires_in <= 0) {
+  if ((typeof json.expires_in !== 'number' && typeof json.expires_in !== 'string') || parseInt(json.expires_in) <= 0) {
     throw new OPE('"response" body "expires_in" property must be a positive number')
   }
 
