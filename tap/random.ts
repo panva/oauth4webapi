@@ -12,7 +12,7 @@ export default (QUnit: QUnit) => {
     t.equal(codeVerifier.length, b64length(32))
   })
 
-  test('calculatePKCECodeChallenge() - https://www.rfc-editor.org/rfc/rfc7636#appendix-B', async (t) => {
+  test('calculatePKCECodeChallenge() https://www.rfc-editor.org/rfc/rfc7636#appendix-B', async (t) => {
     const verifier = 'dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk'
     t.equal(
       await lib.calculatePKCECodeChallenge(verifier),

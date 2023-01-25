@@ -11,7 +11,7 @@ export default (QUnit: QUnit) => {
   module('request_object.ts')
 
   for (const [alg, kp] of Object.entries(keys)) {
-    test(`issueRequestObject() - ${alg}`, async (t) => {
+    test(`issueRequestObject() w/ ${alg}`, async (t) => {
       const { privateKey, publicKey } = await kp
       const jwt = await lib.issueRequestObject(
         issuer,
@@ -37,7 +37,7 @@ export default (QUnit: QUnit) => {
     })
   }
 
-  test('issueRequestObject() - multiple resource parameters', async (t) => {
+  test('issueRequestObject() multiple resource parameters', async (t) => {
     const kp = await keys.ES256
     const jwt = await lib.issueRequestObject(
       issuer,
@@ -54,7 +54,7 @@ export default (QUnit: QUnit) => {
     t.propEqual(resource, ['urn:example:resource', 'urn:example:resource-2'])
   })
 
-  test('issueRequestObject() - claims parameter', async (t) => {
+  test('issueRequestObject() claims parameter', async (t) => {
     const kp = await keys.ES256
 
     await t.rejects(
