@@ -34,11 +34,11 @@ export const variant: Record<string, string> = conformance.variant
 let prefix = ''
 
 switch (plan.name) {
-  case 'fapi2-baseline-id2-client-test-plan':
-    prefix = 'fapi2-baseline-id2-client-test-'
+  case 'fapi2-security-profile-id2-client-test-plan':
+    prefix = 'fapi2-security-profile-id2-client-test-'
     break
-  case 'fapi2-advanced-id1-client-test-plan':
-    prefix = 'fapi2-baseline-id2-client-test-'
+  case 'fapi2-message-signing-id1-client-test-plan':
+    prefix = 'fapi2-security-profile-id2-client-test-'
     break
   case 'oidcc-client-test-plan':
   case 'oidcc-client-basic-certification-test-plan':
@@ -88,7 +88,7 @@ export function modules(name: string): ModulePrescription[] {
 }
 
 function usesJarm(plan: Plan) {
-  return plan.name.startsWith('fapi2-advanced')
+  return plan.name.startsWith('fapi2-message-signing')
 }
 
 function usesDpop(variant: Record<string, string>) {
@@ -100,7 +100,7 @@ function usesPar(plan: Plan) {
 }
 
 function usesRequestObject(planName: string, variant: Record<string, string>) {
-  if (planName.startsWith('fapi2-advanced')) {
+  if (planName.startsWith('fapi2-message-signing')) {
     return true
   }
 

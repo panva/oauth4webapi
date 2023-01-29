@@ -17,8 +17,8 @@ import packageJson from '../package.json' assert { type: 'json' }
 
 export async function fapi2(alg: lib.JWSAlgorithm, kp: CryptoKeyPair) {
   return setup(
-    'fapi2-advanced-id1-client-test-plan',
-    'fapi2-baseline-id2-client-test-happy-path',
+    'fapi2-message-signing-id1-client-test-plan',
+    'fapi2-security-profile-id2-client-test-happy-path',
     {
       client_auth_type: 'private_key_jwt',
       sender_constrain: 'dpop',

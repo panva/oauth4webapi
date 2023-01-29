@@ -15,8 +15,8 @@ import { JWS_ALGORITHM, PLAN_NAME, VARIANT } from './env.js'
 switch (PLAN_NAME) {
   case 'oidcc-client-basic-certification-test-plan':
   case 'oidcc-client-test-plan':
-  case 'fapi2-baseline-id2-client-test-plan':
-  case 'fapi2-advanced-id1-client-test-plan':
+  case 'fapi2-security-profile-id2-client-test-plan':
+  case 'fapi2-message-signing-id1-client-test-plan':
     break
   default:
     throw new Error()
@@ -98,13 +98,13 @@ const DEFAULTS: Record<typeof PLAN_NAME, Record<string, string>> = {
     request_type: 'plain_http_request',
     client_registration: 'static_client',
   },
-  'fapi2-baseline-id2-client-test-plan': {
+  'fapi2-security-profile-id2-client-test-plan': {
     client_auth_type: 'private_key_jwt',
     sender_constrain: 'dpop',
     fapi_client_type: 'oidc', // oidc, plain_oauth
     fapi_profile: 'plain_fapi',
   },
-  'fapi2-advanced-id1-client-test-plan': {
+  'fapi2-message-signing-id1-client-test-plan': {
     client_auth_type: 'private_key_jwt',
     sender_constrain: 'dpop',
     fapi_client_type: 'oidc', // oidc, plain_oauth
@@ -209,9 +209,12 @@ export default async () => {
   const files: Set<string> = new Set()
   for (const module of plan.modules) {
     switch (PLAN_NAME) {
-      case 'fapi2-baseline-id2-client-test-plan':
-      case 'fapi2-advanced-id1-client-test-plan': {
-        const name = module.testModule.replace(/fapi2-(baseline-id2|advanced-id1)-client-test-/, '')
+      case 'fapi2-security-profile-id2-client-test-plan':
+      case 'fapi2-message-signing-id1-client-test-plan': {
+        const name = module.testModule.replace(
+          /fapi2-(security-profile-id2|message-signing-id1)-client-test-/,
+          '',
+        )
         const path = `./conformance/fapi/${name}.ts`
         ensureTestFile(path, name)
         files.add(path)
