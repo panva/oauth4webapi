@@ -5,13 +5,15 @@ import { keys } from './keys.js'
 import * as env from './env.js'
 
 export default (QUnit: QUnit) => {
-  const { module, test } = QUnit
+  const { module, test, skip } = QUnit
   module('end2end.ts')
 
   for (const [alg, kp] of Object.entries(keys)) {
     const fapi = alg === 'EdDSA' || alg === 'ES256' || alg === 'PS256'
     const setup = fapi ? fapi2 : oidcc
-    test(`${fapi ? 'FAPI 2.0' : 'OIDC Core 1.0'} ${alg}`, async (t) => {
+    const method = fapi ? skip : test
+    // TODO: remove skip when the fapi2 plan and test names are stable
+    method(`${fapi ? 'FAPI 2.0' : 'OIDC Core 1.0'} ${alg}`, async (t) => {
       const { client, issuerIdentifier, clientPrivateKey, exposed, cleanup } = await setup(
         <lib.JWSAlgorithm>alg,
         await kp,
