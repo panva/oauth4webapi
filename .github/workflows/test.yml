@@ -87,7 +87,7 @@ jobs:
         run: npm run tap:edge-runtime
 
   electron:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Environment Information
         run: npx envinfo
@@ -120,7 +120,7 @@ jobs:
         run: npm run tap:deno
 
   workers:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Environment Information
         run: npx envinfo
