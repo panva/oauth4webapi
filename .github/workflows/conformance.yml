@@ -18,6 +18,8 @@ jobs:
     outputs:
       cache-key: ${{ steps.cache-key.outputs.value }}
     steps:
+      - name: Environment Information
+        run: npx envinfo
       - name: Checkout
         uses: actions/checkout@master
       - name: Set Conformance Suite Version from GitLab
@@ -140,6 +142,8 @@ jobs:
               fapi_jarm_type: 'plain_oauth'
 
     steps:
+      - name: Environment Information
+        run: npx envinfo
       - name: Checkout
         uses: actions/checkout@master
       - name: Load Cached Conformance Suite Build
