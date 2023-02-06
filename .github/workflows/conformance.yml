@@ -2,7 +2,9 @@ name: Conformance Checks
 
 on:
   push:
+    branches: [main]
   pull_request:
+    branches: [main]
   schedule:
     - cron: '47 11 * * 1'
   workflow_dispatch:
