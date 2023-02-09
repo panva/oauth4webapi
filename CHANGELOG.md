@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.1.0](https://github.com/panva/oauth4webapi/compare/v2.0.6...v2.1.0) (2023-02-09)
+
+
+### Features
+
+* add more asymmetric JWS algorithms ([af43ec7](https://github.com/panva/oauth4webapi/commit/af43ec710bd03b1c72315d5058bf932528f15940))
+
 ## [2.0.6](https://github.com/panva/oauth4webapi/compare/v2.0.5...v2.0.6) (2022-12-16)
 
 
