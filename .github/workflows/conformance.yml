@@ -99,15 +99,22 @@ jobs:
               client_auth_type: none
             plan: oidcc-client-test-plan
 
-          # ES256
-          - algorithm: ES256
+          # RS256
+          - algorithm: RS256
             plan: oidcc-client-test-plan
             variant:
               request_type: request_object
               client_auth_type: private_key_jwt
 
-          # RS256
-          - algorithm: RS256
+          # RS384
+          - algorithm: RS384
+            plan: oidcc-client-test-plan
+            variant:
+              request_type: request_object
+              client_auth_type: private_key_jwt
+
+          # RS512
+          - algorithm: RS512
             plan: oidcc-client-test-plan
             variant:
               request_type: request_object
@@ -119,6 +126,42 @@ jobs:
             variant:
               request_type: request_object
               client_auth_type: private_key_jwt
+
+          # PS384
+          - algorithm: PS384
+            plan: oidcc-client-test-plan
+            variant:
+              request_type: request_object
+              client_auth_type: private_key_jwt
+
+          # PS512
+          - algorithm: PS512
+            plan: oidcc-client-test-plan
+            variant:
+              request_type: request_object
+              client_auth_type: private_key_jwt
+
+          # ES256
+          - algorithm: ES256
+            plan: oidcc-client-test-plan
+            variant:
+              request_type: request_object
+              client_auth_type: private_key_jwt
+
+          # TODO: https://gitlab.com/openid/conformance-suite/-/issues/1129
+          # # ES384
+          # - algorithm: ES384
+          #   plan: oidcc-client-test-plan
+          #   variant:
+          #     request_type: request_object
+          #     client_auth_type: private_key_jwt
+
+          # # ES512
+          # - algorithm: ES512
+          #   plan: oidcc-client-test-plan
+          #   variant:
+          #     request_type: request_object
+          #     client_auth_type: private_key_jwt
 
           # EdDSA
           - algorithm: EdDSA

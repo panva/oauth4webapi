@@ -34,14 +34,21 @@ async function RS256() {
     kid: crypto.randomUUID(),
   }
 }
-
-async function PS256() {
-  return {
-    ...(await RS256()),
-    alg: 'PS256',
-  }
+async function RS384() {
+  return { ...(await RS256()), alg: 'RS384' }
 }
-
+async function RS512() {
+  return { ...(await RS256()), alg: 'RS512' }
+}
+async function PS256() {
+  return { ...(await RS256()), alg: 'PS256' }
+}
+async function PS384() {
+  return { ...(await RS256()), alg: 'PS384' }
+}
+async function PS512() {
+  return { ...(await RS256()), alg: 'PS512' }
+}
 async function ES256() {
   return {
     ...exportPrivate(await generateKeyPair('ec', { namedCurve: 'P-256' })),
@@ -50,7 +57,22 @@ async function ES256() {
     kid: crypto.randomUUID(),
   }
 }
-
+async function ES384() {
+  return {
+    ...exportPrivate(await generateKeyPair('ec', { namedCurve: 'P-384' })),
+    use: 'sig',
+    alg: 'ES384',
+    kid: crypto.randomUUID(),
+  }
+}
+async function ES512() {
+  return {
+    ...exportPrivate(await generateKeyPair('ec', { namedCurve: 'P-521' })),
+    use: 'sig',
+    alg: 'ES512',
+    kid: crypto.randomUUID(),
+  }
+}
 async function EdDSA() {
   return {
     ...exportPrivate(await generateKeyPair('ed25519')),
@@ -64,10 +86,22 @@ async function generate() {
   switch (JWS_ALGORITHM) {
     case 'PS256':
       return Promise.all([PS256()])
+    case 'PS384':
+      return Promise.all([PS384()])
+    case 'PS512':
+      return Promise.all([PS512()])
     case 'RS256':
       return Promise.all([RS256()])
+    case 'RS384':
+      return Promise.all([RS384()])
+    case 'RS512':
+      return Promise.all([RS512()])
     case 'ES256':
       return Promise.all([ES256()])
+    case 'ES384':
+      return Promise.all([ES384()])
+    case 'ES512':
+      return Promise.all([ES512()])
     case 'EdDSA':
       return Promise.all([EdDSA()])
     default:

@@ -4,7 +4,18 @@ import * as jose from 'jose'
 
 import type { AuthorizationServer, Client, JWSAlgorithm } from '../src/index.js'
 
-export const ALGS: JWSAlgorithm[] = ['ES256', 'RS256', 'PS256', 'EdDSA']
+export const ALGS: JWSAlgorithm[] = [
+  'ES256',
+  'RS256',
+  'PS256',
+  'ES384',
+  'RS384',
+  'PS384',
+  'ES512',
+  'RS512',
+  'PS512',
+  'EdDSA',
+]
 interface ContextAlgs {
   [key: string]: CryptoKeyPair
 }

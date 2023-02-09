@@ -48,29 +48,24 @@ switch (plan.name) {
     throw new Error()
 }
 
+const es = (namedCurve: string): EcKeyImportParams => ({ name: 'ECDSA', namedCurve })
+const rs = (hash: string): RsaHashedImportParams => ({
+  name: 'RSASSA-PKCS1-v1_5',
+  hash: { name: hash },
+})
+const ps = (hash: string): RsaHashedImportParams => ({ ...rs(hash), name: 'RSA-PSS' })
+
 const algorithms: Map<string, RsaHashedImportParams | EcKeyImportParams | Algorithm> = new Map([
-  [
-    'PS256',
-    {
-      name: 'RSA-PSS',
-      hash: { name: 'SHA-256' },
-    },
-  ],
-  [
-    'ES256',
-    {
-      name: 'ECDSA',
-      namedCurve: 'P-256',
-    },
-  ],
-  [
-    'RS256',
-    {
-      name: 'RSASSA-PKCS1-v1_5',
-      hash: { name: 'SHA-256' },
-    },
-  ],
-  ['EdDSA', { name: 'Ed25519' }],
+  ['PS256', ps('SHA-256')],
+  ['PS384', ps('SHA-384')],
+  ['PS512', ps('SHA-512')],
+  ['RS256', rs('SHA-256')],
+  ['RS384', rs('SHA-384')],
+  ['RS512', rs('SHA-512')],
+  ['ES256', es('P-256')],
+  ['ES384', es('P-384')],
+  ['ES512', es('P-521')],
+  ['EdDSA', <Algorithm>{ name: 'Ed25519' }],
 ])
 
 function importPrivateKey(alg: string, jwk: JsonWebKey) {

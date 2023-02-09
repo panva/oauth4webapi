@@ -6,10 +6,19 @@
 
 ### Properties
 
+- [crv](GenerateKeyPairOptions.md#crv)
 - [extractable](GenerateKeyPairOptions.md#extractable)
 - [modulusLength](GenerateKeyPairOptions.md#moduluslength)
 
 ## Properties
+
+### crv
+
+• `Optional` **crv**: ``"Ed25519"`` \| ``"Ed448"``
+
+(EdDSA algorithms only) The EdDSA sub-type. Default is `Ed25519`.
+
+___
 
 ### extractable
 

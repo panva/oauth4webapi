@@ -59,30 +59,66 @@ export type ClientAuthenticationMethod =
 /**
  * Supported JWS `alg` Algorithm identifiers.
  *
- * @example CryptoKey algorithm for the `PS256` JWS Algorithm Identifier
+ * @example CryptoKey algorithm for the `PS256`, `PS384`, or `PS512` JWS Algorithm Identifiers
  *
  * ```ts
- * interface Ps256Algorithm extends RsaHashedKeyAlgorithm {
+ * interface RSAPSSAlgorithm extends RsaHashedKeyAlgorithm {
  *   name: 'RSA-PSS'
+ *   hash: { name: 'SHA-256' | 'SHA-384' | 'SHA-512' }
+ * }
+ *
+ * interface PS256 extends RSAPSSAlgorithm {
  *   hash: { name: 'SHA-256' }
+ * }
+ *
+ * interface PS384 extends RSAPSSAlgorithm {
+ *   hash: { name: 'SHA-384' }
+ * }
+ *
+ * interface PS512 extends RSAPSSAlgorithm {
+ *   hash: { name: 'SHA-512' }
  * }
  * ```
  *
- * @example CryptoKey algorithm for the `ES256` JWS Algorithm Identifier
+ * @example CryptoKey algorithm for the `ES256`, `ES384`, or `ES512` JWS Algorithm Identifiers
  *
  * ```ts
- * interface Es256Algorithm extends EcKeyAlgorithm {
+ * interface ECDSAAlgorithm extends EcKeyAlgorithm {
  *   name: 'ECDSA'
+ *   namedCurve: 'P-256' | 'P-384' | 'P-521'
+ * }
+ *
+ * interface ES256 extends ECDSAAlgorithm {
  *   namedCurve: 'P-256'
  * }
+ *
+ * interface ES384 extends ECDSAAlgorithm {
+ *   namedCurve: 'P-384'
+ * }
+ *
+ * interface ES512 extends ECDSAAlgorithm {
+ *   namedCurve: 'P-521'
+ * }
  * ```
  *
- * @example CryptoKey algorithm for the `RS256` JWS Algorithm Identifier
+ * @example CryptoKey algorithm for the `RS256`, `RS384`, or `RS512` JWS Algorithm Identifiers
  *
  * ```ts
- * interface Rs256Algorithm extends RsaHashedKeyAlgorithm {
+ * interface ECDSAAlgorithm extends RsaHashedKeyAlgorithm {
  *   name: 'RSASSA-PKCS1-v1_5'
+ *   hash: { name: 'SHA-256' | 'SHA-384' | 'SHA-512' }
+ * }
+ *
+ * interface RS256 extends ECDSAAlgorithm {
  *   hash: { name: 'SHA-256' }
+ * }
+ *
+ * interface RS384 extends ECDSAAlgorithm {
+ *   hash: { name: 'SHA-384' }
+ * }
+ *
+ * interface RS512 extends ECDSAAlgorithm {
+ *   hash: { name: 'SHA-512' }
  * }
  * ```
  *
@@ -93,12 +129,24 @@ export type ClientAuthenticationMethod =
  * widely adopted. If the proposal changes this implementation will follow up with a minor release.
  *
  * ```ts
- * interface EdDSAAlgorithm extends KeyAlgorithm {
- *   name: 'Ed25519'
+ * interface EdDSA extends KeyAlgorithm {
+ *   name: 'Ed25519' | 'Ed448'
  * }
  * ```
  */
-export type JWSAlgorithm = 'PS256' | 'ES256' | 'RS256' | 'EdDSA'
+export type JWSAlgorithm =
+  // widely used
+  | 'PS256'
+  | 'ES256'
+  | 'RS256'
+  | 'EdDSA'
+  // less used
+  | 'ES384'
+  | 'PS384'
+  | 'RS384'
+  | 'ES512'
+  | 'PS512'
+  | 'RS512'
 
 interface JWK {
   readonly kty?: string
@@ -592,7 +640,18 @@ function isPublicKey(key: unknown): key is CryptoKey {
   return isCryptoKey(key) && key.type === 'public'
 }
 
-const SUPPORTED_JWS_ALGS: JWSAlgorithm[] = ['PS256', 'ES256', 'RS256', 'EdDSA']
+const SUPPORTED_JWS_ALGS: JWSAlgorithm[] = [
+  'PS256',
+  'ES256',
+  'RS256',
+  'PS384',
+  'ES384',
+  'RS384',
+  'PS512',
+  'ES512',
+  'RS512',
+  'EdDSA',
+]
 
 export interface HttpRequestOptions {
   /**
@@ -909,6 +968,10 @@ function psAlg(key: CryptoKey): JWSAlgorithm {
   switch ((<RsaHashedKeyAlgorithm>key.algorithm).hash.name) {
     case 'SHA-256':
       return 'PS256'
+    case 'SHA-384':
+      return 'PS384'
+    case 'SHA-512':
+      return 'PS512'
     default:
       throw new UnsupportedOperationError('unsupported RsaHashedKeyAlgorithm hash name')
   }
@@ -919,6 +982,10 @@ function rsAlg(key: CryptoKey): JWSAlgorithm {
   switch ((<RsaHashedKeyAlgorithm>key.algorithm).hash.name) {
     case 'SHA-256':
       return 'RS256'
+    case 'SHA-384':
+      return 'RS384'
+    case 'SHA-512':
+      return 'RS512'
     default:
       throw new UnsupportedOperationError('unsupported RsaHashedKeyAlgorithm hash name')
   }
@@ -929,13 +996,17 @@ function esAlg(key: CryptoKey): JWSAlgorithm {
   switch ((<EcKeyAlgorithm>key.algorithm).namedCurve) {
     case 'P-256':
       return 'ES256'
+    case 'P-384':
+      return 'ES384'
+    case 'P-521':
+      return 'ES512'
     default:
       throw new UnsupportedOperationError('unsupported EcKeyAlgorithm namedCurve')
   }
 }
 
 /** Determines a supported JWS `alg` identifier from CryptoKey instance properties. */
-function determineJWSAlgorithm(key: CryptoKey) {
+function keyToJws(key: CryptoKey) {
   switch (key.algorithm.name) {
     case 'RSA-PSS':
       return psAlg(key)
@@ -943,7 +1014,8 @@ function determineJWSAlgorithm(key: CryptoKey) {
       return rsAlg(key)
     case 'ECDSA':
       return esAlg(key)
-    case 'Ed25519':
+    case 'Ed25519': // Fall through
+    case 'Ed448':
       return 'EdDSA'
     default:
       throw new UnsupportedOperationError('unsupported CryptoKey algorithm name')
@@ -977,7 +1049,7 @@ async function privateKeyJwt(
 ) {
   return jwt(
     {
-      alg: determineJWSAlgorithm(key),
+      alg: keyToJws(key),
       kid,
     },
     clientAssertion(as, client),
@@ -1099,7 +1171,7 @@ async function jwt(
     )
   }
   const input = `${b64u(buf(JSON.stringify(header)))}.${b64u(buf(JSON.stringify(claimsSet)))}`
-  const signature = b64u(await crypto.subtle.sign(subtleAlgorithm(key), key, buf(input)))
+  const signature = b64u(await crypto.subtle.sign(keyToSubtle(key), key, buf(input)))
   return `${input}.${signature}`
 }
 
@@ -1171,7 +1243,7 @@ export async function issueRequestObject(
 
   return jwt(
     {
-      alg: determineJWSAlgorithm(key),
+      alg: keyToJws(key),
       typ: 'oauth-authz-req+jwt',
       kid,
     },
@@ -1209,7 +1281,7 @@ async function dpopProofJwt(
   const now = epochTime()
   const proof = await jwt(
     {
-      alg: determineJWSAlgorithm(privateKey),
+      alg: keyToJws(privateKey),
       typ: 'dpop+jwt',
       jwk: await publicJwk(publicKey),
     },
@@ -1669,7 +1741,9 @@ async function getPublicSigKeyFromIssuerJwksUri(
     // filter keys based on alg-specific key requirements
     switch (true) {
       case alg === 'ES256' && jwk.crv !== 'P-256': // Fall through
-      case alg === 'EdDSA' && jwk.crv !== 'Ed25519':
+      case alg === 'ES384' && jwk.crv !== 'P-384': // Fall through
+      case alg === 'ES512' && jwk.crv !== 'P-521': // Fall through
+      case alg === 'EdDSA' && !(jwk.crv === 'Ed25519' || jwk.crv === 'Ed448'):
         return false
     }
 
@@ -2755,19 +2829,45 @@ function checkRsaKeyAlgorithm(algorithm: RsaHashedKeyAlgorithm) {
   }
 }
 
-function subtleAlgorithm(key: CryptoKey): Algorithm | RsaPssParams | EcdsaParams {
+function ecdsaHashName(namedCurve: string) {
+  switch (namedCurve) {
+    case 'P-256':
+      return 'SHA-256'
+    case 'P-384':
+      return 'SHA-384'
+    case 'P-521':
+      return 'SHA-512'
+    default:
+      throw new UnsupportedOperationError()
+  }
+}
+
+function keyToSubtle(key: CryptoKey): Algorithm | RsaPssParams | EcdsaParams {
   switch (key.algorithm.name) {
     case 'ECDSA':
-      return <EcdsaParams>{ name: key.algorithm.name, hash: { name: 'SHA-256' } }
-    case 'RSA-PSS':
-      checkRsaKeyAlgorithm(<RsaHashedKeyAlgorithm>key.algorithm)
-      return <RsaPssParams>{
+      return <EcdsaParams>{
         name: key.algorithm.name,
-        saltLength: 256 >> 3,
+        hash: { name: ecdsaHashName((<EcKeyAlgorithm>key.algorithm).namedCurve) },
       }
+    case 'RSA-PSS': {
+      checkRsaKeyAlgorithm(<RsaHashedKeyAlgorithm>key.algorithm)
+      switch ((<RsaHashedKeyAlgorithm>key.algorithm).hash.name) {
+        case 'SHA-256': // Fall through
+        case 'SHA-384': // Fall through
+        case 'SHA-512':
+          return <RsaPssParams>{
+            name: key.algorithm.name,
+            saltLength:
+              parseInt((<RsaHashedKeyAlgorithm>key.algorithm).hash.name.slice(-3), 10) >> 3,
+          }
+        default:
+          throw new UnsupportedOperationError()
+      }
+    }
     case 'RSASSA-PKCS1-v1_5':
       checkRsaKeyAlgorithm(<RsaHashedKeyAlgorithm>key.algorithm)
       return { name: key.algorithm.name }
+    case 'Ed448': // Fall through
     case 'Ed25519':
       return { name: key.algorithm.name }
   }
@@ -2810,7 +2910,7 @@ async function validateJwt(
   if (getKey !== noSignatureCheck) {
     const key = await getKey(header)
     const input = `${protectedHeader}.${payload}`
-    const verified = await crypto.subtle.verify(subtleAlgorithm(key), key, signature, buf(input))
+    const verified = await crypto.subtle.verify(keyToSubtle(key), key, signature, buf(input))
     if (!verified) {
       throw new OPE('JWT signature verification failed')
     }
@@ -3094,29 +3194,42 @@ type ReturnTypes =
   | URLSearchParams
   | UserInfoResponse
 
-async function importJwk(alg: JWSAlgorithm, jwk: JWK) {
-  const { ext, key_ops, use, ...key } = jwk
-
-  let algorithm: RsaHashedImportParams | EcKeyImportParams | Algorithm
-
+function algToSubtle(
+  alg: JWSAlgorithm,
+  crv?: string,
+): RsaHashedImportParams | EcKeyImportParams | Algorithm {
   switch (alg) {
-    case 'PS256':
-      algorithm = { name: 'RSA-PSS', hash: { name: 'SHA-256' } }
-      break
-    case 'RS256':
-      algorithm = { name: 'RSASSA-PKCS1-v1_5', hash: { name: 'SHA-256' } }
-      break
-    case 'ES256':
-      algorithm = { name: 'ECDSA', namedCurve: 'P-256' }
-      break
-    case 'EdDSA':
-      algorithm = { name: 'Ed25519' }
-      break
+    case 'PS256': // Fall through
+    case 'PS384': // Fall through
+    case 'PS512':
+      return { name: 'RSA-PSS', hash: { name: `SHA-${alg.slice(-3)}` } }
+    case 'RS256': // Fall through
+    case 'RS384': // Fall through
+    case 'RS512':
+      return { name: 'RSASSA-PKCS1-v1_5', hash: { name: `SHA-${alg.slice(-3)}` } }
+    case 'ES256': // Fall through
+    case 'ES384':
+      return { name: 'ECDSA', namedCurve: `P-${alg.slice(-3)}` }
+    case 'ES512':
+      return { name: 'ECDSA', namedCurve: 'P-521' }
+    case 'EdDSA': {
+      switch (crv) {
+        case 'Ed25519':
+          return { name: 'Ed25519' }
+        case 'Ed448':
+          return { name: 'Ed448' }
+        default:
+          throw new UnsupportedOperationError()
+      }
+    }
     default:
       throw new UnsupportedOperationError()
   }
+}
 
-  return crypto.subtle.importKey('jwk', key, algorithm, true, ['verify'])
+async function importJwk(alg: JWSAlgorithm, jwk: JWK) {
+  const { ext, key_ops, use, ...key } = jwk
+  return crypto.subtle.importKey('jwk', key, algToSubtle(alg, jwk.crv), true, ['verify'])
 }
 
 export interface DeviceAuthorizationRequestOptions
@@ -3309,6 +3422,9 @@ export interface GenerateKeyPairOptions {
 
   /** (RSA algorithms only) The length, in bits, of the RSA modulus. Default is `2048`. */
   modulusLength?: number
+
+  /** (EdDSA algorithms only) The EdDSA sub-type. Default is `Ed25519`. */
+  crv?: 'Ed25519' | 'Ed448'
 }
 
 /**
@@ -3317,37 +3433,19 @@ export interface GenerateKeyPairOptions {
  * @param alg Supported JWS `alg` Algorithm identifier.
  */
 export async function generateKeyPair(alg: JWSAlgorithm, options?: GenerateKeyPairOptions) {
-  let algorithm: RsaHashedKeyGenParams | EcKeyGenParams | Algorithm
-
   if (!validateString(alg)) {
     throw new TypeError('"alg" must be a non-empty string')
   }
+  const algorithm: RsaHashedKeyGenParams | EcKeyGenParams | Algorithm = algToSubtle(
+    alg,
+    alg === 'EdDSA' ? options?.crv ?? 'Ed25519' : undefined,
+  )
 
-  switch (alg) {
-    case 'PS256':
-      algorithm = {
-        name: 'RSA-PSS',
-        hash: { name: 'SHA-256' },
-        modulusLength: options?.modulusLength ?? 2048,
-        publicExponent: new Uint8Array([0x01, 0x00, 0x01]),
-      }
-      break
-    case 'RS256':
-      algorithm = {
-        name: 'RSASSA-PKCS1-v1_5',
-        hash: { name: 'SHA-256' },
-        modulusLength: options?.modulusLength ?? 2048,
-        publicExponent: new Uint8Array([0x01, 0x00, 0x01]),
-      }
-      break
-    case 'ES256':
-      algorithm = { name: 'ECDSA', namedCurve: 'P-256' }
-      break
-    case 'EdDSA':
-      algorithm = { name: 'Ed25519' }
-      break
-    default:
-      throw new UnsupportedOperationError()
+  if (alg.startsWith('PS') || alg.startsWith('RS')) {
+    Object.assign(algorithm, {
+      modulusLength: options?.modulusLength ?? 2048,
+      publicExponent: new Uint8Array([0x01, 0x00, 0x01]),
+    })
   }
 
   return <Promise<CryptoKeyPair>>(
