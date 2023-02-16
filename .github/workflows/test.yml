@@ -54,6 +54,9 @@ jobs:
           - lts/gallium # 16
           - lts/hydrogen # 18
           - current
+        suite:
+          - tap:node
+          - test
     steps:
       - name: Environment Information
         run: npx envinfo
@@ -67,9 +70,7 @@ jobs:
           check-latest: true
       - run: npm clean-install
       - name: Run Test Suite
-        run: npm run tap:node
-      - name: Run Network Tests
-        run: npm run test
+        run: npm run ${{ matrix.suite }}
 
   edge-runtime:
     runs-on: ubuntu-latest
