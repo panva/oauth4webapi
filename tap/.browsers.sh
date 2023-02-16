@@ -20,6 +20,7 @@ else
       SSL="key=./letsencrypt/config/live/oauth4webapi.panva.me/privkey.pem;cert=./letsencrypt/config/live/oauth4webapi.panva.me/cert.pem;rejectUnauthorized=true;"
     fi
     BROWSER=$(NODE_PATH=$(npm root -g) node ./tap/browserstack.cjs $BROWSER)
+    echo "Using $BROWSER"
   fi
 fi
 
