@@ -11,10 +11,7 @@ export default (QUnit: QUnit) => {
   for (const [alg, kp] of Object.entries(keys)) {
     const fapi = alg === 'EdDSA' || alg === 'ES256' || alg === 'PS256'
     const setup = fapi ? fapi2 : oidcc
-
-    // TODO: https://gitlab.com/openid/conformance-suite/-/issues/1129
-    // TODO: don't skip FAPI when it's a stable test plan
-    const method = alg === 'ES384' || alg === 'ES512' || fapi ? skip : test
+    const method = (alg === 'PS256' || alg === 'RS256') && !fapi ? test : skip
 
     method(`${fapi ? 'FAPI 2.0' : 'OIDC Core 1.0'} ${alg}`, async (t) => {
       const { client, issuerIdentifier, clientPrivateKey, exposed, cleanup } = await setup(
