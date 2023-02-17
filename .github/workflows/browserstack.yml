@@ -56,7 +56,6 @@ jobs:
         with:
           node-version: lts/hydrogen # 18
           cache: 'npm'
-          check-latest: true
       - name: Cache letsencrypt
         id: cert
         uses: actions/cache@v3

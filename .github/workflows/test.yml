@@ -22,7 +22,6 @@ jobs:
         with:
           node-version: lts/hydrogen # 18
           cache: 'npm'
-          check-latest: true
       - run: npm clean-install
       - run: npm run build
 
@@ -38,7 +37,6 @@ jobs:
         with:
           node-version: lts/hydrogen # 18
           cache: 'npm'
-          check-latest: true
       - run: npm clean-install
       - run: npm run format-check
       - run: ./examples/.update-diffs.sh
@@ -67,7 +65,6 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
-          check-latest: true
       - run: npm clean-install
       - name: Run Test Suite
         run: npm run ${{ matrix.suite }}
@@ -84,7 +81,6 @@ jobs:
         with:
           node-version: lts/hydrogen # 18
           cache: 'npm'
-          check-latest: true
       - run: npm clean-install
       - name: Run Test Suite
         run: npm run tap:edge-runtime
@@ -101,7 +97,6 @@ jobs:
         with:
           node-version: lts/hydrogen # 18
           cache: 'npm'
-          check-latest: true
       - run: npm clean-install
       - run: npm install --global electron
       - name: Run Test Suite
@@ -134,7 +129,6 @@ jobs:
         with:
           node-version: lts/hydrogen # 18
           cache: 'npm'
-          check-latest: true
       - run: npm clean-install
       - run: npm install --global workerd
       - name: Run Test Suite
@@ -154,7 +148,6 @@ jobs:
         with:
           node-version: lts/hydrogen # 18
           cache: 'npm'
-          check-latest: true
       - run: npm clean-install
       - name: Run Test Suite
         run: npm run tap:bun
@@ -178,7 +171,6 @@ jobs:
         with:
           node-version: lts/hydrogen # 18
           cache: 'npm'
-          check-latest: true
       - run: npm clean-install
       - run: npm install --global testcafe@2
       - name: Run Test Suite
