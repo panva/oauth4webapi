@@ -2,14 +2,16 @@ import QUnit from 'qunit'
 import run from './run.js'
 
 export default {
-  async fetch() {
-    const results = await new Promise((resolve) => {
+  async test() {
+    await new Promise((resolve, reject) => {
       run(QUnit, (results) => {
-        resolve(results)
+        if (results?.failed !== 0) {
+          reject()
+        } else {
+          // @ts-ignore
+          resolve()
+        }
       })
     })
-
-    // @ts-ignore
-    return Response.json({ ...results })
   },
 }
