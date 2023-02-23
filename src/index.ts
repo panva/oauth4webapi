@@ -957,8 +957,8 @@ function formUrlEncode(token: string) {
  * specified in RFC6749.
  */
 function clientSecretBasic(clientId: string, clientSecret: string) {
-  const username = formUrlEncode(clientId)
-  const password = formUrlEncode(clientSecret)
+  const username = decodeURIComponent(formUrlEncode(clientId))
+  const password = decodeURIComponent(formUrlEncode(clientSecret))
   const credentials = btoa(`${username}:${password}`)
   return `Basic ${credentials}`
 }
