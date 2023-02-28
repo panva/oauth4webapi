@@ -17,8 +17,6 @@ jobs:
     if: ${{ github.event_name == 'pull_request_target' && github.event.label.name == 'trigger-browserstack' }}
     runs-on: ubuntu-latest
     steps:
-      - name: Environment Information
-        run: npx envinfo
       - run: gh pr edit $PR --repo $REPO --remove-label "trigger-browserstack"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -37,7 +35,6 @@ jobs:
   browserstack:
     needs:
       - cert
-    if: ${{ !startsWith(github.event_name, 'pull_request') || (github.event_name == 'pull_request_target' && github.event.label.name == 'trigger-browserstack') }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -47,8 +44,6 @@ jobs:
           - browserstack:ios
           - browserstack:safari
     steps:
-      - name: Environment Information
-        run: npx envinfo
       - name: Checkout
         uses: actions/checkout@v3
       - name: Setup node

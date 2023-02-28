@@ -13,8 +13,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Environment Information
-        run: npx envinfo
       - name: Checkout
         uses: actions/checkout@v3
       - name: Setup node
@@ -28,8 +26,6 @@ jobs:
   format:
     runs-on: ubuntu-latest
     steps:
-      - name: Environment Information
-        run: npx envinfo
       - name: Checkout
         uses: actions/checkout@v3
       - name: Setup node
@@ -56,8 +52,6 @@ jobs:
           - tap:node
           - test
     steps:
-      - name: Environment Information
-        run: npx envinfo
       - name: Checkout
         uses: actions/checkout@v3
       - name: Setup node
@@ -72,8 +66,6 @@ jobs:
   edge-runtime:
     runs-on: ubuntu-latest
     steps:
-      - name: Environment Information
-        run: npx envinfo
       - name: Checkout
         uses: actions/checkout@v3
       - name: Setup node
@@ -88,8 +80,6 @@ jobs:
   electron:
     runs-on: macos-latest
     steps:
-      - name: Environment Information
-        run: npx envinfo
       - name: Checkout
         uses: actions/checkout@v3
       - name: Setup node
@@ -105,8 +95,6 @@ jobs:
   deno:
     runs-on: ubuntu-latest
     steps:
-      - name: Environment Information
-        run: npx envinfo
       - name: Checkout
         uses: actions/checkout@v3
       - uses: denoland/setup-deno@v1
@@ -120,8 +108,6 @@ jobs:
   workers:
     runs-on: ubuntu-latest
     steps:
-      - name: Environment Information
-        run: npx envinfo
       - name: Checkout
         uses: actions/checkout@v3
       - name: Setup node
@@ -138,8 +124,6 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
-      - name: Environment Information
-        run: npx envinfo
       - name: Checkout
         uses: actions/checkout@v3
       - run: curl https://bun.sh/install | bash
@@ -162,8 +146,6 @@ jobs:
           - firefox:headless
           - edge:headless
     steps:
-      - name: Environment Information
-        run: npx envinfo
       - name: Checkout
         uses: actions/checkout@v3
       - name: Setup node
