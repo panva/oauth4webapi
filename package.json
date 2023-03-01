@@ -66,7 +66,7 @@
     "@types/node": "^18.14.2",
     "@types/qunit": "^2.19.4",
     "ava": "^5.2.0",
-    "edge-runtime": "^2.0.6",
+    "edge-runtime": "^2.1.1",
     "esbuild": "^0.17.10",
     "jose": "^4.13.0",
     "patch-package": "^6.5.1",
