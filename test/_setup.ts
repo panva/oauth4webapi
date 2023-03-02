@@ -38,11 +38,7 @@ export default (t: ExecutionContext<Context>) => {
 
 export async function setupContextKeys(t: ExecutionContext<ContextWithAlgs>) {
   await Promise.all(
-    ALGS.map((alg) =>
-      jose.generateKeyPair(alg).then((kp) => {
-        t.context[alg] = <CryptoKeyPair>kp
-      }),
-    ),
+    ALGS.map(async (alg) => (t.context[alg] = await jose.generateKeyPair<CryptoKey>(alg))),
   )
 }
 

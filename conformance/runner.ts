@@ -1,4 +1,5 @@
 import anyTest, { type TestFn } from 'ava'
+import { importJWK, type JWK } from 'jose'
 
 export const test = anyTest as TestFn<{ instance: Test }>
 
@@ -23,7 +24,7 @@ const configuration: {
     client_secret?: string
     redirect_uri: string
     jwks: {
-      keys: Array<JsonWebKey & { kid: string }>
+      keys: Array<JWK & { kid: string }>
     }
   }
 } = conformance.configuration
@@ -48,28 +49,12 @@ switch (plan.name) {
     throw new Error()
 }
 
-const es = (namedCurve: string): EcKeyImportParams => ({ name: 'ECDSA', namedCurve })
-const rs = (hash: string): RsaHashedImportParams => ({
-  name: 'RSASSA-PKCS1-v1_5',
-  hash: { name: hash },
-})
-const ps = (hash: string): RsaHashedImportParams => ({ ...rs(hash), name: 'RSA-PSS' })
-
-const algorithms: Map<string, RsaHashedImportParams | EcKeyImportParams | Algorithm> = new Map([
-  ['PS256', ps('SHA-256')],
-  ['PS384', ps('SHA-384')],
-  ['PS512', ps('SHA-512')],
-  ['RS256', rs('SHA-256')],
-  ['RS384', rs('SHA-384')],
-  ['RS512', rs('SHA-512')],
-  ['ES256', es('P-256')],
-  ['ES384', es('P-384')],
-  ['ES512', es('P-521')],
-  ['EdDSA', <Algorithm>{ name: 'Ed25519' }],
-])
-
-function importPrivateKey(alg: string, jwk: JsonWebKey) {
-  return crypto.subtle.importKey('jwk', jwk, algorithms.get(alg)!, false, ['sign'])
+async function importPrivateKey(alg: string, jwk: JWK) {
+  const key = await importJWK<CryptoKey>(jwk, alg)
+  if (!('type' in key)) {
+    throw new Error()
+  }
+  return key
 }
 
 export function modules(name: string): ModulePrescription[] {
