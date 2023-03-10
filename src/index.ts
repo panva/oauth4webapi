@@ -165,6 +165,9 @@ interface JWK {
 
 /** @ignore during Documentation generation but part of the public API */
 export const clockSkew = Symbol()
+/** @ignore during Documentation generation but part of the public API */
+export const clockTolerance = Symbol()
+
 /**
  * Authorization Server Metadata
  *
@@ -527,6 +530,23 @@ export interface Client {
    */
   [clockSkew]?: number
 
+  /**
+   * Use to set allowed client's clock tolerance when checking DateTime JWT Claims. Only positive
+   * finite values representing seconds are allowed. Default is `30` (30 seconds).
+   *
+   * @ignore during Documentation generation but part of the public API
+   *
+   * @example Tolerate 30 seconds clock skew when validating JWT claims like `exp` or `nbf`.
+   *
+   * ```ts
+   * const client: oauth.Client = {
+   *   client_id: 'abc4ba37-4ab8-49b5-99d4-9441ba35d428',
+   *   // ... other metadata
+   *   [oauth.clockTolerance]: 30,
+   * }
+   * ```
+   */
+  [clockTolerance]?: number
   [metadata: string]: JsonValue | undefined
 }
 
@@ -1058,6 +1078,15 @@ function getClockSkew(client: Pick<Client, typeof clockSkew>) {
   }
 
   return 0
+}
+
+function getClockTolerance(client: Pick<Client, typeof clockTolerance>) {
+  const tolerance = client[clockTolerance]
+  if (Number.isFinite(tolerance) && Math.sign(tolerance!) !== -1) {
+    return tolerance!
+  }
+
+  return 30
 }
 
 /** Returns the current unix timestamp in seconds. */
@@ -1892,6 +1921,7 @@ export async function processUserInfoResponse(
       ),
       noSignatureCheck,
       getClockSkew(client),
+      getClockTolerance(client),
     )
       .then(validateOptionalAudience.bind(undefined, client.client_id))
       .then(validateOptionalIssuer.bind(undefined, as.issuer))
@@ -2132,6 +2162,7 @@ async function processGenericAccessTokenResponse(
         ),
         noSignatureCheck,
         getClockSkew(client),
+        getClockTolerance(client),
       )
         .then(validatePresence.bind(undefined, ['aud', 'exp', 'iat', 'iss', 'sub']))
         .then(validateIssuer.bind(undefined, as.issuer))
@@ -2425,8 +2456,8 @@ export async function processAuthorizationCodeOpenIDResponse(
       throw new TypeError('"options.max_age" must be a non-negative number')
     }
 
-    const tolerance = 30
     const now = epochTime() + getClockSkew(client)
+    const tolerance = getClockTolerance(client)
     if (claims.auth_time! + maxAge < now - tolerance) {
       throw new OPE('too much time has elapsed since the last End-User authentication')
     }
@@ -2765,6 +2796,7 @@ export async function processIntrospectionResponse(
       ),
       noSignatureCheck,
       getClockSkew(client),
+      getClockTolerance(client),
     )
       .then(checkJwtType.bind(undefined, 'token-introspection+jwt'))
       .then(validatePresence.bind(undefined, ['aud', 'iat', 'iss']))
@@ -2945,6 +2977,7 @@ async function validateJwt(
   checkAlg: (h: CompactJWSHeaderParameters) => void,
   getKey: ((h: CompactJWSHeaderParameters) => Promise<CryptoKey>) | typeof noSignatureCheck,
   clockSkew: number,
+  clockTolerance: number,
 ): Promise<ParsedJWT> {
   const { 0: protectedHeader, 1: payload, 2: encodedSignature, length } = jws.split('.')
   if (length === 5) {
@@ -2991,7 +3024,6 @@ async function validateJwt(
     throw new OPE('JWT Payload must be a top level object')
   }
 
-  const tolerance = 30
   const now = epochTime() + clockSkew
 
   if (claims.exp !== undefined) {
@@ -2999,7 +3031,7 @@ async function validateJwt(
       throw new OPE('unexpected JWT "exp" (expiration time) claim type')
     }
 
-    if (claims.exp <= now - tolerance) {
+    if (claims.exp <= now - clockTolerance) {
       throw new OPE('unexpected JWT "exp" (expiration time) claim value, timestamp is <= now()')
     }
   }
@@ -3020,7 +3052,7 @@ async function validateJwt(
     if (typeof claims.nbf !== 'number') {
       throw new OPE('unexpected JWT "nbf" (not before) claim type')
     }
-    if (claims.nbf > now + tolerance) {
+    if (claims.nbf > now + clockTolerance) {
       throw new OPE('unexpected JWT "nbf" (not before) claim value, timestamp is > now()')
     }
   }
@@ -3082,6 +3114,7 @@ export async function validateJwtAuthResponse(
     ),
     getPublicSigKeyFromIssuerJwksUri.bind(undefined, as, options),
     getClockSkew(client),
+    getClockTolerance(client),
   )
     .then(validatePresence.bind(undefined, ['aud', 'exp', 'iss']))
     .then(validateIssuer.bind(undefined, as.issuer))
