@@ -163,6 +163,8 @@ interface JWK {
   readonly [parameter: string]: JsonValue | undefined
 }
 
+/** @ignore during Documentation generation but part of the public API */
+export const clockSkew = Symbol()
 /**
  * Authorization Server Metadata
  *
@@ -496,6 +498,34 @@ export interface Client {
   introspection_signed_response_alg?: string
   /** Default Maximum Authentication Age. */
   default_max_age?: number
+
+  /**
+   * Use to adjust the client's assumed current time. Positive and negative finite values
+   * representing seconds are allowed. Default is `0` (Date.now() + 0 seconds is used).
+   *
+   * @ignore during Documentation generation but part of the public API
+   *
+   * @example Client's local clock is mistakenly 1 hour in the past
+   *
+   * ```ts
+   * const client: oauth.Client = {
+   *   client_id: 'abc4ba37-4ab8-49b5-99d4-9441ba35d428',
+   *   // ... other metadata
+   *   [oauth.clockSkew]: +(60 * 60),
+   * }
+   * ```
+   *
+   * @example Client's local clock is mistakenly 1 hour in the future
+   *
+   * ```ts
+   * const client: oauth.Client = {
+   *   client_id: 'abc4ba37-4ab8-49b5-99d4-9441ba35d428',
+   *   // ... other metadata
+   *   [oauth.clockSkew]: -(60 * 60),
+   * }
+   * ```
+   */
+  [clockSkew]?: number
 
   [metadata: string]: JsonValue | undefined
 }
@@ -1022,13 +1052,21 @@ function keyToJws(key: CryptoKey) {
   }
 }
 
+function getClockSkew(client: Pick<Client, typeof clockSkew>) {
+  if (Number.isFinite(client[clockSkew])) {
+    return client[clockSkew]!
+  }
+
+  return 0
+}
+
 /** Returns the current unix timestamp in seconds. */
 function epochTime() {
   return Math.floor(Date.now() / 1000)
 }
 
 function clientAssertion(as: AuthorizationServer, client: Client) {
-  const now = epochTime()
+  const now = epochTime() + getClockSkew(client)
   return {
     jti: randomBytes(),
     aud: [as.issuer, as.token_endpoint],
@@ -1205,7 +1243,7 @@ export async function issueRequestObject(
 
   parameters.set('client_id', client.client_id)
 
-  const now = epochTime()
+  const now = epochTime() + getClockSkew(client)
   const claims: Record<string, unknown> = {
     ...Object.fromEntries(parameters.entries()),
     jti: randomBytes(),
@@ -1258,6 +1296,7 @@ async function dpopProofJwt(
   options: DPoPOptions,
   url: URL,
   htm: string,
+  clockSkew: number,
   accessToken?: string,
 ) {
   const { privateKey, publicKey, nonce = dpopNonces.get(url.origin) } = options
@@ -1278,7 +1317,7 @@ async function dpopProofJwt(
     throw new TypeError('"DPoP.publicKey.extractable" must be true')
   }
 
-  const now = epochTime()
+  const now = epochTime() + clockSkew
   const proof = await jwt(
     {
       alg: keyToJws(privateKey),
@@ -1351,7 +1390,7 @@ export async function pushedAuthorizationRequest(
   headers.set('accept', 'application/json')
 
   if (options?.DPoP !== undefined) {
-    await dpopProofJwt(headers, options.DPoP, url, 'POST')
+    await dpopProofJwt(headers, options.DPoP, url, 'POST', getClockSkew(client))
   }
 
   return authenticatedRequest(as, client, 'POST', url, body, headers, options)
@@ -1537,7 +1576,18 @@ export async function processPushedAuthorizationResponse(
 
 export interface ProtectedResourceRequestOptions
   extends Omit<HttpRequestOptions, 'headers'>,
-    DPoPRequestOptions {}
+    DPoPRequestOptions {
+  /**
+   * Use to adjust the client's assumed current time. Positive and negative finite values
+   * representing seconds are allowed. Default is `0` (Date.now() + 0 seconds is used).
+   *
+   * This option only affects the request if the {@link ProtectedResourceRequestOptions.DPoP DPoP}
+   * option is also used.
+   *
+   * @ignore during Documentation generation but part of the public API
+   */
+  clockSkew?: number
+}
 
 /**
  * Performs a protected resource request at an arbitrary URL.
@@ -1574,7 +1624,14 @@ export async function protectedResourceRequest(
   if (options?.DPoP === undefined) {
     headers.set('authorization', `Bearer ${accessToken}`)
   } else {
-    await dpopProofJwt(headers, options.DPoP, url, 'GET', accessToken)
+    await dpopProofJwt(
+      headers,
+      options.DPoP,
+      url,
+      'GET',
+      getClockSkew({ [clockSkew]: options?.clockSkew }),
+      accessToken,
+    )
     headers.set('authorization', `DPoP ${accessToken}`)
   }
 
@@ -1625,7 +1682,10 @@ export async function userInfoRequest(
     headers.append('accept', 'application/jwt')
   }
 
-  return protectedResourceRequest(accessToken, 'GET', url, headers, null, options)
+  return protectedResourceRequest(accessToken, 'GET', url, headers, null, {
+    ...options,
+    clockSkew: getClockSkew(client),
+  })
 }
 
 export interface UserInfoResponse {
@@ -1831,6 +1891,7 @@ export async function processUserInfoResponse(
         as.userinfo_signing_alg_values_supported,
       ),
       noSignatureCheck,
+      getClockSkew(client),
     )
       .then(validateOptionalAudience.bind(undefined, client.client_id))
       .then(validateOptionalIssuer.bind(undefined, as.issuer))
@@ -1919,7 +1980,7 @@ async function tokenEndpointRequest(
   headers.set('accept', 'application/json')
 
   if (options?.DPoP !== undefined) {
-    await dpopProofJwt(headers, options.DPoP, url, 'POST')
+    await dpopProofJwt(headers, options.DPoP, url, 'POST', getClockSkew(client))
   }
 
   return authenticatedRequest(as, client, 'POST', url, parameters, headers, options)
@@ -2070,6 +2131,7 @@ async function processGenericAccessTokenResponse(
           as.id_token_signing_alg_values_supported,
         ),
         noSignatureCheck,
+        getClockSkew(client),
       )
         .then(validatePresence.bind(undefined, ['aud', 'exp', 'iat', 'iss', 'sub']))
         .then(validateIssuer.bind(undefined, as.issuer))
@@ -2363,8 +2425,8 @@ export async function processAuthorizationCodeOpenIDResponse(
       throw new TypeError('"options.max_age" must be a non-negative number')
     }
 
-    const now = epochTime()
     const tolerance = 30
+    const now = epochTime() + getClockSkew(client)
     if (claims.auth_time! + maxAge < now - tolerance) {
       throw new OPE('too much time has elapsed since the last End-User authentication')
     }
@@ -2702,6 +2764,7 @@ export async function processIntrospectionResponse(
         as.introspection_signing_alg_values_supported,
       ),
       noSignatureCheck,
+      getClockSkew(client),
     )
       .then(checkJwtType.bind(undefined, 'token-introspection+jwt'))
       .then(validatePresence.bind(undefined, ['aud', 'iat', 'iss']))
@@ -2881,6 +2944,7 @@ async function validateJwt(
   jws: string,
   checkAlg: (h: CompactJWSHeaderParameters) => void,
   getKey: ((h: CompactJWSHeaderParameters) => Promise<CryptoKey>) | typeof noSignatureCheck,
+  clockSkew: number,
 ): Promise<ParsedJWT> {
   const { 0: protectedHeader, 1: payload, 2: encodedSignature, length } = jws.split('.')
   if (length === 5) {
@@ -2927,8 +2991,8 @@ async function validateJwt(
     throw new OPE('JWT Payload must be a top level object')
   }
 
-  const now = epochTime()
   const tolerance = 30
+  const now = epochTime() + clockSkew
 
   if (claims.exp !== undefined) {
     if (typeof claims.exp !== 'number') {
@@ -3017,6 +3081,7 @@ export async function validateJwtAuthResponse(
       as.authorization_signing_alg_values_supported,
     ),
     getPublicSigKeyFromIssuerJwksUri.bind(undefined, as, options),
+    getClockSkew(client),
   )
     .then(validatePresence.bind(undefined, ['aud', 'exp', 'iss']))
     .then(validateIssuer.bind(undefined, as.issuer))
