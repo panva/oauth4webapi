@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.2.0](https://github.com/panva/oauth4webapi/compare/v2.1.0...v2.2.0) (2023-03-10)
+
+
+### Features
+
+* allow the client's assumed current time to be adjusted ([5051a5d](https://github.com/panva/oauth4webapi/commit/5051a5d06344c6721d074d67c47a5f3ec3a1ff4a)), closes [#49](https://github.com/panva/oauth4webapi/issues/49) [#50](https://github.com/panva/oauth4webapi/issues/50)
+* allow the client's DateTime claims tolerance to be adjusted ([3936a56](https://github.com/panva/oauth4webapi/commit/3936a561f9f55ecd8bdd4fcd9ec6fa28e97f3114)), closes [#49](https://github.com/panva/oauth4webapi/issues/49) [#50](https://github.com/panva/oauth4webapi/issues/50)
+
 ## [2.1.0](https://github.com/panva/oauth4webapi/compare/v2.0.6...v2.1.0) (2023-02-09)
 
 
