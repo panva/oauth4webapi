@@ -59,6 +59,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
+          check-latest: true
       - run: npm clean-install
       - name: Run Test Suite
         run: npm run ${{ matrix.suite }}
