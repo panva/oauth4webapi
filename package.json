@@ -67,7 +67,7 @@
     "@types/qunit": "^2.19.4",
     "ava": "^5.2.0",
     "edge-runtime": "^2.1.2",
-    "esbuild": "^0.17.14",
+    "esbuild": "^0.17.15",
     "jose": "^4.13.1",
     "patch-package": "^6.5.1",
     "prettier": "^2.8.7",
