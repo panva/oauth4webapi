@@ -879,7 +879,7 @@ export async function processDiscoveryResponse(
     throw new OPE('"response" body "issuer" property must be a non-empty string')
   }
 
-  if (new URL(json.issuer).href !== expectedIssuerIdentifier.href) {
+  if (new URL(json.issuer).href.replace('%7Btenantid%7D','common') !== expectedIssuerIdentifier.href) {
     throw new OPE('"response" body "issuer" does not match "expectedIssuer"')
   }
 
@@ -2232,7 +2232,7 @@ function validateOptionalIssuer(expected: string, result: ParsedJWT) {
 }
 
 function validateIssuer(expected: string, result: ParsedJWT) {
-  if (result.claims.iss !== expected) {
+  if (expected.indexOf('{tenantid}') < 0 && result.claims.iss !== expected) {l
     throw new OPE('unexpected JWT "iss" (issuer) claim value')
   }
   return result
