@@ -2,7 +2,7 @@
 
 [💗 Help the project](https://github.com/sponsors/panva)
 
-▸ **processRevocationResponse**(`response`): `Promise`<`undefined` \| [`OAuth2Error`](../interfaces/OAuth2Error.md)\>
+▸ **processRevocationResponse**(`response`): [`Promise`]( https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise )<`undefined` \| [`OAuth2Error`](../interfaces/OAuth2Error.md)\>
 
 Validates Response instance to be one coming from the
 [`as.revocation_endpoint`](../interfaces/AuthorizationServer.md#revocation_endpoint).
@@ -17,7 +17,7 @@ Validates Response instance to be one coming from the
 
 #### Returns
 
-`Promise`<`undefined` \| [`OAuth2Error`](../interfaces/OAuth2Error.md)\>
+[`Promise`]( https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise )<`undefined` \| [`OAuth2Error`](../interfaces/OAuth2Error.md)\>
 
 Resolves with `undefined` when the request was successful, or an object representing an
   OAuth 2.0 protocol style error.

@@ -2,7 +2,7 @@
 
 [💗 Help the project](https://github.com/sponsors/panva)
 
-▸ **processAuthorizationCodeOpenIDResponse**(`as`, `client`, `response`, `expectedNonce?`, `maxAge?`): `Promise`<[`OpenIDTokenEndpointResponse`](../interfaces/OpenIDTokenEndpointResponse.md) \| [`OAuth2Error`](../interfaces/OAuth2Error.md)\>
+▸ **processAuthorizationCodeOpenIDResponse**(`as`, `client`, `response`, `expectedNonce?`, `maxAge?`): [`Promise`]( https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise )<[`OpenIDTokenEndpointResponse`](../interfaces/OpenIDTokenEndpointResponse.md) \| [`OAuth2Error`](../interfaces/OAuth2Error.md)\>
 
 (OpenID Connect only) Validates Authorization Code Grant Response instance to be one coming from
 the [`as.token_endpoint`](../interfaces/AuthorizationServer.md#token_endpoint).
@@ -23,7 +23,7 @@ the [`as.token_endpoint`](../interfaces/AuthorizationServer.md#token_endpoint).
 
 #### Returns
 
-`Promise`<[`OpenIDTokenEndpointResponse`](../interfaces/OpenIDTokenEndpointResponse.md) \| [`OAuth2Error`](../interfaces/OAuth2Error.md)\>
+[`Promise`]( https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise )<[`OpenIDTokenEndpointResponse`](../interfaces/OpenIDTokenEndpointResponse.md) \| [`OAuth2Error`](../interfaces/OAuth2Error.md)\>
 
 Resolves with an object representing the parsed successful response, or an object
   representing an OAuth 2.0 protocol style error. Use [isOAuth2Error](isOAuth2Error.md) to determine if an

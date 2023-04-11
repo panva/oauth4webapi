@@ -11,7 +11,7 @@
   "hideGenerator": true,
   "intentionallyNotExported": ["ReturnTypes", "CallbackParameters", "JsonValue"],
   "out": "docs",
-  "plugin": ["typedoc-plugin-markdown", "./.mdn_links.cjs"],
+  "plugin": ["typedoc-plugin-markdown", "typedoc-plugin-mdn-links"],
   "readme": "none",
   "sort": [
     "kind",

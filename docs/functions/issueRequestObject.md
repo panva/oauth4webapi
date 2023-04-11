@@ -2,7 +2,7 @@
 
 [💗 Help the project](https://github.com/sponsors/panva)
 
-▸ **issueRequestObject**(`as`, `client`, `parameters`, `privateKey`): `Promise`<`string`\>
+▸ **issueRequestObject**(`as`, `client`, `parameters`, `privateKey`): [`Promise`]( https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise )<`string`\>
 
 Generates a signed JWT-Secured Authorization Request (JAR).
 
@@ -19,4 +19,4 @@ Generates a signed JWT-Secured Authorization Request (JAR).
 
 #### Returns
 
-`Promise`<`string`\>
+[`Promise`]( https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise )<`string`\>
