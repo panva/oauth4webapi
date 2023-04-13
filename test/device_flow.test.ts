@@ -412,28 +412,33 @@ test('processDeviceCodeResponse() without ID Tokens', async (t) => {
     },
   )
 
-  t.deepEqual(
-    await lib.processDeviceCodeResponse(
-      issuer,
-      client,
-      getResponse(
-        JSON.stringify({
-          access_token: 'token',
-          token_type: 'Bearer',
-          expires_in: 60,
-          scope: 'api:read',
-          refresh_token: 'refresh_token',
-        }),
-      ),
+  const response = await lib.processDeviceCodeResponse(
+    issuer,
+    client,
+    getResponse(
+      JSON.stringify({
+        access_token: 'token',
+        token_type: 'Bearer',
+        expires_in: 60,
+        scope: 'api:read',
+        refresh_token: 'refresh_token',
+      }),
     ),
-    {
-      access_token: 'token',
-      token_type: 'bearer',
-      expires_in: 60,
-      scope: 'api:read',
-      refresh_token: 'refresh_token',
-    },
   )
+
+  if (lib.isOAuth2Error(response)) {
+    throw new Error()
+  }
+
+  t.deepEqual(response, {
+    access_token: 'token',
+    token_type: 'bearer',
+    expires_in: 60,
+    scope: 'api:read',
+    refresh_token: 'refresh_token',
+  })
+
+  t.is(lib.getValidatedIdTokenClaims(response), undefined)
 
   t.true(
     lib.isOAuth2Error(

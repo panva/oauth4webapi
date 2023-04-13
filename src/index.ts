@@ -2070,13 +2070,18 @@ export function getValidatedIdTokenClaims(ref: TokenEndpointResponse): IDToken |
 export function getValidatedIdTokenClaims(
   ref: OpenIDTokenEndpointResponse | TokenEndpointResponse,
 ): IDToken | undefined {
-  if (!idTokenClaims.has(ref)) {
+  if (!ref.id_token) {
+    return undefined
+  }
+
+  const claims = idTokenClaims.get(ref)
+  if (!claims) {
     throw new TypeError(
       '"ref" was already garbage collected or did not resolve from the proper sources',
     )
   }
 
-  return idTokenClaims.get(ref)
+  return claims
 }
 
 async function processGenericAccessTokenResponse(
