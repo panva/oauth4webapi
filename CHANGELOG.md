@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.2.1](https://github.com/panva/oauth4webapi/compare/v2.2.0...v2.2.1) (2023-04-13)
+
+
+### Fixes
+
+* return undefined from getValidatedIdTokenClaims as documented ([678b12d](https://github.com/panva/oauth4webapi/commit/678b12d4e113b4b5d599590a9b104330bf82ee56))
+
 ## [2.2.0](https://github.com/panva/oauth4webapi/compare/v2.1.0...v2.2.0) (2023-03-10)
 
 
