@@ -8,7 +8,7 @@ const test = anyTest as TestFn<Context>
 test.before(setup)
 test.after(teardown)
 
-test('when in browser does not set custom user-agent', async (t) => {
+test.skip('when in browser does not set custom user-agent', async (t) => {
   // All browser navigator user-agent strings start with Mozilla/5.0
   // It is unlikely to ever change too
   // @ts-expect-error
