@@ -12,3 +12,5 @@ for (const [path, regex, replace, gitAdd = true] of updates) {
   writeFileSync(path, readFileSync(path, { encoding: 'utf-8' }).replace(regex, replace))
   if (gitAdd) execSync(`git add ${path}`, { stdio: 'inherit' })
 }
+
+execSync('git add build/**/* -f', { stdio: 'inherit' })
