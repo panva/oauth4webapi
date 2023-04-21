@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.2.2](https://github.com/panva/oauth4webapi/compare/v2.2.1...v2.2.2) (2023-04-21)
+
+
+### Refactor
+
+* **types:** enforce flat interfaces ([c958d61](https://github.com/panva/oauth4webapi/commit/c958d61885f67078998d7f4c214627d2323ba206))
+
 ## [2.2.1](https://github.com/panva/oauth4webapi/compare/v2.2.0...v2.2.1) (2023-04-13)
 
 
