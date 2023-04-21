@@ -49,14 +49,7 @@ ___
 
 ### cnf
 
-• `Optional` `Readonly` **cnf**: `Object`
-
-#### Type declaration
-
-| Name | Type |
-| :------ | :------ |
-| `jkt?` | `string` |
-| `x5t#S256?` | `string` |
+• `Optional` `Readonly` **cnf**: [`IntrospectionConfirmationClaims`](IntrospectionConfirmationClaims.md)
 
 ___
 

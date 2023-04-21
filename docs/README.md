@@ -60,6 +60,7 @@
 - [GenerateKeyPairOptions](interfaces/GenerateKeyPairOptions.md)
 - [HttpRequestOptions](interfaces/HttpRequestOptions.md)
 - [IDToken](interfaces/IDToken.md)
+- [IntrospectionConfirmationClaims](interfaces/IntrospectionConfirmationClaims.md)
 - [IntrospectionRequestOptions](interfaces/IntrospectionRequestOptions.md)
 - [IntrospectionResponse](interfaces/IntrospectionResponse.md)
 - [MTLSEndpointAliases](interfaces/MTLSEndpointAliases.md)
@@ -73,9 +74,11 @@
 - [RevocationRequestOptions](interfaces/RevocationRequestOptions.md)
 - [TokenEndpointRequestOptions](interfaces/TokenEndpointRequestOptions.md)
 - [TokenEndpointResponse](interfaces/TokenEndpointResponse.md)
+- [UserInfoAddress](interfaces/UserInfoAddress.md)
 - [UserInfoRequestOptions](interfaces/UserInfoRequestOptions.md)
 - [UserInfoResponse](interfaces/UserInfoResponse.md)
 - [WWWAuthenticateChallenge](interfaces/WWWAuthenticateChallenge.md)
+- [WWWAuthenticateChallengeParameters](interfaces/WWWAuthenticateChallengeParameters.md)
 
 ### Type Aliases
 

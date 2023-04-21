@@ -1453,20 +1453,22 @@ export function isOAuth2Error(input?: ReturnTypes): input is OAuth2Error {
   return value.error !== undefined
 }
 
+export interface WWWAuthenticateChallengeParameters {
+  readonly realm?: string
+  readonly error?: string
+  readonly error_description?: string
+  readonly error_uri?: string
+  readonly algs?: string
+  readonly scope?: string
+
+  /** NOTE: because the parameter names are case insensitive they are always returned lowercased */
+  readonly [parameter: string]: string | undefined
+}
+
 export interface WWWAuthenticateChallenge {
   /** NOTE: because the value is case insensitive it is always returned lowercased */
   readonly scheme: string
-  readonly parameters: {
-    readonly realm?: string
-    readonly error?: string
-    readonly error_description?: string
-    readonly error_uri?: string
-    readonly algs?: string
-    readonly scope?: string
-
-    /** NOTE: because the parameter names are case insensitive they are always returned lowercased */
-    readonly [parameter: string]: string | undefined
-  }
+  readonly parameters: WWWAuthenticateChallengeParameters
 }
 
 function unquote(value: string) {
@@ -1717,6 +1719,17 @@ export async function userInfoRequest(
   })
 }
 
+export interface UserInfoAddress {
+  readonly formatted?: string
+  readonly street_address?: string
+  readonly locality?: string
+  readonly region?: string
+  readonly postal_code?: string
+  readonly country?: string
+
+  readonly [claim: string]: JsonValue | undefined
+}
+
 export interface UserInfoResponse {
   readonly sub: string
   readonly name?: string
@@ -1736,14 +1749,7 @@ export interface UserInfoResponse {
   readonly locale?: string
   readonly phone_number?: string
   readonly updated_at?: number
-  readonly address?: {
-    readonly formatted?: string
-    readonly street_address?: string
-    readonly locality?: string
-    readonly region?: string
-    readonly postal_code?: string
-    readonly country?: string
-  }
+  readonly address?: UserInfoAddress
 
   readonly [claim: string]: JsonValue | undefined
 }
@@ -2731,6 +2737,13 @@ export async function introspectionRequest(
   return authenticatedRequest(as, client, 'POST', url, body, headers, options)
 }
 
+export interface IntrospectionConfirmationClaims {
+  readonly 'x5t#S256'?: string
+  readonly jkt?: string
+
+  readonly [claim: string]: JsonValue | undefined
+}
+
 export interface IntrospectionResponse {
   readonly active: boolean
   readonly client_id?: string
@@ -2745,12 +2758,7 @@ export interface IntrospectionResponse {
   readonly sub?: string
   readonly nbf?: number
   readonly token_type?: string
-  readonly cnf?: {
-    readonly 'x5t#S256'?: string
-    readonly jkt?: string
-
-    readonly [claim: string]: JsonValue | undefined
-  }
+  readonly cnf?: IntrospectionConfirmationClaims
 
   readonly [claim: string]: JsonValue | undefined
 }

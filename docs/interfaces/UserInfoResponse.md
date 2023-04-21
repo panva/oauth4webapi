@@ -36,18 +36,7 @@ ___
 
 ### address
 
-• `Optional` `Readonly` **address**: `Object`
-
-#### Type declaration
-
-| Name | Type |
-| :------ | :------ |
-| `country?` | `string` |
-| `formatted?` | `string` |
-| `locality?` | `string` |
-| `postal_code?` | `string` |
-| `region?` | `string` |
-| `street_address?` | `string` |
+• `Optional` `Readonly` **address**: [`UserInfoAddress`](UserInfoAddress.md)
 
 ___
 

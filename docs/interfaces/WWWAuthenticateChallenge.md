@@ -13,18 +13,7 @@
 
 ### parameters
 
-• `Readonly` **parameters**: `Object`
-
-#### Type declaration
-
-| Name | Type |
-| :------ | :------ |
-| `algs?` | `string` |
-| `error?` | `string` |
-| `error_description?` | `string` |
-| `error_uri?` | `string` |
-| `realm?` | `string` |
-| `scope?` | `string` |
+• `Readonly` **parameters**: [`WWWAuthenticateChallengeParameters`](WWWAuthenticateChallengeParameters.md)
 
 ___
 
