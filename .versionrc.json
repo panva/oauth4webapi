@@ -3,7 +3,7 @@
   "scripts": {
     "prerelease": "npm run format && npm run docs && ./examples/.update-diffs.sh && git diff --quiet && npm run test && npm run tap:node && npm run build",
     "postbump": "node .postbump.cjs",
-    "postchangelog": "sed -i -e 's/### \\[/## [/g' CHANGELOG.md"
+    "postchangelog": "sed -i '' -e 's/### \\[/## [/g' CHANGELOG.md"
   },
   "types": [
     {
