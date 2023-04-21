@@ -1,12 +1,15 @@
 name: Create GitHub Release
 
 on:
-  push:
-    tags: ['v[0-9]+.[0-9]+.[0-9]+']
+  workflow_run:
+    workflows: [NPM Release]
+    types:
+      - completed
 
 jobs:
   create-github-release:
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
