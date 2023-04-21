@@ -13,4 +13,4 @@ for (const [path, regex, replace, gitAdd = true] of updates) {
   if (gitAdd) execSync(`git add ${path}`, { stdio: 'inherit' })
 }
 
-execSync('git add build/**/* -f', { stdio: 'inherit' })
+execSync('git add build/* -f', { stdio: 'inherit' })
