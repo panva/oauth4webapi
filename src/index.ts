@@ -2249,6 +2249,12 @@ function validateIssuer(expected: string, result: ParsedJWT) {
   return result
 }
 
+const branded = new WeakSet<URLSearchParams>()
+function brand(searchParams: URLSearchParams) {
+  branded.add(searchParams)
+  return searchParams
+}
+
 /**
  * Performs an Authorization Code grant request at the
  * {@link AuthorizationServer.token_endpoint `as.token_endpoint`}.
@@ -2268,7 +2274,7 @@ function validateIssuer(expected: string, result: ParsedJWT) {
 export async function authorizationCodeGrantRequest(
   as: AuthorizationServer,
   client: Client,
-  callbackParameters: CallbackParameters,
+  callbackParameters: URLSearchParams,
   redirectUri: string,
   codeVerifier: string,
   options?: TokenEndpointRequestOptions,
@@ -2276,9 +2282,9 @@ export async function authorizationCodeGrantRequest(
   assertAs(as)
   assertClient(client)
 
-  if (!(callbackParameters instanceof CallbackParameters)) {
+  if (!branded.has(callbackParameters)) {
     throw new TypeError(
-      '"callbackParameters" must be an instance of CallbackParameters obtained from "validateAuthResponse()", or "validateJwtAuthResponse()',
+      '"callbackParameters" must be an instance of URLSearchParams obtained from "validateAuthResponse()", or "validateJwtAuthResponse()',
     )
   }
 
@@ -3097,7 +3103,7 @@ export async function validateJwtAuthResponse(
   parameters: URLSearchParams | URL,
   expectedState?: string | typeof expectNoState | typeof skipStateCheck,
   options?: HttpRequestOptions,
-): Promise<CallbackParameters | OAuth2Error> {
+): Promise<URLSearchParams | OAuth2Error> {
   assertAs(as)
   assertClient(client)
 
@@ -3202,8 +3208,6 @@ export const skipStateCheck = Symbol()
  */
 export const expectNoState = Symbol()
 
-class CallbackParameters extends URLSearchParams {}
-
 /**
  * Validates an OAuth 2.0 Authorization Response or Authorization Error Response message returned
  * from the authorization server's
@@ -3225,7 +3229,7 @@ export function validateAuthResponse(
   client: Client,
   parameters: URLSearchParams | URL,
   expectedState?: string | typeof expectNoState | typeof skipStateCheck,
-): CallbackParameters | OAuth2Error {
+): URLSearchParams | OAuth2Error {
   assertAs(as)
   assertClient(client)
 
@@ -3290,7 +3294,7 @@ export function validateAuthResponse(
     throw new UnsupportedOperationError('implicit and hybrid flows are not supported')
   }
 
-  return new CallbackParameters(parameters)
+  return brand(new URLSearchParams(parameters))
 }
 
 type ReturnTypes =

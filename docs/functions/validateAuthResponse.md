@@ -2,7 +2,7 @@
 
 [💗 Help the project](https://github.com/sponsors/panva)
 
-▸ **validateAuthResponse**(`as`, `client`, `parameters`, `expectedState?`): `CallbackParameters` \| [`OAuth2Error`](../interfaces/OAuth2Error.md)
+▸ **validateAuthResponse**(`as`, `client`, `parameters`, `expectedState?`): [`URLSearchParams`]( https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams ) \| [`OAuth2Error`](../interfaces/OAuth2Error.md)
 
 Validates an OAuth 2.0 Authorization Response or Authorization Error Response message returned
 from the authorization server's
@@ -25,6 +25,6 @@ from the authorization server's
 
 #### Returns
 
-`CallbackParameters` \| [`OAuth2Error`](../interfaces/OAuth2Error.md)
+[`URLSearchParams`]( https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams ) \| [`OAuth2Error`](../interfaces/OAuth2Error.md)
 
 Validated Authorization Response parameters or Authorization Error Response.

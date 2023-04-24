@@ -1,4 +1,5 @@
 import anyTest, { type TestFn } from 'ava'
+import * as querystring from 'node:querystring'
 import setup, {
   ALGS,
   client,
@@ -22,17 +23,27 @@ test.before(setupJwks)
 
 const tClient: lib.Client = { ...client, client_secret: 'foo' }
 
-const callbackParameters = lib.validateAuthResponse(
-  { issuer: 'foo' },
-  { client_id: 'foo' },
-  new URLSearchParams(),
-  lib.expectNoState,
-)
-if (lib.isOAuth2Error(callbackParameters)) throw new Error()
-
-function cb(arg: any): Exclude<ReturnType<typeof lib.validateAuthResponse>, lib.OAuth2Error> {
-  // @ts-expect-error
-  return new callbackParameters.constructor(arg)
+function cb(params: string) {
+  const callbackParameters = lib.validateAuthResponse(
+    { issuer: 'foo' },
+    { client_id: 'foo' },
+    new URLSearchParams(),
+    lib.expectNoState,
+  )
+  if (lib.isOAuth2Error(callbackParameters)) throw new Error()
+  for (const param of callbackParameters.keys()) {
+    callbackParameters.delete(param)
+  }
+  for (const [key, value] of Object.entries(querystring.parse(params))) {
+    if (Array.isArray(value)) {
+      for (const v of value) {
+        callbackParameters.append(key, v)
+      }
+    } else if (typeof value === 'string') {
+      callbackParameters.set(key, value)
+    }
+  }
+  return callbackParameters
 }
 
 test('authorizationCodeGrantRequest()', async (t) => {
@@ -53,7 +64,7 @@ test('authorizationCodeGrantRequest()', async (t) => {
     lib.authorizationCodeGrantRequest(issuer, tClient, <any>null, 'redirect_uri', 'verifier'),
     {
       message:
-        '"callbackParameters" must be an instance of CallbackParameters obtained from "validateAuthResponse()", or "validateJwtAuthResponse()',
+        '"callbackParameters" must be an instance of URLSearchParams obtained from "validateAuthResponse()", or "validateJwtAuthResponse()',
     },
   )
 
@@ -137,8 +148,7 @@ test('authorizationCodeGrantRequest() w/ Extra Parameters', async (t) => {
       path: '/token-2',
       method: 'POST',
       body(body) {
-        const params = new URLSearchParams(body)
-        return params.get('resource') === 'urn:example:resource'
+        return new URLSearchParams(body).get('resource') === 'urn:example:resource'
       },
     })
     .reply(200, { access_token: 'token', token_type: 'Bearer' })

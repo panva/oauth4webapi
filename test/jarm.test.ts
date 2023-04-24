@@ -56,7 +56,7 @@ test('validateJwtAuthResponse()', async (t) => {
       t.fail()
       throw new Error()
     }
-    t.is(result.constructor.name, 'CallbackParameters')
+    t.true(result instanceof URLSearchParams)
     t.deepEqual([...result.keys()], ['iss', 'code'])
   })
 })
@@ -85,7 +85,7 @@ test('validateJwtAuthResponse() as URL', async (t) => {
       t.fail()
       throw new Error()
     }
-    t.is(result.constructor.name, 'CallbackParameters')
+    t.true(result instanceof URLSearchParams)
     t.deepEqual([...result.keys()], ['iss', 'code'])
   })
 })

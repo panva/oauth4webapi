@@ -9,7 +9,7 @@
   "excludeProtected": true,
   "gitRevision": "main",
   "hideGenerator": true,
-  "intentionallyNotExported": ["ReturnTypes", "CallbackParameters", "JsonValue"],
+  "intentionallyNotExported": ["ReturnTypes", "JsonValue"],
   "out": "docs",
   "plugin": ["typedoc-plugin-markdown", "typedoc-plugin-mdn-links"],
   "readme": "none",
