@@ -36,7 +36,7 @@ jobs:
         with:
           fetch-depth: 0
       - run: git push origin $GITHUB_SHA:v2.x
-      - run: git rm -r build/**/*
+      - run: git rm -r build
       - run: |
           git config --local user.name "github-actions[bot]"
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
