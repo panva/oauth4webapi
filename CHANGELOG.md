@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.3.0](https://github.com/panva/oauth4webapi/compare/v2.2.4...v2.3.0) (2023-04-26)
+
+
+### Features
+
+* allow Record<string, string> and string[][] as parameter arguments ([021b85f](https://github.com/panva/oauth4webapi/commit/021b85fe27346089aa2380caf1073f2b1310de9b))
+
 ## [2.2.4](https://github.com/panva/oauth4webapi/compare/v2.2.3...v2.2.4) (2023-04-24)
 
 
