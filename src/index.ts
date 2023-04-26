@@ -547,6 +547,7 @@ export interface Client {
    * ```
    */
   [clockTolerance]?: number
+
   [metadata: string]: JsonValue | undefined
 }
 
