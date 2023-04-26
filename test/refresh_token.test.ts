@@ -72,10 +72,25 @@ test('refreshTokenGrantRequest() w/ Extra Parameters', async (t) => {
       },
     })
     .reply(200, { access_token: 'token', token_type: 'Bearer' })
+    .times(3)
 
   await t.notThrowsAsync(
     lib.refreshTokenGrantRequest(tIssuer, tClient, 'refresh_token', {
       additionalParameters: new URLSearchParams('resource=urn:example:resource'),
+    }),
+  )
+
+  await t.notThrowsAsync(
+    lib.refreshTokenGrantRequest(tIssuer, tClient, 'refresh_token', {
+      additionalParameters: {
+        resource: 'urn:example:resource',
+      },
+    }),
+  )
+
+  await t.notThrowsAsync(
+    lib.refreshTokenGrantRequest(tIssuer, tClient, 'refresh_token', {
+      additionalParameters: [['resource', 'urn:example:resource']],
     }),
   )
 })

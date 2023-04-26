@@ -26,10 +26,6 @@ test('deviceAuthorizationRequest()', async (t) => {
     message: '"as.device_authorization_endpoint" must be a string',
   })
 
-  await t.throwsAsync(lib.deviceAuthorizationRequest(issuer, tClient, <any>null), {
-    message: '"parameters" must be an instance of URLSearchParams',
-  })
-
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
     device_authorization_endpoint: endpoint('device-1'),
@@ -44,12 +40,29 @@ test('deviceAuthorizationRequest()', async (t) => {
         'user-agent': UA,
       },
       body(body) {
-        return new URLSearchParams(body).get('client_id') === client.client_id
+        const params = new URLSearchParams(body)
+        return (
+          params.get('client_id') === client.client_id &&
+          params.get('resource') === 'urn:example:resource'
+        )
       },
     })
     .reply(200, '')
+    .times(3)
 
-  await t.notThrowsAsync(lib.deviceAuthorizationRequest(tIssuer, tClient, new URLSearchParams()))
+  await t.notThrowsAsync(
+    lib.deviceAuthorizationRequest(
+      tIssuer,
+      tClient,
+      new URLSearchParams({ resource: 'urn:example:resource' }),
+    ),
+  )
+  await t.notThrowsAsync(
+    lib.deviceAuthorizationRequest(tIssuer, tClient, { resource: 'urn:example:resource' }),
+  )
+  await t.notThrowsAsync(
+    lib.deviceAuthorizationRequest(tIssuer, tClient, [['resource', 'urn:example:resource']]),
+  )
 })
 
 test('deviceAuthorizationRequest() w/ Custom Headers', async (t) => {
@@ -267,10 +280,25 @@ test('deviceCodeGrantRequest() w/ Extra Parameters', async (t) => {
       },
     })
     .reply(200, { access_token: 'token', token_type: 'Bearer' })
+    .times(3)
 
   await t.notThrowsAsync(
     lib.deviceCodeGrantRequest(tIssuer, tClient, 'device_code', {
       additionalParameters: new URLSearchParams('resource=urn:example:resource'),
+    }),
+  )
+
+  await t.notThrowsAsync(
+    lib.deviceCodeGrantRequest(tIssuer, tClient, 'device_code', {
+      additionalParameters: {
+        resource: 'urn:example:resource',
+      },
+    }),
+  )
+
+  await t.notThrowsAsync(
+    lib.deviceCodeGrantRequest(tIssuer, tClient, 'device_code', {
+      additionalParameters: [['resource', 'urn:example:resource']],
     }),
   )
 })

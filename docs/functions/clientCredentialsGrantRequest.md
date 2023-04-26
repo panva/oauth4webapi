@@ -17,7 +17,7 @@ Performs a Client Credentials Grant request at the
 | :------ | :------ | :------ |
 | `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata. |
 | `client` | [`Client`](../interfaces/Client.md) | Client Metadata. |
-| `parameters` | [`URLSearchParams`]( https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams ) | - |
+| `parameters` | [`Record`]( https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type )<`string`, `string`\> \| [`URLSearchParams`]( https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams ) \| `string`[][] | - |
 | `options?` | [`ClientCredentialsGrantRequestOptions`](../interfaces/ClientCredentialsGrantRequestOptions.md) | - |
 
 #### Returns

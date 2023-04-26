@@ -13,27 +13,31 @@ export default (QUnit: QUnit) => {
   for (const [alg, kp] of Object.entries(keys)) {
     test(`issueRequestObject() w/ ${alg}`, async (t) => {
       const { privateKey, publicKey } = await kp
-      const jwt = await lib.issueRequestObject(
-        issuer,
-        client,
+      for (const parameters of [
         new URLSearchParams({ response_type: 'code', resource: 'urn:example:resource' }),
-        { key: privateKey },
-      )
+        { response_type: 'code', resource: 'urn:example:resource' },
+        [
+          ['response_type', 'code'],
+          ['resource', 'urn:example:resource'],
+        ],
+      ]) {
+        const jwt = await lib.issueRequestObject(issuer, client, parameters, { key: privateKey })
 
-      const { payload, protectedHeader } = await jose.jwtVerify(jwt, publicKey)
-      t.propEqual(protectedHeader, { alg, typ: 'oauth-authz-req+jwt' })
-      const { exp, iat, nbf, jti, ...claims } = payload
-      t.equal(typeof exp, 'number')
-      t.equal(typeof nbf, 'number')
-      t.equal(typeof iat, 'number')
-      t.equal(typeof jti, 'string')
-      t.propEqual(claims, {
-        iss: client.client_id,
-        aud: issuer.issuer,
-        response_type: 'code',
-        resource: 'urn:example:resource',
-        client_id: client.client_id,
-      })
+        const { payload, protectedHeader } = await jose.jwtVerify(jwt, publicKey)
+        t.propEqual(protectedHeader, { alg, typ: 'oauth-authz-req+jwt' })
+        const { exp, iat, nbf, jti, ...claims } = payload
+        t.equal(typeof exp, 'number')
+        t.equal(typeof nbf, 'number')
+        t.equal(typeof iat, 'number')
+        t.equal(typeof jti, 'string')
+        t.propEqual(claims, {
+          iss: client.client_id,
+          aud: issuer.issuer,
+          response_type: 'code',
+          resource: 'urn:example:resource',
+          client_id: client.client_id,
+        })
+      }
     })
   }
 

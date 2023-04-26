@@ -14,7 +14,7 @@ Generates a signed JWT-Secured Authorization Request (JAR).
 | :------ | :------ | :------ |
 | `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata. |
 | `client` | [`Client`](../interfaces/Client.md) | Client Metadata. |
-| `parameters` | [`URLSearchParams`]( https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams ) | - |
+| `parameters` | [`Record`]( https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type )<`string`, `string`\> \| [`URLSearchParams`]( https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams ) \| `string`[][] | - |
 | `privateKey` | [`CryptoKey`]( https://developer.mozilla.org/en-US/docs/Web/API/CryptoKey ) \| [`PrivateKey`](../interfaces/PrivateKey.md) | Private key to sign the Request Object with. |
 
 #### Returns

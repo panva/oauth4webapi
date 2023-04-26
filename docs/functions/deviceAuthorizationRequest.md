@@ -15,7 +15,7 @@ Performs a Device Authorization Request at the
 | :------ | :------ | :------ |
 | `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata. |
 | `client` | [`Client`](../interfaces/Client.md) | Client Metadata. |
-| `parameters` | [`URLSearchParams`]( https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams ) | Device Authorization Request parameters. |
+| `parameters` | [`Record`]( https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type )<`string`, `string`\> \| [`URLSearchParams`]( https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams ) \| `string`[][] | Device Authorization Request parameters. |
 | `options?` | [`DeviceAuthorizationRequestOptions`](../interfaces/DeviceAuthorizationRequestOptions.md) | - |
 
 #### Returns

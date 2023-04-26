@@ -17,7 +17,7 @@ Performs a Pushed Authorization Request at the
 | :------ | :------ | :------ |
 | `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata. |
 | `client` | [`Client`](../interfaces/Client.md) | Client Metadata. |
-| `parameters` | [`URLSearchParams`]( https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams ) | Authorization Request parameters. |
+| `parameters` | [`Record`]( https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type )<`string`, `string`\> \| [`URLSearchParams`]( https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams ) \| `string`[][] | Authorization Request parameters. |
 | `options?` | [`PushedAuthorizationRequestOptions`](../interfaces/PushedAuthorizationRequestOptions.md) | - |
 
 #### Returns

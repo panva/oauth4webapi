@@ -37,12 +37,28 @@ test('clientCredentialsGrantRequest()', async (t) => {
       },
       body(body) {
         const params = new URLSearchParams(body)
-        return params.get('grant_type') === 'client_credentials'
+        return (
+          params.get('grant_type') === 'client_credentials' &&
+          params.get('resource') === 'urn:example:resource'
+        )
       },
     })
     .reply(200, { access_token: 'token', token_type: 'Bearer' })
+    .times(3)
 
-  await t.notThrowsAsync(lib.clientCredentialsGrantRequest(tIssuer, tClient, new URLSearchParams()))
+  await t.notThrowsAsync(
+    lib.clientCredentialsGrantRequest(
+      tIssuer,
+      tClient,
+      new URLSearchParams({ resource: 'urn:example:resource' }),
+    ),
+  )
+  await t.notThrowsAsync(
+    lib.clientCredentialsGrantRequest(tIssuer, tClient, { resource: 'urn:example:resource' }),
+  )
+  await t.notThrowsAsync(
+    lib.clientCredentialsGrantRequest(tIssuer, tClient, [['resource', 'urn:example:resource']]),
+  )
 })
 
 test('clientCredentialsGrantRequest() w/ Extra Parameters', async (t) => {

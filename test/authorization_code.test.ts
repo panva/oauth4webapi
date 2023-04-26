@@ -152,6 +152,7 @@ test('authorizationCodeGrantRequest() w/ Extra Parameters', async (t) => {
       },
     })
     .reply(200, { access_token: 'token', token_type: 'Bearer' })
+    .times(3)
 
   await t.notThrowsAsync(
     lib.authorizationCodeGrantRequest(
@@ -162,6 +163,34 @@ test('authorizationCodeGrantRequest() w/ Extra Parameters', async (t) => {
       'verifier',
       {
         additionalParameters: new URLSearchParams('resource=urn:example:resource'),
+      },
+    ),
+  )
+
+  await t.notThrowsAsync(
+    lib.authorizationCodeGrantRequest(
+      tIssuer,
+      tClient,
+      cb('code=authorization_code'),
+      'redirect_uri',
+      'verifier',
+      {
+        additionalParameters: {
+          resource: 'urn:example:resource',
+        },
+      },
+    ),
+  )
+
+  await t.notThrowsAsync(
+    lib.authorizationCodeGrantRequest(
+      tIssuer,
+      tClient,
+      cb('code=authorization_code'),
+      'redirect_uri',
+      'verifier',
+      {
+        additionalParameters: [['resource', 'urn:example:resource']],
       },
     ),
   )

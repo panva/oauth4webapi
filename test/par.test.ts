@@ -22,10 +22,6 @@ test('pushedAuthorizationRequest()', async (t) => {
     message: '"as.pushed_authorization_request_endpoint" must be a string',
   })
 
-  await t.throwsAsync(lib.pushedAuthorizationRequest(issuer, tClient, <any>null), {
-    message: '"parameters" must be an instance of URLSearchParams',
-  })
-
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
     pushed_authorization_request_endpoint: endpoint('par-1'),
@@ -40,12 +36,28 @@ test('pushedAuthorizationRequest()', async (t) => {
         'user-agent': UA,
       },
       body(body) {
-        return new URLSearchParams(body).get('client_id') === client.client_id
+        const params = new URLSearchParams(body)
+        return (
+          params.get('client_id') === client.client_id && params.get('response_type') === 'code'
+        )
       },
     })
     .reply(200, { request_uri: 'urn:example:uri', expires_in: 60 })
+    .times(3)
 
-  await t.notThrowsAsync(lib.pushedAuthorizationRequest(tIssuer, tClient, new URLSearchParams()))
+  await t.notThrowsAsync(
+    lib.pushedAuthorizationRequest(
+      tIssuer,
+      tClient,
+      new URLSearchParams({ response_type: 'code' }),
+    ),
+  )
+  await t.notThrowsAsync(
+    lib.pushedAuthorizationRequest(tIssuer, tClient, { response_type: 'code' }),
+  )
+  await t.notThrowsAsync(
+    lib.pushedAuthorizationRequest(tIssuer, tClient, [['response_type', 'code']]),
+  )
 })
 
 test('pushedAuthorizationRequest() w/ Custom Headers', async (t) => {
@@ -121,16 +133,12 @@ test('pushedAuthorizationRequest() w/ Request Object', async (t) => {
     .reply(200, { request_uri: 'urn:example:uri', expires_in: 60 })
 
   const sign = await lib.generateKeyPair('ES256')
+  const request = await lib.issueRequestObject(tIssuer, tClient, new URLSearchParams(), {
+    key: sign.privateKey,
+  })
+
   await t.notThrowsAsync(
-    lib.pushedAuthorizationRequest(
-      tIssuer,
-      tClient,
-      new URLSearchParams({
-        request: await lib.issueRequestObject(tIssuer, tClient, new URLSearchParams(), {
-          key: sign.privateKey,
-        }),
-      }),
-    ),
+    lib.pushedAuthorizationRequest(tIssuer, tClient, new URLSearchParams({ request })),
   )
 })
 

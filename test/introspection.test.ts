@@ -67,10 +67,25 @@ test('introspectionRequest() w/ Extra Parameters', async (t) => {
       },
     })
     .reply(200, { access_token: 'token', token_type: 'Bearer' })
+    .times(3)
 
   await t.notThrowsAsync(
     lib.introspectionRequest(tIssuer, tClient, 'token', {
       additionalParameters: new URLSearchParams('token_type_hint=access_token'),
+    }),
+  )
+
+  await t.notThrowsAsync(
+    lib.introspectionRequest(tIssuer, tClient, 'token', {
+      additionalParameters: {
+        token_type_hint: 'access_token',
+      },
+    }),
+  )
+
+  await t.notThrowsAsync(
+    lib.introspectionRequest(tIssuer, tClient, 'token', {
+      additionalParameters: [['token_type_hint', 'access_token']],
     }),
   )
 })

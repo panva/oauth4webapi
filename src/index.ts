@@ -1255,15 +1255,12 @@ async function jwt(
 export async function issueRequestObject(
   as: AuthorizationServer,
   client: Client,
-  parameters: URLSearchParams,
+  parameters: URLSearchParams | Record<string, string> | string[][],
   privateKey: CryptoKey | PrivateKey,
 ) {
   assertAs(as)
   assertClient(client)
 
-  if (!(parameters instanceof URLSearchParams)) {
-    throw new TypeError('"parameters" must be an instance of URLSearchParams')
-  }
   parameters = new URLSearchParams(parameters)
 
   const { key, kid } = getKeyAndKid(privateKey)
@@ -1397,15 +1394,11 @@ async function publicJwk(key: CryptoKey) {
 export async function pushedAuthorizationRequest(
   as: AuthorizationServer,
   client: Client,
-  parameters: URLSearchParams,
+  parameters: URLSearchParams | Record<string, string> | string[][],
   options?: PushedAuthorizationRequestOptions,
 ): Promise<Response> {
   assertAs(as)
   assertClient(client)
-
-  if (!(parameters instanceof URLSearchParams)) {
-    throw new TypeError('"parameters" must be an instance of URLSearchParams')
-  }
 
   if (typeof as.pushed_authorization_request_endpoint !== 'string') {
     throw new TypeError('"as.pushed_authorization_request_endpoint" must be a string')
@@ -1996,7 +1989,7 @@ export interface TokenEndpointRequestOptions
     AuthenticatedRequestOptions,
     DPoPRequestOptions {
   /** Any additional parameters to send. This cannot override existing parameter values. */
-  additionalParameters?: URLSearchParams
+  additionalParameters?: URLSearchParams | Record<string, string> | string[][]
 }
 
 async function tokenEndpointRequest(
@@ -2566,7 +2559,7 @@ export interface ClientCredentialsGrantRequestOptions
 export async function clientCredentialsGrantRequest(
   as: AuthorizationServer,
   client: Client,
-  parameters: URLSearchParams,
+  parameters: URLSearchParams | Record<string, string> | string[][],
   options?: ClientCredentialsGrantRequestOptions,
 ): Promise<Response> {
   assertAs(as)
@@ -2610,7 +2603,7 @@ export async function processClientCredentialsResponse(
 
 export interface RevocationRequestOptions extends HttpRequestOptions, AuthenticatedRequestOptions {
   /** Any additional parameters to send. This cannot override existing parameter values. */
-  additionalParameters?: URLSearchParams
+  additionalParameters?: URLSearchParams | Record<string, string> | string[][]
 }
 
 /**
@@ -2683,7 +2676,7 @@ export interface IntrospectionRequestOptions
   extends HttpRequestOptions,
     AuthenticatedRequestOptions {
   /** Any additional parameters to send. This cannot override existing parameter values. */
-  additionalParameters?: URLSearchParams
+  additionalParameters?: URLSearchParams | Record<string, string> | string[][]
   /**
    * Request a JWT Response from the
    * {@link AuthorizationServer.introspection_endpoint `as.introspection_endpoint`}. Default is
@@ -3365,15 +3358,11 @@ export interface DeviceAuthorizationRequestOptions
 export async function deviceAuthorizationRequest(
   as: AuthorizationServer,
   client: Client,
-  parameters: URLSearchParams,
+  parameters: URLSearchParams | Record<string, string> | string[][],
   options?: DeviceAuthorizationRequestOptions,
 ): Promise<Response> {
   assertAs(as)
   assertClient(client)
-
-  if (!(parameters instanceof URLSearchParams)) {
-    throw new TypeError('"parameters" must be an instance of URLSearchParams')
-  }
 
   if (typeof as.device_authorization_endpoint !== 'string') {
     throw new TypeError('"as.device_authorization_endpoint" must be a string')
