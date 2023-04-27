@@ -1,13 +1,13 @@
-# OAuth 2 / OpenID Connect for Web Platform API JavaScript runtimes
+# OAuth 2 / OpenID Connect for JavaScript Runtimes
 
-This software is a collection of routines upon which framework-specific client modules may be written. Its objective is to support and, where possible, enforce secure and current best practices using only capabilities common to Browser and Non-Browser JavaScript-based runtime environments.
+This software provides a collection of routines that can be used to build client modules for OAuth 2.1, OAuth 2.0 with the latest Security Best Current Practices (BCP), and FAPI 2.0, as well as OpenID Connect where applicable. The primary goal of this software is to promote secure and up-to-date best practices while using only the capabilities common to both browser and non-browser JavaScript runtimes.
 
-Target profiles of this software are OAuth 2.1, OAuth 2.0 complemented by the latest Security BCP, and FAPI 2.0. Where applicable OpenID Connect is also supported.
+## Features
 
-## In Scope & Implemented
+The following features are currently in scope and implemented in this software:
 
 - Authorization Server Metadata discovery
-- Authorization Code Flow (profiled under OpenID Connect 1.0, OAuth 2.0, OAuth 2.1, and FAPI 2.0), PKCE
+- Authorization Code Flow (profiled under OpenID Connect 1.0, OAuth 2.0, OAuth 2.1, and FAPI 2.0), with PKCE
 - Refresh Token, Device Authorization, and Client Credentials Grants
 - Demonstrating Proof-of-Possession at the Application Layer (DPoP)
 - Token Introspection and Revocation
@@ -25,6 +25,8 @@ Target profiles of this software are OAuth 2.1, OAuth 2.0 complemented by the la
 ## [💗 Help the project](https://github.com/sponsors/panva)
 
 ## Dependencies: 0
+
+`oauth4webapi` has no dependencies and it exports tree-shakeable ESM.
 
 ## [Documentation](docs/README.md)
 
@@ -54,9 +56,8 @@ import * as oauth2 from 'https://deno.land/x/oauth4webapi@v2.3.0/mod.ts'
 
 ## Supported Runtimes
 
-The supported JavaScript runtimes include ones that support the utilized Web API globals and standard built-in objects
+The supported JavaScript runtimes include those that support the utilized Web API globals and standard built-in objects. These are _(but are not limited to)_:
 
-These are _(this is not an exhaustive list)_:
 - Browsers
 - Bun
 - Cloudflare Workers
@@ -66,6 +67,8 @@ These are _(this is not an exhaustive list)_:
 - Vercel's Edge Runtime
 
 ## Out of scope
+
+The following features are currently out of scope:
 
 - CommonJS
 - Implicit, Hybrid, and Resource Owner Password Credentials Flows

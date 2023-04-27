@@ -1,7 +1,7 @@
 {
   "name": "oauth4webapi",
   "version": "2.3.0",
-  "description": "OAuth 2 / OpenID Connect for Web Platform API JavaScript runtimes",
+  "description": "OAuth 2 / OpenID Connect for JavaScript Runtimes",
   "keywords": [
     "auth",
     "authentication",
