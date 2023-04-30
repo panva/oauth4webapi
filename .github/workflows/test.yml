@@ -106,7 +106,7 @@ jobs:
       - name: Run Test Suite
         run: npm run tap:deno
 
-  workers:
+  workerd:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -119,7 +119,7 @@ jobs:
       - run: npm clean-install
       - run: npm install --global workerd
       - name: Run Test Suite
-        run: npm run tap:workers
+        run: npm run tap:workerd
 
   bun:
     runs-on: ubuntu-latest

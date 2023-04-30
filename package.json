@@ -28,6 +28,7 @@
     "openid-connect",
     "openid",
     "vercel",
+    "workerd",
     "workers"
   ],
   "homepage": "https://github.com/panva/oauth4webapi",
@@ -58,7 +59,7 @@
     "tap:edge-runtime": "./tap/.edge-runtime.sh",
     "tap:electron": "./tap/.electron.sh",
     "tap:node": "bash -c './tap/.node.sh'",
-    "tap:workers": "./tap/.workers.sh",
+    "tap:workerd": "./tap/.workerd.sh",
     "test": "bash -c 'source .node_flags.sh && ava'"
   },
   "devDependencies": {

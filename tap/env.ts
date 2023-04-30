@@ -32,7 +32,7 @@ export const isBrowser =
     ? await browser()
     : false
 
-export const isWorkers =
+export const isWorkerd =
   typeof navigator !== 'undefined' && navigator.userAgent === 'Cloudflare-Workers'
     ? // @ts-ignore
       `workerd/${WORKERD_VERSION}`

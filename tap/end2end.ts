@@ -134,7 +134,7 @@ export default (QUnit: QUnit) => {
 
         const { accounts_endpoint } = await exposed()
         // TODO: https://gitlab.com/openid/conformance-suite/-/issues/1060
-        if (accounts_endpoint && !(env.isBun || env.isDeno || env.isWorkers)) {
+        if (accounts_endpoint && !(env.isBun || env.isDeno || env.isWorkerd)) {
           const response = await lib.protectedResourceRequest(
             access_token,
             'GET',

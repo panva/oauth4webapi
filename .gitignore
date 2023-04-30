@@ -132,4 +132,5 @@ tap/run-*.cjs
 *.txt
 *.bun
 *.bak
+tap/.workerd.capnp
 tap/.workers.capnp
