@@ -64,8 +64,8 @@
   },
   "devDependencies": {
     "@esbuild-kit/esm-loader": "^2.5.5",
-    "@types/node": "^18.16.2",
-    "@types/qunit": "^2.19.4",
+    "@types/node": "^18.16.3",
+    "@types/qunit": "^2.19.5",
     "ava": "^5.2.0",
     "edge-runtime": "^2.2.0",
     "esbuild": "^0.17.18",
@@ -76,7 +76,7 @@
     "qunit": "^2.19.4",
     "timekeeper": "^2.2.0",
     "typedoc": "^0.24.6",
-    "typedoc-plugin-markdown": "^3.15.2",
+    "typedoc-plugin-markdown": "^3.15.3",
     "typedoc-plugin-mdn-links": "^3.0.3",
     "typescript": "^5.0.4",
     "undici": "^5.22.0"
