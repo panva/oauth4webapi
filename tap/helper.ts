@@ -2,7 +2,10 @@ import * as lib from '../src/index.js'
 import * as jose from 'jose'
 import * as env from './env.js'
 
-const runtime = Object.values(env).find(Boolean)
+const runtime = [...Object.entries(env)]
+  .filter(([, v]) => v !== false)
+  .map(([k]) => k)
+  .join(',')
 
 function url(pathname: string, search?: Record<string, string>) {
   const target = new URL(pathname, 'https://obscure-mesa-34474.deno.dev')
