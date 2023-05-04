@@ -33,7 +33,7 @@ export default (QUnit: QUnit) => {
     })
   }
 
-  if (env.isNode) {
+  if (env.isNode || env.isEdgeRuntime) {
     test('EdDSA w/ Ed448', async (t) => {
       const { publicKey, privateKey } = await lib.generateKeyPair('EdDSA', { crv: 'Ed448' })
       testGeneratedCryptoKeyPair(t, privateKey, publicKey)

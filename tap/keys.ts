@@ -12,8 +12,8 @@ export const algs = <lib.JWSAlgorithm[]>[
   'ES384',
 ]
 export const fails = <lib.JWSAlgorithm[]>[]
-;(!env.isDeno ? algs : fails).push('ES512')
-;(env.isBrowser || env.isEdgeRuntime ? fails : algs).push('EdDSA')
+;(env.isDeno ? fails : algs).push('ES512')
+;(env.isBrowser ? fails : algs).push('EdDSA')
 
 export const keys = algs.reduce((acc, alg) => {
   acc[alg] = lib.generateKeyPair(alg)
