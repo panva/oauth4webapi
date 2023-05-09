@@ -64,7 +64,7 @@
   },
   "devDependencies": {
     "@esbuild-kit/esm-loader": "^2.5.5",
-    "@types/node": "^18.16.3",
+    "@types/node": "^18.16.6",
     "@types/qunit": "^2.19.5",
     "ava": "^5.2.0",
     "edge-runtime": "^2.2.0",
@@ -75,7 +75,7 @@
     "prettier-plugin-jsdoc": "^0.4.2",
     "qunit": "^2.19.4",
     "timekeeper": "^2.2.0",
-    "typedoc": "^0.24.6",
+    "typedoc": "^0.24.7",
     "typedoc-plugin-markdown": "^3.15.3",
     "typedoc-plugin-mdn-links": "^3.0.3",
     "typescript": "^5.0.4",
