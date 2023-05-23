@@ -64,7 +64,7 @@
   },
   "devDependencies": {
     "@esbuild-kit/esm-loader": "^2.5.5",
-    "@types/node": "^18.16.13",
+    "@types/node": "^18.16.14",
     "@types/qunit": "^2.19.5",
     "ava": "^5.2.0",
     "edge-runtime": "^2.2.0",
