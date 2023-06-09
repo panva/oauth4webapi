@@ -54,6 +54,25 @@ import * as oauth2 from 'https://deno.land/x/oauth4webapi@v2.3.0/mod.ts'
 - FAPI 2.0 (Private Key JWT, PAR, DPoP) - [source](examples/fapi2.ts)
 - FAPI 2.0 Message Signing (Private Key JWT, PAR, DPoP, JAR, JARM) - [source](examples/fapi2-message-signing.ts) | [diff](examples/fapi2-message-signing.diff)
 
+1. **Authorization Code Flow - OpenID Connect**: This flow is generally recommended for server-side web applications where the application server can securely store the client secret. OpenID Connect extends OAuth 2.0 to provide identity information about the user.
+
+2. **Public Client Authorization Code Flow**: This is similar to the Authorization Code Flow but is designed for public clients where the client secret cannot be securely stored. It's commonly used for mobile apps and Single Page Apps (SPAs).
+
+3. **Private Key JWT Client Authentication**: This method provides a higher level of assurance about the client's identity and is often used in scenarios with higher security requirements. It involves the client creating a JWT and signing it using its private key.
+
+4. **DPoP (Demonstration of Proof of Possession)**: This is a mechanism that binds tokens to a particular client's public key, providing additional security against token theft. It's suitable for high-security scenarios.
+
+5. **Pushed Authorization Request (PAR)**: This method increases security by directly pushing authorization requests from the client to the authorization server, reducing exposure to potential interception. It's useful in high-security contexts.
+
+6. **Client Credentials Grant**: This flow is best used for server-to-server communication where a client application needs to access a resource independently of any user interaction.
+
+7. **Device Authorization Grant**: This flow is designed for devices with limited input capabilities (e.g., smart TVs, consoles). It allows users to authorize the device from a more input-friendly environment (like their smartphone or laptop).
+
+8. **FAPI 2.0 (Private Key JWT, PAR, DPoP)**: FAPI 2.0 is designed for high-value scenarios, such as banking or financial services. It incorporates elements like Private Key JWT, PAR, and DPoP to provide high levels of security.
+
+9. **FAPI 2.0 Message Signing (Private Key JWT, PAR, DPoP, JAR, JARM)**: This is similar to the above but includes JSON Web Token (JWT) Secured Authorization Request (JAR) and JWT Secured Authorization Response Mode (JARM), adding an extra layer of security via message signing. It's suitable for very high-security applications.
+
+
 ## Supported Runtimes
 
 The supported JavaScript runtimes include those that support the utilized Web API globals and standard built-in objects. These are _(but are not limited to)_:
