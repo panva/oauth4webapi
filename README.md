@@ -72,6 +72,10 @@ import * as oauth2 from 'https://deno.land/x/oauth4webapi@v2.3.0/mod.ts'
 
 9. **FAPI 2.0 Message Signing (Private Key JWT, PAR, DPoP, JAR, JARM)**: This is similar to the above but includes JSON Web Token (JWT) Secured Authorization Request (JAR) and JWT Secured Authorization Response Mode (JARM), adding an extra layer of security via message signing. It's suitable for very high-security applications.
 
+10. **JWT Secured Authorization Request (JAR)**: With JAR, the client sends a JWT-secured authorization request to the authorization endpoint. This request JWT includes all the authorization request parameters.
+
+11. **JWT Secured Authorization Response Mode (JARM)**: With JARM, the authorization server sends a JWT-secured response from the authorization endpoint back to the client. This JWT includes the authorization response parameters.
+
 
 ## Supported Runtimes
 
