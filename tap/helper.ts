@@ -69,9 +69,7 @@ async function setup(
   const serverKey = {
     ...(await crypto.subtle.exportKey(
       'jwk',
-      (
-        await lib.generateKeyPair(alg, { extractable: true })
-      ).privateKey,
+      (await lib.generateKeyPair(alg, { extractable: true })).privateKey,
     )),
     alg,
     use: 'sig',

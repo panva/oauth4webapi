@@ -1554,6 +1554,7 @@ export function parseWwwAuthenticateChallenges(
  * @returns Resolves with an object representing the parsed successful response, or an object
  *   representing an OAuth 2.0 protocol style error. Use {@link isOAuth2Error} to determine if an
  *   OAuth 2.0 error was returned.
+ *
  * @see [RFC 9126 - OAuth 2.0 Pushed Authorization Requests](https://www.rfc-editor.org/rfc/rfc9126.html#name-pushed-authorization-reques)
  */
 export async function processPushedAuthorizationResponse(
@@ -1890,6 +1891,7 @@ function getContentType(response: Response) {
  * @returns Resolves with an object representing the parsed successful response, or an object
  *   representing an OAuth 2.0 protocol style error. Use {@link isOAuth2Error} to determine if an
  *   OAuth 2.0 error was returned.
+ *
  * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#UserInfo)
  */
 export async function processUserInfoResponse(
@@ -2199,6 +2201,7 @@ async function processGenericAccessTokenResponse(
  * @returns Resolves with an object representing the parsed successful response, or an object
  *   representing an OAuth 2.0 protocol style error. Use {@link isOAuth2Error} to determine if an
  *   OAuth 2.0 error was returned.
+ *
  * @see [RFC 6749 - The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html#section-6)
  * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#RefreshTokens)
  */
@@ -2433,6 +2436,7 @@ export const skipAuthTimeCheck = Symbol()
  * @returns Resolves with an object representing the parsed successful response, or an object
  *   representing an OAuth 2.0 protocol style error. Use {@link isOAuth2Error} to determine if an
  *   OAuth 2.0 error was returned.
+ *
  * @see [RFC 6749 - The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html#section-4.1)
  * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#CodeFlowAuth)
  */
@@ -2507,6 +2511,7 @@ export async function processAuthorizationCodeOpenIDResponse(
  * @returns Resolves with an object representing the parsed successful response, or an object
  *   representing an OAuth 2.0 protocol style error. Use {@link isOAuth2Error} to determine if an
  *   OAuth 2.0 error was returned.
+ *
  * @see [RFC 6749 - The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html#section-4.1)
  */
 export async function processAuthorizationCodeOAuth2Response(
@@ -2585,6 +2590,7 @@ export async function clientCredentialsGrantRequest(
  * @returns Resolves with an object representing the parsed successful response, or an object
  *   representing an OAuth 2.0 protocol style error. Use {@link isOAuth2Error} to determine if an
  *   OAuth 2.0 error was returned.
+ *
  * @see [RFC 6749 - The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html#section-4.4)
  */
 export async function processClientCredentialsResponse(
@@ -2614,6 +2620,7 @@ export interface RevocationRequestOptions extends HttpRequestOptions, Authentica
  * @param client Client Metadata.
  * @param token Token to revoke. You can provide the `token_type_hint` parameter via
  *   {@link RevocationRequestOptions.additionalParameters options}.
+ *
  * @see [RFC 7009 - OAuth 2.0 Token Revocation](https://www.rfc-editor.org/rfc/rfc7009.html#section-2)
  */
 export async function revocationRequest(
@@ -2652,6 +2659,7 @@ export async function revocationRequest(
  *
  * @returns Resolves with `undefined` when the request was successful, or an object representing an
  *   OAuth 2.0 protocol style error.
+ *
  * @see [RFC 7009 - OAuth 2.0 Token Revocation](https://www.rfc-editor.org/rfc/rfc7009.html#section-2)
  */
 export async function processRevocationResponse(
@@ -2703,6 +2711,7 @@ function assertReadableResponse(response: Response) {
  * @param client Client Metadata.
  * @param token Token to introspect. You can provide the `token_type_hint` parameter via
  *   {@link IntrospectionRequestOptions.additionalParameters options}.
+ *
  * @see [RFC 7662 - OAuth 2.0 Token Introspection](https://www.rfc-editor.org/rfc/rfc7662.html#section-2)
  * @see [draft-ietf-oauth-jwt-introspection-response-12 - JWT Response for OAuth Token Introspection](https://www.ietf.org/archive/id/draft-ietf-oauth-jwt-introspection-response-12.html#section-4)
  */
@@ -2774,6 +2783,7 @@ export interface IntrospectionResponse {
  * @returns Resolves with an object representing the parsed successful response, or an object
  *   representing an OAuth 2.0 protocol style error. Use {@link isOAuth2Error} to determine if an
  *   OAuth 2.0 error was returned.
+ *
  * @see [RFC 7662 - OAuth 2.0 Token Introspection](https://www.rfc-editor.org/rfc/rfc7662.html#section-2)
  * @see [draft-ietf-oauth-jwt-introspection-response-12 - JWT Response for OAuth Token Introspection](https://www.ietf.org/archive/id/draft-ietf-oauth-jwt-introspection-response-12.html#section-5)
  */
@@ -3401,6 +3411,7 @@ export interface DeviceAuthorizationResponse {
  * @returns Resolves with an object representing the parsed successful response, or an object
  *   representing an OAuth 2.0 protocol style error. Use {@link isOAuth2Error} to determine if an
  *   OAuth 2.0 error was returned.
+ *
  * @see [RFC 8628 - OAuth 2.0 Device Authorization Grant](https://www.rfc-editor.org/rfc/rfc8628.html#section-3.1)
  */
 export async function processDeviceAuthorizationResponse(
@@ -3511,6 +3522,7 @@ export async function deviceCodeGrantRequest(
  * @returns Resolves with an object representing the parsed successful response, or an object
  *   representing an OAuth 2.0 protocol style error. Use {@link isOAuth2Error} to determine if an
  *   OAuth 2.0 error was returned.
+ *
  * @see [RFC 8628 - OAuth 2.0 Device Authorization Grant](https://www.rfc-editor.org/rfc/rfc8628.html#section-3.4)
  */
 export async function processDeviceCodeResponse(
