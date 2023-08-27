@@ -3,7 +3,6 @@ name: Retry
 on:
   workflow_run:
     workflows:
-      - Browserstack
       - Conformance Checks
     types:
       - completed
