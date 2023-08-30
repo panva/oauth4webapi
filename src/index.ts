@@ -3458,7 +3458,7 @@ export async function processDeviceAuthorizationResponse(
     throw new OPE('"response" body "verification_uri" property must be a non-empty string')
   }
 
-  if (typeof json.expires_in !== 'number' || json.expires_in <= 0) {
+  if (isNaN(Number(json.expires_in)) || json.expires_in <= 0) {
     throw new OPE('"response" body "expires_in" property must be a positive number')
   }
 
