@@ -11,7 +11,7 @@ Performs a Refresh Token Grant request at the
 
 **`see`** [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#RefreshTokens)
 
-**`see`** [draft-ietf-oauth-dpop-16 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)](https://www.ietf.org/archive/id/draft-ietf-oauth-dpop-16.html#name-dpop-access-token-request)
+**`see`** [RFC 9449 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)](https://www.rfc-editor.org/rfc/rfc9449.html#name-dpop-access-token-request)
 
 #### Parameters
 

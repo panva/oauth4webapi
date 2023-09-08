@@ -10,7 +10,7 @@ Authorization Header is used to transmit the Access Token value.
 
 **`see`** [RFC 6750 - The OAuth 2.0 Authorization Framework: Bearer Token Usage](https://www.rfc-editor.org/rfc/rfc6750.html#section-2.1)
 
-**`see`** [draft-ietf-oauth-dpop-16 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)](https://www.ietf.org/archive/id/draft-ietf-oauth-dpop-16.html#name-protected-resource-access)
+**`see`** [RFC 9449 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)](https://www.rfc-editor.org/rfc/rfc9449.html#name-protected-resource-access)
 
 #### Parameters
 
