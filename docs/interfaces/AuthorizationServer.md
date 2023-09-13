@@ -4,7 +4,9 @@
 
 Authorization Server Metadata
 
-**`see`** [IANA OAuth Authorization Server Metadata registry](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#authorization-server-metadata)
+**`See`**
+
+[IANA OAuth Authorization Server Metadata registry](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#authorization-server-metadata)
 
 ## Table of contents
 

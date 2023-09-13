@@ -7,8 +7,6 @@
 Validates Response instance to be one coming from the
 [`as.device_authorization_endpoint`](../interfaces/AuthorizationServer.md#device_authorization_endpoint).
 
-**`see`** [RFC 8628 - OAuth 2.0 Device Authorization Grant](https://www.rfc-editor.org/rfc/rfc8628.html#section-3.1)
-
 #### Parameters
 
 | Name | Type | Description |
@@ -24,3 +22,7 @@ Validates Response instance to be one coming from the
 Resolves with an object representing the parsed successful response, or an object
   representing an OAuth 2.0 protocol style error. Use [isOAuth2Error](isOAuth2Error.md) to determine if an
   OAuth 2.0 error was returned.
+
+**`See`**
+
+[RFC 8628 - OAuth 2.0 Device Authorization Grant](https://www.rfc-editor.org/rfc/rfc8628.html#section-3.1)

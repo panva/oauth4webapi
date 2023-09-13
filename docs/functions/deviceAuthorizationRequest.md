@@ -7,8 +7,6 @@
 Performs a Device Authorization Request at the
 [`as.device_authorization_endpoint`](../interfaces/AuthorizationServer.md#device_authorization_endpoint).
 
-**`see`** [RFC 8628 - OAuth 2.0 Device Authorization Grant](https://www.rfc-editor.org/rfc/rfc8628.html#section-3.1)
-
 #### Parameters
 
 | Name | Type | Description |
@@ -21,3 +19,7 @@ Performs a Device Authorization Request at the
 #### Returns
 
 [`Promise`]( https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise )<[`Response`]( https://developer.mozilla.org/en-US/docs/Web/API/Response )\>
+
+**`See`**
+
+[RFC 8628 - OAuth 2.0 Device Authorization Grant](https://www.rfc-editor.org/rfc/rfc8628.html#section-3.1)

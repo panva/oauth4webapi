@@ -26,7 +26,7 @@ ___
 
 • **publicKey**: [`CryptoKey`]( https://developer.mozilla.org/en-US/docs/Web/API/CryptoKey )
 
-The public key corresponding to [privateKey](DPoPOptions.md#privatekey).
+The public key corresponding to [DPoPOptions.privateKey](DPoPOptions.md#privatekey).
 
 ___
 

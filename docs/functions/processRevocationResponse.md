@@ -7,8 +7,6 @@
 Validates Response instance to be one coming from the
 [`as.revocation_endpoint`](../interfaces/AuthorizationServer.md#revocation_endpoint).
 
-**`see`** [RFC 7009 - OAuth 2.0 Token Revocation](https://www.rfc-editor.org/rfc/rfc7009.html#section-2)
-
 #### Parameters
 
 | Name | Type | Description |
@@ -21,3 +19,7 @@ Validates Response instance to be one coming from the
 
 Resolves with `undefined` when the request was successful, or an object representing an
   OAuth 2.0 protocol style error.
+
+**`See`**
+
+[RFC 7009 - OAuth 2.0 Token Revocation](https://www.rfc-editor.org/rfc/rfc7009.html#section-2)

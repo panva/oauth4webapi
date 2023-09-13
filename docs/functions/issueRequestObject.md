@@ -6,8 +6,6 @@
 
 Generates a signed JWT-Secured Authorization Request (JAR).
 
-**`see`** [RFC 9101 - The OAuth 2.0 Authorization Framework: JWT-Secured Authorization Request (JAR)](https://www.rfc-editor.org/rfc/rfc9101.html#name-request-object-2)
-
 #### Parameters
 
 | Name | Type | Description |
@@ -20,3 +18,7 @@ Generates a signed JWT-Secured Authorization Request (JAR).
 #### Returns
 
 [`Promise`]( https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise )<`string`\>
+
+**`See`**
+
+[RFC 9101 - The OAuth 2.0 Authorization Framework: JWT-Secured Authorization Request (JAR)](https://www.rfc-editor.org/rfc/rfc9101.html#name-request-object-2)

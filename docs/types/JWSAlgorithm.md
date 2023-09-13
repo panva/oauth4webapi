@@ -6,7 +6,9 @@
 
 Supported JWS `alg` Algorithm identifiers.
 
-**`example`** CryptoKey algorithm for the `PS256`, `PS384`, or `PS512` JWS Algorithm Identifiers
+**`Example`**
+
+CryptoKey algorithm for the `PS256`, `PS384`, or `PS512` JWS Algorithm Identifiers
 
 ```ts
 interface RSAPSSAlgorithm extends RsaHashedKeyAlgorithm {
@@ -27,7 +29,9 @@ interface PS512 extends RSAPSSAlgorithm {
 }
 ```
 
-**`example`** CryptoKey algorithm for the `ES256`, `ES384`, or `ES512` JWS Algorithm Identifiers
+**`Example`**
+
+CryptoKey algorithm for the `ES256`, `ES384`, or `ES512` JWS Algorithm Identifiers
 
 ```ts
 interface ECDSAAlgorithm extends EcKeyAlgorithm {
@@ -48,7 +52,9 @@ interface ES512 extends ECDSAAlgorithm {
 }
 ```
 
-**`example`** CryptoKey algorithm for the `RS256`, `RS384`, or `RS512` JWS Algorithm Identifiers
+**`Example`**
+
+CryptoKey algorithm for the `RS256`, `RS384`, or `RS512` JWS Algorithm Identifiers
 
 ```ts
 interface ECDSAAlgorithm extends RsaHashedKeyAlgorithm {
@@ -69,7 +75,9 @@ interface RS512 extends ECDSAAlgorithm {
 }
 ```
 
-**`example`** CryptoKey algorithm for the `EdDSA` JWS Algorithm Identifier (Experimental)
+**`Example`**
+
+CryptoKey algorithm for the `EdDSA` JWS Algorithm Identifier (Experimental)
 
 Runtime support for this algorithm is very limited, it depends on the [Secure Curves in the Web
 Cryptography API](https://wicg.github.io/webcrypto-secure-curves/) proposal which is yet to be
