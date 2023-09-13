@@ -2,7 +2,6 @@ import type QUnit from 'qunit'
 import { oidcc, fapi2 } from './helper.js'
 import * as lib from '../src/index.js'
 import { keys } from './keys.js'
-import * as env from './env.js'
 
 export default (QUnit: QUnit) => {
   const { module, test, skip } = QUnit
@@ -133,8 +132,7 @@ export default (QUnit: QUnit) => {
         }
 
         const { accounts_endpoint } = await exposed()
-        // TODO: https://gitlab.com/openid/conformance-suite/-/issues/1060
-        if (accounts_endpoint && !(env.isBun || env.isDeno || env.isWorkerd)) {
+        if (accounts_endpoint) {
           const response = await lib.protectedResourceRequest(
             access_token,
             'GET',
