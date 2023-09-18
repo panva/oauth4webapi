@@ -63,12 +63,12 @@
     "test": "bash -c 'source .node_flags.sh && ava'"
   },
   "devDependencies": {
-    "@esbuild-kit/esm-loader": "^2.6.2",
-    "@types/node": "^18.17.15",
+    "@esbuild-kit/esm-loader": "^2.6.5",
+    "@types/node": "^18.17.17",
     "@types/qunit": "^2.19.6",
     "ava": "^5.3.1",
     "edge-runtime": "^2.5.3",
-    "esbuild": "^0.19.2",
+    "esbuild": "^0.19.3",
     "jose": "^4.14.6",
     "patch-package": "^8.0.0",
     "prettier": "^3.0.3",
