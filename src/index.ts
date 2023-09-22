@@ -709,14 +709,13 @@ export interface HttpRequestOptions {
    * The credentials read-only property of the Request interface indicates whether the user agent
    * should send or receive cookies from the other domain in the case of cross-origin requests.
    *
-   * @example
-   * // The credentials mode of the request can be set as follows:
-   * credentials: 'include'; // Automatically include credentials for same-origin domain.
-   * credentials: 'same-origin'; // Include credentials for the same-origin and cross-origin requests.
-   * credentials: 'omit'; // Exclude credentials from the request.
+   * @example // The credentials mode of the request can be set as follows: credentials: 'include';
+   * // Automatically include credentials for same-origin domain. credentials: 'same-origin'; //
+   * Include credentials for the same-origin and cross-origin requests. credentials: 'omit'; //
+   * Exclude credentials from the request.
    */
-  credentials?: RequestCredentials;
-  
+  credentials?: RequestCredentials
+
   /**
    * An AbortSignal instance, or a factory returning one, to abort the HTTP Request(s) triggered by
    * this function's invocation.
@@ -838,7 +837,7 @@ export async function discoveryRequest(
 
   return fetch(url.href, {
     headers,
-    credentials: options?.credentials ? options.credentials: undefined,
+    credentials: options?.credentials ? options.credentials : undefined,
     method: 'GET',
     redirect: 'manual',
     signal: options?.signal ? signal(options.signal) : null,
@@ -1675,7 +1674,7 @@ export async function protectedResourceRequest(
   }
 
   return fetch(url.href, {
-    credentials: options?.credentials ? options.credentials: undefined,
+    credentials: options?.credentials ? options.credentials : undefined,
     body,
     headers,
     method,
@@ -1992,7 +1991,7 @@ async function authenticatedRequest(
   headers.set('content-type', 'application/x-www-form-urlencoded;charset=UTF-8')
 
   return fetch(url.href, {
-    credentials: options?.credentials ? options.credentials: undefined,
+    credentials: options?.credentials ? options.credentials : undefined,
     body,
     headers,
     method,
@@ -2881,7 +2880,7 @@ async function jwksRequest(
   headers.append('accept', 'application/jwk-set+json')
 
   return fetch(url.href, {
-    credentials: options?.credentials ? options.credentials: undefined,
+    credentials: options?.credentials ? options.credentials : undefined,
     headers,
     method: 'GET',
     redirect: 'manual',
