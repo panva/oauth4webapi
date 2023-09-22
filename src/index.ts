@@ -705,6 +705,18 @@ const SUPPORTED_JWS_ALGS: JWSAlgorithm[] = [
 ]
 
 export interface HttpRequestOptions {
+/**
+ * The credentials read-only property of the Request interface indicates whether the user agent
+ * should send or receive cookies from the other domain in the case of cross-origin requests.
+ *
+ * @example
+ * // The credentials mode of the request can be set as follows:
+ * credentials: 'include'; // Automatically include credentials for same-origin domain.
+ * credentials: 'same-origin'; // Include credentials for the same-origin and cross-origin requests.
+ * credentials: 'omit'; // Exclude credentials from the request.
+ */
+credentials?: RequestCredentials;
+  
   /**
    * An AbortSignal instance, or a factory returning one, to abort the HTTP Request(s) triggered by
    * this function's invocation.
