@@ -837,6 +837,7 @@ export async function discoveryRequest(
   headers.set('accept', 'application/json')
 
   return fetch(url.href, {
+    credentials,
     headers,
     method: 'GET',
     redirect: 'manual',
@@ -1674,6 +1675,7 @@ export async function protectedResourceRequest(
   }
 
   return fetch(url.href, {
+    credentials,
     body,
     headers,
     method,
@@ -1990,6 +1992,7 @@ async function authenticatedRequest(
   headers.set('content-type', 'application/x-www-form-urlencoded;charset=UTF-8')
 
   return fetch(url.href, {
+    credentials,
     body,
     headers,
     method,
@@ -2878,6 +2881,7 @@ async function jwksRequest(
   headers.append('accept', 'application/jwk-set+json')
 
   return fetch(url.href, {
+    credentials,
     headers,
     method: 'GET',
     redirect: 'manual',
