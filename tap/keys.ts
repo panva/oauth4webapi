@@ -13,7 +13,7 @@ export const algs = <lib.JWSAlgorithm[]>[
 ]
 export const fails = <lib.JWSAlgorithm[]>[]
 ;(env.isDeno ? fails : algs).push('ES512')
-;(env.isBrowser ? fails : algs).push('EdDSA')
+;(env.isBrowser && !(env.isWebKit && env.isWebKitAbove17) ? fails : algs).push('EdDSA')
 
 export const keys = algs.reduce(
   (acc, alg) => {
