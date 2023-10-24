@@ -2,6 +2,8 @@
 // All browser navigator user-agent strings start with Mozilla/5.0
 // It is unlikely to ever change too
 // @ts-expect-error
+delete globalThis.navigator
+// @ts-expect-error
 globalThis.navigator = { userAgent: 'Mozilla/5.0 foo' }
 const lib = await import('../src/index.js')
 
