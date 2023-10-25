@@ -18,7 +18,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v4
         with:
-          node-version: lts/hydrogen # 18
+          node-version: lts/iron # 20
           cache: 'npm'
       - run: npm clean-install
       - run: npm run build
@@ -31,7 +31,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v4
         with:
-          node-version: lts/hydrogen # 18
+          node-version: lts/iron # 20
           cache: 'npm'
       - run: npm clean-install
       - run: npm run format-check
@@ -47,6 +47,7 @@ jobs:
         node-version:
           - lts/gallium # 16
           - lts/hydrogen # 18
+          - lts/iron # 20
           - current
         suite:
           - tap:node
@@ -72,7 +73,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v4
         with:
-          node-version: lts/hydrogen # 18
+          node-version: lts/iron # 20
           cache: 'npm'
       - run: npm clean-install
       - name: Run Test Suite
@@ -86,7 +87,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v4
         with:
-          node-version: lts/hydrogen # 18
+          node-version: lts/iron # 20
           cache: 'npm'
       - run: npm clean-install
       - run: npm install --global electron
@@ -114,7 +115,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v4
         with:
-          node-version: lts/hydrogen # 18
+          node-version: lts/iron # 20
           cache: 'npm'
       - run: npm clean-install
       - run: npm install --global workerd
@@ -133,7 +134,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v4
         with:
-          node-version: lts/hydrogen # 18
+          node-version: lts/iron # 20
           cache: 'npm'
       - run: npm clean-install
       - name: Run Test Suite
@@ -157,7 +158,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v4
         with:
-          node-version: lts/hydrogen # 18
+          node-version: lts/iron # 20
           cache: 'npm'
       - run: npm clean-install
       - run: npm install --global testcafe@2
