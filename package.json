@@ -79,6 +79,6 @@
     "typedoc-plugin-markdown": "^3.16.0",
     "typedoc-plugin-mdn-links": "^3.1.0",
     "typescript": "^5.2.2",
-    "undici": "^5.26.3"
+    "undici": "^5.26.5"
   }
 }
