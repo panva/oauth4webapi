@@ -2,7 +2,7 @@
 
 [💗 Help the project](https://github.com/sponsors/panva)
 
-▸ **processUserInfoResponse**(`as`, `client`, `expectedSubject`, `response`): [`Promise`]( https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise )<[`UserInfoResponse`](../interfaces/UserInfoResponse.md)\>
+▸ **processUserInfoResponse**(`as`, `client`, `expectedSubject`, `response`): [`Promise`]( https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise )\<[`UserInfoResponse`](../interfaces/UserInfoResponse.md)\>
 
 Validates Response instance to be one coming from the
 [`as.userinfo_endpoint`](../interfaces/AuthorizationServer.md#userinfo_endpoint).
@@ -18,7 +18,7 @@ Validates Response instance to be one coming from the
 
 #### Returns
 
-[`Promise`]( https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise )<[`UserInfoResponse`](../interfaces/UserInfoResponse.md)\>
+[`Promise`]( https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise )\<[`UserInfoResponse`](../interfaces/UserInfoResponse.md)\>
 
 Resolves with an object representing the parsed successful response, or an object
   representing an OAuth 2.0 protocol style error. Use [isOAuth2Error](isOAuth2Error.md) to determine if an

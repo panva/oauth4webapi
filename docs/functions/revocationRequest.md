@@ -2,7 +2,7 @@
 
 [💗 Help the project](https://github.com/sponsors/panva)
 
-▸ **revocationRequest**(`as`, `client`, `token`, `options?`): [`Promise`]( https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise )<[`Response`]( https://developer.mozilla.org/en-US/docs/Web/API/Response )\>
+▸ **revocationRequest**(`as`, `client`, `token`, `options?`): [`Promise`]( https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise )\<[`Response`]( https://developer.mozilla.org/en-US/docs/Web/API/Response )\>
 
 Performs a Revocation Request at the
 [`as.revocation_endpoint`](../interfaces/AuthorizationServer.md#revocation_endpoint).
@@ -18,7 +18,7 @@ Performs a Revocation Request at the
 
 #### Returns
 
-[`Promise`]( https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise )<[`Response`]( https://developer.mozilla.org/en-US/docs/Web/API/Response )\>
+[`Promise`]( https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise )\<[`Response`]( https://developer.mozilla.org/en-US/docs/Web/API/Response )\>
 
 **`See`**
 

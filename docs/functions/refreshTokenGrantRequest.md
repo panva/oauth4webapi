@@ -2,7 +2,7 @@
 
 [💗 Help the project](https://github.com/sponsors/panva)
 
-▸ **refreshTokenGrantRequest**(`as`, `client`, `refreshToken`, `options?`): [`Promise`]( https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise )<[`Response`]( https://developer.mozilla.org/en-US/docs/Web/API/Response )\>
+▸ **refreshTokenGrantRequest**(`as`, `client`, `refreshToken`, `options?`): [`Promise`]( https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise )\<[`Response`]( https://developer.mozilla.org/en-US/docs/Web/API/Response )\>
 
 Performs a Refresh Token Grant request at the
 [`as.token_endpoint`](../interfaces/AuthorizationServer.md#token_endpoint).
@@ -18,7 +18,7 @@ Performs a Refresh Token Grant request at the
 
 #### Returns
 
-[`Promise`]( https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise )<[`Response`]( https://developer.mozilla.org/en-US/docs/Web/API/Response )\>
+[`Promise`]( https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise )\<[`Response`]( https://developer.mozilla.org/en-US/docs/Web/API/Response )\>
 
 **`See`**
 

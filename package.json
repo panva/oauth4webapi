@@ -64,21 +64,21 @@
   },
   "devDependencies": {
     "@esbuild-kit/esm-loader": "^2.6.5",
-    "@types/node": "^20.8.9",
+    "@types/node": "^20.8.10",
     "@types/qunit": "^2.19.7",
     "ava": "^5.3.1",
-    "edge-runtime": "^2.5.6",
+    "edge-runtime": "^2.5.7",
     "esbuild": "^0.19.5",
-    "jose": "^5.0.1",
+    "jose": "^5.1.0",
     "patch-package": "^8.0.0",
     "prettier": "^3.0.3",
     "prettier-plugin-jsdoc": "^1.1.1",
     "qunit": "^2.20.0",
     "timekeeper": "^2.3.1",
-    "typedoc": "^0.25.2",
-    "typedoc-plugin-markdown": "^3.16.0",
+    "typedoc": "^0.25.3",
+    "typedoc-plugin-markdown": "^3.17.0",
     "typedoc-plugin-mdn-links": "^3.1.0",
     "typescript": "^5.2.2",
-    "undici": "^5.26.5"
+    "undici": "^5.27.2"
   }
 }

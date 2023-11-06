@@ -12,10 +12,14 @@
 
 ### constructor
 
-• **new UnsupportedOperationError**(`message?`)
+• **new UnsupportedOperationError**(`message?`): [`UnsupportedOperationError`](UnsupportedOperationError.md)
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `message?` | `string` |
+
+#### Returns
+
+[`UnsupportedOperationError`](UnsupportedOperationError.md)
