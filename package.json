@@ -71,7 +71,7 @@
     "esbuild": "^0.19.5",
     "jose": "^5.1.0",
     "patch-package": "^8.0.0",
-    "prettier": "^3.0.3",
+    "prettier": "^3.1.0",
     "prettier-plugin-jsdoc": "^1.1.1",
     "qunit": "^2.20.0",
     "timekeeper": "^2.3.1",
