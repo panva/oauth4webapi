@@ -69,7 +69,7 @@
     "ava": "^5.3.1",
     "edge-runtime": "^2.5.7",
     "esbuild": "^0.19.5",
-    "jose": "^5.1.0",
+    "jose": "^5.1.1",
     "patch-package": "^8.0.0",
     "prettier": "^3.1.0",
     "prettier-plugin-jsdoc": "^1.1.1",
