@@ -580,8 +580,8 @@ function decodeBase64Url(input: string) {
       bytes[i] = binary.charCodeAt(i)
     }
     return bytes
-  } catch {
-    throw new TypeError('The input to be decoded is not correctly encoded.')
+  } catch (cause) {
+    throw new TypeError('The input to be decoded is not correctly encoded.', { cause })
   }
 }
 
@@ -661,8 +661,8 @@ export class UnsupportedOperationError extends Error {
 }
 
 export class OperationProcessingError extends Error {
-  constructor(message: string) {
-    super(message)
+  constructor(message: string, options?: { cause?: unknown }) {
+    super(message, options)
     this.name = this.constructor.name
     // @ts-ignore
     Error.captureStackTrace?.(this, this.constructor)
@@ -862,8 +862,8 @@ export async function processDiscoveryResponse(
   let json: JsonValue
   try {
     json = await response.json()
-  } catch {
-    throw new OPE('failed to parse "response" body as JSON')
+  } catch (cause) {
+    throw new OPE('failed to parse "response" body as JSON', { cause })
   }
 
   if (!isJsonObject<AuthorizationServer>(json)) {
@@ -1291,8 +1291,8 @@ export async function issueRequestObject(
     }
     try {
       claims.claims = JSON.parse(value)
-    } catch {
-      throw new OPE('failed to parse the "claims" parameter as JSON')
+    } catch (cause) {
+      throw new OPE('failed to parse the "claims" parameter as JSON', { cause })
     }
 
     if (!isJsonObject(claims.claims)) {
@@ -1573,8 +1573,8 @@ export async function processPushedAuthorizationResponse(
   let json: JsonValue
   try {
     json = await response.json()
-  } catch {
-    throw new OPE('failed to parse "response" body as JSON')
+  } catch (cause) {
+    throw new OPE('failed to parse "response" body as JSON', { cause })
   }
 
   if (!isJsonObject<PushedAuthorizationResponse>(json)) {
@@ -1929,8 +1929,8 @@ export async function processUserInfoResponse(
     assertReadableResponse(response)
     try {
       json = await response.json()
-    } catch {
-      throw new OPE('failed to parse "response" body as JSON')
+    } catch (cause) {
+      throw new OPE('failed to parse "response" body as JSON', { cause })
     }
   }
 
@@ -2104,8 +2104,8 @@ async function processGenericAccessTokenResponse(
   let json: JsonValue
   try {
     json = await response.json()
-  } catch {
-    throw new OPE('failed to parse "response" body as JSON')
+  } catch (cause) {
+    throw new OPE('failed to parse "response" body as JSON', { cause })
   }
 
   if (!isJsonObject<TokenEndpointResponse>(json)) {
@@ -2826,8 +2826,8 @@ export async function processIntrospectionResponse(
     assertReadableResponse(response)
     try {
       json = await response.json()
-    } catch {
-      throw new OPE('failed to parse "response" body as JSON')
+    } catch (cause) {
+      throw new OPE('failed to parse "response" body as JSON', { cause })
     }
     if (!isJsonObject(json)) {
       throw new OPE('"response" body must be a top level object')
@@ -2882,8 +2882,8 @@ async function processJwksResponse(response: Response): Promise<JsonWebKeySet> {
   let json: JsonValue
   try {
     json = await response.json()
-  } catch {
-    throw new OPE('failed to parse "response" body as JSON')
+  } catch (cause) {
+    throw new OPE('failed to parse "response" body as JSON', { cause })
   }
 
   if (!isJsonObject<JsonWebKeySet>(json)) {
@@ -3005,8 +3005,8 @@ async function validateJwt(
   let header: JsonValue
   try {
     header = JSON.parse(buf(b64u(protectedHeader)))
-  } catch {
-    throw new OPE('failed to parse JWT Header body as base64url encoded JSON')
+  } catch (cause) {
+    throw new OPE('failed to parse JWT Header body as base64url encoded JSON', { cause })
   }
 
   if (!isJsonObject<CompactJWSHeaderParameters>(header)) {
@@ -3031,8 +3031,8 @@ async function validateJwt(
   let claims: JsonValue
   try {
     claims = JSON.parse(buf(b64u(payload)))
-  } catch {
-    throw new OPE('failed to parse JWT Payload body as base64url encoded JSON')
+  } catch (cause) {
+    throw new OPE('failed to parse JWT Payload body as base64url encoded JSON', { cause })
   }
 
   if (!isJsonObject<JWTPayload>(claims)) {
@@ -3429,8 +3429,8 @@ export async function processDeviceAuthorizationResponse(
   let json: JsonValue
   try {
     json = await response.json()
-  } catch {
-    throw new OPE('failed to parse "response" body as JSON')
+  } catch (cause) {
+    throw new OPE('failed to parse "response" body as JSON', { cause })
   }
 
   if (!isJsonObject<DeviceAuthorizationResponse>(json)) {
