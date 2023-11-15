@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.4.0](https://github.com/panva/oauth4webapi/compare/v2.3.0...v2.4.0) (2023-11-15)
+
+
+### Features
+
+* add the cause property to errors where possible ([07c95f7](https://github.com/panva/oauth4webapi/commit/07c95f735a84ff614ad77f0ccaeb96df79720d6c))
+
+
+### Refactor
+
+* use AlgorithmIdentifier instead of Algorithm where possible ([e2ae2f3](https://github.com/panva/oauth4webapi/commit/e2ae2f3824bb5d0d98557c6ec30ff96353f538e8))
+
+
+### Fixes
+
+* base64url decode errors are OperationProcessingError ([7f4a878](https://github.com/panva/oauth4webapi/commit/7f4a8783f3db20fd44b027e30fa828fed5c7b753))
+
 ## [2.3.0](https://github.com/panva/oauth4webapi/compare/v2.2.4...v2.3.0) (2023-04-26)
 
 
