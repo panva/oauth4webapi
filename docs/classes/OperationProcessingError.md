@@ -12,13 +12,15 @@
 
 ### constructor
 
-• **new OperationProcessingError**(`message`): [`OperationProcessingError`](OperationProcessingError.md)
+• **new OperationProcessingError**(`message`, `options?`): [`OperationProcessingError`](OperationProcessingError.md)
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `message` | `string` |
+| `options?` | `Object` |
+| `options.cause?` | `unknown` |
 
 #### Returns
 
