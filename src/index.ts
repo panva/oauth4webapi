@@ -62,20 +62,18 @@ export type ClientAuthenticationMethod =
  * @example CryptoKey algorithm for the `PS256`, `PS384`, or `PS512` JWS Algorithm Identifiers
  *
  * ```ts
- * interface RSAPSSAlgorithm extends RsaHashedKeyAlgorithm {
+ * interface PS256 extends RsaHashedKeyAlgorithm {
  *   name: 'RSA-PSS'
- *   hash: 'SHA-256' | 'SHA-384' | 'SHA-512'
- * }
- *
- * interface PS256 extends RSAPSSAlgorithm {
  *   hash: 'SHA-256'
  * }
  *
- * interface PS384 extends RSAPSSAlgorithm {
+ * interface PS384 extends RsaHashedKeyAlgorithm {
+ *   name: 'RSA-PSS'
  *   hash: 'SHA-384'
  * }
  *
- * interface PS512 extends RSAPSSAlgorithm {
+ * interface PS512 extends RsaHashedKeyAlgorithm {
+ *   name: 'RSA-PSS'
  *   hash: 'SHA-512'
  * }
  * ```
@@ -83,20 +81,18 @@ export type ClientAuthenticationMethod =
  * @example CryptoKey algorithm for the `ES256`, `ES384`, or `ES512` JWS Algorithm Identifiers
  *
  * ```ts
- * interface ECDSAAlgorithm extends EcKeyAlgorithm {
+ * interface ES256 extends EcKeyAlgorithm {
  *   name: 'ECDSA'
- *   namedCurve: 'P-256' | 'P-384' | 'P-521'
- * }
- *
- * interface ES256 extends ECDSAAlgorithm {
  *   namedCurve: 'P-256'
  * }
  *
- * interface ES384 extends ECDSAAlgorithm {
+ * interface ES384 extends EcKeyAlgorithm {
+ *   name: 'ECDSA'
  *   namedCurve: 'P-384'
  * }
  *
- * interface ES512 extends ECDSAAlgorithm {
+ * interface ES512 extends EcKeyAlgorithm {
+ *   name: 'ECDSA'
  *   namedCurve: 'P-521'
  * }
  * ```
@@ -104,20 +100,18 @@ export type ClientAuthenticationMethod =
  * @example CryptoKey algorithm for the `RS256`, `RS384`, or `RS512` JWS Algorithm Identifiers
  *
  * ```ts
- * interface ECDSAAlgorithm extends RsaHashedKeyAlgorithm {
+ * interface RS256 extends RsaHashedKeyAlgorithm {
  *   name: 'RSASSA-PKCS1-v1_5'
- *   hash: 'SHA-256' | 'SHA-384' | 'SHA-512'
- * }
- *
- * interface RS256 extends ECDSAAlgorithm {
  *   hash: 'SHA-256'
  * }
  *
- * interface RS384 extends ECDSAAlgorithm {
+ * interface RS384 extends RsaHashedKeyAlgorithm {
+ *   name: 'RSASSA-PKCS1-v1_5'
  *   hash: 'SHA-384'
  * }
  *
- * interface RS512 extends ECDSAAlgorithm {
+ * interface RS512 extends RsaHashedKeyAlgorithm {
+ *   name: 'RSASSA-PKCS1-v1_5'
  *   hash: 'SHA-512'
  * }
  * ```
