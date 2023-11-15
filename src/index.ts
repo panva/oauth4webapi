@@ -64,19 +64,19 @@ export type ClientAuthenticationMethod =
  * ```ts
  * interface RSAPSSAlgorithm extends RsaHashedKeyAlgorithm {
  *   name: 'RSA-PSS'
- *   hash: { name: 'SHA-256' | 'SHA-384' | 'SHA-512' }
+ *   hash: 'SHA-256' | 'SHA-384' | 'SHA-512'
  * }
  *
  * interface PS256 extends RSAPSSAlgorithm {
- *   hash: { name: 'SHA-256' }
+ *   hash: 'SHA-256'
  * }
  *
  * interface PS384 extends RSAPSSAlgorithm {
- *   hash: { name: 'SHA-384' }
+ *   hash: 'SHA-384'
  * }
  *
  * interface PS512 extends RSAPSSAlgorithm {
- *   hash: { name: 'SHA-512' }
+ *   hash: 'SHA-512'
  * }
  * ```
  *
@@ -106,19 +106,19 @@ export type ClientAuthenticationMethod =
  * ```ts
  * interface ECDSAAlgorithm extends RsaHashedKeyAlgorithm {
  *   name: 'RSASSA-PKCS1-v1_5'
- *   hash: { name: 'SHA-256' | 'SHA-384' | 'SHA-512' }
+ *   hash: 'SHA-256' | 'SHA-384' | 'SHA-512'
  * }
  *
  * interface RS256 extends ECDSAAlgorithm {
- *   hash: { name: 'SHA-256' }
+ *   hash: 'SHA-256'
  * }
  *
  * interface RS384 extends ECDSAAlgorithm {
- *   hash: { name: 'SHA-384' }
+ *   hash: 'SHA-384'
  * }
  *
  * interface RS512 extends ECDSAAlgorithm {
- *   hash: { name: 'SHA-512' }
+ *   hash: 'SHA-512'
  * }
  * ```
  *
@@ -932,7 +932,7 @@ export async function calculatePKCECodeChallenge(codeVerifier: string) {
     throw new TypeError('"codeVerifier" must be a non-empty string')
   }
 
-  return b64u(await crypto.subtle.digest({ name: 'SHA-256' }, buf(codeVerifier)))
+  return b64u(await crypto.subtle.digest('SHA-256', buf(codeVerifier)))
 }
 
 interface NormalizedKeyInput {
@@ -1357,9 +1357,7 @@ async function dpopProofJwt(
       htm,
       nonce,
       htu: `${url.origin}${url.pathname}`,
-      ath: accessToken
-        ? b64u(await crypto.subtle.digest({ name: 'SHA-256' }, buf(accessToken)))
-        : undefined,
+      ath: accessToken ? b64u(await crypto.subtle.digest('SHA-256', buf(accessToken))) : undefined,
     },
     privateKey,
   )
@@ -2960,12 +2958,12 @@ function ecdsaHashName(namedCurve: string) {
   }
 }
 
-function keyToSubtle(key: CryptoKey): Algorithm | RsaPssParams | EcdsaParams {
+function keyToSubtle(key: CryptoKey): AlgorithmIdentifier | RsaPssParams | EcdsaParams {
   switch (key.algorithm.name) {
     case 'ECDSA':
       return <EcdsaParams>{
         name: key.algorithm.name,
-        hash: { name: ecdsaHashName((<EcKeyAlgorithm>key.algorithm).namedCurve) },
+        hash: ecdsaHashName((<EcKeyAlgorithm>key.algorithm).namedCurve),
       }
     case 'RSA-PSS': {
       checkRsaKeyAlgorithm(<RsaHashedKeyAlgorithm>key.algorithm)
@@ -2984,10 +2982,10 @@ function keyToSubtle(key: CryptoKey): Algorithm | RsaPssParams | EcdsaParams {
     }
     case 'RSASSA-PKCS1-v1_5':
       checkRsaKeyAlgorithm(<RsaHashedKeyAlgorithm>key.algorithm)
-      return { name: key.algorithm.name }
+      return key.algorithm.name
     case 'Ed448': // Fall through
     case 'Ed25519':
-      return { name: key.algorithm.name }
+      return key.algorithm.name
   }
   throw new UnsupportedOperationError()
 }
@@ -3316,16 +3314,16 @@ type ReturnTypes =
 function algToSubtle(
   alg: JWSAlgorithm,
   crv?: string,
-): RsaHashedImportParams | EcKeyImportParams | Algorithm {
+): RsaHashedImportParams | EcKeyImportParams | AlgorithmIdentifier {
   switch (alg) {
     case 'PS256': // Fall through
     case 'PS384': // Fall through
     case 'PS512':
-      return { name: 'RSA-PSS', hash: { name: `SHA-${alg.slice(-3)}` } }
+      return { name: 'RSA-PSS', hash: `SHA-${alg.slice(-3)}` }
     case 'RS256': // Fall through
     case 'RS384': // Fall through
     case 'RS512':
-      return { name: 'RSASSA-PKCS1-v1_5', hash: { name: `SHA-${alg.slice(-3)}` } }
+      return { name: 'RSASSA-PKCS1-v1_5', hash: `SHA-${alg.slice(-3)}` }
     case 'ES256': // Fall through
     case 'ES384':
       return { name: 'ECDSA', namedCurve: `P-${alg.slice(-3)}` }
@@ -3333,10 +3331,9 @@ function algToSubtle(
       return { name: 'ECDSA', namedCurve: 'P-521' }
     case 'EdDSA': {
       switch (crv) {
-        case 'Ed25519':
-          return { name: 'Ed25519' }
+        case 'Ed25519': // Fall through
         case 'Ed448':
-          return { name: 'Ed448' }
+          return crv
         default:
           throw new UnsupportedOperationError()
       }
@@ -3553,7 +3550,7 @@ export async function generateKeyPair(alg: JWSAlgorithm, options?: GenerateKeyPa
   if (!validateString(alg)) {
     throw new TypeError('"alg" must be a non-empty string')
   }
-  const algorithm: RsaHashedKeyGenParams | EcKeyGenParams | Algorithm = algToSubtle(
+  const algorithm: RsaHashedKeyGenParams | EcKeyGenParams | AlgorithmIdentifier = algToSubtle(
     alg,
     alg === 'EdDSA' ? options?.crv ?? 'Ed25519' : undefined,
   )
