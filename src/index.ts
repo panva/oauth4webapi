@@ -581,7 +581,7 @@ function decodeBase64Url(input: string) {
     }
     return bytes
   } catch (cause) {
-    throw new TypeError('The input to be decoded is not correctly encoded.', { cause })
+    throw new OPE('The input to be decoded is not correctly encoded.', { cause })
   }
 }
 
