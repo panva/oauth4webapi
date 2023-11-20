@@ -2,7 +2,7 @@
 
 [💗 Help the project](https://github.com/sponsors/panva)
 
-▸ **calculatePKCECodeChallenge**(`codeVerifier`): [`Promise`]( https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise )\<`string`\>
+▸ **calculatePKCECodeChallenge**(`codeVerifier`): [`Promise`]( https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise )\<`string`\>
 
 Calculates the PKCE `code_verifier` value to send with an authorization request using the S256
 PKCE Code Challenge Method transformation.
@@ -15,7 +15,7 @@ PKCE Code Challenge Method transformation.
 
 #### Returns
 
-[`Promise`]( https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise )\<`string`\>
+[`Promise`]( https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise )\<`string`\>
 
 **`See`**
 

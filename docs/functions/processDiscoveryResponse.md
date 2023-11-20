@@ -2,7 +2,7 @@
 
 [💗 Help the project](https://github.com/sponsors/panva)
 
-▸ **processDiscoveryResponse**(`expectedIssuerIdentifier`, `response`): [`Promise`]( https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise )\<[`AuthorizationServer`](../interfaces/AuthorizationServer.md)\>
+▸ **processDiscoveryResponse**(`expectedIssuerIdentifier`, `response`): [`Promise`]( https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise )\<[`AuthorizationServer`](../interfaces/AuthorizationServer.md)\>
 
 Validates Response instance to be one coming from the authorization server's well-known discovery
 endpoint.
@@ -11,12 +11,12 @@ endpoint.
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `expectedIssuerIdentifier` | [`URL`]( https://developer.mozilla.org/en-US/docs/Web/API/URL ) | Expected Issuer Identifier value. |
-| `response` | [`Response`]( https://developer.mozilla.org/en-US/docs/Web/API/Response ) | Resolved value from [discoveryRequest](discoveryRequest.md). |
+| `expectedIssuerIdentifier` | [`URL`]( https://developer.mozilla.org/docs/Web/API/URL ) | Expected Issuer Identifier value. |
+| `response` | [`Response`]( https://developer.mozilla.org/docs/Web/API/Response ) | Resolved value from [discoveryRequest](discoveryRequest.md). |
 
 #### Returns
 
-[`Promise`]( https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise )\<[`AuthorizationServer`](../interfaces/AuthorizationServer.md)\>
+[`Promise`]( https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise )\<[`AuthorizationServer`](../interfaces/AuthorizationServer.md)\>
 
 Resolves with the discovered Authorization Server Metadata.
 

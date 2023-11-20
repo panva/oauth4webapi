@@ -14,7 +14,7 @@
 
 ### privateKey
 
-• **privateKey**: [`CryptoKey`]( https://developer.mozilla.org/en-US/docs/Web/API/CryptoKey )
+• **privateKey**: [`CryptoKey`]( https://developer.mozilla.org/docs/Web/API/CryptoKey )
 
 Private CryptoKey instance to sign the DPoP Proof JWT with.
 
@@ -24,7 +24,7 @@ ___
 
 ### publicKey
 
-• **publicKey**: [`CryptoKey`]( https://developer.mozilla.org/en-US/docs/Web/API/CryptoKey )
+• **publicKey**: [`CryptoKey`]( https://developer.mozilla.org/docs/Web/API/CryptoKey )
 
 The public key corresponding to [DPoPOptions.privateKey](DPoPOptions.md#privatekey).
 

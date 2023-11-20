@@ -2,7 +2,7 @@
 
 [💗 Help the project](https://github.com/sponsors/panva)
 
-▸ **generateKeyPair**(`alg`, `options?`): [`Promise`]( https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise )\<[`CryptoKeyPair`]( https://developer.mozilla.org/en-US/docs/Web/API/CryptoKeyPair )\>
+▸ **generateKeyPair**(`alg`, `options?`): [`Promise`]( https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise )\<`CryptoKeyPair`\>
 
 Generates a CryptoKeyPair for a given JWS `alg` Algorithm identifier.
 
@@ -15,4 +15,4 @@ Generates a CryptoKeyPair for a given JWS `alg` Algorithm identifier.
 
 #### Returns
 
-[`Promise`]( https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise )\<[`CryptoKeyPair`]( https://developer.mozilla.org/en-US/docs/Web/API/CryptoKeyPair )\>
+[`Promise`]( https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise )\<`CryptoKeyPair`\>

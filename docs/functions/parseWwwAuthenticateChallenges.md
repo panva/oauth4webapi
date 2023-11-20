@@ -10,7 +10,7 @@ Parses the `WWW-Authenticate` HTTP Header from a Response instance.
 
 | Name | Type |
 | :------ | :------ |
-| `response` | [`Response`]( https://developer.mozilla.org/en-US/docs/Web/API/Response ) |
+| `response` | [`Response`]( https://developer.mozilla.org/docs/Web/API/Response ) |
 
 #### Returns
 

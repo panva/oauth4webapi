@@ -22,7 +22,7 @@ ___
 
 ### headers
 
-• `Optional` **headers**: [`Headers`]( https://developer.mozilla.org/en-US/docs/Web/API/Headers )
+• `Optional` **headers**: [`Headers`]( https://developer.mozilla.org/docs/Web/API/Headers )
 
 A Headers instance to additionally send with the HTTP Request(s) triggered by this function's
 invocation.
@@ -31,7 +31,7 @@ ___
 
 ### signal
 
-• `Optional` **signal**: [`AbortSignal`]( https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal ) \| () => [`AbortSignal`]( https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal )
+• `Optional` **signal**: [`AbortSignal`]( https://developer.mozilla.org/docs/Web/API/AbortSignal ) \| () => [`AbortSignal`]( https://developer.mozilla.org/docs/Web/API/AbortSignal )
 
 An AbortSignal instance, or a factory returning one, to abort the HTTP Request(s) triggered by
 this function's invocation.

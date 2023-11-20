@@ -2,7 +2,7 @@
 
 [💗 Help the project](https://github.com/sponsors/panva)
 
-▸ **discoveryRequest**(`issuerIdentifier`, `options?`): [`Promise`]( https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise )\<[`Response`]( https://developer.mozilla.org/en-US/docs/Web/API/Response )\>
+▸ **discoveryRequest**(`issuerIdentifier`, `options?`): [`Promise`]( https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise )\<[`Response`]( https://developer.mozilla.org/docs/Web/API/Response )\>
 
 Performs an authorization server metadata discovery using one of two
 [transformation algorithms](../interfaces/DiscoveryRequestOptions.md#algorithm) applied to the
@@ -15,12 +15,12 @@ Performs an authorization server metadata discovery using one of two
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `issuerIdentifier` | [`URL`]( https://developer.mozilla.org/en-US/docs/Web/API/URL ) | Issuer Identifier to resolve the well-known discovery URI for. |
+| `issuerIdentifier` | [`URL`]( https://developer.mozilla.org/docs/Web/API/URL ) | Issuer Identifier to resolve the well-known discovery URI for. |
 | `options?` | [`DiscoveryRequestOptions`](../interfaces/DiscoveryRequestOptions.md) | - |
 
 #### Returns
 
-[`Promise`]( https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise )\<[`Response`]( https://developer.mozilla.org/en-US/docs/Web/API/Response )\>
+[`Promise`]( https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise )\<[`Response`]( https://developer.mozilla.org/docs/Web/API/Response )\>
 
 **`See`**
 

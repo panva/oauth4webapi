@@ -16,7 +16,7 @@ added as a `kid` JOSE Header Parameter.
 
 ### key
 
-• **key**: [`CryptoKey`]( https://developer.mozilla.org/en-US/docs/Web/API/CryptoKey )
+• **key**: [`CryptoKey`]( https://developer.mozilla.org/docs/Web/API/CryptoKey )
 
 An asymmetric private CryptoKey.
 

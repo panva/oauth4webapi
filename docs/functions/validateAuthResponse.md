@@ -2,7 +2,7 @@
 
 [💗 Help the project](https://github.com/sponsors/panva)
 
-▸ **validateAuthResponse**(`as`, `client`, `parameters`, `expectedState?`): [`URLSearchParams`]( https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams ) \| [`OAuth2Error`](../interfaces/OAuth2Error.md)
+▸ **validateAuthResponse**(`as`, `client`, `parameters`, `expectedState?`): [`URLSearchParams`]( https://developer.mozilla.org/docs/Web/API/URLSearchParams ) \| [`OAuth2Error`](../interfaces/OAuth2Error.md)
 
 Validates an OAuth 2.0 Authorization Response or Authorization Error Response message returned
 from the authorization server's
@@ -14,12 +14,12 @@ from the authorization server's
 | :------ | :------ | :------ |
 | `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata. |
 | `client` | [`Client`](../interfaces/Client.md) | Client Metadata. |
-| `parameters` | [`URLSearchParams`]( https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams ) \| [`URL`]( https://developer.mozilla.org/en-US/docs/Web/API/URL ) | Authorization response. |
+| `parameters` | [`URLSearchParams`]( https://developer.mozilla.org/docs/Web/API/URLSearchParams ) \| [`URL`]( https://developer.mozilla.org/docs/Web/API/URL ) | Authorization response. |
 | `expectedState?` | `string` \| typeof [`expectNoState`](../variables/expectNoState.md) \| typeof [`skipStateCheck`](../variables/skipStateCheck.md) | Expected `state` parameter value. Default is [expectNoState](../variables/expectNoState.md). |
 
 #### Returns
 
-[`URLSearchParams`]( https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams ) \| [`OAuth2Error`](../interfaces/OAuth2Error.md)
+[`URLSearchParams`]( https://developer.mozilla.org/docs/Web/API/URLSearchParams ) \| [`OAuth2Error`](../interfaces/OAuth2Error.md)
 
 Validated Authorization Response parameters or Authorization Error Response.
 
