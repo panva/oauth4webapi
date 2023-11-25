@@ -63,7 +63,6 @@
     "test": "bash -c 'source .node_flags.sh && ava'"
   },
   "devDependencies": {
-    "@esbuild-kit/esm-loader": "^2.6.5",
     "@types/node": "^20.9.2",
     "@types/qunit": "^2.19.8",
     "ava": "^5.3.1",
@@ -75,6 +74,7 @@
     "prettier-plugin-jsdoc": "^1.1.1",
     "qunit": "^2.20.0",
     "timekeeper": "^2.3.1",
+    "tsx": "^4.5.0",
     "typedoc": "^0.25.3",
     "typedoc-plugin-markdown": "^3.17.1",
     "typedoc-plugin-mdn-links": "^3.1.4",
