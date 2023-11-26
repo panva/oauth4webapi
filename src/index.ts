@@ -818,12 +818,14 @@ export async function discoveryRequest(
   const headers = prepareHeaders(options?.headers)
   headers.set('accept', 'application/json')
 
-  return fetch(url.href, {
+  const request = new Request(url.href, {
     headers,
     method: 'GET',
     redirect: 'manual',
     signal: options?.signal ? signal(options.signal) : null,
-  }).then(processDpopNonce)
+  })
+
+  return fetch(request).then(processDpopNonce)
 }
 
 function validateString(input: unknown): input is string {
@@ -1653,13 +1655,15 @@ export async function protectedResourceRequest(
     headers.set('authorization', `DPoP ${accessToken}`)
   }
 
-  return fetch(url.href, {
+  const request = new Request(url.href, {
     body,
     headers,
     method,
     redirect: 'manual',
     signal: options?.signal ? signal(options.signal) : null,
-  }).then(processDpopNonce)
+  })
+
+  return fetch(request).then(processDpopNonce)
 }
 
 export interface UserInfoRequestOptions extends HttpRequestOptions, DPoPRequestOptions {}
@@ -1969,13 +1973,15 @@ async function authenticatedRequest(
   await clientAuthentication(as, client, body, headers, options?.clientPrivateKey)
   headers.set('content-type', 'application/x-www-form-urlencoded;charset=UTF-8')
 
-  return fetch(url.href, {
+  const request = new Request(url.href, {
     body,
     headers,
     method,
     redirect: 'manual',
     signal: options?.signal ? signal(options.signal) : null,
-  }).then(processDpopNonce)
+  })
+
+  return fetch(request).then(processDpopNonce)
 }
 
 export interface TokenEndpointRequestOptions
@@ -2857,12 +2863,14 @@ async function jwksRequest(
   headers.set('accept', 'application/json')
   headers.append('accept', 'application/jwk-set+json')
 
-  return fetch(url.href, {
+  const request = new Request(url.href, {
     headers,
     method: 'GET',
     redirect: 'manual',
     signal: options?.signal ? signal(options.signal) : null,
-  }).then(processDpopNonce)
+  })
+
+  return fetch(request).then(processDpopNonce)
 }
 
 interface JsonWebKeySet {
