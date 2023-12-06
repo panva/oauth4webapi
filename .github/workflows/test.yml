@@ -102,6 +102,12 @@ jobs:
       - uses: denoland/setup-deno@v1
         with:
           deno-version: v1.x
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/iron # 20
+          cache: 'npm'
+      - run: npm clean-install
       - name: Test Deno Definitions
         run: deno check mod.ts
       - name: Run Test Suite
