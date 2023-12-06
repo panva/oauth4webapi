@@ -1,6 +1,7 @@
 {
   "imports": {
-    "jose": "https://deno.land/x/jose/index.ts",
+    "jose": "../node_modules/jose/dist/browser/index.js",
+    "qunit": "../node_modules/qunit/qunit/qunit.js",
     "../src/index.js": "../src/index.ts",
     "./callback.js": "./callback.ts",
     "./end2end.js": "./end2end.ts",

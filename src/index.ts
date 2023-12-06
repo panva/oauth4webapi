@@ -59,7 +59,9 @@ export type ClientAuthenticationMethod =
 /**
  * Supported JWS `alg` Algorithm identifiers.
  *
- * @example CryptoKey algorithm for the `PS256`, `PS384`, or `PS512` JWS Algorithm Identifiers
+ * @example
+ *
+ * CryptoKey algorithm for the `PS256`, `PS384`, or `PS512` JWS Algorithm Identifiers
  *
  * ```ts
  * interface PS256 extends RsaHashedKeyAlgorithm {
@@ -78,7 +80,9 @@ export type ClientAuthenticationMethod =
  * }
  * ```
  *
- * @example CryptoKey algorithm for the `ES256`, `ES384`, or `ES512` JWS Algorithm Identifiers
+ * @example
+ *
+ * CryptoKey algorithm for the `ES256`, `ES384`, or `ES512` JWS Algorithm Identifiers
  *
  * ```ts
  * interface ES256 extends EcKeyAlgorithm {
@@ -97,7 +101,9 @@ export type ClientAuthenticationMethod =
  * }
  * ```
  *
- * @example CryptoKey algorithm for the `RS256`, `RS384`, or `RS512` JWS Algorithm Identifiers
+ * @example
+ *
+ * CryptoKey algorithm for the `RS256`, `RS384`, or `RS512` JWS Algorithm Identifiers
  *
  * ```ts
  * interface RS256 extends RsaHashedKeyAlgorithm {
@@ -116,7 +122,9 @@ export type ClientAuthenticationMethod =
  * }
  * ```
  *
- * @example CryptoKey algorithm for the `EdDSA` JWS Algorithm Identifier (Experimental)
+ * @example
+ *
+ * CryptoKey algorithm for the `EdDSA` JWS Algorithm Identifier (Experimental)
  *
  * Runtime support for this algorithm is very limited, it depends on the [Secure Curves in the Web
  * Cryptography API](https://wicg.github.io/webcrypto-secure-curves/) proposal which is yet to be
@@ -530,7 +538,7 @@ export interface Client {
    *
    * @ignore during Documentation generation but part of the public API
    *
-   * @example Tolerate 30 seconds clock skew when validating JWT claims like `exp` or `nbf`.
+   * @example Tolerate 30 seconds clock skew when validating JWT claims like exp or nbf.
    *
    * ```ts
    * const client: oauth.Client = {
@@ -703,7 +711,9 @@ export interface HttpRequestOptions {
    * An AbortSignal instance, or a factory returning one, to abort the HTTP Request(s) triggered by
    * this function's invocation.
    *
-   * @example A 5000ms timeout AbortSignal for every request
+   * @example
+   *
+   * A 5000ms timeout AbortSignal for every request
    *
    * ```js
    * const signal = () => AbortSignal.timeout(5_000) // Note: AbortSignal.timeout may not yet be available in all runtimes.

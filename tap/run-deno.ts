@@ -1,4 +1,4 @@
-import 'https://cdnjs.cloudflare.com/ajax/libs/qunit/2.20.0/qunit.js'
+import 'qunit'
 import run from './run.js'
 
 run(QUnit, (stats) => {
