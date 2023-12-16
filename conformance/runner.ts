@@ -1,5 +1,5 @@
 import anyTest, { type TestFn } from 'ava'
-import { importJWK, type JWK } from 'jose'
+import { importJWK, type JWK, calculateJwkThumbprint, exportJWK } from 'jose'
 
 export const test = anyTest as TestFn<{ instance: Test }>
 
@@ -182,6 +182,10 @@ export const green = test.macro({
     let DPoP!: CryptoKeyPair
     if (usesDpop(variant)) {
       DPoP = await oauth.generateKeyPair(<oauth.JWSAlgorithm>JWS_ALGORITHM)
+      authorizationUrl.searchParams.set(
+        'dpop_jkt',
+        await calculateJwkThumbprint(await exportJWK(DPoP.publicKey)),
+      )
     }
 
     if (usesPar(plan)) {
