@@ -208,8 +208,13 @@ export const green = test.macro({
           t.log('retrying with a newly obtained dpop nonce')
           par = await request()
           result = await oauth.processPushedAuthorizationResponse(as, client, par)
+          if (oauth.isOAuth2Error(result)) {
+            t.log('error', result)
+            throw new Error() // Handle OAuth 2.0 response body error
+          }
+        } else {
+          throw new Error() // Handle OAuth 2.0 response body error
         }
-        throw new Error() // Handle OAuth 2.0 response body error
       }
       t.log('PAR response', { ...result })
       authorizationUrl = new URL(as.authorization_endpoint!)
@@ -285,8 +290,13 @@ export const green = test.macro({
           } else {
             result = await oauth.processAuthorizationCodeOAuth2Response(as, client, response)
           }
+          if (oauth.isOAuth2Error(result)) {
+            t.log('error', result)
+            throw new Error() // Handle OAuth 2.0 response body error
+          }
+        } else {
+          throw new Error() // Handle OAuth 2.0 response body error
         }
-        throw new Error() // Handle OAuth 2.0 response body error
       }
 
       t.log('token endpoint response body', { ...result })
