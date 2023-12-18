@@ -175,7 +175,7 @@ jobs:
       - run: node ./conformance/.parse-logs.mjs capture.txt
       - run: rm capture.txt
       - name: Upload test artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           path: |
             *.zip
