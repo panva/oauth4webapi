@@ -168,18 +168,21 @@ jobs:
           PLAN_NAME: ${{ matrix.setup.plan }}
           VARIANT: ${{ toJSON(matrix.setup.variant) }}
           JWS_ALGORITHM: ${{ matrix.setup.algorithm }}
-      - if: ${{ success() }}
-        run: echo "### :tada:" >> $GITHUB_STEP_SUMMARY
-      - if: ${{ failure() }}
-        run: echo "### :exclamation:" >> $GITHUB_STEP_SUMMARY
       - run: node ./conformance/.parse-logs.mjs capture.txt
       - run: rm capture.txt
       - name: Upload test artifacts
+        id: artifact-upload-step
         uses: actions/upload-artifact@v4
         with:
           path: |
             *.zip
             *.txt
-          name: conformance results
+          name: conformance results idx(${{ strategy.job-index }})
           if-no-files-found: error
         if: ${{ always() }}
+      - if: ${{ success() }}
+        run: |
+          echo "### [:tada:](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ steps.artifact-upload-step.outputs.artifact-id }})" >> $GITHUB_STEP_SUMMARY
+      - if: ${{ failure() }}
+        run: |
+          echo "### [:exclamation:](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ steps.artifact-upload-step.outputs.artifact-id }})" >> $GITHUB_STEP_SUMMARY
