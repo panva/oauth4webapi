@@ -126,7 +126,7 @@ export type ClientAuthenticationMethod =
  *
  * CryptoKey algorithm for the `EdDSA` JWS Algorithm Identifier (Experimental)
  *
- * Runtime support for this algorithm is very limited, it depends on the [Secure Curves in the Web
+ * Runtime support for this algorithm is limited, it depends on the [Secure Curves in the Web
  * Cryptography API](https://wicg.github.io/webcrypto-secure-curves/) proposal which is yet to be
  * widely adopted. If the proposal changes this implementation will follow up with a minor release.
  *
