@@ -16,7 +16,7 @@ Authorization Header is used to transmit the Access Token value.
 | `method` | `string` | The HTTP method for the request. |
 | `url` | [`URL`]( https://developer.mozilla.org/docs/Web/API/URL ) | Target URL for the request. |
 | `headers` | [`Headers`]( https://developer.mozilla.org/docs/Web/API/Headers ) | Headers for the request. |
-| `body` | `undefined` \| ``null`` \| `BodyInit` | Request body compatible with the Fetch API and the request's method. |
+| `body` | `undefined` \| ``null`` \| `string` \| [`ArrayBuffer`]( https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer ) \| `ArrayBufferView` \| [`Blob`]( https://developer.mozilla.org/docs/Web/API/Blob ) \| [`FormData`]( https://developer.mozilla.org/docs/Web/API/FormData ) \| [`ReadableStream`]( https://developer.mozilla.org/docs/Web/API/ReadableStream )\<`any`\> \| [`URLSearchParams`]( https://developer.mozilla.org/docs/Web/API/URLSearchParams ) | Request body compatible with the Fetch API and the request's method. |
 | `options?` | [`ProtectedResourceRequestOptions`](../interfaces/ProtectedResourceRequestOptions.md) | - |
 
 #### Returns

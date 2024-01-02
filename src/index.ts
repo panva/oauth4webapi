@@ -659,6 +659,7 @@ class LRU<T1, T2> {
   }
 }
 
+/** @group Errors */
 export class UnsupportedOperationError extends Error {
   constructor(message?: string) {
     super(message ?? 'operation not supported')
@@ -668,6 +669,7 @@ export class UnsupportedOperationError extends Error {
   }
 }
 
+/** @group Errors */
 export class OperationProcessingError extends Error {
   constructor(message: string, options?: { cause?: unknown }) {
     super(message, options)
@@ -792,6 +794,9 @@ function signal(value: Exclude<HttpRequestOptions['signal'], undefined>): AbortS
  *
  * @param issuerIdentifier Issuer Identifier to resolve the well-known discovery URI for.
  *
+ * @group Authorization Server Metadata
+ * @group OpenID Connect (OIDC) Discovery
+ *
  * @see [RFC 8414 - OAuth 2.0 Authorization Server Metadata](https://www.rfc-editor.org/rfc/rfc8414.html#section-3)
  * @see [OpenID Connect Discovery 1.0](https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfig)
  */
@@ -851,6 +856,9 @@ function validateString(input: unknown): input is string {
  *
  * @returns Resolves with the discovered Authorization Server Metadata.
  *
+ * @group Authorization Server Metadata
+ * @group OpenID Connect (OIDC) Discovery
+ *
  * @see [RFC 8414 - OAuth 2.0 Authorization Server Metadata](https://www.rfc-editor.org/rfc/rfc8414.html#section-3)
  * @see [OpenID Connect Discovery 1.0](https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfig)
  */
@@ -901,6 +909,11 @@ function randomBytes() {
 /**
  * Generate random `code_verifier` value.
  *
+ * @group Utilities
+ * @group Authorization Code Grant
+ * @group Authorization Code Grant w/ OpenID Connect (OIDC)
+ * @group Proof Key for Code Exchange by OAuth Public Clients (PKCE)
+ *
  * @see [RFC 7636 - Proof Key for Code Exchange by OAuth Public Clients (PKCE)](https://www.rfc-editor.org/rfc/rfc7636.html#section-4)
  */
 export function generateRandomCodeVerifier() {
@@ -910,6 +923,8 @@ export function generateRandomCodeVerifier() {
 /**
  * Generate random `state` value.
  *
+ * @group Utilities
+ *
  * @see [RFC 6749 - The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html#section-4.1.1)
  */
 export function generateRandomState() {
@@ -918,6 +933,8 @@ export function generateRandomState() {
 
 /**
  * Generate random `nonce` value.
+ *
+ * @group Utilities
  *
  * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#IDToken)
  */
@@ -930,6 +947,10 @@ export function generateRandomNonce() {
  * PKCE Code Challenge Method transformation.
  *
  * @param codeVerifier `code_verifier` value generated e.g. from {@link generateRandomCodeVerifier}.
+ *
+ * @group Authorization Code Grant
+ * @group Authorization Code Grant w/ OpenID Connect (OIDC)
+ * @group Proof Key for Code Exchange by OAuth Public Clients (PKCE)
  *
  * @see [RFC 7636 - Proof Key for Code Exchange by OAuth Public Clients (PKCE)](https://www.rfc-editor.org/rfc/rfc7636.html#section-4)
  */
@@ -1256,6 +1277,10 @@ async function jwt(
  * @param client Client Metadata.
  * @param privateKey Private key to sign the Request Object with.
  *
+ * @group Authorization Code Grant
+ * @group Authorization Code Grant w/ OpenID Connect (OIDC)
+ * @group JWT-Secured Authorization Request (JAR)
+ *
  * @see [RFC 9101 - The OAuth 2.0 Authorization Framework: JWT-Secured Authorization Request (JAR)](https://www.rfc-editor.org/rfc/rfc9101.html#name-request-object-2)
  */
 export async function issueRequestObject(
@@ -1392,7 +1417,9 @@ async function publicJwk(key: CryptoKey) {
  * @param client Client Metadata.
  * @param parameters Authorization Request parameters.
  *
- * @see [RFC 9126 - OAuth 2.0 Pushed Authorization Requests](https://www.rfc-editor.org/rfc/rfc9126.html#name-pushed-authorization-reques)
+ * @group Pushed Authorization Requests (PAR)
+ *
+ * @see [RFC 9126 - OAuth 2.0 Pushed Authorization Requests (PAR)](https://www.rfc-editor.org/rfc/rfc9126.html#name-pushed-authorization-reques)
  * @see [RFC 9449 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)](https://www.rfc-editor.org/rfc/rfc9449.html#name-dpop-with-pushed-authorizat)
  */
 export async function pushedAuthorizationRequest(
@@ -1440,7 +1467,19 @@ export interface OAuth2Error {
   readonly [parameter: string]: JsonValue | undefined
 }
 
-/** A helper function used to determine if a response processing function returned an OAuth2Error. */
+/**
+ * A helper function used to determine if a response processing function returned an OAuth2Error.
+ *
+ * @group Utilities
+ * @group Client Credentials Grant
+ * @group Device Authorization Grant
+ * @group Authorization Code Grant
+ * @group Authorization Code Grant w/ OpenID Connect (OIDC)
+ * @group Token Introspection
+ * @group Token Revocation
+ * @group Refreshing an Access Token
+ * @group Pushed Authorization Requests (PAR)
+ */
 export function isOAuth2Error(input?: ReturnTypes): input is OAuth2Error {
   const value = <unknown>input
   if (typeof value !== 'object' || Array.isArray(value) || value === null) {
@@ -1510,6 +1549,17 @@ function wwwAuth(scheme: string, params: string): WWWAuthenticateChallenge {
  *
  * @returns Array of {@link WWWAuthenticateChallenge} objects. Their order from the response is
  *   preserved. `undefined` when there wasn't a `WWW-Authenticate` HTTP Header returned.
+ *
+ * @group Accessing Protected Resources
+ * @group Utilities
+ * @group Client Credentials Grant
+ * @group Device Authorization Grant
+ * @group Authorization Code Grant
+ * @group Authorization Code Grant w/ OpenID Connect (OIDC)
+ * @group Token Introspection
+ * @group Token Revocation
+ * @group Refreshing an Access Token
+ * @group Pushed Authorization Requests (PAR)
  */
 export function parseWwwAuthenticateChallenges(
   response: Response,
@@ -1559,7 +1609,9 @@ export function parseWwwAuthenticateChallenges(
  *   representing an OAuth 2.0 protocol style error. Use {@link isOAuth2Error} to determine if an
  *   OAuth 2.0 error was returned.
  *
- * @see [RFC 9126 - OAuth 2.0 Pushed Authorization Requests](https://www.rfc-editor.org/rfc/rfc9126.html#name-pushed-authorization-reques)
+ * @group Pushed Authorization Requests (PAR)
+ *
+ * @see [RFC 9126 - OAuth 2.0 Pushed Authorization Requests (PAR)](https://www.rfc-editor.org/rfc/rfc9126.html#name-pushed-authorization-reques)
  */
 export async function processPushedAuthorizationResponse(
   as: AuthorizationServer,
@@ -1630,6 +1682,8 @@ export interface ProtectedResourceRequestOptions
  * @param headers Headers for the request.
  * @param body Request body compatible with the Fetch API and the request's method.
  *
+ * @group Accessing Protected Resources
+ *
  * @see [RFC 6750 - The OAuth 2.0 Authorization Framework: Bearer Token Usage](https://www.rfc-editor.org/rfc/rfc6750.html#section-2.1)
  * @see [RFC 9449 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)](https://www.rfc-editor.org/rfc/rfc9449.html#name-protected-resource-access)
  */
@@ -1687,6 +1741,9 @@ export interface UserInfoRequestOptions extends HttpRequestOptions, DPoPRequestO
  * @param as Authorization Server Metadata.
  * @param client Client Metadata.
  * @param accessToken Access Token value.
+ *
+ * @group Authorization Code Grant w/ OpenID Connect (OIDC)
+ * @group OpenID Connect (OIDC) UserInfo
  *
  * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#UserInfo)
  * @see [RFC 9449 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)](https://www.rfc-editor.org/rfc/rfc9449.html#name-protected-resource-access)
@@ -1898,6 +1955,9 @@ function getContentType(response: Response) {
  *   representing an OAuth 2.0 protocol style error. Use {@link isOAuth2Error} to determine if an
  *   OAuth 2.0 error was returned.
  *
+ * @group Authorization Code Grant w/ OpenID Connect (OIDC)
+ * @group OpenID Connect (OIDC) UserInfo
+ *
  * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#UserInfo)
  */
 export async function processUserInfoResponse(
@@ -2034,6 +2094,8 @@ async function tokenEndpointRequest(
  * @param client Client Metadata.
  * @param refreshToken Refresh Token value.
  *
+ * @group Refreshing an Access Token
+ *
  * @see [RFC 6749 - The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html#section-6)
  * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#RefreshTokens)
  * @see [RFC 9449 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)](https://www.rfc-editor.org/rfc/rfc9449.html#name-dpop-access-token-request)
@@ -2064,6 +2126,8 @@ const idTokenClaims = new WeakMap<TokenEndpointResponse, IDToken>()
  * @param ref Value previously resolved from {@link processAuthorizationCodeOpenIDResponse}.
  *
  * @returns JWT Claims Set from an ID Token.
+ *
+ * @group Authorization Code Grant w/ OpenID Connect (OIDC)
  */
 export function getValidatedIdTokenClaims(ref: OpenIDTokenEndpointResponse): IDToken
 
@@ -2210,6 +2274,8 @@ async function processGenericAccessTokenResponse(
  *   representing an OAuth 2.0 protocol style error. Use {@link isOAuth2Error} to determine if an
  *   OAuth 2.0 error was returned.
  *
+ * @group Refreshing an Access Token
+ *
  * @see [RFC 6749 - The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html#section-6)
  * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#RefreshTokens)
  */
@@ -2270,6 +2336,9 @@ function brand(searchParams: URLSearchParams) {
  *   from {@link validateAuthResponse}, or {@link validateJwtAuthResponse}.
  * @param redirectUri `redirect_uri` value used in the authorization request.
  * @param codeVerifier PKCE `code_verifier` to send to the token endpoint.
+ *
+ * @group Authorization Code Grant
+ * @group Authorization Code Grant w/ OpenID Connect (OIDC)
  *
  * @see [RFC 6749 - The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html#section-4.1)
  * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#CodeFlowAuth)
@@ -2445,6 +2514,8 @@ export const skipAuthTimeCheck = Symbol()
  *   representing an OAuth 2.0 protocol style error. Use {@link isOAuth2Error} to determine if an
  *   OAuth 2.0 error was returned.
  *
+ * @group Authorization Code Grant w/ OpenID Connect (OIDC)
+ *
  * @see [RFC 6749 - The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html#section-4.1)
  * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#CodeFlowAuth)
  */
@@ -2520,6 +2591,8 @@ export async function processAuthorizationCodeOpenIDResponse(
  *   representing an OAuth 2.0 protocol style error. Use {@link isOAuth2Error} to determine if an
  *   OAuth 2.0 error was returned.
  *
+ * @group Authorization Code Grant
+ *
  * @see [RFC 6749 - The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html#section-4.1)
  */
 export async function processAuthorizationCodeOAuth2Response(
@@ -2566,6 +2639,8 @@ export interface ClientCredentialsGrantRequestOptions
  * @param as Authorization Server Metadata.
  * @param client Client Metadata.
  *
+ * @group Client Credentials Grant
+ *
  * @see [RFC 6749 - The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html#section-4.4)
  * @see [RFC 9449 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)](https://www.rfc-editor.org/rfc/rfc9449.html#name-dpop-access-token-request)
  */
@@ -2599,6 +2674,8 @@ export async function clientCredentialsGrantRequest(
  *   representing an OAuth 2.0 protocol style error. Use {@link isOAuth2Error} to determine if an
  *   OAuth 2.0 error was returned.
  *
+ * @group Client Credentials Grant
+ *
  * @see [RFC 6749 - The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html#section-4.4)
  */
 export async function processClientCredentialsResponse(
@@ -2628,6 +2705,8 @@ export interface RevocationRequestOptions extends HttpRequestOptions, Authentica
  * @param client Client Metadata.
  * @param token Token to revoke. You can provide the `token_type_hint` parameter via
  *   {@link RevocationRequestOptions.additionalParameters options}.
+ *
+ * @group Token Revocation
  *
  * @see [RFC 7009 - OAuth 2.0 Token Revocation](https://www.rfc-editor.org/rfc/rfc7009.html#section-2)
  */
@@ -2667,6 +2746,8 @@ export async function revocationRequest(
  *
  * @returns Resolves with `undefined` when the request was successful, or an object representing an
  *   OAuth 2.0 protocol style error.
+ *
+ * @group Token Revocation
  *
  * @see [RFC 7009 - OAuth 2.0 Token Revocation](https://www.rfc-editor.org/rfc/rfc7009.html#section-2)
  */
@@ -2719,6 +2800,8 @@ function assertReadableResponse(response: Response) {
  * @param client Client Metadata.
  * @param token Token to introspect. You can provide the `token_type_hint` parameter via
  *   {@link IntrospectionRequestOptions.additionalParameters options}.
+ *
+ * @group Token Introspection
  *
  * @see [RFC 7662 - OAuth 2.0 Token Introspection](https://www.rfc-editor.org/rfc/rfc7662.html#section-2)
  * @see [draft-ietf-oauth-jwt-introspection-response-12 - JWT Response for OAuth Token Introspection](https://www.ietf.org/archive/id/draft-ietf-oauth-jwt-introspection-response-12.html#section-4)
@@ -2791,6 +2874,8 @@ export interface IntrospectionResponse {
  * @returns Resolves with an object representing the parsed successful response, or an object
  *   representing an OAuth 2.0 protocol style error. Use {@link isOAuth2Error} to determine if an
  *   OAuth 2.0 error was returned.
+ *
+ * @group Token Introspection
  *
  * @see [RFC 7662 - OAuth 2.0 Token Introspection](https://www.rfc-editor.org/rfc/rfc7662.html#section-2)
  * @see [draft-ietf-oauth-jwt-introspection-response-12 - JWT Response for OAuth Token Introspection](https://www.ietf.org/archive/id/draft-ietf-oauth-jwt-introspection-response-12.html#section-5)
@@ -3109,6 +3194,10 @@ async function validateJwt(
  *
  * @returns Validated Authorization Response parameters or Authorization Error Response.
  *
+ * @group Authorization Code Grant
+ * @group Authorization Code Grant w/ OpenID Connect (OIDC)
+ * @group JWT Secured Authorization Response Mode for OAuth 2.0 (JARM)
+ *
  * @see [JWT Secured Authorization Response Mode for OAuth 2.0 (JARM)](https://openid.net/specs/openid-financial-api-jarm.html)
  */
 export async function validateJwtAuthResponse(
@@ -3233,6 +3322,9 @@ export const expectNoState = Symbol()
  * @param expectedState Expected `state` parameter value. Default is {@link expectNoState}.
  *
  * @returns Validated Authorization Response parameters or Authorization Error Response.
+ *
+ * @group Authorization Code Grant
+ * @group Authorization Code Grant w/ OpenID Connect (OIDC)
  *
  * @see [RFC 6749 - The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html#section-4.1.2)
  * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication)
@@ -3372,6 +3464,8 @@ export interface DeviceAuthorizationRequestOptions
  * @param client Client Metadata.
  * @param parameters Device Authorization Request parameters.
  *
+ * @group Device Authorization Grant
+ *
  * @see [RFC 8628 - OAuth 2.0 Device Authorization Grant](https://www.rfc-editor.org/rfc/rfc8628.html#section-3.1)
  */
 export async function deviceAuthorizationRequest(
@@ -3420,6 +3514,8 @@ export interface DeviceAuthorizationResponse {
  * @returns Resolves with an object representing the parsed successful response, or an object
  *   representing an OAuth 2.0 protocol style error. Use {@link isOAuth2Error} to determine if an
  *   OAuth 2.0 error was returned.
+ *
+ * @group Device Authorization Grant
  *
  * @see [RFC 8628 - OAuth 2.0 Device Authorization Grant](https://www.rfc-editor.org/rfc/rfc8628.html#section-3.1)
  */
@@ -3493,6 +3589,8 @@ export async function processDeviceAuthorizationResponse(
  * @param client Client Metadata.
  * @param deviceCode Device Code.
  *
+ * @group Device Authorization Grant
+ *
  * @see [RFC 8628 - OAuth 2.0 Device Authorization Grant](https://www.rfc-editor.org/rfc/rfc8628.html#section-3.4)
  * @see [RFC 9449 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)](https://www.rfc-editor.org/rfc/rfc9449.html#name-dpop-access-token-request)
  */
@@ -3532,6 +3630,8 @@ export async function deviceCodeGrantRequest(
  *   representing an OAuth 2.0 protocol style error. Use {@link isOAuth2Error} to determine if an
  *   OAuth 2.0 error was returned.
  *
+ * @group Device Authorization Grant
+ *
  * @see [RFC 8628 - OAuth 2.0 Device Authorization Grant](https://www.rfc-editor.org/rfc/rfc8628.html#section-3.4)
  */
 export async function processDeviceCodeResponse(
@@ -3557,6 +3657,8 @@ export interface GenerateKeyPairOptions {
  * Generates a CryptoKeyPair for a given JWS `alg` Algorithm identifier.
  *
  * @param alg Supported JWS `alg` Algorithm identifier.
+ *
+ * @group Utilities
  */
 export async function generateKeyPair(alg: JWSAlgorithm, options?: GenerateKeyPairOptions) {
   if (!validateString(alg)) {

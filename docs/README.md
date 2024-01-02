@@ -4,46 +4,125 @@
 
 ## Table of contents
 
-### Functions
+### Accessing Protected Resources
+
+- [parseWwwAuthenticateChallenges](functions/parseWwwAuthenticateChallenges.md)
+- [protectedResourceRequest](functions/protectedResourceRequest.md)
+
+### Authorization Code Grant
 
 - [authorizationCodeGrantRequest](functions/authorizationCodeGrantRequest.md)
 - [calculatePKCECodeChallenge](functions/calculatePKCECodeChallenge.md)
-- [clientCredentialsGrantRequest](functions/clientCredentialsGrantRequest.md)
-- [deviceAuthorizationRequest](functions/deviceAuthorizationRequest.md)
-- [deviceCodeGrantRequest](functions/deviceCodeGrantRequest.md)
-- [discoveryRequest](functions/discoveryRequest.md)
-- [generateKeyPair](functions/generateKeyPair.md)
 - [generateRandomCodeVerifier](functions/generateRandomCodeVerifier.md)
-- [generateRandomNonce](functions/generateRandomNonce.md)
-- [generateRandomState](functions/generateRandomState.md)
-- [getValidatedIdTokenClaims](functions/getValidatedIdTokenClaims.md)
-- [introspectionRequest](functions/introspectionRequest.md)
 - [isOAuth2Error](functions/isOAuth2Error.md)
 - [issueRequestObject](functions/issueRequestObject.md)
 - [parseWwwAuthenticateChallenges](functions/parseWwwAuthenticateChallenges.md)
 - [processAuthorizationCodeOAuth2Response](functions/processAuthorizationCodeOAuth2Response.md)
+- [validateAuthResponse](functions/validateAuthResponse.md)
+- [validateJwtAuthResponse](functions/validateJwtAuthResponse.md)
+
+### Authorization Code Grant w/ OpenID Connect (OIDC)
+
+- [authorizationCodeGrantRequest](functions/authorizationCodeGrantRequest.md)
+- [calculatePKCECodeChallenge](functions/calculatePKCECodeChallenge.md)
+- [generateRandomCodeVerifier](functions/generateRandomCodeVerifier.md)
+- [getValidatedIdTokenClaims](functions/getValidatedIdTokenClaims.md)
+- [isOAuth2Error](functions/isOAuth2Error.md)
+- [issueRequestObject](functions/issueRequestObject.md)
+- [parseWwwAuthenticateChallenges](functions/parseWwwAuthenticateChallenges.md)
 - [processAuthorizationCodeOpenIDResponse](functions/processAuthorizationCodeOpenIDResponse.md)
-- [processClientCredentialsResponse](functions/processClientCredentialsResponse.md)
-- [processDeviceAuthorizationResponse](functions/processDeviceAuthorizationResponse.md)
-- [processDeviceCodeResponse](functions/processDeviceCodeResponse.md)
-- [processDiscoveryResponse](functions/processDiscoveryResponse.md)
-- [processIntrospectionResponse](functions/processIntrospectionResponse.md)
-- [processPushedAuthorizationResponse](functions/processPushedAuthorizationResponse.md)
-- [processRefreshTokenResponse](functions/processRefreshTokenResponse.md)
-- [processRevocationResponse](functions/processRevocationResponse.md)
 - [processUserInfoResponse](functions/processUserInfoResponse.md)
-- [protectedResourceRequest](functions/protectedResourceRequest.md)
-- [pushedAuthorizationRequest](functions/pushedAuthorizationRequest.md)
-- [refreshTokenGrantRequest](functions/refreshTokenGrantRequest.md)
-- [revocationRequest](functions/revocationRequest.md)
 - [userInfoRequest](functions/userInfoRequest.md)
 - [validateAuthResponse](functions/validateAuthResponse.md)
 - [validateJwtAuthResponse](functions/validateJwtAuthResponse.md)
 
-### Classes
+### Authorization Server Metadata
+
+- [discoveryRequest](functions/discoveryRequest.md)
+- [processDiscoveryResponse](functions/processDiscoveryResponse.md)
+
+### Client Credentials Grant
+
+- [clientCredentialsGrantRequest](functions/clientCredentialsGrantRequest.md)
+- [isOAuth2Error](functions/isOAuth2Error.md)
+- [parseWwwAuthenticateChallenges](functions/parseWwwAuthenticateChallenges.md)
+- [processClientCredentialsResponse](functions/processClientCredentialsResponse.md)
+
+### Device Authorization Grant
+
+- [deviceAuthorizationRequest](functions/deviceAuthorizationRequest.md)
+- [deviceCodeGrantRequest](functions/deviceCodeGrantRequest.md)
+- [isOAuth2Error](functions/isOAuth2Error.md)
+- [parseWwwAuthenticateChallenges](functions/parseWwwAuthenticateChallenges.md)
+- [processDeviceAuthorizationResponse](functions/processDeviceAuthorizationResponse.md)
+- [processDeviceCodeResponse](functions/processDeviceCodeResponse.md)
+
+### Errors
 
 - [OperationProcessingError](classes/OperationProcessingError.md)
 - [UnsupportedOperationError](classes/UnsupportedOperationError.md)
+
+### JWT Secured Authorization Response Mode for OAuth 2.0 (JARM)
+
+- [validateJwtAuthResponse](functions/validateJwtAuthResponse.md)
+
+### JWT-Secured Authorization Request (JAR)
+
+- [issueRequestObject](functions/issueRequestObject.md)
+
+### OpenID Connect (OIDC) Discovery
+
+- [discoveryRequest](functions/discoveryRequest.md)
+- [processDiscoveryResponse](functions/processDiscoveryResponse.md)
+
+### OpenID Connect (OIDC) UserInfo
+
+- [processUserInfoResponse](functions/processUserInfoResponse.md)
+- [userInfoRequest](functions/userInfoRequest.md)
+
+### Proof Key for Code Exchange by OAuth Public Clients (PKCE)
+
+- [calculatePKCECodeChallenge](functions/calculatePKCECodeChallenge.md)
+- [generateRandomCodeVerifier](functions/generateRandomCodeVerifier.md)
+
+### Pushed Authorization Requests (PAR)
+
+- [isOAuth2Error](functions/isOAuth2Error.md)
+- [parseWwwAuthenticateChallenges](functions/parseWwwAuthenticateChallenges.md)
+- [processPushedAuthorizationResponse](functions/processPushedAuthorizationResponse.md)
+- [pushedAuthorizationRequest](functions/pushedAuthorizationRequest.md)
+
+### Refreshing an Access Token
+
+- [isOAuth2Error](functions/isOAuth2Error.md)
+- [parseWwwAuthenticateChallenges](functions/parseWwwAuthenticateChallenges.md)
+- [processRefreshTokenResponse](functions/processRefreshTokenResponse.md)
+- [refreshTokenGrantRequest](functions/refreshTokenGrantRequest.md)
+
+### Token Introspection
+
+- [introspectionRequest](functions/introspectionRequest.md)
+- [isOAuth2Error](functions/isOAuth2Error.md)
+- [parseWwwAuthenticateChallenges](functions/parseWwwAuthenticateChallenges.md)
+- [processIntrospectionResponse](functions/processIntrospectionResponse.md)
+
+### Token Revocation
+
+- [isOAuth2Error](functions/isOAuth2Error.md)
+- [parseWwwAuthenticateChallenges](functions/parseWwwAuthenticateChallenges.md)
+- [processRevocationResponse](functions/processRevocationResponse.md)
+- [revocationRequest](functions/revocationRequest.md)
+
+### Utilities
+
+- [generateKeyPair](functions/generateKeyPair.md)
+- [generateRandomCodeVerifier](functions/generateRandomCodeVerifier.md)
+- [generateRandomNonce](functions/generateRandomNonce.md)
+- [generateRandomState](functions/generateRandomState.md)
+- [isOAuth2Error](functions/isOAuth2Error.md)
+- [parseWwwAuthenticateChallenges](functions/parseWwwAuthenticateChallenges.md)
+
+<details><summary>Uncategorized</summary>
 
 ### Interfaces
 
@@ -92,3 +171,5 @@
 - [skipAuthTimeCheck](variables/skipAuthTimeCheck.md)
 - [skipStateCheck](variables/skipStateCheck.md)
 - [skipSubjectCheck](variables/skipSubjectCheck.md)
+
+</details>
