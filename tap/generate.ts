@@ -24,7 +24,7 @@ export default (QUnit: QUnit) => {
   })
 
   test('unknown algorithm', async (t) => {
-    await t.rejects(lib.generateKeyPair(<any>'foo'), /UnsupportedOperationError/)
+    await t.rejects(lib.generateKeyPair(<any>'foo'), lib.UnsupportedOperationError)
   })
 
   for (const alg of fails) {
