@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.4.1](https://github.com/panva/oauth4webapi/compare/v2.4.0...v2.4.1) (2024-01-03)
+
+
+### Refactor
+
+* create Request instances before passing them to fetch ([02ab110](https://github.com/panva/oauth4webapi/commit/02ab1104cb334e27a10adcbd4f299e6622c134dd))
+* **types:** mark always lowercased values and keys as Lowercase<string> ([89e7a77](https://github.com/panva/oauth4webapi/commit/89e7a77738f6069bf79b4ce9cbfdca99bdde0807))
+
+
+### Documentation
+
+* categorize APIs in docs/README.md ([c28efda](https://github.com/panva/oauth4webapi/commit/c28efda48a2632d3cd0bcf3ae676e5dc4dce2896))
+* expose Indexed Access Types ([54c4393](https://github.com/panva/oauth4webapi/commit/54c4393f4da219c54e30539874a5aae61a53937a))
+* update EdDSA description ([9765e7a](https://github.com/panva/oauth4webapi/commit/9765e7a9a0706f8e1ea8399b1cbe2ea9a1cf25f2))
+
 ## [2.4.0](https://github.com/panva/oauth4webapi/compare/v2.3.0...v2.4.0) (2023-11-15)
 
 
