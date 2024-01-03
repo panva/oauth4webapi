@@ -10,7 +10,7 @@ export default (QUnit: QUnit) => {
   for (const [alg, kp] of Object.entries(keys)) {
     const fapi = alg === 'EdDSA' || alg === 'ES256' || alg === 'PS256'
     const setup = fapi ? fapi2 : oidcc
-    const method = (alg === 'PS256' || alg === 'RS256') ? test : skip
+    const method = alg === 'PS256' || alg === 'RS256' ? test : skip
 
     function isDpopNonceError(input: lib.OAuth2Error | lib.WWWAuthenticateChallenge[]) {
       if ('error' in input) {
