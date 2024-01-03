@@ -8,11 +8,13 @@
   "types": [
     {
       "type": "feat",
-      "section": "Features"
+      "section": "Features",
+      "hidden": false
     },
     {
       "type": "fix",
-      "section": "Fixes"
+      "section": "Fixes",
+      "hidden": false
     },
     {
       "type": "chore",
@@ -20,7 +22,8 @@
     },
     {
       "type": "docs",
-      "hidden": true
+      "section": "Documentation",
+      "hidden": false
     },
     {
       "type": "style",
