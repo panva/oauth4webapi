@@ -30,6 +30,8 @@ The following features are currently in scope and implemented in this software:
 
 ## [Documentation](docs/README.md)
 
+`oauth4webapi` is distributed via [npmjs.com](https://www.npmjs.com/package/oauth4webapi), [deno.land/x](https://deno.land/x/oauth4webapi), [cdnjs.com](https://cdnjs.com/libraries/oauth4webapi), [jsdelivr.com](https://www.jsdelivr.com/package/npm/oauth4webapi), and [github.com](https://github.com/panva/oauth4webapi).
+
 ## [Examples](examples/README.md)
 
 **`example`** ESM import
