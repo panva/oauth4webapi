@@ -8,6 +8,10 @@ Recognized Client Metadata that have an effect on the exposed functionality.
 
 [IANA OAuth Client Registration Metadata registry](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#client-metadata)
 
+## Indexable
+
+▪ [metadata: `string`]: [`JsonValue`](../types/JsonValue.md) \| `undefined`
+
 ## Table of contents
 
 ### Properties

@@ -2,6 +2,12 @@
 
 [💗 Help the project](https://github.com/sponsors/panva)
 
+## Indexable
+
+▪ [parameter: [`Lowercase`]( https://www.typescriptlang.org/docs/handbook/2/template-literal-types.html#lowercasestringtype )\<`string`\>]: `string` \| `undefined`
+
+NOTE: because the parameter names are case insensitive they are always returned lowercased
+
 ## Table of contents
 
 ### Properties

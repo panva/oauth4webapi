@@ -6,10 +6,14 @@ if (typeof navigator === 'undefined' || !navigator.userAgent?.startsWith?.('Mozi
   USER_AGENT = `${NAME}/${VERSION}`
 }
 
-type JsonObject = { [Key in string]?: JsonValue }
-type JsonArray = JsonValue[]
-type JsonPrimitive = string | number | boolean | null
-type JsonValue = JsonPrimitive | JsonObject | JsonArray
+/** JSON Object */
+export type JsonObject = { [Key in string]?: JsonValue }
+/** JSON Array */
+export type JsonArray = JsonValue[]
+/** JSON Primitives */
+export type JsonPrimitive = string | number | boolean | null
+/** JSON Values */
+export type JsonValue = JsonPrimitive | JsonObject | JsonArray
 
 /**
  * Interface to pass an asymmetric private key and, optionally, its associated JWK Key ID to be

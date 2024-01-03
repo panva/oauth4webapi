@@ -9,7 +9,6 @@
   "excludeProtected": true,
   "gitRevision": "main",
   "hideGenerator": true,
-  "intentionallyNotExported": ["JsonValue"],
   "out": "docs",
   "plugin": ["typedoc-plugin-markdown", "typedoc-plugin-mdn-links"],
   "readme": "none",

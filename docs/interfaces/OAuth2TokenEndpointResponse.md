@@ -2,6 +2,10 @@
 
 [💗 Help the project](https://github.com/sponsors/panva)
 
+## Indexable
+
+▪ [parameter: `string`]: [`JsonValue`](../types/JsonValue.md) \| `undefined`
+
 ## Table of contents
 
 ### Properties

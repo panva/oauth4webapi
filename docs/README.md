@@ -163,6 +163,10 @@
 
 - [ClientAuthenticationMethod](types/ClientAuthenticationMethod.md)
 - [JWSAlgorithm](types/JWSAlgorithm.md)
+- [JsonArray](types/JsonArray.md)
+- [JsonObject](types/JsonObject.md)
+- [JsonPrimitive](types/JsonPrimitive.md)
+- [JsonValue](types/JsonValue.md)
 
 ### Variables
 
