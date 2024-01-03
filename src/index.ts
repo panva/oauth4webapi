@@ -1499,12 +1499,12 @@ export interface WWWAuthenticateChallengeParameters {
   readonly scope?: string
 
   /** NOTE: because the parameter names are case insensitive they are always returned lowercased */
-  readonly [parameter: string]: string | undefined
+  readonly [parameter: Lowercase<string>]: string | undefined
 }
 
 export interface WWWAuthenticateChallenge {
   /** NOTE: because the value is case insensitive it is always returned lowercased */
-  readonly scheme: string
+  readonly scheme: Lowercase<string>
   readonly parameters: WWWAuthenticateChallengeParameters
 }
 
@@ -1522,7 +1522,7 @@ const SCHEMES_REGEXP = /(?:^|, ?)([0-9a-zA-Z!#$%&'*+\-.^_`|~]+)(?=$|[ ,])/g
 function wwwAuth(scheme: string, params: string): WWWAuthenticateChallenge {
   const arr = params.split(SPLIT_REGEXP).slice(1)
   if (!arr.length) {
-    return { scheme: scheme.toLowerCase(), parameters: {} }
+    return { scheme: <Lowercase<string>>scheme.toLowerCase(), parameters: {} }
   }
   arr[arr.length - 1] = arr[arr.length - 1].replace(/,$/, '')
   const parameters: WWWAuthenticateChallenge['parameters'] = {}
@@ -1533,13 +1533,13 @@ function wwwAuth(scheme: string, params: string): WWWAuthenticateChallenge {
         arr[idx] += arr[i]
       }
     }
-    const key = arr[idx - 1].replace(/^(?:, ?)|=$/g, '').toLowerCase()
+    const key = <Lowercase<string>>arr[idx - 1].replace(/^(?:, ?)|=$/g, '').toLowerCase()
     // @ts-expect-error
     parameters[key] = unquote(arr[idx])
   }
 
   return {
-    scheme: scheme.toLowerCase(),
+    scheme: <Lowercase<string>>scheme.toLowerCase(),
     parameters,
   }
 }
@@ -2444,7 +2444,7 @@ export interface TokenEndpointResponse {
   readonly refresh_token?: string
   readonly scope?: string
   /** NOTE: because the value is case insensitive it is always returned lowercased */
-  readonly token_type: string
+  readonly token_type: 'bearer' | 'dpop' | Lowercase<string>
 
   readonly [parameter: string]: JsonValue | undefined
 }
@@ -2456,7 +2456,7 @@ export interface OpenIDTokenEndpointResponse {
   readonly refresh_token?: string
   readonly scope?: string
   /** NOTE: because the value is case insensitive it is always returned lowercased */
-  readonly token_type: string
+  readonly token_type: 'bearer' | 'dpop' | Lowercase<string>
 
   readonly [parameter: string]: JsonValue | undefined
 }
@@ -2468,7 +2468,7 @@ export interface OAuth2TokenEndpointResponse {
   readonly refresh_token?: string
   readonly scope?: string
   /** NOTE: because the value is case insensitive it is always returned lowercased */
-  readonly token_type: string
+  readonly token_type: 'bearer' | 'dpop' | Lowercase<string>
 
   readonly [parameter: string]: JsonValue | undefined
 }
@@ -2478,7 +2478,7 @@ export interface ClientCredentialsGrantResponse {
   readonly expires_in?: number
   readonly scope?: string
   /** NOTE: because the value is case insensitive it is always returned lowercased */
-  readonly token_type: string
+  readonly token_type: 'bearer' | 'dpop' | Lowercase<string>
 
   readonly [parameter: string]: JsonValue | undefined
 }
