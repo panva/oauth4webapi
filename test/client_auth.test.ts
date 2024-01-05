@@ -49,7 +49,8 @@ test('client_secret_basic (appendix b)', async (t) => {
         authorization(authorization) {
           const [, auth] = authorization.split(' ')
           for (const token of atob(auth).split(':')) {
-            t.is(decodeURIComponent(token), '+%&+£€')
+            t.false(/[^a-zA-Z0-9%+]/.test(token))
+            t.deepEqual(token, 'client+%25%26%2B%2D%5F%2E%21%7E%2A%27%28%29')
           }
           return true
         },
@@ -65,8 +66,8 @@ test('client_secret_basic (appendix b)', async (t) => {
     { ...issuer, revocation_endpoint: endpoint('test-basic-encoding') },
     {
       ...client,
-      client_id: ' %&+£€',
-      client_secret: ' %&+£€',
+      client_id: "client %&+-_.!~*'()",
+      client_secret: "client %&+-_.!~*'()",
       token_endpoint_auth_method: 'client_secret_basic',
     },
     'token',

@@ -1558,9 +1558,24 @@ export interface PushedAuthorizationRequestOptions
  * using the same algorithm and used as the password.
  */
 function formUrlEncode(token: string) {
-  // TODO: in v3.x additionally encode the `- _ . ! ~ * ' ( )` characters
-  // https://github.com/panva/oauth4webapi/commit/f926175cdf6caa467029a57e76375054fff7c57b
-  return encodeURIComponent(token).replace(/%20/g, '+')
+  return encodeURIComponent(token).replace(/(?:[-_.!~*'()]|%20)/g, (substring) => {
+    switch (substring) {
+      case '-':
+      case '_':
+      case '.':
+      case '!':
+      case '~':
+      case '*':
+      case "'":
+      case '(':
+      case ')':
+        return `%${substring.charCodeAt(0).toString(16).toUpperCase()}`
+      case '%20':
+        return '+'
+      default:
+        throw new Error()
+    }
+  })
 }
 
 /**
