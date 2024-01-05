@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.4.2](https://github.com/panva/oauth4webapi/compare/v2.4.1...v2.4.2) (2024-01-05)
+
+
+### Documentation
+
+* add distribution links to README.md ([29bb947](https://github.com/panva/oauth4webapi/commit/29bb947081fd533ad0562b0c219a231794663162))
+
+
+### Fixes
+
+* encode client_secret_basic - _ . ! ~ * ' ( ) characters ([f926175](https://github.com/panva/oauth4webapi/commit/f926175cdf6caa467029a57e76375054fff7c57b))
+
 ## [2.4.1](https://github.com/panva/oauth4webapi/compare/v2.4.0...v2.4.1) (2024-01-03)
 
 
