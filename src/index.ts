@@ -1031,6 +1031,7 @@ export interface PushedAuthorizationRequestOptions
  * using the same algorithm and used as the password.
  */
 function formUrlEncode(token: string) {
+  // TODO: in v3.x additionally encode the `- _ . ! ~ * ' ( )` characters
   return encodeURIComponent(token).replace(/%20/g, '+')
 }
 
