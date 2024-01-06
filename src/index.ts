@@ -1032,6 +1032,7 @@ export interface PushedAuthorizationRequestOptions
  */
 function formUrlEncode(token: string) {
   // TODO: in v3.x additionally encode the `- _ . ! ~ * ' ( )` characters
+  // https://github.com/panva/oauth4webapi/commit/f926175cdf6caa467029a57e76375054fff7c57b
   return encodeURIComponent(token).replace(/%20/g, '+')
 }
 
