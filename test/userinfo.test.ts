@@ -51,20 +51,26 @@ test('userInfoRequest() w/ Custom Headers', async (t) => {
       },
     })
     .reply(200, data)
+    .times(3)
 
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
     userinfo_endpoint: endpoint('userinfo-headers'),
   }
   const tClient: lib.Client = { ...client }
-  const response = await lib.userInfoRequest(tIssuer, tClient, 'token', {
-    headers: new Headers([
-      ['accept', 'will be overwritten'],
-      ['user-agent', 'foo'],
-      ['foo', 'bar'],
-    ]),
-  })
-  t.true(response instanceof Response)
+  const entries = [
+    ['accept', 'will be overwritten'],
+    ['user-agent', 'foo'],
+    ['foo', 'bar'],
+  ]
+  for (const headers of [
+    entries,
+    Object.fromEntries(entries),
+    new Headers(Object.fromEntries(entries)),
+  ]) {
+    const response = await lib.userInfoRequest(tIssuer, tClient, 'token', { headers })
+    t.true(response instanceof Response)
+  }
 })
 
 test('userInfoRequest() w/ jwt signal', async (t) => {

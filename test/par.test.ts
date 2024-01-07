@@ -77,16 +77,21 @@ test('pushedAuthorizationRequest() w/ Custom Headers', async (t) => {
       },
     })
     .reply(200, { request_uri: 'urn:example:uri', expires_in: 60 })
-
-  await t.notThrowsAsync(
-    lib.pushedAuthorizationRequest(tIssuer, tClient, new URLSearchParams(), {
-      headers: new Headers([
-        ['accept', 'will be overwritten'],
-        ['user-agent', 'foo'],
-        ['foo', 'bar'],
-      ]),
-    }),
-  )
+    .times(3)
+  const entries = [
+    ['accept', 'will be overwritten'],
+    ['user-agent', 'foo'],
+    ['foo', 'bar'],
+  ]
+  for (const headers of [
+    entries,
+    Object.fromEntries(entries),
+    new Headers(Object.fromEntries(entries)),
+  ]) {
+    await t.notThrowsAsync(
+      lib.pushedAuthorizationRequest(tIssuer, tClient, new URLSearchParams(), { headers }),
+    )
+  }
 })
 
 test('pushedAuthorizationRequest() w/ DPoP', async (t) => {
