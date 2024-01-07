@@ -7,6 +7,7 @@
 ### Properties
 
 - [DPoP](UserInfoRequestOptions.md#dpop)
+- [[experimentalCustomFetch]](UserInfoRequestOptions.md#[experimentalcustomfetch])
 - [headers](UserInfoRequestOptions.md#headers)
 - [signal](UserInfoRequestOptions.md#signal)
 
@@ -17,6 +18,17 @@
 • `Optional` **DPoP**: [`DPoPOptions`](DPoPOptions.md)
 
 DPoP-related options.
+
+___
+
+### [experimentalCustomFetch]
+
+• `Optional` **[experimentalCustomFetch]**: (`input`: `string` \| [`Request`]( https://developer.mozilla.org/docs/Web/API/Request ) \| [`URL`]( https://developer.mozilla.org/docs/Web/API/URL ), `init?`: `RequestInit`) => [`Promise`]( https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise )\<[`Response`]( https://developer.mozilla.org/docs/Web/API/Response )\>
+
+This is an experimental feature, it is not subject to semantic versioning rules. Non-backward
+compatible changes or removal may occur in any future release.
+
+See [experimentalCustomFetch](../variables/experimentalCustomFetch.md) for its documentation.
 
 ___
 

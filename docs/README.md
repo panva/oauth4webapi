@@ -172,6 +172,7 @@
 
 - [expectNoNonce](variables/expectNoNonce.md)
 - [expectNoState](variables/expectNoState.md)
+- [experimentalCustomFetch](variables/experimentalCustomFetch.md)
 - [skipAuthTimeCheck](variables/skipAuthTimeCheck.md)
 - [skipStateCheck](variables/skipStateCheck.md)
 - [skipSubjectCheck](variables/skipSubjectCheck.md)

@@ -15,6 +15,23 @@ export type JsonPrimitive = string | number | boolean | null
 /** JSON Values */
 export type JsonValue = JsonPrimitive | JsonObject | JsonArray
 
+type Constructor<T extends {} = {}> = new (...args: any[]) => T
+
+function looseInstanceOf<T extends {}>(input: unknown, expected: Constructor<T>): input is T {
+  if (input == null) {
+    return false
+  }
+
+  try {
+    return (
+      input instanceof expected ||
+      Object.getPrototypeOf(input)[Symbol.toStringTag] === expected.prototype[Symbol.toStringTag]
+    )
+  } catch {
+    return false
+  }
+}
+
 /**
  * Interface to pass an asymmetric private key and, optionally, its associated JWK Key ID to be
  * added as a `kid` JOSE Header Parameter.
@@ -173,6 +190,92 @@ interface JWK {
 export const clockSkew = Symbol()
 /** @ignore during Documentation generation but part of the public API */
 export const clockTolerance = Symbol()
+/**
+ * This is an experimental feature, it is not subject to semantic versioning rules. Non-backward
+ * compatible changes or removal may occur in any future release.
+ *
+ * When configured on an interface that extends {@link HttpRequestOptions}, that's every `options`
+ * parameter for functions that trigger HTTP Requests, this replaces the use of global fetch. As a
+ * fetch replacement the arguments and expected return are the same as fetch.
+ *
+ * In theory any module that claims to be compatible with the Fetch API can be used but your mileage
+ * may vary. No workarounds to allow use of non-conform {@link Response}s will be considered.
+ *
+ * If you only need to update the {@link Request} properties you do not need to use a Fetch API
+ * module, just change what you need and pass it to globalThis.fetch just like this module would
+ * normally do.
+ *
+ * Its intended use cases are to enable
+ *
+ * - {@link Request}/{@link Response} tracing and logging
+ * - Custom caching strategies for responses of Authorization Server Metadata and JSON Web Key Set
+ *   (JWKS) endpoints
+ * - Changing the {@link Request} properties like headers, body, credentials, mode before it is sent
+ *
+ * Known issues:
+ *
+ * - Expect Type-related issues when passing the inputs through to fetch-like modules, they hardly
+ *   ever get their typings inline with actual fetch, you should `@ts-expect-error` them.
+ * - Returning self-constructed {@link Response} instances prohibits AS-signalled DPoP Nonce caching.
+ *
+ * @example
+ *
+ * Using [sindresorhus/ky](https://github.com/sindresorhus/ky) hooks feature for logging outgoing
+ * requests and their responses.
+ *
+ * ```js
+ * import ky from 'ky'
+ * import { experimentalCustomFetch } from 'oauth4webapi'
+ *
+ * // example use
+ * await discoveryRequest(new URL('https://as.example.com'), {
+ *   [experimentalCustomFetch]: (...args) =>
+ *     ky(args[0], {
+ *       ...args[1],
+ *       hooks: {
+ *         beforeRequest: [
+ *           (request) => {
+ *             logRequest(request)
+ *           },
+ *         ],
+ *         beforeRetry: [
+ *           ({ request, error, retryCount }) => {
+ *             logRetry(request, error, retryCount)
+ *           },
+ *         ],
+ *         afterResponse: [
+ *           (request, _, response) => {
+ *             logResponse(request, response)
+ *           },
+ *         ],
+ *       },
+ *     }),
+ * })
+ * ```
+ *
+ * @example
+ *
+ * Using [nodejs/undici](https://github.com/nodejs/undici) for mocking.
+ *
+ * ```js
+ * import * as undici from 'undici'
+ * import { discoveryRequest, experimentalCustomFetch } from 'oauth4webapi'
+ *
+ * const mockAgent = new undici.MockAgent()
+ * mockAgent.disableNetConnect()
+ * undici.setGlobalDispatcher(mockAgent)
+ *
+ * // continue as per undici documentation
+ * // https://github.com/nodejs/undici/blob/v6.2.1/docs/api/MockAgent.md#example---basic-mocked-request
+ *
+ * // example use
+ * await discoveryRequest(new URL('https://as.example.com'), {
+ *   // @ts-expect-error
+ *   [experimentalCustomFetch]: undici.fetch,
+ * })
+ * ```
+ */
+export const experimentalCustomFetch = Symbol()
 
 /**
  * Authorization Server Metadata
@@ -729,6 +832,14 @@ export interface HttpRequestOptions {
 
   /** Headers to additionally send with the HTTP Request(s) triggered by this function's invocation. */
   headers?: HeadersInit
+
+  /**
+   * This is an experimental feature, it is not subject to semantic versioning rules. Non-backward
+   * compatible changes or removal may occur in any future release.
+   *
+   * See {@link experimentalCustomFetch} for its documentation.
+   */
+  [experimentalCustomFetch]?: typeof fetch
 }
 
 export interface DiscoveryRequestOptions extends HttpRequestOptions {
@@ -760,10 +871,11 @@ function isJsonObject<T = JsonObject>(input: unknown): input is T {
 }
 
 function prepareHeaders(input?: HeadersInit): Headers {
-  if (input instanceof Headers) {
+  if (looseInstanceOf(input, Headers)) {
     input = Object.fromEntries(input.entries())
   }
   const headers = new Headers(input)
+
   if (USER_AGENT && !headers.has('user-agent')) {
     headers.set('user-agent', USER_AGENT)
   }
@@ -837,14 +949,12 @@ export async function discoveryRequest(
   const headers = prepareHeaders(options?.headers)
   headers.set('accept', 'application/json')
 
-  const request = new Request(url.href, {
-    headers,
+  return (options?.[experimentalCustomFetch] || fetch)(url.href, {
+    headers: Object.fromEntries(headers.entries()),
     method: 'GET',
     redirect: 'manual',
     signal: options?.signal ? signal(options.signal) : null,
-  })
-
-  return fetch(request).then(processDpopNonce)
+  }).then(processDpopNonce)
 }
 
 function validateString(input: unknown): input is string {
@@ -874,7 +984,7 @@ export async function processDiscoveryResponse(
     throw new TypeError('"expectedIssuer" must be an instance of URL')
   }
 
-  if (!(response instanceof Response)) {
+  if (!looseInstanceOf(response, Response)) {
     throw new TypeError('"response" must be an instance of Response')
   }
 
@@ -1570,7 +1680,7 @@ function wwwAuth(scheme: string, params: string): WWWAuthenticateChallenge {
 export function parseWwwAuthenticateChallenges(
   response: Response,
 ): WWWAuthenticateChallenge[] | undefined {
-  if (!(response instanceof Response)) {
+  if (!looseInstanceOf(response, Response)) {
     throw new TypeError('"response" must be an instance of Response')
   }
 
@@ -1627,7 +1737,7 @@ export async function processPushedAuthorizationResponse(
   assertAs(as)
   assertClient(client)
 
-  if (!(response instanceof Response)) {
+  if (!looseInstanceOf(response, Response)) {
     throw new TypeError('"response" must be an instance of Response')
   }
 
@@ -1725,15 +1835,13 @@ export async function protectedResourceRequest(
     headers.set('authorization', `DPoP ${accessToken}`)
   }
 
-  const request = new Request(url.href, {
+  return (options?.[experimentalCustomFetch] || fetch)(url.href, {
     body,
-    headers,
+    headers: Object.fromEntries(headers.entries()),
     method,
     redirect: 'manual',
     signal: options?.signal ? signal(options.signal) : null,
-  })
-
-  return fetch(request).then(processDpopNonce)
+  }).then(processDpopNonce)
 }
 
 export interface UserInfoRequestOptions extends HttpRequestOptions, DPoPRequestOptions {}
@@ -1975,7 +2083,7 @@ export async function processUserInfoResponse(
   assertAs(as)
   assertClient(client)
 
-  if (!(response instanceof Response)) {
+  if (!looseInstanceOf(response, Response)) {
     throw new TypeError('"response" must be an instance of Response')
   }
 
@@ -2049,15 +2157,13 @@ async function authenticatedRequest(
   await clientAuthentication(as, client, body, headers, options?.clientPrivateKey)
   headers.set('content-type', 'application/x-www-form-urlencoded;charset=UTF-8')
 
-  const request = new Request(url.href, {
+  return (options?.[experimentalCustomFetch] || fetch)(url.href, {
     body,
-    headers,
+    headers: Object.fromEntries(headers.entries()),
     method,
     redirect: 'manual',
     signal: options?.signal ? signal(options.signal) : null,
-  })
-
-  return fetch(request).then(processDpopNonce)
+  }).then(processDpopNonce)
 }
 
 export interface TokenEndpointRequestOptions
@@ -2174,7 +2280,7 @@ async function processGenericAccessTokenResponse(
   assertAs(as)
   assertClient(client)
 
-  if (!(response instanceof Response)) {
+  if (!looseInstanceOf(response, Response)) {
     throw new TypeError('"response" must be an instance of Response')
   }
 
@@ -2760,7 +2866,7 @@ export async function revocationRequest(
 export async function processRevocationResponse(
   response: Response,
 ): Promise<undefined | OAuth2Error> {
-  if (!(response instanceof Response)) {
+  if (!looseInstanceOf(response, Response)) {
     throw new TypeError('"response" must be an instance of Response')
   }
 
@@ -2894,7 +3000,7 @@ export async function processIntrospectionResponse(
   assertAs(as)
   assertClient(client)
 
-  if (!(response instanceof Response)) {
+  if (!looseInstanceOf(response, Response)) {
     throw new TypeError('"response" must be an instance of Response')
   }
 
@@ -2964,14 +3070,12 @@ async function jwksRequest(
   headers.set('accept', 'application/json')
   headers.append('accept', 'application/jwk-set+json')
 
-  const request = new Request(url.href, {
-    headers,
+  return (options?.[experimentalCustomFetch] || fetch)(url.href, {
+    headers: Object.fromEntries(headers.entries()),
     method: 'GET',
     redirect: 'manual',
     signal: options?.signal ? signal(options.signal) : null,
-  })
-
-  return fetch(request).then(processDpopNonce)
+  }).then(processDpopNonce)
 }
 
 interface JsonWebKeySet {
@@ -2979,7 +3083,7 @@ interface JsonWebKeySet {
 }
 
 async function processJwksResponse(response: Response): Promise<JsonWebKeySet> {
-  if (!(response instanceof Response)) {
+  if (!looseInstanceOf(response, Response)) {
     throw new TypeError('"response" must be an instance of Response')
   }
 
@@ -3533,7 +3637,7 @@ export async function processDeviceAuthorizationResponse(
   assertAs(as)
   assertClient(client)
 
-  if (!(response instanceof Response)) {
+  if (!looseInstanceOf(response, Response)) {
     throw new TypeError('"response" must be an instance of Response')
   }
 

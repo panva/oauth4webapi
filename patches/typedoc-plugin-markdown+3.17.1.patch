@@ -44,51 +44,68 @@ index e332374..1ecd370 100644
          }
          return md.length > 0 ? md.join('\n') : null;
 diff --git a/node_modules/typedoc-plugin-markdown/dist/resources/partials/member.declaration.hbs b/node_modules/typedoc-plugin-markdown/dist/resources/partials/member.declaration.hbs
-index 1ca0b74..2eafdc6 100755
+index 1ca0b74..2bc3b47 100755
 --- a/node_modules/typedoc-plugin-markdown/dist/resources/partials/member.declaration.hbs
 +++ b/node_modules/typedoc-plugin-markdown/dist/resources/partials/member.declaration.hbs
-@@ -16,29 +16,29 @@
+@@ -14,58 +14,4 @@
  
- {{#if type.declaration}}
+ {{/if}}
  
+-{{#if type.declaration}}
+-
 -{{#if type.declaration.indexSignature}}
 -
 -{{#with type.declaration.indexSignature}}
-+{{#if type.declaration.signatures}}
- 
+-
 -#### Index signature
-+{{#if type.declaration.children}}
- 
+-
 -{{{indexSignatureTitle}}}
-+#### Call signature
- 
+-
 -{{> comment}}
-+{{else}}
- 
+-
 -{{/with}}
-+#### Type declaration
- 
- {{/if}}
- 
+-
+-{{/if}}
+-
 -{{#if type.declaration.signatures}}
-+{{#if type.declaration.indexSignature}}
- 
+-
 -{{#if type.declaration.children}}
-+{{#with type.declaration.indexSignature}}
- 
+-
 -#### Call signature
-+#### Index signature
- 
+-
 -{{else}}
-+{{{indexSignatureTitle}}}
- 
+-
 -#### Type declaration
-+{{> comment}}
-+
-+{{/with}}
- 
- {{/if}}
- 
+-
+-{{/if}}
+-
+-{{#each type.declaration.signatures}}
+-
+-{{> member.signature showSources=false }}
+-
+-{{/each}}
+-
+-{{/if}}
+-
+-{{#if type.declaration.children}}
+-
+-{{#with type.declaration}}
+-
+-#### Type declaration
+-
+-{{/with}}
+-
+-{{#with type.declaration.children}}
+-
+-{{{typeDeclarationMembers}}}
+-
+-{{/with}}
+-
+-{{/if}}
+-
+-{{/if}}
+-
+ {{> member.sources}}
 diff --git a/node_modules/typedoc-plugin-markdown/dist/resources/partials/member.sources.hbs b/node_modules/typedoc-plugin-markdown/dist/resources/partials/member.sources.hbs
 index a999ee8..3f11cfe 100755
 --- a/node_modules/typedoc-plugin-markdown/dist/resources/partials/member.sources.hbs
@@ -136,7 +153,7 @@ index ba8e5be..6a4e1d3 100644
 \ No newline at end of file
 +[💗 Help the project](https://github.com/sponsors/panva)
 diff --git a/node_modules/typedoc-plugin-markdown/dist/resources/templates/reflection.hbs b/node_modules/typedoc-plugin-markdown/dist/resources/templates/reflection.hbs
-index ce29bc5..dbe8a85 100755
+index ce29bc5..471fe38 100755
 --- a/node_modules/typedoc-plugin-markdown/dist/resources/templates/reflection.hbs
 +++ b/node_modules/typedoc-plugin-markdown/dist/resources/templates/reflection.hbs
 @@ -24,18 +24,6 @@
