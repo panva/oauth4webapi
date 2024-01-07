@@ -104,16 +104,20 @@ test('revocationRequest() w/ Custom Headers', async (t) => {
       },
     })
     .reply(200, { access_token: 'token', token_type: 'Bearer' })
+    .times(3)
 
-  await t.notThrowsAsync(
-    lib.revocationRequest(tIssuer, tClient, 'token', {
-      headers: new Headers([
-        ['accept', 'will be overwritten'],
-        ['user-agent', 'foo'],
-        ['foo', 'bar'],
-      ]),
-    }),
-  )
+  const entries = [
+    ['accept', 'will be overwritten'],
+    ['user-agent', 'foo'],
+    ['foo', 'bar'],
+  ]
+  for (const headers of [
+    entries,
+    Object.fromEntries(entries),
+    new Headers(Object.fromEntries(entries)),
+  ]) {
+    await t.notThrowsAsync(lib.revocationRequest(tIssuer, tClient, 'token', { headers }))
+  }
 })
 
 test('processRevocationResponse()', async (t) => {

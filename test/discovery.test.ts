@@ -37,15 +37,21 @@ test('discoveryRequest() w/ Custom Headers', async (t) => {
       },
     })
     .reply(200, data)
+    .times(3)
 
-  const response = await lib.discoveryRequest(new URL(issuer.issuer), {
-    headers: new Headers([
-      ['accept', 'will be overwritten'],
-      ['user-agent', 'foo'],
-      ['foo', 'bar'],
-    ]),
-  })
-  t.true(response instanceof Response)
+  const entries = [
+    ['accept', 'will be overwritten'],
+    ['user-agent', 'foo'],
+    ['foo', 'bar'],
+  ]
+  for (const headers of [
+    entries,
+    Object.fromEntries(entries),
+    new Headers(Object.fromEntries(entries)),
+  ]) {
+    const response = await lib.discoveryRequest(new URL(issuer.issuer), { headers })
+    t.true(response instanceof Response)
+  }
 })
 
 test('discoveryRequest() - oidc with a pathname', async (t) => {

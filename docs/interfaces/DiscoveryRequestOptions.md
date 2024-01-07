@@ -22,10 +22,9 @@ ___
 
 ### headers
 
-• `Optional` **headers**: [`Headers`]( https://developer.mozilla.org/docs/Web/API/Headers )
+• `Optional` **headers**: [`Record`]( https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type )\<`string`, `string`\> \| [`string`, `string`][] \| [`Headers`]( https://developer.mozilla.org/docs/Web/API/Headers )
 
-A Headers instance to additionally send with the HTTP Request(s) triggered by this function's
-invocation.
+Headers to additionally send with the HTTP Request(s) triggered by this function's invocation.
 
 ___
 

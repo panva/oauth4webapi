@@ -727,11 +727,8 @@ export interface HttpRequestOptions {
    */
   signal?: (() => AbortSignal) | AbortSignal
 
-  /**
-   * A Headers instance to additionally send with the HTTP Request(s) triggered by this function's
-   * invocation.
-   */
-  headers?: Headers
+  /** Headers to additionally send with the HTTP Request(s) triggered by this function's invocation. */
+  headers?: [string, string][] | Record<string, string> | Headers
 }
 
 export interface DiscoveryRequestOptions extends HttpRequestOptions {
@@ -762,9 +759,9 @@ function isJsonObject<T = JsonObject>(input: unknown): input is T {
   return true
 }
 
-function prepareHeaders(input: unknown): Headers {
-  if (input !== undefined && !(input instanceof Headers)) {
-    throw new TypeError('"options.headers" must be an instance of Headers')
+function prepareHeaders(input?: [string, string][] | Record<string, string> | Headers): Headers {
+  if (input instanceof Headers) {
+    input = Object.fromEntries(input.entries())
   }
   const headers = new Headers(input)
   if (USER_AGENT && !headers.has('user-agent')) {
