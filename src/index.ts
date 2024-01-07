@@ -740,11 +740,14 @@ export interface DiscoveryRequestOptions extends HttpRequestOptions {
 }
 
 function processDpopNonce(response: Response) {
-  const url = new URL(response.url)
-  if (response.headers.has('dpop-nonce')) {
-    dpopNonces.set(url.origin, response.headers.get('dpop-nonce')!)
+  try {
+    if (response.headers.has('dpop-nonce')) {
+      const url = new URL(response.url)
+      dpopNonces.set(url.origin, response.headers.get('dpop-nonce')!)
+    }
+  } finally {
+    return response
   }
-  return response
 }
 
 function normalizeTyp(value: string) {
