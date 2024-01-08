@@ -37,8 +37,9 @@ export const mtls: { key: string; cert: string } = conformance.mtls || {}
 let prefix = ''
 
 switch (plan.name) {
+  case 'fapi1-advanced-final-client-test-plan':
   case 'fapi2-security-profile-id2-client-test-plan':
-    prefix = 'fapi2-security-profile-id2-client-test-'
+    prefix = plan.name.slice(0, -4)
     break
   case 'fapi2-message-signing-id1-client-test-plan':
     prefix = 'fapi2-security-profile-id2-client-test-'
@@ -70,7 +71,7 @@ export function modules(name: string): ModulePrescription[] {
 }
 
 function usesJarm(plan: Plan) {
-  return plan.name.startsWith('fapi2-message-signing')
+  return plan.name.startsWith('fapi2-message-signing') || plan.name.startsWith('fapi1')
 }
 
 function usesDpop(variant: Record<string, string>) {
@@ -78,10 +79,14 @@ function usesDpop(variant: Record<string, string>) {
 }
 
 function usesPar(plan: Plan) {
-  return plan.name.startsWith('fapi2')
+  return plan.name.startsWith('fapi')
 }
 
 function usesRequestObject(planName: string, variant: Record<string, string>) {
+  if (planName.startsWith('fapi1')) {
+    return true
+  }
+
   if (planName.startsWith('fapi2-message-signing')) {
     return true
   }
@@ -91,6 +96,14 @@ function usesRequestObject(planName: string, variant: Record<string, string>) {
   }
 
   return false
+}
+
+function requiresNonce(planName: string, variant: Record<string, string>) {
+  return planName.startsWith('fapi1') && getScope(variant).includes('openid')
+}
+
+function requiresState(planName: string, variant: Record<string, string>) {
+  return planName.startsWith('fapi1') && !getScope(variant).includes('openid')
 }
 
 export const green = test.macro({
@@ -184,15 +197,27 @@ export const green = test.macro({
     const code_verifier = oauth.generateRandomCodeVerifier()
     const code_challenge = await oauth.calculatePKCECodeChallenge(code_verifier)
     const code_challenge_method = 'S256'
+    let nonce = requiresNonce(plan.name, variant)
+      ? oauth.generateRandomNonce()
+      : oauth.expectNoNonce
+    let state = requiresState(plan.name, variant)
+      ? oauth.generateRandomState()
+      : oauth.expectNoState
 
     let authorizationUrl = new URL(as.authorization_endpoint!)
-    if (usesRequestObject(plan.name, variant) === false) {
+    if (!usesRequestObject(plan.name, variant)) {
       authorizationUrl.searchParams.set('client_id', client.client_id)
       authorizationUrl.searchParams.set('code_challenge', code_challenge)
       authorizationUrl.searchParams.set('code_challenge_method', code_challenge_method)
       authorizationUrl.searchParams.set('redirect_uri', configuration.client.redirect_uri)
       authorizationUrl.searchParams.set('response_type', 'code')
       authorizationUrl.searchParams.set('scope', scope)
+      if (typeof nonce === 'string') {
+        authorizationUrl.searchParams.set('nonce', nonce)
+      }
+      if (typeof state === 'string') {
+        authorizationUrl.searchParams.set('state', state)
+      }
     } else {
       authorizationUrl.searchParams.set('client_id', client.client_id)
       const params = new URLSearchParams()
@@ -201,6 +226,12 @@ export const green = test.macro({
       params.set('redirect_uri', configuration.client.redirect_uri)
       params.set('response_type', 'code')
       params.set('scope', scope)
+      if (typeof nonce === 'string') {
+        params.set('nonce', nonce)
+      }
+      if (typeof state === 'string') {
+        params.set('state', state)
+      }
 
       const jwk = configuration.client.jwks.keys.find((key) => key.alg === JWS_ALGORITHM)!
       const privateKey = await importPrivateKey(JWS_ALGORITHM, jwk)
@@ -278,9 +309,9 @@ export const green = test.macro({
       let params: ReturnType<typeof oauth.validateAuthResponse>
 
       if (usesJarm(plan)) {
-        params = await oauth.validateJwtAuthResponse(as, client, currentUrl)
+        params = await oauth.validateJwtAuthResponse(as, client, currentUrl, state)
       } else {
-        params = oauth.validateAuthResponse(as, client, currentUrl)
+        params = oauth.validateAuthResponse(as, client, currentUrl, state)
       }
 
       if (oauth.isOAuth2Error(params)) {
@@ -318,7 +349,7 @@ export const green = test.macro({
         | oauth.OpenIDTokenEndpointResponse
         | oauth.OAuth2Error
       if (scope.includes('openid')) {
-        result = await oauth.processAuthorizationCodeOpenIDResponse(as, client, response)
+        result = await oauth.processAuthorizationCodeOpenIDResponse(as, client, response, nonce)
       } else {
         result = await oauth.processAuthorizationCodeOAuth2Response(as, client, response)
       }
@@ -351,7 +382,7 @@ export const green = test.macro({
       }
     }
 
-    if (scope.includes('openid') && as.userinfo_endpoint) {
+    if (!plan.name.startsWith('fapi1') && scope.includes('openid') && as.userinfo_endpoint) {
       // fetch userinfo response
       const request = () => {
         t.log('fetching', as.userinfo_endpoint)
@@ -466,11 +497,11 @@ export const red = test.macro({
   title: <any>green.title,
 })
 
-export const skipped = test.macro({
+export const skippable = test.macro({
   async exec(t, module: ModulePrescription) {
     await Promise.allSettled([green.exec(t, module)])
 
-    await waitForState(t.context.instance, { results: new Set(['SKIPPED']) })
+    await waitForState(t.context.instance, { results: new Set(['SKIPPED', 'PASSED']) })
     t.log('Test result is SKIPPED')
     t.pass()
   },

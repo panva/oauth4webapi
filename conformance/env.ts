@@ -1,3 +1,7 @@
 export const { PLAN_NAME = 'oidcc-client-basic-certification-test-plan', VARIANT = '{}' } =
   process.env
-export const JWS_ALGORITHM = process.env.JWS_ALGORITHM ? process.env.JWS_ALGORITHM : 'EdDSA'
+export const JWS_ALGORITHM = process.env.JWS_ALGORITHM
+  ? process.env.JWS_ALGORITHM
+  : PLAN_NAME.startsWith('fapi1')
+    ? 'PS256'
+    : 'EdDSA'

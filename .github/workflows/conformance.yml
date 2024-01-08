@@ -120,6 +120,21 @@ jobs:
               request_type: request_object
               client_auth_type: private_key_jwt
 
+          # Financial-grade API Security Profile 1.0 - Part 2: Advanced - OpenID Connect
+          - plan: fapi1-advanced-final-client-test-plan
+          - plan: fapi1-advanced-final-client-test-plan
+            variant:
+              client_auth_type: 'mtls'
+
+              # Financial-grade API Security Profile 1.0 - Part 2: Advanced - Oauth 2.0
+          - plan: fapi1-advanced-final-client-test-plan
+            variant:
+              fapi_client_type: 'plain_oauth'
+          - plan: fapi1-advanced-final-client-test-plan
+            variant:
+              fapi_client_type: 'plain_oauth'
+              client_auth_type: 'mtls'
+
           # FAPI 2.0 Security Profile ID2 - OpenID Connect
           - plan: fapi2-security-profile-id2-client-test-plan
           - plan: fapi2-security-profile-id2-client-test-plan
