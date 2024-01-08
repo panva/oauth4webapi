@@ -1606,6 +1606,38 @@ async function publicJwk(key: CryptoKey) {
   return jwk
 }
 
+function validateEndpoint(
+  value: unknown,
+  endpoint: keyof AuthorizationServer,
+  options?: ExperimentalUseMTLSAliasOptions,
+) {
+  if (typeof value !== 'string') {
+    if (options?.[experimentalUseMtlsAlias]) {
+      throw new TypeError(`"as.mtls_endpoint_aliases.${endpoint}" must be a string`)
+    } else {
+      throw new TypeError(`"as.${endpoint}" must be a string`)
+    }
+  }
+
+  return new URL(value)
+}
+
+function resolveEndpoint(
+  as: AuthorizationServer,
+  endpoint: keyof AuthorizationServer,
+  options?: ExperimentalUseMTLSAliasOptions,
+) {
+  if (
+    options?.[experimentalUseMtlsAlias] &&
+    as.mtls_endpoint_aliases &&
+    endpoint in as.mtls_endpoint_aliases
+  ) {
+    return validateEndpoint(as.mtls_endpoint_aliases[endpoint], endpoint, options)
+  }
+
+  return validateEndpoint(as[endpoint], endpoint)
+}
+
 /**
  * Performs a Pushed Authorization Request at the
  * {@link AuthorizationServer.pushed_authorization_request_endpoint `as.pushed_authorization_request_endpoint`}.
@@ -1628,21 +1660,7 @@ export async function pushedAuthorizationRequest(
   assertAs(as)
   assertClient(client)
 
-  let endpoint: JsonValue | undefined
-  if (
-    options?.[experimentalUseMtlsAlias] &&
-    as.mtls_endpoint_aliases?.pushed_authorization_request_endpoint
-  ) {
-    endpoint = as.mtls_endpoint_aliases.pushed_authorization_request_endpoint
-  } else {
-    endpoint = as.pushed_authorization_request_endpoint
-  }
-
-  if (typeof endpoint !== 'string') {
-    throw new TypeError('"as.pushed_authorization_request_endpoint" must be a string')
-  }
-
-  const url = new URL(endpoint)
+  const url = resolveEndpoint(as, 'pushed_authorization_request_endpoint', options)
 
   const body = new URLSearchParams(parameters)
   body.set('client_id', client.client_id)
@@ -1983,18 +2001,7 @@ export async function userInfoRequest(
   assertAs(as)
   assertClient(client)
 
-  let endpoint: JsonValue | undefined
-  if (options?.[experimentalUseMtlsAlias] && as.mtls_endpoint_aliases?.userinfo_endpoint) {
-    endpoint = as.mtls_endpoint_aliases.userinfo_endpoint
-  } else {
-    endpoint = as.userinfo_endpoint
-  }
-
-  if (typeof endpoint !== 'string') {
-    throw new TypeError('"as.userinfo_endpoint" must be a string')
-  }
-
-  const url = new URL(endpoint)
+  const url = resolveEndpoint(as, 'userinfo_endpoint', options)
 
   const headers = prepareHeaders(options?.headers)
   if (client.userinfo_signed_response_alg) {
@@ -2300,18 +2307,7 @@ async function tokenEndpointRequest(
   parameters: URLSearchParams,
   options?: Omit<TokenEndpointRequestOptions, 'additionalParameters'>,
 ): Promise<Response> {
-  let endpoint: JsonValue | undefined
-  if (options?.[experimentalUseMtlsAlias] && as.mtls_endpoint_aliases?.token_endpoint) {
-    endpoint = as.mtls_endpoint_aliases.token_endpoint
-  } else {
-    endpoint = as.token_endpoint
-  }
-
-  if (typeof endpoint !== 'string') {
-    throw new TypeError('"as.token_endpoint" must be a string')
-  }
-
-  const url = new URL(endpoint)
+  const url = resolveEndpoint(as, 'token_endpoint', options)
 
   parameters.set('grant_type', grantType)
   const headers = prepareHeaders(options?.headers)
@@ -2961,18 +2957,7 @@ export async function revocationRequest(
     throw new TypeError('"token" must be a non-empty string')
   }
 
-  let endpoint: JsonValue | undefined
-  if (options?.[experimentalUseMtlsAlias] && as.mtls_endpoint_aliases?.revocation_endpoint) {
-    endpoint = as.mtls_endpoint_aliases.revocation_endpoint
-  } else {
-    endpoint = as.revocation_endpoint
-  }
-
-  if (typeof endpoint !== 'string') {
-    throw new TypeError('"as.revocation_endpoint" must be a string')
-  }
-
-  const url = new URL(endpoint)
+  const url = resolveEndpoint(as, 'revocation_endpoint', options)
 
   const body = new URLSearchParams(options?.additionalParameters)
   body.set('token', token)
@@ -3064,18 +3049,7 @@ export async function introspectionRequest(
     throw new TypeError('"token" must be a non-empty string')
   }
 
-  let endpoint: JsonValue | undefined
-  if (options?.[experimentalUseMtlsAlias] && as.mtls_endpoint_aliases?.introspection_endpoint) {
-    endpoint = as.mtls_endpoint_aliases.introspection_endpoint
-  } else {
-    endpoint = as.introspection_endpoint
-  }
-
-  if (typeof endpoint !== 'string') {
-    throw new TypeError('"as.introspection_endpoint" must be a string')
-  }
-
-  const url = new URL(endpoint)
+  const url = resolveEndpoint(as, 'introspection_endpoint', options)
 
   const body = new URLSearchParams(options?.additionalParameters)
   body.set('token', token)
@@ -3200,11 +3174,7 @@ async function jwksRequest(
 ): Promise<Response> {
   assertAs(as)
 
-  if (typeof as.jwks_uri !== 'string') {
-    throw new TypeError('"as.jwks_uri" must be a string')
-  }
-
-  const url = new URL(as.jwks_uri)
+  const url = resolveEndpoint(as, 'jwks_uri')
 
   const headers = prepareHeaders(options?.headers)
   headers.set('accept', 'application/json')
@@ -3715,21 +3685,7 @@ export async function deviceAuthorizationRequest(
   assertAs(as)
   assertClient(client)
 
-  let endpoint: JsonValue | undefined
-  if (
-    options?.[experimentalUseMtlsAlias] &&
-    as.mtls_endpoint_aliases?.device_authorization_endpoint
-  ) {
-    endpoint = as.mtls_endpoint_aliases.device_authorization_endpoint
-  } else {
-    endpoint = as.device_authorization_endpoint
-  }
-
-  if (typeof endpoint !== 'string') {
-    throw new TypeError('"as.device_authorization_endpoint" must be a string')
-  }
-
-  const url = new URL(endpoint)
+  const url = resolveEndpoint(as, 'device_authorization_endpoint', options)
 
   const body = new URLSearchParams(parameters)
   body.set('client_id', client.client_id)
