@@ -39,11 +39,11 @@ requests and their responses.
 
 ```js
 import ky from 'ky'
-import { experimentalCustomFetch } from 'oauth4webapi'
+import * as oauth from 'oauth4webapi'
 
 // example use
-await discoveryRequest(new URL('https://as.example.com'), {
-  [experimentalCustomFetch]: (...args) =>
+await oauth.discoveryRequest(new URL('https://as.example.com'), {
+  [oauth.experimentalCustomFetch]: (...args) =>
     ky(args[0], {
       ...args[1],
       hooks: {
@@ -73,7 +73,7 @@ Using [nodejs/undici](https://github.com/nodejs/undici) for mocking.
 
 ```js
 import * as undici from 'undici'
-import { discoveryRequest, experimentalCustomFetch } from 'oauth4webapi'
+import * as oauth from 'oauth4webapi'
 
 const mockAgent = new undici.MockAgent()
 mockAgent.disableNetConnect()
@@ -83,8 +83,7 @@ undici.setGlobalDispatcher(mockAgent)
 // https://github.com/nodejs/undici/blob/v6.2.1/docs/api/MockAgent.md#example---basic-mocked-request
 
 // example use
-await discoveryRequest(new URL('https://as.example.com'), {
-  // @ts-expect-error
-  [experimentalCustomFetch]: undici.fetch,
+await oauth.discoveryRequest(new URL('https://as.example.com'), {
+  [oauth.experimentalCustomFetch]: undici.fetch,
 })
 ```

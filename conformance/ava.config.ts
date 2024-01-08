@@ -133,19 +133,27 @@ const DEFAULTS: Record<typeof PLAN_NAME, Record<string, string>> = {
     client_registration: 'static_client',
   },
   'fapi2-security-profile-id2-client-test-plan': {
-    client_auth_type: 'private_key_jwt',
-    sender_constrain: 'dpop',
+    client_auth_type: 'private_key_jwt', // private_key_jwt, mtls
+    sender_constrain: 'dpop', // dpop, mtls
     fapi_client_type: 'oidc', // oidc, plain_oauth
     fapi_profile: 'plain_fapi',
   },
   'fapi2-message-signing-id1-client-test-plan': {
-    client_auth_type: 'private_key_jwt',
-    sender_constrain: 'dpop',
+    client_auth_type: 'private_key_jwt', // private_key_jwt, mtls
+    sender_constrain: 'dpop', // dpop, mtls
     fapi_client_type: 'oidc', // oidc, plain_oauth
     fapi_profile: 'plain_fapi',
     fapi_request_method: 'signed_non_repudiation',
     fapi_response_mode: 'jarm',
   },
+}
+
+export function usesClientCert(planName: string, variant: Record<string, string>) {
+  return (
+    variant.client_auth_type === 'mtls' ||
+    variant.sender_constrain === 'mtls' ||
+    planName.startsWith('fapi1')
+  )
 }
 
 export function getScope(variant: Record<string, string>) {
@@ -198,6 +206,19 @@ export default async () => {
       keys: await generate(),
     },
     id_token_signed_response_alg: JWS_ALGORITHM,
+    certificate: '',
+  }
+
+  let mtls: { key: string; cert: string } | undefined
+
+  if (usesClientCert(PLAN_NAME, variant)) {
+    const { generate } = await import('selfsigned')
+    const selfsigned = generate(undefined, { keySize: 2048 })
+    clientConfig.certificate = selfsigned.cert
+    mtls = {
+      cert: selfsigned.cert,
+      key: selfsigned.private,
+    }
   }
 
   const configuration = {
@@ -272,6 +293,7 @@ export default async () => {
         configuration,
         variant,
         plan,
+        mtls,
       }),
     },
     concurrency: 1,

@@ -224,11 +224,11 @@ export const clockTolerance = Symbol()
  *
  * ```js
  * import ky from 'ky'
- * import { experimentalCustomFetch } from 'oauth4webapi'
+ * import * as oauth from 'oauth4webapi'
  *
  * // example use
- * await discoveryRequest(new URL('https://as.example.com'), {
- *   [experimentalCustomFetch]: (...args) =>
+ * await oauth.discoveryRequest(new URL('https://as.example.com'), {
+ *   [oauth.experimentalCustomFetch]: (...args) =>
  *     ky(args[0], {
  *       ...args[1],
  *       hooks: {
@@ -258,7 +258,7 @@ export const clockTolerance = Symbol()
  *
  * ```js
  * import * as undici from 'undici'
- * import { discoveryRequest, experimentalCustomFetch } from 'oauth4webapi'
+ * import * as oauth from 'oauth4webapi'
  *
  * const mockAgent = new undici.MockAgent()
  * mockAgent.disableNetConnect()
@@ -268,13 +268,79 @@ export const clockTolerance = Symbol()
  * // https://github.com/nodejs/undici/blob/v6.2.1/docs/api/MockAgent.md#example---basic-mocked-request
  *
  * // example use
- * await discoveryRequest(new URL('https://as.example.com'), {
- *   // @ts-expect-error
- *   [experimentalCustomFetch]: undici.fetch,
+ * await oauth.discoveryRequest(new URL('https://as.example.com'), {
+ *   [oauth.experimentalCustomFetch]: undici.fetch,
  * })
  * ```
  */
 export const experimentalCustomFetch = Symbol()
+
+/**
+ * This is an experimental feature, it is not subject to semantic versioning rules. Non-backward
+ * compatible changes or removal may occur in any future release.
+ *
+ * When combined with {@link experimentalCustomFetch} (to use a Fetch API implementation that
+ * supports client certificates) this can be used to target FAPI 2.0 profiles that utilize
+ * Mutual-TLS for either client authentication or sender constraining. FAPI 1.0 Advanced profiles
+ * that use PAR and JARM can also be targetted.
+ *
+ * When configured on an interface that extends {@link ExperimentalUseMTLSAliasOptions} this makes
+ * the client prioritize an endpoint URL present in
+ * {@link AuthorizationServer.mtls_endpoint_aliases `as.mtls_endpoint_aliases`}.
+ *
+ * @example
+ *
+ * (Node.js) Using [nodejs/undici](https://github.com/nodejs/undici) for Mutual-TLS Client
+ * Authentication and Certificate-Bound Access Tokens support.
+ *
+ * ```js
+ * import * as undici from 'undici'
+ * import * as oauth from 'oauth4webapi'
+ *
+ * const response = await oauth.pushedAuthorizationRequest(as, client, params, {
+ *   [oauth.experimentalUseMtlsAlias]: true,
+ *   [oauth.experimentalCustomFetch]: (...args) => {
+ *     return undici.fetch(args[0], {
+ *       ...args[1],
+ *       dispatcher: new undici.Agent({
+ *         connect: {
+ *           key: clientKey,
+ *           cert: clientCertificate,
+ *         },
+ *       }),
+ *     })
+ *   },
+ * })
+ * ```
+ *
+ * @example
+ *
+ * (Deno) Using Deno.createHttpClient API for Mutual-TLS Client Authentication and Certificate-Bound
+ * Access Tokens support. This is currently (Jan 2023) locked behind the --unstable command line
+ * flag.
+ *
+ * ```js
+ * import * as oauth from 'oauth4webapi'
+ *
+ * const agent = Deno.createHttpClient({
+ *   certChain: clientCertificate,
+ *   privateKey: clientKey,
+ * })
+ *
+ * const response = await oauth.pushedAuthorizationRequest(as, client, params, {
+ *   [oauth.experimentalUseMtlsAlias]: true,
+ *   [oauth.experimentalCustomFetch]: (...args) => {
+ *     return fetch(args[0], {
+ *       ...args[1],
+ *       client: agent,
+ *     })
+ *   },
+ * })
+ * ```
+ *
+ * @see [RFC 8705 - OAuth 2.0 Mutual-TLS Client Authentication and Certificate-Bound Access Tokens](https://www.rfc-editor.org/rfc/rfc8705.html)
+ */
+export const experimentalUseMtlsAlias = Symbol()
 
 /**
  * Authorization Server Metadata
@@ -1122,7 +1188,17 @@ export interface DPoPRequestOptions {
   DPoP?: DPoPOptions
 }
 
-export interface AuthenticatedRequestOptions {
+export interface ExperimentalUseMTLSAliasOptions {
+  /**
+   * This is an experimental feature, it is not subject to semantic versioning rules. Non-backward
+   * compatible changes or removal may occur in any future release.
+   *
+   * See {@link experimentalUseMtlsAlias} for its documentation.
+   */
+  [experimentalUseMtlsAlias]?: boolean
+}
+
+export interface AuthenticatedRequestOptions extends ExperimentalUseMTLSAliasOptions {
   /**
    * Private key to use for `private_key_jwt`
    * {@link ClientAuthenticationMethod client authentication}. Its algorithm must be compatible with
@@ -1360,9 +1436,13 @@ async function clientAuthentication(
       body.set('client_assertion', await privateKeyJwt(as, client, key, kid))
       break
     }
+    // @ts-expect-error
+    case 'tls_client_auth':
+    // @ts-expect-error
+    case 'self_signed_tls_client_auth':
     case 'none': {
-      assertNoClientSecret('none', client.client_secret)
-      assertNoClientPrivateKey('none', clientPrivateKey)
+      assertNoClientSecret(client.token_endpoint_auth_method, client.client_secret)
+      assertNoClientPrivateKey(client.token_endpoint_auth_method, clientPrivateKey)
       body.set('client_id', client.client_id)
       break
     }
@@ -1548,11 +1628,21 @@ export async function pushedAuthorizationRequest(
   assertAs(as)
   assertClient(client)
 
-  if (typeof as.pushed_authorization_request_endpoint !== 'string') {
+  let endpoint: JsonValue | undefined
+  if (
+    options?.[experimentalUseMtlsAlias] &&
+    as.mtls_endpoint_aliases?.pushed_authorization_request_endpoint
+  ) {
+    endpoint = as.mtls_endpoint_aliases.pushed_authorization_request_endpoint
+  } else {
+    endpoint = as.pushed_authorization_request_endpoint
+  }
+
+  if (typeof endpoint !== 'string') {
     throw new TypeError('"as.pushed_authorization_request_endpoint" must be a string')
   }
 
-  const url = new URL(as.pushed_authorization_request_endpoint)
+  const url = new URL(endpoint)
 
   const body = new URLSearchParams(parameters)
   body.set('client_id', client.client_id)
@@ -1863,7 +1953,10 @@ export async function protectedResourceRequest(
   }).then(processDpopNonce)
 }
 
-export interface UserInfoRequestOptions extends HttpRequestOptions, DPoPRequestOptions {}
+export interface UserInfoRequestOptions
+  extends HttpRequestOptions,
+    DPoPRequestOptions,
+    ExperimentalUseMTLSAliasOptions {}
 
 /**
  * Performs a UserInfo Request at the
@@ -1890,11 +1983,18 @@ export async function userInfoRequest(
   assertAs(as)
   assertClient(client)
 
-  if (typeof as.userinfo_endpoint !== 'string') {
+  let endpoint: JsonValue | undefined
+  if (options?.[experimentalUseMtlsAlias] && as.mtls_endpoint_aliases?.userinfo_endpoint) {
+    endpoint = as.mtls_endpoint_aliases.userinfo_endpoint
+  } else {
+    endpoint = as.userinfo_endpoint
+  }
+
+  if (typeof endpoint !== 'string') {
     throw new TypeError('"as.userinfo_endpoint" must be a string')
   }
 
-  const url = new URL(as.userinfo_endpoint)
+  const url = new URL(endpoint)
 
   const headers = prepareHeaders(options?.headers)
   if (client.userinfo_signed_response_alg) {
@@ -2200,11 +2300,18 @@ async function tokenEndpointRequest(
   parameters: URLSearchParams,
   options?: Omit<TokenEndpointRequestOptions, 'additionalParameters'>,
 ): Promise<Response> {
-  if (typeof as.token_endpoint !== 'string') {
+  let endpoint: JsonValue | undefined
+  if (options?.[experimentalUseMtlsAlias] && as.mtls_endpoint_aliases?.token_endpoint) {
+    endpoint = as.mtls_endpoint_aliases.token_endpoint
+  } else {
+    endpoint = as.token_endpoint
+  }
+
+  if (typeof endpoint !== 'string') {
     throw new TypeError('"as.token_endpoint" must be a string')
   }
 
-  const url = new URL(as.token_endpoint)
+  const url = new URL(endpoint)
 
   parameters.set('grant_type', grantType)
   const headers = prepareHeaders(options?.headers)
@@ -2854,11 +2961,18 @@ export async function revocationRequest(
     throw new TypeError('"token" must be a non-empty string')
   }
 
-  if (typeof as.revocation_endpoint !== 'string') {
+  let endpoint: JsonValue | undefined
+  if (options?.[experimentalUseMtlsAlias] && as.mtls_endpoint_aliases?.revocation_endpoint) {
+    endpoint = as.mtls_endpoint_aliases.revocation_endpoint
+  } else {
+    endpoint = as.revocation_endpoint
+  }
+
+  if (typeof endpoint !== 'string') {
     throw new TypeError('"as.revocation_endpoint" must be a string')
   }
 
-  const url = new URL(as.revocation_endpoint)
+  const url = new URL(endpoint)
 
   const body = new URLSearchParams(options?.additionalParameters)
   body.set('token', token)
@@ -2950,11 +3064,18 @@ export async function introspectionRequest(
     throw new TypeError('"token" must be a non-empty string')
   }
 
-  if (typeof as.introspection_endpoint !== 'string') {
+  let endpoint: JsonValue | undefined
+  if (options?.[experimentalUseMtlsAlias] && as.mtls_endpoint_aliases?.introspection_endpoint) {
+    endpoint = as.mtls_endpoint_aliases.introspection_endpoint
+  } else {
+    endpoint = as.introspection_endpoint
+  }
+
+  if (typeof endpoint !== 'string') {
     throw new TypeError('"as.introspection_endpoint" must be a string')
   }
 
-  const url = new URL(as.introspection_endpoint)
+  const url = new URL(endpoint)
 
   const body = new URLSearchParams(options?.additionalParameters)
   body.set('token', token)
@@ -3594,11 +3715,21 @@ export async function deviceAuthorizationRequest(
   assertAs(as)
   assertClient(client)
 
-  if (typeof as.device_authorization_endpoint !== 'string') {
+  let endpoint: JsonValue | undefined
+  if (
+    options?.[experimentalUseMtlsAlias] &&
+    as.mtls_endpoint_aliases?.device_authorization_endpoint
+  ) {
+    endpoint = as.mtls_endpoint_aliases.device_authorization_endpoint
+  } else {
+    endpoint = as.device_authorization_endpoint
+  }
+
+  if (typeof endpoint !== 'string') {
     throw new TypeError('"as.device_authorization_endpoint" must be a string')
   }
 
-  const url = new URL(as.device_authorization_endpoint)
+  const url = new URL(endpoint)
 
   const body = new URLSearchParams(parameters)
   body.set('client_id', client.client_id)

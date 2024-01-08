@@ -8,6 +8,7 @@
 
 - [DPoP](ClientCredentialsGrantRequestOptions.md#dpop)
 - [[experimentalCustomFetch]](ClientCredentialsGrantRequestOptions.md#[experimentalcustomfetch])
+- [[experimentalUseMtlsAlias]](ClientCredentialsGrantRequestOptions.md#[experimentalusemtlsalias])
 - [clientPrivateKey](ClientCredentialsGrantRequestOptions.md#clientprivatekey)
 - [headers](ClientCredentialsGrantRequestOptions.md#headers)
 - [signal](ClientCredentialsGrantRequestOptions.md#signal)
@@ -30,6 +31,17 @@ This is an experimental feature, it is not subject to semantic versioning rules.
 compatible changes or removal may occur in any future release.
 
 See [experimentalCustomFetch](../variables/experimentalCustomFetch.md) for its documentation.
+
+___
+
+### [experimentalUseMtlsAlias]
+
+• `Optional` **[experimentalUseMtlsAlias]**: `boolean`
+
+This is an experimental feature, it is not subject to semantic versioning rules. Non-backward
+compatible changes or removal may occur in any future release.
+
+See [experimentalUseMtlsAlias](../variables/experimentalUseMtlsAlias.md) for its documentation.
 
 ___
 

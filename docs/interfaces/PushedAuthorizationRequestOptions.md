@@ -8,6 +8,7 @@
 
 - [DPoP](PushedAuthorizationRequestOptions.md#dpop)
 - [[experimentalCustomFetch]](PushedAuthorizationRequestOptions.md#[experimentalcustomfetch])
+- [[experimentalUseMtlsAlias]](PushedAuthorizationRequestOptions.md#[experimentalusemtlsalias])
 - [clientPrivateKey](PushedAuthorizationRequestOptions.md#clientprivatekey)
 - [headers](PushedAuthorizationRequestOptions.md#headers)
 - [signal](PushedAuthorizationRequestOptions.md#signal)
@@ -30,6 +31,17 @@ This is an experimental feature, it is not subject to semantic versioning rules.
 compatible changes or removal may occur in any future release.
 
 See [experimentalCustomFetch](../variables/experimentalCustomFetch.md) for its documentation.
+
+___
+
+### [experimentalUseMtlsAlias]
+
+• `Optional` **[experimentalUseMtlsAlias]**: `boolean`
+
+This is an experimental feature, it is not subject to semantic versioning rules. Non-backward
+compatible changes or removal may occur in any future release.
+
+See [experimentalUseMtlsAlias](../variables/experimentalUseMtlsAlias.md) for its documentation.
 
 ___
 

@@ -1,9 +1,10 @@
 import anyTest, { type TestFn } from 'ava'
 import { importJWK, type JWK, calculateJwkThumbprint, exportJWK } from 'jose'
+import * as undici from 'undici'
 
 export const test = anyTest as TestFn<{ instance: Test }>
 
-import { getScope } from './ava.config.js'
+import { getScope, usesClientCert } from './ava.config.js'
 import * as oauth from '../src/index.js'
 import {
   createTestFromPlan,
@@ -31,6 +32,7 @@ const configuration: {
 
 export const plan: Plan = conformance.plan
 export const variant: Record<string, string> = conformance.variant
+export const mtls: { key: string; cert: string } = conformance.mtls || {}
 
 let prefix = ''
 
@@ -113,6 +115,24 @@ export const green = test.macro({
       throw new Error()
     }
 
+    const httpOptions: oauth.ExperimentalUseMTLSAliasOptions = {}
+
+    if (usesClientCert(plan.name, variant)) {
+      httpOptions[oauth.experimentalUseMtlsAlias] = true
+      // @ts-expect-error
+      httpOptions[oauth.experimentalCustomFetch] = (...args) => {
+        return undici.fetch(args[0], {
+          ...args[1],
+          dispatcher: new undici.Agent({
+            connect: {
+              key: mtls.key,
+              cert: mtls.cert,
+            },
+          }),
+        })
+      }
+    }
+
     const issuer = new URL(issuerIdentifier)
 
     const as = await oauth
@@ -126,7 +146,21 @@ export const green = test.macro({
       client_secret: configuration.client.client_secret,
     }
 
-    client.token_endpoint_auth_method = variant.client_auth_type || 'client_secret_basic'
+    switch (variant.client_auth_type) {
+      case 'mtls':
+        client.token_endpoint_auth_method = 'none'
+        break
+      case 'none':
+      case 'private_key_jwt':
+      case 'client_secret_basic':
+      case 'client_secret_post':
+        client.token_endpoint_auth_method = variant.client_auth_type
+        break
+      default:
+        client.token_endpoint_auth_method = 'client_secret_basic'
+        break
+    }
+
     if (instance.name.includes('client-secret-basic')) {
       client.token_endpoint_auth_method = 'client_secret_basic'
     }
@@ -192,6 +226,7 @@ export const green = test.macro({
       t.log('PAR request with', Object.fromEntries(authorizationUrl.searchParams.entries()))
       const request = () =>
         oauth.pushedAuthorizationRequest(as, client, authorizationUrl.searchParams, {
+          ...httpOptions,
           DPoP,
           clientPrivateKey,
         })
@@ -262,7 +297,11 @@ export const green = test.macro({
           <Exclude<typeof params, oauth.OAuth2Error>>params,
           configuration.client.redirect_uri,
           code_verifier,
-          { clientPrivateKey, DPoP },
+          {
+            ...httpOptions,
+            clientPrivateKey,
+            DPoP,
+          },
         )
       let response = await request()
 
@@ -316,7 +355,10 @@ export const green = test.macro({
       // fetch userinfo response
       const request = () => {
         t.log('fetching', as.userinfo_endpoint)
-        return oauth.userInfoRequest(as, client, access_token, { DPoP })
+        return oauth.userInfoRequest(as, client, access_token, {
+          ...httpOptions,
+          DPoP,
+        })
       }
       let response = await request()
 
@@ -349,7 +391,10 @@ export const green = test.macro({
           new URL(accounts_endpoint),
           new Headers(),
           null,
-          { DPoP },
+          {
+            ...httpOptions,
+            DPoP,
+          },
         )
       }
       let accounts = await request()

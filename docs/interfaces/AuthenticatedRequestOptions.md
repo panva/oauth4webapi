@@ -6,9 +6,21 @@
 
 ### Properties
 
+- [[experimentalUseMtlsAlias]](AuthenticatedRequestOptions.md#[experimentalusemtlsalias])
 - [clientPrivateKey](AuthenticatedRequestOptions.md#clientprivatekey)
 
 ## Properties
+
+### [experimentalUseMtlsAlias]
+
+• `Optional` **[experimentalUseMtlsAlias]**: `boolean`
+
+This is an experimental feature, it is not subject to semantic versioning rules. Non-backward
+compatible changes or removal may occur in any future release.
+
+See [experimentalUseMtlsAlias](../variables/experimentalUseMtlsAlias.md) for its documentation.
+
+___
 
 ### clientPrivateKey
 

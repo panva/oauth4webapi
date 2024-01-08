@@ -7,6 +7,7 @@
 ### Properties
 
 - [[experimentalCustomFetch]](IntrospectionRequestOptions.md#[experimentalcustomfetch])
+- [[experimentalUseMtlsAlias]](IntrospectionRequestOptions.md#[experimentalusemtlsalias])
 - [additionalParameters](IntrospectionRequestOptions.md#additionalparameters)
 - [clientPrivateKey](IntrospectionRequestOptions.md#clientprivatekey)
 - [headers](IntrospectionRequestOptions.md#headers)
@@ -23,6 +24,17 @@ This is an experimental feature, it is not subject to semantic versioning rules.
 compatible changes or removal may occur in any future release.
 
 See [experimentalCustomFetch](../variables/experimentalCustomFetch.md) for its documentation.
+
+___
+
+### [experimentalUseMtlsAlias]
+
+• `Optional` **[experimentalUseMtlsAlias]**: `boolean`
+
+This is an experimental feature, it is not subject to semantic versioning rules. Non-backward
+compatible changes or removal may occur in any future release.
+
+See [experimentalUseMtlsAlias](../variables/experimentalUseMtlsAlias.md) for its documentation.
 
 ___
 

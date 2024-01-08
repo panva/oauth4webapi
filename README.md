@@ -74,6 +74,5 @@ The following features are currently out of scope:
 
 - CommonJS
 - Implicit, Hybrid, and Resource Owner Password Credentials Flows
-- Mutual-TLS Client Authentication and Certificate-Bound Access Tokens
 - JSON Web Encryption (JWE)
 - Automatic polyfills of any kind

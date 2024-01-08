@@ -122,19 +122,37 @@ jobs:
 
           # FAPI 2.0 Security Profile ID2 - OpenID Connect
           - plan: fapi2-security-profile-id2-client-test-plan
+          - plan: fapi2-security-profile-id2-client-test-plan
+            variant:
+              sender_constrain: 'mtls'
+              client_auth_type: 'mtls'
 
           # FAPI 2.0 Security Profile ID2 - OAuth 2.0
           - plan: fapi2-security-profile-id2-client-test-plan
             variant:
               fapi_client_type: 'plain_oauth'
+          - plan: fapi2-security-profile-id2-client-test-plan
+            variant:
+              fapi_client_type: 'plain_oauth'
+              sender_constrain: 'mtls'
+              client_auth_type: 'mtls'
 
           # FAPI 2.0 Message Signing ID1 - OpenID Connect
           - plan: fapi2-message-signing-id1-client-test-plan
+          - plan: fapi2-message-signing-id1-client-test-plan
+            variant:
+              sender_constrain: 'mtls'
+              client_auth_type: 'mtls'
 
           # FAPI 2.0 Message Signing ID1 - OAuth 2.0
           - plan: fapi2-message-signing-id1-client-test-plan
             variant:
               fapi_client_type: 'plain_oauth'
+          - plan: fapi2-message-signing-id1-client-test-plan
+            variant:
+              fapi_client_type: 'plain_oauth'
+              sender_constrain: 'mtls'
+              client_auth_type: 'mtls'
 
     steps:
       - name: Checkout
