@@ -38,7 +38,7 @@ ___
 
 ### authorization\_signed\_response\_alg
 
-• `Optional` **authorization\_signed\_response\_alg**: ``"PS256"`` \| ``"ES256"`` \| ``"RS256"`` \| ``"EdDSA"`` \| ``"ES384"`` \| ``"PS384"`` \| ``"RS384"`` \| ``"ES512"`` \| ``"PS512"`` \| ``"RS512"``
+• `Optional` **authorization\_signed\_response\_alg**: [`JWSAlgorithm`](../types/JWSAlgorithm.md)
 
 JWS `alg` algorithm required for signing authorization responses. When not configured the
 default is to allow only [supported algorithms](../types/JWSAlgorithm.md) listed in
@@ -96,7 +96,7 @@ ___
 
 ### token\_endpoint\_auth\_method
 
-• `Optional` **token\_endpoint\_auth\_method**: ``"none"`` \| ``"client_secret_basic"`` \| ``"client_secret_post"`` \| ``"private_key_jwt"``
+• `Optional` **token\_endpoint\_auth\_method**: [`ClientAuthenticationMethod`](../types/ClientAuthenticationMethod.md)
 
 Client [authentication method](../types/ClientAuthenticationMethod.md) for the client's authenticated
 requests. Default is `client_secret_basic`.

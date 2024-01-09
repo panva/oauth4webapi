@@ -65,7 +65,7 @@
   "devDependencies": {
     "@koa/cors": "^5.0.0",
     "@types/koa__cors": "^5.0.0",
-    "@types/node": "^20.10.6",
+    "@types/node": "^20.10.8",
     "@types/oidc-provider": "^8.4.3",
     "@types/qunit": "^2.19.9",
     "ava": "^5.3.1",
@@ -82,9 +82,9 @@
     "raw-body": "^2.5.2",
     "timekeeper": "^2.3.1",
     "tsx": "^4.7.0",
-    "typedoc": "^0.25.6",
+    "typedoc": "^0.25.7",
     "typedoc-plugin-markdown": "^3.17.1",
-    "typedoc-plugin-mdn-links": "^3.1.10",
+    "typedoc-plugin-mdn-links": "^3.1.11",
     "typescript": "^5.3.3",
     "undici": "^5.28.2"
   }

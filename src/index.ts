@@ -1489,7 +1489,19 @@ export interface OAuth2Error {
  * @group Refreshing an Access Token
  * @group Pushed Authorization Requests (PAR)
  */
-export function isOAuth2Error(input?: ReturnTypes): input is OAuth2Error {
+export function isOAuth2Error(
+  input?:
+    | TokenEndpointResponse
+    | OAuth2TokenEndpointResponse
+    | OpenIDTokenEndpointResponse
+    | ClientCredentialsGrantResponse
+    | DeviceAuthorizationResponse
+    | IntrospectionResponse
+    | OAuth2Error
+    | PushedAuthorizationResponse
+    | URLSearchParams
+    | UserInfoResponse,
+): input is OAuth2Error {
   const value = <unknown>input
   if (typeof value !== 'object' || Array.isArray(value) || value === null) {
     return false
@@ -1701,7 +1713,7 @@ export async function protectedResourceRequest(
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | string,
   url: URL,
   headers: Headers,
-  body: RequestInit['body'],
+  body?: ReadableStream | Blob | ArrayBufferView | ArrayBuffer | FormData | URLSearchParams | string | null,
   options?: ProtectedResourceRequestOptions,
 ): Promise<Response> {
   if (!validateString(accessToken)) {
@@ -3411,18 +3423,6 @@ export function validateAuthResponse(
 
   return brand(new URLSearchParams(parameters))
 }
-
-type ReturnTypes =
-  | TokenEndpointResponse
-  | OAuth2TokenEndpointResponse
-  | OpenIDTokenEndpointResponse
-  | ClientCredentialsGrantResponse
-  | DeviceAuthorizationResponse
-  | IntrospectionResponse
-  | OAuth2Error
-  | PushedAuthorizationResponse
-  | URLSearchParams
-  | UserInfoResponse
 
 function algToSubtle(
   alg: JWSAlgorithm,
