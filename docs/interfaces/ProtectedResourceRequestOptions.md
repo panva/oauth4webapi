@@ -7,6 +7,7 @@
 ### Properties
 
 - [DPoP](ProtectedResourceRequestOptions.md#dpop)
+- [[clockSkew]](ProtectedResourceRequestOptions.md#[clockskew])
 - [signal](ProtectedResourceRequestOptions.md#signal)
 
 ## Properties
@@ -16,6 +17,18 @@
 • `Optional` **DPoP**: [`DPoPOptions`](DPoPOptions.md)
 
 DPoP-related options.
+
+___
+
+### [clockSkew]
+
+• `Optional` **[clockSkew]**: `number`
+
+Use to adjust the client's assumed current time. Positive and negative finite values
+representing seconds are allowed. Default is `0` (Date.now() + 0 seconds is used).
+
+This option only affects the request if the [DPoP](DPoPRequestOptions.md#dpop)
+option is also used.
 
 ___
 

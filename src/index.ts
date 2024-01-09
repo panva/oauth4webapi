@@ -169,9 +169,7 @@ interface JWK {
   readonly [parameter: string]: JsonValue | undefined
 }
 
-/** @ignore during Documentation generation but part of the public API */
 export const clockSkew = Symbol()
-/** @ignore during Documentation generation but part of the public API */
 export const clockTolerance = Symbol()
 
 /**
@@ -512,9 +510,9 @@ export interface Client {
    * Use to adjust the client's assumed current time. Positive and negative finite values
    * representing seconds are allowed. Default is `0` (Date.now() + 0 seconds is used).
    *
-   * @ignore during Documentation generation but part of the public API
+   * @example
    *
-   * @example Client's local clock is mistakenly 1 hour in the past
+   * When the client's local clock is mistakenly 1 hour in the past
    *
    * ```ts
    * const client: oauth.Client = {
@@ -524,7 +522,9 @@ export interface Client {
    * }
    * ```
    *
-   * @example Client's local clock is mistakenly 1 hour in the future
+   * @example
+   *
+   * When the client's local clock is mistakenly 1 hour in the future
    *
    * ```ts
    * const client: oauth.Client = {
@@ -540,9 +540,9 @@ export interface Client {
    * Use to set allowed client's clock tolerance when checking DateTime JWT Claims. Only positive
    * finite values representing seconds are allowed. Default is `30` (30 seconds).
    *
-   * @ignore during Documentation generation but part of the public API
+   * @example
    *
-   * @example Tolerate 30 seconds clock skew when validating JWT claims like exp or nbf.
+   * Tolerate 30 seconds clock skew when validating JWT claims like exp or nbf.
    *
    * ```ts
    * const client: oauth.Client = {
@@ -1686,8 +1686,6 @@ export interface ProtectedResourceRequestOptions
    *
    * This option only affects the request if the {@link ProtectedResourceRequestOptions.DPoP DPoP}
    * option is also used.
-   *
-   * @ignore during Documentation generation but part of the public API
    */
   [clockSkew]?: number
 }

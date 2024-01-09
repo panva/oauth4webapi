@@ -17,6 +17,8 @@ Recognized Client Metadata that have an effect on the exposed functionality.
 ### Properties
 
 - [client\_id](Client.md#client_id)
+- [[clockSkew]](Client.md#[clockskew])
+- [[clockTolerance]](Client.md#[clocktolerance])
 - [authorization\_signed\_response\_alg](Client.md#authorization_signed_response_alg)
 - [client\_secret](Client.md#client_secret)
 - [default\_max\_age](Client.md#default_max_age)
@@ -33,6 +35,60 @@ Recognized Client Metadata that have an effect on the exposed functionality.
 • **client\_id**: `string`
 
 Client identifier.
+
+___
+
+### [clockSkew]
+
+• `Optional` **[clockSkew]**: `number`
+
+Use to adjust the client's assumed current time. Positive and negative finite values
+representing seconds are allowed. Default is `0` (Date.now() + 0 seconds is used).
+
+**`Example`**
+
+When the client's local clock is mistakenly 1 hour in the past
+
+```ts
+const client: oauth.Client = {
+  client_id: 'abc4ba37-4ab8-49b5-99d4-9441ba35d428',
+  // ... other metadata
+  [oauth.clockSkew]: +(60 * 60),
+}
+```
+
+**`Example`**
+
+When the client's local clock is mistakenly 1 hour in the future
+
+```ts
+const client: oauth.Client = {
+  client_id: 'abc4ba37-4ab8-49b5-99d4-9441ba35d428',
+  // ... other metadata
+  [oauth.clockSkew]: -(60 * 60),
+}
+```
+
+___
+
+### [clockTolerance]
+
+• `Optional` **[clockTolerance]**: `number`
+
+Use to set allowed client's clock tolerance when checking DateTime JWT Claims. Only positive
+finite values representing seconds are allowed. Default is `30` (30 seconds).
+
+**`Example`**
+
+Tolerate 30 seconds clock skew when validating JWT claims like exp or nbf.
+
+```ts
+const client: oauth.Client = {
+  client_id: 'abc4ba37-4ab8-49b5-99d4-9441ba35d428',
+  // ... other metadata
+  [oauth.clockTolerance]: 30,
+}
+```
 
 ___
 

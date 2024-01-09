@@ -170,6 +170,8 @@
 
 ### Variables
 
+- [clockSkew](variables/clockSkew.md)
+- [clockTolerance](variables/clockTolerance.md)
 - [expectNoNonce](variables/expectNoNonce.md)
 - [expectNoState](variables/expectNoState.md)
 - [skipAuthTimeCheck](variables/skipAuthTimeCheck.md)
