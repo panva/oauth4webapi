@@ -1,16 +1,6 @@
 #!/bin/bash
 
-function stop_server {
-    if [ ! -z "$node_pid" ]; then
-        kill $node_pid
-    fi
-}
-
-trap stop_server EXIT
-
-DEBUG=oidc-provider:* node tap/server.mjs > server.log 2>&1 &
-node_pid=$!
-while ! curl -s http://localhost:3000 >/dev/null; do sleep 0; done
+. ./tap/.server.sh
 
 COMPATIBILITY_DATE=$(NODE_PATH=$(npm root -g) node -p "require('workerd').compatibilityDate")
 WORKERD_VERSION=$(npm ls --global --json | jq -r '.dependencies.workerd.version')
