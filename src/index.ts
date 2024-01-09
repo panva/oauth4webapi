@@ -1689,7 +1689,7 @@ export interface ProtectedResourceRequestOptions
    *
    * @ignore during Documentation generation but part of the public API
    */
-  clockSkew?: number
+  [clockSkew]?: number
 }
 
 /**
@@ -1742,7 +1742,7 @@ export async function protectedResourceRequest(
       options.DPoP,
       url,
       'GET',
-      getClockSkew({ [clockSkew]: options?.clockSkew }),
+      getClockSkew({ [clockSkew]: options?.[clockSkew] }),
       accessToken,
     )
     headers.set('authorization', `DPoP ${accessToken}`)
@@ -1802,7 +1802,7 @@ export async function userInfoRequest(
 
   return protectedResourceRequest(accessToken, 'GET', url, headers, null, {
     ...options,
-    clockSkew: getClockSkew(client),
+    [clockSkew]: getClockSkew(client),
   })
 }
 
