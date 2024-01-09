@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.4.4](https://github.com/panva/oauth4webapi/compare/v2.4.3...v2.4.4) (2024-01-09)
+
+
+### Fixes
+
+* handle Response objects with empty string url in processDpopNonce ([f2c9415](https://github.com/panva/oauth4webapi/commit/f2c9415df06fbef4f4da9d5cfaee9e5336fb5eed))
+
 ## [2.4.3](https://github.com/panva/oauth4webapi/compare/v2.4.2...v2.4.3) (2024-01-06)
 
 ## [2.4.2](https://github.com/panva/oauth4webapi/compare/v2.4.1...v2.4.2) (2024-01-05)
