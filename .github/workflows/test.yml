@@ -64,6 +64,14 @@ jobs:
       - run: npm clean-install
       - name: Run Test Suite
         run: npm run ${{ matrix.suite }}
+      - name: Upload server logs
+        if: ${{ failure() && matrix.suite == 'tap:node' }}
+        id: artifact-upload-step
+        uses: actions/upload-artifact@v4
+        with:
+          path: server.log
+          name: node idx(${{ strategy.job-index }}) server log
+          if-no-files-found: warn
 
   edge-runtime:
     runs-on: ubuntu-latest
@@ -78,6 +86,14 @@ jobs:
       - run: npm clean-install
       - name: Run Test Suite
         run: npm run tap:edge-runtime
+      - name: Upload server logs
+        if: ${{ failure() }}
+        id: artifact-upload-step
+        uses: actions/upload-artifact@v4
+        with:
+          path: server.log
+          name: edge-runtime server log
+          if-no-files-found: warn
 
   electron:
     runs-on: macos-latest
@@ -93,6 +109,14 @@ jobs:
       - run: npm install --global electron
       - name: Run Test Suite
         run: npm run tap:electron
+      - name: Upload server logs
+        if: ${{ failure() }}
+        id: artifact-upload-step
+        uses: actions/upload-artifact@v4
+        with:
+          path: server.log
+          name: electron server log
+          if-no-files-found: warn
 
   deno:
     runs-on: ubuntu-latest
@@ -112,6 +136,14 @@ jobs:
         run: deno check mod.ts
       - name: Run Test Suite
         run: npm run tap:deno
+      - name: Upload server logs
+        if: ${{ failure() }}
+        id: artifact-upload-step
+        uses: actions/upload-artifact@v4
+        with:
+          path: server.log
+          name: deno server log
+          if-no-files-found: warn
 
   workerd:
     runs-on: ubuntu-latest
@@ -145,6 +177,14 @@ jobs:
       - run: npm clean-install
       - name: Run Test Suite
         run: npm run tap:bun
+      - name: Upload server logs
+        if: ${{ failure() }}
+        id: artifact-upload-step
+        uses: actions/upload-artifact@v4
+        with:
+          path: server.log
+          name: bun server log
+          if-no-files-found: warn
 
   browsers:
     runs-on: ${{ matrix.runs-on || 'ubuntu-latest' }}
@@ -152,12 +192,17 @@ jobs:
       fail-fast: false
       matrix:
         browser:
-          - chrome:headless
-          - firefox:headless
-          - edge:headless
+          - name: chrome
+            id: chrome:headless
+          - name: firefox
+            id: firefox:headless
+          - name: edge
+            id: edge:headless
         include:
           - runs-on: macos-13
-            browser: safari
+            browser:
+              - name: safari
+                id: safari
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -176,4 +221,12 @@ jobs:
       - name: Run Test Suite
         run: npm run tap:browsers
         env:
-          BROWSER: ${{ matrix.browser }}
+          BROWSER: ${{ matrix.browser.id }}
+      - name: Upload server logs
+        if: ${{ failure() }}
+        id: artifact-upload-step
+        uses: actions/upload-artifact@v4
+        with:
+          path: server.log
+          name: ${{ matrix.browser.name }} server log
+          if-no-files-found: warn

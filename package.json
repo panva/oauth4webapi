@@ -47,7 +47,7 @@
     "build/index.d.ts"
   ],
   "scripts": {
-    "_format": "find src test tap examples conformance -type f -name '*.ts' -o -name '*.mjs' -name '*.cjs' | xargs prettier",
+    "_format": "find src test tap examples conformance -type f -name '*.ts' -o -name '*.mjs' -o -name '*.cjs' | xargs prettier",
     "build": "rm -rf build && tsc && tsc --declaration true --emitDeclarationOnly true --removeComments false && tsc -p test && tsc -p examples && tsc -p conformance && tsc -p tap",
     "conformance": "bash -c 'source .node_flags.sh && ava --config conformance/ava.config.ts'",
     "docs": "patch-package && typedoc",
@@ -63,16 +63,23 @@
     "test": "bash -c 'source .node_flags.sh && ava'"
   },
   "devDependencies": {
+    "@koa/cors": "^5.0.0",
+    "@types/koa__cors": "^5.0.0",
     "@types/node": "^20.10.6",
+    "@types/oidc-provider": "^8.4.3",
     "@types/qunit": "^2.19.9",
     "ava": "^5.3.1",
+    "chrome-launcher": "^1.1.0",
     "edge-runtime": "^2.5.7",
     "esbuild": "^0.19.11",
     "jose": "^5.2.0",
+    "oidc-provider": "^8.4.4",
     "patch-package": "^8.0.0",
     "prettier": "^3.1.1",
     "prettier-plugin-jsdoc": "^1.3.0",
+    "puppeteer-core": "^21.7.0",
     "qunit": "^2.20.0",
+    "raw-body": "^2.5.2",
     "timekeeper": "^2.3.1",
     "tsx": "^4.7.0",
     "typedoc": "^0.25.6",
