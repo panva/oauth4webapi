@@ -1,5 +1,17 @@
 #!/bin/bash
 
+function stop_server {
+    if [ ! -z "$node_pid" ]; then
+        kill $node_pid
+    fi
+}
+
+trap stop_server EXIT
+
+DEBUG=oidc-provider:* node tap/server.mjs > server.log 2>&1 &
+node_pid=$!
+while ! curl -s http://localhost:3000 >/dev/null; do sleep 0; done
+
 COMPATIBILITY_DATE=$(NODE_PATH=$(npm root -g) node -p "require('workerd').compatibilityDate")
 WORKERD_VERSION=$(npm ls --global --json | jq -r '.dependencies.workerd.version')
 
@@ -21,6 +33,7 @@ using Workerd = import "/workerd/workerd.capnp";
 const config :Workerd.Config = (
   services = [
     (name = "main", worker = .tapWorker),
+    (name = "fullNetwork", network = .myNetwork),
   ],
 );
 
@@ -28,7 +41,13 @@ const tapWorker :Workerd.Worker = (
   modules = [
     (name = "worker", esModule = embed "run-workerd.js")
   ],
+  globalOutbound = "fullNetwork",
   compatibilityDate = "$COMPATIBILITY_DATE",
+);
+
+const myNetwork :Workerd.Network = (
+  allow = ["public", "private"],
+  deny = []
 );
 EOT
 
