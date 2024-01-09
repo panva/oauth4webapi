@@ -186,7 +186,7 @@ export const green = test.macro({
         break
       case 'private_key_jwt':
         delete client.client_secret
-        const jwk = configuration.client.jwks.keys.find((key) => key.alg === JWS_ALGORITHM)!
+        const [jwk] = configuration.client.jwks.keys
         clientPrivateKey = {
           kid: jwk.kid,
           key: await importPrivateKey(JWS_ALGORITHM, jwk),
@@ -233,7 +233,7 @@ export const green = test.macro({
         params.set('state', state)
       }
 
-      const jwk = configuration.client.jwks.keys.find((key) => key.alg === JWS_ALGORITHM)!
+      const [jwk] = configuration.client.jwks.keys
       const privateKey = await importPrivateKey(JWS_ALGORITHM, jwk)
 
       authorizationUrl.searchParams.set(

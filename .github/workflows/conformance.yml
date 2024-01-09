@@ -24,150 +24,37 @@ jobs:
           # Core 1.0 Basic
           - plan: oidcc-client-basic-certification-test-plan
 
-          # client_secret_basic
-          - variant:
-              client_auth_type: client_secret_basic
-            plan: oidcc-client-test-plan
+          # Comprehensive Core 1.0 client test
+          - plan: oidcc-client-test-plan
 
-          # client_secret_post
-          - variant:
-              client_auth_type: client_secret_post
-            plan: oidcc-client-test-plan
-
-          # request_object
-          - variant:
-              request_type: request_object
-            plan: oidcc-client-test-plan
-
-          # private_key_jwt
-          - variant:
-              client_auth_type: private_key_jwt
-            plan: oidcc-client-test-plan
-
-          # none
-          - variant:
-              client_auth_type: none
-            plan: oidcc-client-test-plan
-
-          # RS256
-          - algorithm: RS256
-            plan: oidcc-client-test-plan
-            variant:
-              request_type: request_object
-              client_auth_type: private_key_jwt
-
-          # RS384
-          - algorithm: RS384
-            plan: oidcc-client-test-plan
-            variant:
-              request_type: request_object
-              client_auth_type: private_key_jwt
-
-          # RS512
-          - algorithm: RS512
-            plan: oidcc-client-test-plan
-            variant:
-              request_type: request_object
-              client_auth_type: private_key_jwt
-
-          # PS256
-          - algorithm: PS256
-            plan: oidcc-client-test-plan
-            variant:
-              request_type: request_object
-              client_auth_type: private_key_jwt
-
-          # PS384
-          - algorithm: PS384
-            plan: oidcc-client-test-plan
-            variant:
-              request_type: request_object
-              client_auth_type: private_key_jwt
-
-          # PS512
-          - algorithm: PS512
-            plan: oidcc-client-test-plan
-            variant:
-              request_type: request_object
-              client_auth_type: private_key_jwt
-
-          # ES256
-          - algorithm: ES256
-            plan: oidcc-client-test-plan
-            variant:
-              request_type: request_object
-              client_auth_type: private_key_jwt
-
-          # TODO: https://gitlab.com/openid/conformance-suite/-/issues/1129
-          # # ES384
-          # - algorithm: ES384
-          #   plan: oidcc-client-test-plan
-          #   variant:
-          #     request_type: request_object
-          #     client_auth_type: private_key_jwt
-
-          # # ES512
-          # - algorithm: ES512
-          #   plan: oidcc-client-test-plan
-          #   variant:
-          #     request_type: request_object
-          #     client_auth_type: private_key_jwt
-
-          # EdDSA
-          - algorithm: EdDSA
-            plan: oidcc-client-test-plan
-            variant:
-              request_type: request_object
-              client_auth_type: private_key_jwt
-
-          # Financial-grade API Security Profile 1.0 - Part 2: Advanced - OpenID Connect
+          # Financial-grade API Security Profile 1.0 - Part 2: Advanced
           - plan: fapi1-advanced-final-client-test-plan
+            variant:
+              client_auth_type: 'private_key_jwt'
           - plan: fapi1-advanced-final-client-test-plan
             variant:
               client_auth_type: 'mtls'
 
-              # Financial-grade API Security Profile 1.0 - Part 2: Advanced - Oauth 2.0
-          - plan: fapi1-advanced-final-client-test-plan
-            variant:
-              fapi_client_type: 'plain_oauth'
-          - plan: fapi1-advanced-final-client-test-plan
-            variant:
-              fapi_client_type: 'plain_oauth'
-              client_auth_type: 'mtls'
-
-          # FAPI 2.0 Security Profile ID2 - OpenID Connect
-          - plan: fapi2-security-profile-id2-client-test-plan
+          # FAPI 2.0 Security Profile ID2
           - plan: fapi2-security-profile-id2-client-test-plan
             variant:
-              sender_constrain: 'mtls'
-              client_auth_type: 'mtls'
-
-          # FAPI 2.0 Security Profile ID2 - OAuth 2.0
+              client_auth_type: 'private_key_jwt'
+              sender_constrain: 'dpop'
           - plan: fapi2-security-profile-id2-client-test-plan
             variant:
-              fapi_client_type: 'plain_oauth'
+              client_auth_type: 'private_key_jwt'
+              sender_constrain: 'mtls'
           - plan: fapi2-security-profile-id2-client-test-plan
             variant:
-              fapi_client_type: 'plain_oauth'
-              sender_constrain: 'mtls'
               client_auth_type: 'mtls'
+              sender_constrain: 'dpop'
+          - plan: fapi2-security-profile-id2-client-test-plan
+            variant:
+              client_auth_type: 'mtls'
+              sender_constrain: 'mtls'
 
-          # FAPI 2.0 Message Signing ID1 - OpenID Connect
+          # FAPI 2.0 Message Signing ID1
           - plan: fapi2-message-signing-id1-client-test-plan
-          - plan: fapi2-message-signing-id1-client-test-plan
-            variant:
-              sender_constrain: 'mtls'
-              client_auth_type: 'mtls'
-
-          # FAPI 2.0 Message Signing ID1 - OAuth 2.0
-          - plan: fapi2-message-signing-id1-client-test-plan
-            variant:
-              fapi_client_type: 'plain_oauth'
-          - plan: fapi2-message-signing-id1-client-test-plan
-            variant:
-              fapi_client_type: 'plain_oauth'
-              sender_constrain: 'mtls'
-              client_auth_type: 'mtls'
 
     steps:
       - name: Checkout
@@ -199,7 +86,6 @@ jobs:
           SUITE_BASE_URL: https://localhost.emobix.co.uk:8443
           PLAN_NAME: ${{ matrix.setup.plan }}
           VARIANT: ${{ toJSON(matrix.setup.variant) }}
-          JWS_ALGORITHM: ${{ matrix.setup.algorithm }}
       - run: node ./conformance/.parse-logs.mjs capture.txt
       - run: rm capture.txt
       - name: Upload test artifacts

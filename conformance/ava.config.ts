@@ -1,8 +1,7 @@
 import * as crypto from 'node:crypto'
-import { promisify } from 'node:util'
 import { existsSync as exists, writeFileSync, readFileSync } from 'node:fs'
 
-const generateKeyPair = promisify(crypto.generateKeyPair)
+import * as jose from 'jose'
 
 const { homepage, name, version } = JSON.parse(readFileSync('package.json').toString())
 
@@ -23,91 +22,20 @@ switch (PLAN_NAME) {
     throw new Error()
 }
 
-function exportPrivate(keyPair: crypto.KeyPairKeyObjectResult) {
-  return keyPair.privateKey.export({ format: 'jwk' })
-}
-
-async function RS256() {
+async function kid(jwk: jose.JWK) {
   return {
-    ...exportPrivate(await generateKeyPair('rsa', { modulusLength: 2048 })),
-    use: 'sig',
-    alg: 'RS256',
-    kid: crypto.randomUUID(),
-  }
-}
-async function RS384() {
-  return { ...(await RS256()), alg: 'RS384' }
-}
-async function RS512() {
-  return { ...(await RS256()), alg: 'RS512' }
-}
-async function PS256() {
-  return { ...(await RS256()), alg: 'PS256' }
-}
-async function PS384() {
-  return { ...(await RS256()), alg: 'PS384' }
-}
-async function PS512() {
-  return { ...(await RS256()), alg: 'PS512' }
-}
-async function ES256() {
-  return {
-    ...exportPrivate(await generateKeyPair('ec', { namedCurve: 'P-256' })),
-    use: 'sig',
-    alg: 'ES256',
-    kid: crypto.randomUUID(),
-  }
-}
-async function ES384() {
-  return {
-    ...exportPrivate(await generateKeyPair('ec', { namedCurve: 'P-384' })),
-    use: 'sig',
-    alg: 'ES384',
-    kid: crypto.randomUUID(),
-  }
-}
-async function ES512() {
-  return {
-    ...exportPrivate(await generateKeyPair('ec', { namedCurve: 'P-521' })),
-    use: 'sig',
-    alg: 'ES512',
-    kid: crypto.randomUUID(),
-  }
-}
-async function EdDSA() {
-  return {
-    ...exportPrivate(await generateKeyPair('ed25519')),
-    use: 'sig',
-    alg: 'EdDSA',
-    kid: crypto.randomUUID(),
+    ...jwk,
+    kid: await jose.calculateJwkThumbprint(jwk),
   }
 }
 
-async function generate() {
-  switch (JWS_ALGORITHM) {
-    case 'PS256':
-      return Promise.all([PS256()])
-    case 'PS384':
-      return Promise.all([PS384()])
-    case 'PS512':
-      return Promise.all([PS512()])
-    case 'RS256':
-      return Promise.all([RS256()])
-    case 'RS384':
-      return Promise.all([RS384()])
-    case 'RS512':
-      return Promise.all([RS512()])
-    case 'ES256':
-      return Promise.all([ES256()])
-    case 'ES384':
-      return Promise.all([ES384()])
-    case 'ES512':
-      return Promise.all([ES512()])
-    case 'EdDSA':
-      return Promise.all([EdDSA()])
-    default:
-      throw new Error()
-  }
+async function key(alg: string) {
+  const kp = await jose.generateKeyPair(alg, { extractable: true })
+  return kid({
+    ...(await jose.exportJWK(kp.privateKey)),
+    use: 'sig',
+    alg,
+  })
 }
 
 function needsSecret(variant: Record<string, string>) {
@@ -211,7 +139,7 @@ export default async () => {
     scope: getScope(variant),
     redirect_uri: `https://client-${UUID}.local/cb`,
     jwks: {
-      keys: await generate(),
+      keys: [await key(JWS_ALGORITHM)],
     },
     id_token_signed_response_alg: JWS_ALGORITHM,
     certificate: '',
@@ -238,7 +166,7 @@ export default async () => {
       ? {
           server: {
             jwks: {
-              keys: await generate(),
+              keys: [await key(JWS_ALGORITHM)],
             },
           },
         }
