@@ -6,7 +6,7 @@
 
 ### Properties
 
-- [[experimentalCustomFetch]](HttpRequestOptions.md#[experimentalcustomfetch])
+- [[experimentalCustomFetch]](HttpRequestOptions.md#experimentalcustomfetch)
 - [headers](HttpRequestOptions.md#headers)
 - [signal](HttpRequestOptions.md#signal)
 

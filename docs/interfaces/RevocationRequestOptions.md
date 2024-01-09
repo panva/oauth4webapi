@@ -6,8 +6,8 @@
 
 ### Properties
 
-- [[experimentalCustomFetch]](RevocationRequestOptions.md#[experimentalcustomfetch])
-- [[experimentalUseMtlsAlias]](RevocationRequestOptions.md#[experimentalusemtlsalias])
+- [[experimentalCustomFetch]](RevocationRequestOptions.md#experimentalcustomfetch)
+- [[experimentalUseMtlsAlias]](RevocationRequestOptions.md#experimentalusemtlsalias)
 - [additionalParameters](RevocationRequestOptions.md#additionalparameters)
 - [clientPrivateKey](RevocationRequestOptions.md#clientprivatekey)
 - [headers](RevocationRequestOptions.md#headers)

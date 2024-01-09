@@ -6,7 +6,7 @@
 
 ### Properties
 
-- [[experimentalUseMtlsAlias]](ExperimentalUseMTLSAliasOptions.md#[experimentalusemtlsalias])
+- [[experimentalUseMtlsAlias]](ExperimentalUseMTLSAliasOptions.md#experimentalusemtlsalias)
 
 ## Properties
 

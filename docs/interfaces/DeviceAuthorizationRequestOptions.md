@@ -6,8 +6,8 @@
 
 ### Properties
 
-- [[experimentalCustomFetch]](DeviceAuthorizationRequestOptions.md#[experimentalcustomfetch])
-- [[experimentalUseMtlsAlias]](DeviceAuthorizationRequestOptions.md#[experimentalusemtlsalias])
+- [[experimentalCustomFetch]](DeviceAuthorizationRequestOptions.md#experimentalcustomfetch)
+- [[experimentalUseMtlsAlias]](DeviceAuthorizationRequestOptions.md#experimentalusemtlsalias)
 - [clientPrivateKey](DeviceAuthorizationRequestOptions.md#clientprivatekey)
 - [headers](DeviceAuthorizationRequestOptions.md#headers)
 - [signal](DeviceAuthorizationRequestOptions.md#signal)

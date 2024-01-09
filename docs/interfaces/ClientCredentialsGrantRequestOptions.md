@@ -7,8 +7,8 @@
 ### Properties
 
 - [DPoP](ClientCredentialsGrantRequestOptions.md#dpop)
-- [[experimentalCustomFetch]](ClientCredentialsGrantRequestOptions.md#[experimentalcustomfetch])
-- [[experimentalUseMtlsAlias]](ClientCredentialsGrantRequestOptions.md#[experimentalusemtlsalias])
+- [[experimentalCustomFetch]](ClientCredentialsGrantRequestOptions.md#experimentalcustomfetch)
+- [[experimentalUseMtlsAlias]](ClientCredentialsGrantRequestOptions.md#experimentalusemtlsalias)
 - [clientPrivateKey](ClientCredentialsGrantRequestOptions.md#clientprivatekey)
 - [headers](ClientCredentialsGrantRequestOptions.md#headers)
 - [signal](ClientCredentialsGrantRequestOptions.md#signal)

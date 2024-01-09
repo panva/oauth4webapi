@@ -6,8 +6,8 @@
 
 ### Properties
 
-- [[experimentalCustomFetch]](IntrospectionRequestOptions.md#[experimentalcustomfetch])
-- [[experimentalUseMtlsAlias]](IntrospectionRequestOptions.md#[experimentalusemtlsalias])
+- [[experimentalCustomFetch]](IntrospectionRequestOptions.md#experimentalcustomfetch)
+- [[experimentalUseMtlsAlias]](IntrospectionRequestOptions.md#experimentalusemtlsalias)
 - [additionalParameters](IntrospectionRequestOptions.md#additionalparameters)
 - [clientPrivateKey](IntrospectionRequestOptions.md#clientprivatekey)
 - [headers](IntrospectionRequestOptions.md#headers)

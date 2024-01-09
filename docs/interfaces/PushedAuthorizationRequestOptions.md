@@ -7,8 +7,8 @@
 ### Properties
 
 - [DPoP](PushedAuthorizationRequestOptions.md#dpop)
-- [[experimentalCustomFetch]](PushedAuthorizationRequestOptions.md#[experimentalcustomfetch])
-- [[experimentalUseMtlsAlias]](PushedAuthorizationRequestOptions.md#[experimentalusemtlsalias])
+- [[experimentalCustomFetch]](PushedAuthorizationRequestOptions.md#experimentalcustomfetch)
+- [[experimentalUseMtlsAlias]](PushedAuthorizationRequestOptions.md#experimentalusemtlsalias)
 - [clientPrivateKey](PushedAuthorizationRequestOptions.md#clientprivatekey)
 - [headers](PushedAuthorizationRequestOptions.md#headers)
 - [signal](PushedAuthorizationRequestOptions.md#signal)

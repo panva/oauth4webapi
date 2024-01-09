@@ -7,8 +7,8 @@
 ### Properties
 
 - [DPoP](UserInfoRequestOptions.md#dpop)
-- [[experimentalCustomFetch]](UserInfoRequestOptions.md#[experimentalcustomfetch])
-- [[experimentalUseMtlsAlias]](UserInfoRequestOptions.md#[experimentalusemtlsalias])
+- [[experimentalCustomFetch]](UserInfoRequestOptions.md#experimentalcustomfetch)
+- [[experimentalUseMtlsAlias]](UserInfoRequestOptions.md#experimentalusemtlsalias)
 - [headers](UserInfoRequestOptions.md#headers)
 - [signal](UserInfoRequestOptions.md#signal)
 

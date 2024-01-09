@@ -6,7 +6,7 @@
 
 ### Properties
 
-- [[experimentalUseMtlsAlias]](AuthenticatedRequestOptions.md#[experimentalusemtlsalias])
+- [[experimentalUseMtlsAlias]](AuthenticatedRequestOptions.md#experimentalusemtlsalias)
 - [clientPrivateKey](AuthenticatedRequestOptions.md#clientprivatekey)
 
 ## Properties

@@ -17,8 +17,8 @@ Recognized Client Metadata that have an effect on the exposed functionality.
 ### Properties
 
 - [client\_id](Client.md#client_id)
-- [[clockSkew]](Client.md#[clockskew])
-- [[clockTolerance]](Client.md#[clocktolerance])
+- [[clockSkew]](Client.md#clockskew)
+- [[clockTolerance]](Client.md#clocktolerance)
 - [authorization\_signed\_response\_alg](Client.md#authorization_signed_response_alg)
 - [client\_secret](Client.md#client_secret)
 - [default\_max\_age](Client.md#default_max_age)

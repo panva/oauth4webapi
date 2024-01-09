@@ -6,7 +6,7 @@
 
 ### Properties
 
-- [[experimentalCustomFetch]](DiscoveryRequestOptions.md#[experimentalcustomfetch])
+- [[experimentalCustomFetch]](DiscoveryRequestOptions.md#experimentalcustomfetch)
 - [algorithm](DiscoveryRequestOptions.md#algorithm)
 - [headers](DiscoveryRequestOptions.md#headers)
 - [signal](DiscoveryRequestOptions.md#signal)

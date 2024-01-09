@@ -154,7 +154,7 @@ index ba8e5be..6a4e1d3 100644
 \ No newline at end of file
 +[💗 Help the project](https://github.com/sponsors/panva)
 diff --git a/node_modules/typedoc-plugin-markdown/dist/resources/templates/reflection.hbs b/node_modules/typedoc-plugin-markdown/dist/resources/templates/reflection.hbs
-index ce29bc5..ef5d6f8 100755
+index ce29bc5..6833f14 100755
 --- a/node_modules/typedoc-plugin-markdown/dist/resources/templates/reflection.hbs
 +++ b/node_modules/typedoc-plugin-markdown/dist/resources/templates/reflection.hbs
 @@ -24,18 +24,6 @@
@@ -192,3 +192,17 @@ index ce29bc5..ef5d6f8 100755
 +{{/with}}
 +
 +{{/ifShowTypeHierarchy}}
+\ No newline at end of file
+diff --git a/node_modules/typedoc-plugin-markdown/dist/theme.js b/node_modules/typedoc-plugin-markdown/dist/theme.js
+index 2f6715b..de5cf7f 100644
+--- a/node_modules/typedoc-plugin-markdown/dist/theme.js
++++ b/node_modules/typedoc-plugin-markdown/dist/theme.js
+@@ -145,7 +145,7 @@ class MarkdownTheme extends typedoc_1.Theme {
+         });
+     }
+     toAnchorRef(reflectionId) {
+-        return reflectionId;
++        return reflectionId.startsWith('[') && reflectionId.endsWith(']') ? reflectionId.slice(1, -1) : reflectionId;
+     }
+     getRelativeUrl(absolute) {
+         if (MarkdownTheme.URL_PREFIX.test(absolute)) {

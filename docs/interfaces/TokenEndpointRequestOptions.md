@@ -7,8 +7,8 @@
 ### Properties
 
 - [DPoP](TokenEndpointRequestOptions.md#dpop)
-- [[experimentalCustomFetch]](TokenEndpointRequestOptions.md#[experimentalcustomfetch])
-- [[experimentalUseMtlsAlias]](TokenEndpointRequestOptions.md#[experimentalusemtlsalias])
+- [[experimentalCustomFetch]](TokenEndpointRequestOptions.md#experimentalcustomfetch)
+- [[experimentalUseMtlsAlias]](TokenEndpointRequestOptions.md#experimentalusemtlsalias)
 - [additionalParameters](TokenEndpointRequestOptions.md#additionalparameters)
 - [clientPrivateKey](TokenEndpointRequestOptions.md#clientprivatekey)
 - [headers](TokenEndpointRequestOptions.md#headers)

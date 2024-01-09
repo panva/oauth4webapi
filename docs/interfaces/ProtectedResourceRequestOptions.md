@@ -7,8 +7,8 @@
 ### Properties
 
 - [DPoP](ProtectedResourceRequestOptions.md#dpop)
-- [[clockSkew]](ProtectedResourceRequestOptions.md#[clockskew])
-- [[experimentalCustomFetch]](ProtectedResourceRequestOptions.md#[experimentalcustomfetch])
+- [[clockSkew]](ProtectedResourceRequestOptions.md#clockskew)
+- [[experimentalCustomFetch]](ProtectedResourceRequestOptions.md#experimentalcustomfetch)
 - [signal](ProtectedResourceRequestOptions.md#signal)
 
 ## Properties
