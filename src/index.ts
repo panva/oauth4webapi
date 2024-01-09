@@ -1713,7 +1713,15 @@ export async function protectedResourceRequest(
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | string,
   url: URL,
   headers: Headers,
-  body?: ReadableStream | Blob | ArrayBufferView | ArrayBuffer | FormData | URLSearchParams | string | null,
+  body?:
+    | ReadableStream
+    | Blob
+    | ArrayBufferView
+    | ArrayBuffer
+    | FormData
+    | URLSearchParams
+    | string
+    | null,
   options?: ProtectedResourceRequestOptions,
 ): Promise<Response> {
   if (!validateString(accessToken)) {
