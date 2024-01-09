@@ -29,3 +29,21 @@ ___
 Private key to use for `private_key_jwt`
 [client authentication](../types/ClientAuthenticationMethod.md). Its algorithm must be compatible with
 a supported [JWS `alg` Algorithm](../types/JWSAlgorithm.md).
+
+## Hierarchy
+
+- [`ExperimentalUseMTLSAliasOptions`](ExperimentalUseMTLSAliasOptions.md)
+
+  ↳ **`AuthenticatedRequestOptions`**
+
+  ↳↳ [`PushedAuthorizationRequestOptions`](PushedAuthorizationRequestOptions.md)
+
+  ↳↳ [`TokenEndpointRequestOptions`](TokenEndpointRequestOptions.md)
+
+  ↳↳ [`ClientCredentialsGrantRequestOptions`](ClientCredentialsGrantRequestOptions.md)
+
+  ↳↳ [`RevocationRequestOptions`](RevocationRequestOptions.md)
+
+  ↳↳ [`IntrospectionRequestOptions`](IntrospectionRequestOptions.md)
+
+  ↳↳ [`DeviceAuthorizationRequestOptions`](DeviceAuthorizationRequestOptions.md)

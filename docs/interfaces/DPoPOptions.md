@@ -37,3 +37,9 @@ ___
 Server-Provided Nonce to use in the request. This option serves as an override in case the
 self-correcting mechanism does not work with a particular server. Previously received nonces
 will be used automatically.
+
+## Hierarchy
+
+- `CryptoKeyPair`
+
+  ↳ **`DPoPOptions`**

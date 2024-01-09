@@ -76,3 +76,9 @@ ___
 ### nonce
 
 • `Optional` `Readonly` **nonce**: `string`
+
+## Hierarchy
+
+- `JWTPayload`
+
+  ↳ **`IDToken`**

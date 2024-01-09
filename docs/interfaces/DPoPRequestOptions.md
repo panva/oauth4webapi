@@ -15,3 +15,17 @@
 • `Optional` **DPoP**: [`DPoPOptions`](DPoPOptions.md)
 
 DPoP-related options.
+
+## Hierarchy
+
+- **`DPoPRequestOptions`**
+
+  ↳ [`PushedAuthorizationRequestOptions`](PushedAuthorizationRequestOptions.md)
+
+  ↳ [`ProtectedResourceRequestOptions`](ProtectedResourceRequestOptions.md)
+
+  ↳ [`UserInfoRequestOptions`](UserInfoRequestOptions.md)
+
+  ↳ [`TokenEndpointRequestOptions`](TokenEndpointRequestOptions.md)
+
+  ↳ [`ClientCredentialsGrantRequestOptions`](ClientCredentialsGrantRequestOptions.md)

@@ -64,3 +64,9 @@ ___
 • `Optional` `Readonly` **userinfo\_endpoint**: `string`
 
 URL of the authorization server's UserInfo Endpoint.
+
+## Hierarchy
+
+- [`Pick`]( https://www.typescriptlang.org/docs/handbook/utility-types.html#picktype-keys )\<[`AuthorizationServer`](AuthorizationServer.md), ``"token_endpoint"`` \| ``"revocation_endpoint"`` \| ``"introspection_endpoint"`` \| ``"device_authorization_endpoint"`` \| ``"userinfo_endpoint"`` \| ``"pushed_authorization_request_endpoint"``\>
+
+  ↳ **`MTLSEndpointAliases`**

@@ -18,3 +18,11 @@ This is an experimental feature, it is not subject to semantic versioning rules.
 compatible changes or removal may occur in any future release.
 
 See [experimentalUseMtlsAlias](../variables/experimentalUseMtlsAlias.md) for its documentation.
+
+## Hierarchy
+
+- **`ExperimentalUseMTLSAliasOptions`**
+
+  ↳ [`AuthenticatedRequestOptions`](AuthenticatedRequestOptions.md)
+
+  ↳ [`UserInfoRequestOptions`](UserInfoRequestOptions.md)

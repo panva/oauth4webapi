@@ -25,3 +25,9 @@
 #### Returns
 
 [`OperationProcessingError`](OperationProcessingError.md)
+
+## Hierarchy
+
+- [`Error`]( https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error )
+
+  ↳ **`OperationProcessingError`**

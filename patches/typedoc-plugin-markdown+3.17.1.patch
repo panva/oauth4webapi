@@ -44,7 +44,7 @@ index e332374..1ecd370 100644
          }
          return md.length > 0 ? md.join('\n') : null;
 diff --git a/node_modules/typedoc-plugin-markdown/dist/resources/partials/member.declaration.hbs b/node_modules/typedoc-plugin-markdown/dist/resources/partials/member.declaration.hbs
-index 1ca0b74..2bc3b47 100755
+index 1ca0b74..ac61b79 100755
 --- a/node_modules/typedoc-plugin-markdown/dist/resources/partials/member.declaration.hbs
 +++ b/node_modules/typedoc-plugin-markdown/dist/resources/partials/member.declaration.hbs
 @@ -14,58 +14,4 @@
@@ -106,6 +106,7 @@ index 1ca0b74..2bc3b47 100755
 -{{/if}}
 -
  {{> member.sources}}
+\ No newline at end of file
 diff --git a/node_modules/typedoc-plugin-markdown/dist/resources/partials/member.sources.hbs b/node_modules/typedoc-plugin-markdown/dist/resources/partials/member.sources.hbs
 index a999ee8..3f11cfe 100755
 --- a/node_modules/typedoc-plugin-markdown/dist/resources/partials/member.sources.hbs
@@ -153,7 +154,7 @@ index ba8e5be..6a4e1d3 100644
 \ No newline at end of file
 +[💗 Help the project](https://github.com/sponsors/panva)
 diff --git a/node_modules/typedoc-plugin-markdown/dist/resources/templates/reflection.hbs b/node_modules/typedoc-plugin-markdown/dist/resources/templates/reflection.hbs
-index ce29bc5..471fe38 100755
+index ce29bc5..ef5d6f8 100755
 --- a/node_modules/typedoc-plugin-markdown/dist/resources/templates/reflection.hbs
 +++ b/node_modules/typedoc-plugin-markdown/dist/resources/templates/reflection.hbs
 @@ -24,18 +24,6 @@
@@ -175,3 +176,19 @@ index ce29bc5..471fe38 100755
  {{#if model.implementedTypes}}
  
  ## Implements
+@@ -97,3 +85,15 @@
+ {{> main}}
+ 
+ {{/with}}
++
++{{#ifShowTypeHierarchy}}
++
++## Hierarchy
++
++{{#with model.typeHierarchy}}
++
++{{{hierarchy 0}}}
++
++{{/with}}
++
++{{/ifShowTypeHierarchy}}

@@ -77,3 +77,11 @@ A 5000ms timeout AbortSignal for every request
 ```js
 const signal = () => AbortSignal.timeout(5_000) // Note: AbortSignal.timeout may not yet be available in all runtimes.
 ```
+
+## Hierarchy
+
+- [`HttpRequestOptions`](HttpRequestOptions.md)
+
+- [`AuthenticatedRequestOptions`](AuthenticatedRequestOptions.md)
+
+  ↳ **`RevocationRequestOptions`**
