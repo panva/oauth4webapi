@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.4.5](https://github.com/panva/oauth4webapi/compare/v2.4.4...v2.4.5) (2024-01-09)
+
+
+### Fixes
+
+* **DPoP:** clockSkew in ProtectedResourceRequestOptions is a unique Symbol ([1708f21](https://github.com/panva/oauth4webapi/commit/1708f215aa7a080f048b1b2f7eb2bc918dc130da))
+
+
+### Documentation
+
+* expose clock skew and tolerance documentation ([2d90c49](https://github.com/panva/oauth4webapi/commit/2d90c49cd8c4b76274516b580ed30111ae743ea6))
+
 ## [2.4.4](https://github.com/panva/oauth4webapi/compare/v2.4.3...v2.4.4) (2024-01-09)
 
 
