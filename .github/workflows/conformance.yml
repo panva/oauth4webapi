@@ -87,7 +87,6 @@ jobs:
           PLAN_NAME: ${{ matrix.setup.plan }}
           VARIANT: ${{ toJSON(matrix.setup.variant) }}
       - run: node ./conformance/.parse-logs.mjs capture.txt
-      - run: rm capture.txt
       - name: Upload test artifacts
         id: artifact-upload-step
         uses: actions/upload-artifact@v4

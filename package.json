@@ -68,6 +68,7 @@
     "@types/node": "^20.10.8",
     "@types/oidc-provider": "^8.4.3",
     "@types/qunit": "^2.19.9",
+    "archiver": "^6.0.1",
     "ava": "^5.3.1",
     "chrome-launcher": "^1.1.0",
     "edge-runtime": "^2.5.7",

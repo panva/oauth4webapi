@@ -184,17 +184,21 @@ export default async () => {
 
   const { certificationProfileName } = await api.getTestPlanInfo(plan)
 
-  logToActions('Test Plan Details')
-  logToActions('')
-  logToActions(`- Name: **${PLAN_NAME}**`)
-  logToActions(`- ID: **\`${plan.id}\`**`)
-  logToActions(`- Variant`)
+  function logBoth(input: string) {
+    console.log(input.replaceAll('`', '').replaceAll('**', ''))
+    logToActions(input)
+  }
+
+  logBoth('Test Plan Details')
+  logBoth('')
+  logBoth(`- Name: **${PLAN_NAME}**`)
+  logBoth(`- ID: **\`${plan.id}\`**`)
+  logBoth('- Variant')
   for (const [key, value] of Object.entries(variant)) {
-    logToActions(`  - ${key}: ${value}`)
+    logBoth(`  - ${key}: ${value}`)
   }
   if (certificationProfileName) {
-    console.log('CERTIFICATION PROFILE NAME:', certificationProfileName)
-    logToActions(`- Certification Profile Name: **${certificationProfileName}**`)
+    logBoth(`- Certification Profile Name: **${certificationProfileName}**`)
   }
 
   const files: Set<string> = new Set()

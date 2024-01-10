@@ -152,7 +152,7 @@ export const green = test.macro({
       .discoveryRequest(issuer)
       .then((response) => oauth.processDiscoveryResponse(issuer, response))
 
-    t.log('AS Metadata', as)
+    t.log('AS Metadata discovered for', as.issuer)
 
     const client: oauth.Client = {
       client_id: configuration.client.client_id,
