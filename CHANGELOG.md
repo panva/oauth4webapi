@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.5.0](https://github.com/panva/oauth4webapi/compare/v2.4.5...v2.5.0) (2024-01-10)
+
+
+### Features
+
+* add experimental customize fetch option ([e98c1aa](https://github.com/panva/oauth4webapi/commit/e98c1aa02652a6deb9e07d9360070fba6d6aa85a)), closes [#94](https://github.com/panva/oauth4webapi/issues/94)
+* add experimental support for mtls_endpoint_aliases ([f1cb365](https://github.com/panva/oauth4webapi/commit/f1cb365dbd1e0f74d88da4fe0a9f57d2112f5698))
+* allow all of HeadersInit for HttpRequestOptions.headers ([a5fe73c](https://github.com/panva/oauth4webapi/commit/a5fe73cc56dcf0b3c9ec58f86019bb7d4afaeca2))
+
+
+### Refactor
+
+* fetch url resolution and validation ([b2e62a6](https://github.com/panva/oauth4webapi/commit/b2e62a6ce57f5a63cf09b5ce8a7cd062f1d370be))
+
+
+### Documentation
+
+* fix ToC anchors to symbol properties ([ed01dcf](https://github.com/panva/oauth4webapi/commit/ed01dcf75837566f00073c5ed3a87c446fa60d1d))
+* return hierarchy to markdown docs ([7d3b414](https://github.com/panva/oauth4webapi/commit/7d3b41498a74c3e7b69d936e01ab30579aa5805d))
+
 ## [2.4.5](https://github.com/panva/oauth4webapi/compare/v2.4.4...v2.4.5) (2024-01-09)
 
 
