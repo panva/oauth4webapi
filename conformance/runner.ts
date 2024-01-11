@@ -430,7 +430,12 @@ export const green = (options?: MacroOptions) =>
             t.log('retrying with a newly obtained dpop nonce')
             response = await request()
             if (scope.includes('openid')) {
-              result = await oauth.processAuthorizationCodeOpenIDResponse(as, client, response)
+              result = await oauth.processAuthorizationCodeOpenIDResponse(
+                as,
+                client,
+                response,
+                nonce,
+              )
             } else {
               result = await oauth.processAuthorizationCodeOAuth2Response(as, client, response)
             }
