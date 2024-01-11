@@ -1,18 +1,21 @@
 diff --git a/examples/code.ts b/examples/dpop.ts
-index 98576c1..aa2cb90 100644
+index 895d96e..5ff36e6 100644
 --- a/examples/code.ts
 +++ b/examples/dpop.ts
-@@ -1,5 +1,9 @@
- import * as oauth from '../src/index.js'
+@@ -10,6 +10,12 @@ let client_secret!: string
+  * Server.
+  */
+ let redirect_uri!: string
++/**
++ * In order to take full advantage of DPoP you shall generate a random private key for every
++ * session. In the browser environment you shall use IndexedDB to persist the generated
++ * CryptoKeyPair.
++ */
++let DPoP!: CryptoKeyPair
  
-+// in order to take full advantage of DPoP you shall generate a random private key for every session
-+// in the browser environment you shall use IndexedDB to persist the generated CryptoKeyPair
-+const DPoP = await oauth.generateKeyPair('ES256')
-+
- const issuer = new URL('https://example.as.com')
- const as = await oauth
-   .discoveryRequest(issuer)
-@@ -54,6 +58,7 @@ let access_token: string
+ // End of prerequisites
+ 
+@@ -64,6 +70,7 @@ let access_token: string
      params,
      redirect_uri,
      code_verifier,
@@ -20,7 +23,7 @@ index 98576c1..aa2cb90 100644
    )
  
    let challenges: oauth.WWWAuthenticateChallenge[] | undefined
-@@ -67,6 +72,9 @@ let access_token: string
+@@ -77,6 +84,9 @@ let access_token: string
    const result = await oauth.processAuthorizationCodeOpenIDResponse(as, client, response)
    if (oauth.isOAuth2Error(result)) {
      console.log('error', result)
@@ -30,7 +33,7 @@ index 98576c1..aa2cb90 100644
      throw new Error() // Handle OAuth 2.0 response body error
    }
  
-@@ -79,12 +87,15 @@ let access_token: string
+@@ -89,12 +99,15 @@ let access_token: string
  
  // fetch userinfo response
  {

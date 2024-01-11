@@ -1,39 +1,40 @@
 diff --git a/examples/code.ts b/examples/private_key_jwt.ts
-index 98576c1..1a69495 100644
+index 895d96e..6163d34 100644
 --- a/examples/code.ts
 +++ b/examples/private_key_jwt.ts
-@@ -1,5 +1,10 @@
- import * as oauth from '../src/index.js'
+@@ -4,12 +4,16 @@ import * as oauth from '../src/index.js' // replace with an import of oauth4weba
  
-+// a random client authentication key is generated here for the example's sake, you would however
-+// use crypto.subtle.importKey to import a private key that is pre-registered on the AS
-+const { privateKey } = await oauth.generateKeyPair('ES256')
-+const keyID = 'a52faab2-f688-44b6-bde8-f493aeb526fb' // the `kid` the authorization server expects, or undefined if not applicable
-+
- const issuer = new URL('https://example.as.com')
- const as = await oauth
-   .discoveryRequest(issuer)
-@@ -7,9 +12,7 @@ const as = await oauth
+ let issuer!: URL // Authorization server's Issuer Identifier URL
+ let client_id!: string
+-let client_secret!: string
+ /**
+  * Value used in the authorization request as redirect_uri pre-registered at the Authorization
+  * Server.
+  */
+ let redirect_uri!: string
++/**
++ * A key that the client has pre-registered at the Authorization Server for use with Private Key JWT
++ * client authentication method.
++ */
++let clientPrivateKey!: CryptoKey
+ 
+ // End of prerequisites
+ 
+@@ -19,8 +23,7 @@ const as = await oauth
  
  const client: oauth.Client = {
-   client_id: 'abc4ba37-4ab8-49b5-99d4-9441ba35d428',
--  client_secret:
--    'ddce41c3d7618bb30e8a5e5e423fce223427426265ebc96fd9dd5713a6d4fc58bc523c45af42274c210ab18d4a93b5b7169edf6236ed2657f6be64ec41b72f87',
+   client_id,
+-  client_secret,
 -  token_endpoint_auth_method: 'client_secret_basic',
 +  token_endpoint_auth_method: 'private_key_jwt',
  }
  
- const redirect_uri = 'https://example.rp.com/cb'
-@@ -54,6 +57,12 @@ let access_token: string
+ if (as.code_challenge_methods_supported?.includes('S256') !== true) {
+@@ -64,6 +67,7 @@ let access_token: string
      params,
      redirect_uri,
      code_verifier,
-+    {
-+      clientPrivateKey: {
-+        key: privateKey,
-+        kid: keyID,
-+      },
-+    },
++    { clientPrivateKey },
    )
  
    let challenges: oauth.WWWAuthenticateChallenge[] | undefined

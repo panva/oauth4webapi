@@ -1,15 +1,22 @@
 diff --git a/examples/code.ts b/examples/public.ts
-index 98576c1..97791b2 100644
+index 895d96e..ba360f4 100644
 --- a/examples/code.ts
 +++ b/examples/public.ts
-@@ -7,9 +7,7 @@ const as = await oauth
+@@ -4,7 +4,6 @@ import * as oauth from '../src/index.js' // replace with an import of oauth4weba
+ 
+ let issuer!: URL // Authorization server's Issuer Identifier URL
+ let client_id!: string
+-let client_secret!: string
+ /**
+  * Value used in the authorization request as redirect_uri pre-registered at the Authorization
+  * Server.
+@@ -19,8 +18,7 @@ const as = await oauth
  
  const client: oauth.Client = {
-   client_id: 'abc4ba37-4ab8-49b5-99d4-9441ba35d428',
--  client_secret:
--    'ddce41c3d7618bb30e8a5e5e423fce223427426265ebc96fd9dd5713a6d4fc58bc523c45af42274c210ab18d4a93b5b7169edf6236ed2657f6be64ec41b72f87',
+   client_id,
+-  client_secret,
 -  token_endpoint_auth_method: 'client_secret_basic',
 +  token_endpoint_auth_method: 'none',
  }
  
- const redirect_uri = 'https://example.rp.com/cb'
+ if (as.code_challenge_methods_supported?.includes('S256') !== true) {

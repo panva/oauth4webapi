@@ -1,26 +1,41 @@
-import * as oauth from '../src/index.js'
+import * as oauth from '../src/index.js' // replace with an import of oauth4webapi
 
-// in order to take full advantage of DPoP you shall generate a random private key for every session
-const DPoP = await oauth.generateKeyPair('ES256')
+// Prerequisites
 
-// a random client private key is generated here for the example's sake, you would however
-// use crypto.subtle.importKey to import a private key that is pre-registered on the AS
-const clientPrivateKey = {
-  key: (await oauth.generateKeyPair('ES256')).privateKey,
-  kid: 'a52faab2-f688-44b6-bde8-f493aeb526fb', // the `kid` the authorization server expects, or undefined if not applicable
-}
+let issuer!: URL // Authorization server's Issuer Identifier URL
+let client_id!: string
+/**
+ * Value used in the authorization request as redirect_uri pre-registered at the Authorization
+ * Server.
+ */
+let redirect_uri!: string
+/**
+ * In order to take full advantage of DPoP you shall generate a random private key for every
+ * session. In the browser environment you shall use IndexedDB to persist the generated
+ * CryptoKeyPair.
+ */
+let DPoP!: CryptoKeyPair
+/**
+ * A key that the client has pre-registered at the Authorization Server for use with Private Key JWT
+ * client authentication method.
+ */
+let clientPrivateKey!: CryptoKey
+/**
+ * A key that is pre-registered at the Authorization Server that the client is supposed to sign its
+ * Request Objects with.
+ */
+let jarPrivateKey!: CryptoKey
 
-const issuer = new URL('https://example.as.com')
+// End of prerequisites
+
 const as = await oauth
   .discoveryRequest(issuer)
   .then((response) => oauth.processDiscoveryResponse(issuer, response))
 
 const client: oauth.Client = {
-  client_id: 'abc4ba37-4ab8-49b5-99d4-9441ba35d428',
+  client_id,
   token_endpoint_auth_method: 'private_key_jwt',
 }
-
-const redirect_uri = 'https://example.rp.com/cb'
 
 const code_verifier = oauth.generateRandomCodeVerifier()
 const code_challenge = await oauth.calculatePKCECodeChallenge(code_verifier)
@@ -37,7 +52,7 @@ let request: string
   params.set('response_mode', 'jwt')
   params.set('scope', 'openid email')
 
-  request = await oauth.issueRequestObject(as, client, params, clientPrivateKey)
+  request = await oauth.issueRequestObject(as, client, params, jarPrivateKey)
 }
 
 let request_uri: string
@@ -73,7 +88,6 @@ let request_uri: string
 
 {
   // redirect user to as.authorization_endpoint
-
   const authorizationUrl = new URL(as.authorization_endpoint!)
   authorizationUrl.searchParams.set('client_id', client.client_id)
   authorizationUrl.searchParams.set('request_uri', request_uri)

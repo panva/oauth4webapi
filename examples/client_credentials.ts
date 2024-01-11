@@ -1,14 +1,20 @@
-import * as oauth from '../src/index.js'
+import * as oauth from '../src/index.js' // replace with an import of oauth4webapi
 
-const issuer = new URL('https://example.as.com')
+// Prerequisites
+
+let issuer!: URL // Authorization server's Issuer Identifier URL
+let client_id!: string
+let client_secret!: string
+
+// End of prerequisites
+
 const as = await oauth
   .discoveryRequest(issuer)
   .then((response) => oauth.processDiscoveryResponse(issuer, response))
 
 const client: oauth.Client = {
-  client_id: 'abc4ba37-4ab8-49b5-99d4-9441ba35d428',
-  client_secret:
-    'ddce41c3d7618bb30e8a5e5e423fce223427426265ebc96fd9dd5713a6d4fc58bc523c45af42274c210ab18d4a93b5b7169edf6236ed2657f6be64ec41b72f87',
+  client_id,
+  client_secret,
   token_endpoint_auth_method: 'client_secret_basic',
 }
 

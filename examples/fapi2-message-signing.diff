@@ -1,8 +1,20 @@
 diff --git a/examples/fapi2.ts b/examples/fapi2-message-signing.ts
-index 3717f77..8897055 100644
+index 2f73b7a..f49f057 100644
 --- a/examples/fapi2.ts
 +++ b/examples/fapi2-message-signing.ts
-@@ -26,7 +26,7 @@ const code_verifier = oauth.generateRandomCodeVerifier()
+@@ -20,6 +20,11 @@ let DPoP!: CryptoKeyPair
+  * client authentication method.
+  */
+ let clientPrivateKey!: CryptoKey
++/**
++ * A key that is pre-registered at the Authorization Server that the client is supposed to sign its
++ * Request Objects with.
++ */
++let jarPrivateKey!: CryptoKey
+ 
+ // End of prerequisites
+ 
+@@ -36,7 +41,7 @@ const code_verifier = oauth.generateRandomCodeVerifier()
  const code_challenge = await oauth.calculatePKCECodeChallenge(code_verifier)
  const code_challenge_method = 'S256'
  
@@ -11,14 +23,14 @@ index 3717f77..8897055 100644
  {
    const params = new URLSearchParams()
    params.set('client_id', client.client_id)
-@@ -34,8 +34,18 @@ let request_uri: string
+@@ -44,8 +49,18 @@ let request_uri: string
    params.set('code_challenge_method', code_challenge_method)
    params.set('redirect_uri', redirect_uri)
    params.set('response_type', 'code')
 +  params.set('response_mode', 'jwt')
    params.set('scope', 'openid email')
  
-+  request = await oauth.issueRequestObject(as, client, params, clientPrivateKey)
++  request = await oauth.issueRequestObject(as, client, params, jarPrivateKey)
 +}
 +
 +let request_uri: string
@@ -30,7 +42,7 @@ index 3717f77..8897055 100644
    const response = await oauth.pushedAuthorizationRequest(as, client, params, {
      DPoP,
      clientPrivateKey,
-@@ -73,7 +83,7 @@ let request_uri: string
+@@ -82,7 +97,7 @@ let request_uri: string
  {
    // @ts-expect-error
    const currentUrl: URL = getCurrentUrl()

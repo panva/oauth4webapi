@@ -1,22 +1,33 @@
-import * as oauth from '../src/index.js'
+import * as oauth from '../src/index.js' // replace with an import of oauth4webapi
 
-const issuer = new URL('https://example.as.com')
+// Prerequisites
+
+let issuer!: URL // Authorization server's Issuer Identifier URL
+let client_id!: string
+let client_secret!: string
+/**
+ * Value used in the authorization request as redirect_uri pre-registered at the Authorization
+ * Server.
+ */
+let redirect_uri!: string
+
+// End of prerequisites
+
 const as = await oauth
   .discoveryRequest(issuer)
   .then((response) => oauth.processDiscoveryResponse(issuer, response))
 
 const client: oauth.Client = {
-  client_id: 'abc4ba37-4ab8-49b5-99d4-9441ba35d428',
-  client_secret:
-    'ddce41c3d7618bb30e8a5e5e423fce223427426265ebc96fd9dd5713a6d4fc58bc523c45af42274c210ab18d4a93b5b7169edf6236ed2657f6be64ec41b72f87',
+  client_id,
+  client_secret,
   token_endpoint_auth_method: 'client_secret_basic',
 }
 
-const redirect_uri = 'https://example.rp.com/cb'
-
 if (as.code_challenge_methods_supported?.includes('S256') !== true) {
-  // This example assumes S256 PKCE support is signalled
-  // If it isn't supported, random `nonce` must be used for CSRF protection.
+  /**
+   * This example assumes S256 PKCE support is signalled. If it isn't supported, a unique random
+   * `nonce` for each authorization request must be used for CSRF protection.
+   */
   throw new Error()
 }
 
@@ -55,7 +66,6 @@ let request_uri: string
 
 {
   // redirect user to as.authorization_endpoint
-
   const authorizationUrl = new URL(as.authorization_endpoint!)
   authorizationUrl.searchParams.set('client_id', client.client_id)
   authorizationUrl.searchParams.set('request_uri', request_uri)
