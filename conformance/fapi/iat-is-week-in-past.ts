@@ -6,7 +6,7 @@ for (const module of modules('iat-is-week-in-past')) {
     test.todo('iat-is-week-in-past')
   } else {
     test.serial(
-      red,
+      red(),
       module,
       'unexpected JWT "iat" (issued at) claim value, it is too far in the past',
     )
