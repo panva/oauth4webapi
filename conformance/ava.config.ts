@@ -9,15 +9,10 @@ import * as api from './api.js'
 
 const UUID = crypto.randomUUID()
 
-const {
-  PLAN_NAME = 'oidcc-client-basic-certification-test-plan',
-  VARIANT = '{}',
-  ALG = 'PS256',
-} = process.env
+import { JWS_ALGORITHM, PLAN_NAME, VARIANT } from './env.js'
 
 switch (PLAN_NAME) {
   case 'oidcc-client-basic-certification-test-plan':
-  case 'oidcc-client-hybrid-certification-test-plan':
   case 'oidcc-client-test-plan':
   case 'fapi1-advanced-final-client-test-plan':
   case 'fapi2-security-profile-id2-client-test-plan':
@@ -66,16 +61,12 @@ const DEFAULTS: Record<typeof PLAN_NAME, Record<string, string>> = {
     request_type: 'plain_http_request',
     client_registration: 'static_client',
   },
-  'oidcc-client-hybrid-certification-test-plan': {
-    request_type: 'plain_http_request',
-    client_registration: 'static_client',
-  },
   'fapi1-advanced-final-client-test-plan': {
     client_auth_type: 'private_key_jwt', // private_key_jwt, mtls
-    fapi_auth_request_method: 'pushed', // pushed, by_value
+    fapi_auth_request_method: 'pushed',
     fapi_client_type: 'oidc', // oidc, plain_oauth
     fapi_profile: 'plain_fapi',
-    fapi_response_mode: 'jarm', // jarm, plain_response
+    fapi_response_mode: 'jarm',
   },
   'fapi2-security-profile-id2-client-test-plan': {
     client_auth_type: 'private_key_jwt', // private_key_jwt, mtls
@@ -160,9 +151,9 @@ export default async () => {
     scope: getScope(variant),
     redirect_uri: `https://client-${UUID}.local/cb`,
     jwks: {
-      keys: [await key(ALG)],
+      keys: [await key(JWS_ALGORITHM)],
     },
-    use_mtls_endpoint_aliases: false,
+    id_token_signed_response_alg: JWS_ALGORITHM,
     certificate: '',
   }
 
@@ -176,19 +167,18 @@ export default async () => {
       cert: selfsigned.cert,
       key: selfsigned.private,
     }
-    clientConfig.use_mtls_endpoint_aliases = true
   }
 
   const configuration = {
     description: `${name.split('/').reverse()[0]}/${version} (${homepage})`,
     alias: UUID,
     client: clientConfig,
-    waitTimeoutSeconds: 3,
+    waitTimeoutSeconds: 2,
     ...(PLAN_NAME.startsWith('fapi')
       ? {
           server: {
             jwks: {
-              keys: [await key(ALG)],
+              keys: [await key(JWS_ALGORITHM)],
             },
           },
         }
@@ -229,7 +219,7 @@ export default async () => {
     logBoth(`- Certification Profile Name: **N/A**`)
   }
 
-  const files: Set<string> = new Set()
+  const files: string[] = []
   for (const module of plan.modules) {
     switch (PLAN_NAME) {
       case 'fapi1-advanced-final-client-test-plan':
@@ -241,26 +231,23 @@ export default async () => {
         )
         const path = `./conformance/fapi/${name}.ts`
         ensureTestFile(path, name)
-        files.add(path)
+        files.push(path)
         break
       }
       case 'oidcc-client-test-plan':
       case 'oidcc-client-basic-certification-test-plan':
-      case 'oidcc-client-hybrid-certification-test-plan':
-        switch (module.variant?.response_type) {
-          case 'code token':
-          case 'code id_token token':
-            continue
-        }
-
         const name = module.testModule.replace('oidcc-client-test-', '')
         const path = `./conformance/oidc/${name}.ts`
         ensureTestFile(path, name)
-        files.add(path)
+        files.push(path)
         break
       default:
         throw new Error()
     }
+  }
+
+  if (process.env.CI) {
+    files.push('./conformance/download_archive.ts')
   }
 
   return {
@@ -270,7 +257,6 @@ export default async () => {
         variant,
         plan,
         mtls,
-        ALG,
       }),
     },
     concurrency: 1,
@@ -278,7 +264,7 @@ export default async () => {
       ts: 'module',
       mjs: true,
     },
-    files: [...new Set([...files].sort()), './conformance/download_archive.ts'],
+    files: [...new Set(files)],
     workerThreads: false,
     nodeArguments: ['--enable-source-maps'],
   }

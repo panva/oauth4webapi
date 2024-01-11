@@ -76,6 +76,7 @@
   },
   "devDependencies": {
     "@koa/cors": "^5.0.0",
+    "@pdf-lib/fontkit": "^1.1.1",
     "@types/koa__cors": "^5.0.0",
     "@types/node": "^20.17.0",
     "@types/qunit": "^2.19.11",
@@ -87,6 +88,7 @@
     "jose": "^5.9.6",
     "oidc-provider": "^8.5.2",
     "patch-package": "^8.0.0",
+    "pdf-lib": "^1.17.1",
     "prettier": "^3.3.3",
     "prettier-plugin-jsdoc": "^1.3.0",
     "puppeteer-core": "^23.6.0",
