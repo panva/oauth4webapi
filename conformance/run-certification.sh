@@ -16,7 +16,7 @@ run_conformance() {
 
 cleanup() {
   for pid in "${pids[@]}"; do
-    kill "$pid"
+    kill "$pid" > /dev/null 2>&1
   done
   exit 1
 }
