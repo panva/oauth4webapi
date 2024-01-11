@@ -115,6 +115,18 @@ function makePublicJwks(def: any) {
   return client
 }
 
+function pushEncryptionKey(def: any) {
+  const client = structuredClone(def)
+  const key = client.jwks.keys[0]
+  client.jwks.keys.push({
+    ...key,
+    kid: `enc-${key.kid}`,
+    use: 'enc',
+    alg: 'RSA-OEAP',
+  })
+  return client
+}
+
 function ensureTestFile(path: string, name: string) {
   if (!exists(path)) {
     writeFileSync(
@@ -178,6 +190,10 @@ export default async () => {
     {
       ...configuration,
       client: makePublicJwks(clientConfig),
+      client2: {
+        ...pushEncryptionKey(makePublicJwks(clientConfig)),
+        id_token_encrypted_response_alg: 'RSA-OAEP',
+      },
     },
     variant,
   )

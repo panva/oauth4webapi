@@ -1,5 +1,12 @@
 import anyTest, { type TestFn } from 'ava'
-import { importJWK, type JWK, calculateJwkThumbprint, exportJWK } from 'jose'
+import {
+  importJWK,
+  type JWK,
+  calculateJwkThumbprint,
+  exportJWK,
+  decodeProtectedHeader,
+  compactDecrypt,
+} from 'jose'
 import * as undici from 'undici'
 
 export const test = anyTest as TestFn<{ instance: Test }>
@@ -70,8 +77,8 @@ export function modules(name: string): ModulePrescription[] {
   )
 }
 
-function usesJarm(plan: Plan) {
-  return plan.name.startsWith('fapi2-message-signing') || plan.name.startsWith('fapi1')
+function usesJarm(variant: Record<string, string>) {
+  return variant.fapi_response_mode === 'jarm'
 }
 
 function usesDpop(variant: Record<string, string>) {
@@ -79,7 +86,7 @@ function usesDpop(variant: Record<string, string>) {
 }
 
 function usesPar(plan: Plan) {
-  return plan.name.startsWith('fapi')
+  return plan.name.startsWith('fapi2') || variant.fapi_auth_request_method === 'pushed'
 }
 
 function usesRequestObject(planName: string, variant: Record<string, string>) {
@@ -106,6 +113,30 @@ function requiresState(planName: string, variant: Record<string, string>) {
   return planName.startsWith('fapi1') && !getScope(variant).includes('openid')
 }
 
+function responseType(planName: string, variant: Record<string, string>) {
+  if (!planName.startsWith('fapi1')) {
+    return 'code'
+  }
+
+  return variant.fapi_response_mode === 'jarm' ? 'code' : 'code id_token'
+}
+
+async function decryptIdToken(jwe: string) {
+  return new TextDecoder().decode(
+    (
+      await compactDecrypt(
+        jwe,
+        await importPrivateKey('RSA-OAEP', configuration.client.jwks.keys[0]),
+        {
+          keyManagementAlgorithms: ['RSA-OAEP'],
+        },
+      ).catch((cause) => {
+        throw new oauth.OperationProcessingError('failed to decrypt ID Token', { cause })
+      })
+    ).plaintext,
+  )
+}
+
 export const green = test.macro({
   async exec(t, module: ModulePrescription) {
     t.timeout(15000)
@@ -116,7 +147,7 @@ export const green = test.macro({
     t.log('Test ID', instance.id)
     t.log('Test Name', instance.name)
 
-    const variant = {
+    const variant: Record<string, string> = {
       ...conformance.variant,
       ...module.variant,
     }
@@ -193,6 +224,7 @@ export const green = test.macro({
         }
     }
 
+    const response_type = responseType(plan.name, variant)
     const scope = getScope(variant)
     const code_verifier = oauth.generateRandomCodeVerifier()
     const code_challenge = await oauth.calculatePKCECodeChallenge(code_verifier)
@@ -200,9 +232,11 @@ export const green = test.macro({
     let nonce = requiresNonce(plan.name, variant)
       ? oauth.generateRandomNonce()
       : oauth.expectNoNonce
-    let state = requiresState(plan.name, variant)
-      ? oauth.generateRandomState()
-      : oauth.expectNoState
+    let state =
+      requiresState(plan.name, variant) ||
+      (plan.name.startsWith('fapi1') && variant.fapi_response_mode !== 'jarm')
+        ? oauth.generateRandomState()
+        : oauth.expectNoState
 
     let authorizationUrl = new URL(as.authorization_endpoint!)
     if (!usesRequestObject(plan.name, variant)) {
@@ -210,7 +244,7 @@ export const green = test.macro({
       authorizationUrl.searchParams.set('code_challenge', code_challenge)
       authorizationUrl.searchParams.set('code_challenge_method', code_challenge_method)
       authorizationUrl.searchParams.set('redirect_uri', configuration.client.redirect_uri)
-      authorizationUrl.searchParams.set('response_type', 'code')
+      authorizationUrl.searchParams.set('response_type', response_type)
       authorizationUrl.searchParams.set('scope', scope)
       if (typeof nonce === 'string') {
         authorizationUrl.searchParams.set('nonce', nonce)
@@ -224,7 +258,7 @@ export const green = test.macro({
       params.set('code_challenge', code_challenge)
       params.set('code_challenge_method', code_challenge_method)
       params.set('redirect_uri', configuration.client.redirect_uri)
-      params.set('response_type', 'code')
+      params.set('response_type', response_type)
       params.set('scope', scope)
       if (typeof nonce === 'string') {
         params.set('nonce', nonce)
@@ -241,7 +275,7 @@ export const green = test.macro({
         await oauth.issueRequestObject(as, client, params, { kid: jwk.kid, key: privateKey }),
       )
       authorizationUrl.searchParams.set('scope', scope)
-      authorizationUrl.searchParams.set('response_type', 'code')
+      authorizationUrl.searchParams.set('response_type', response_type)
     }
 
     let DPoP!: CryptoKeyPair
@@ -301,15 +335,28 @@ export const green = test.macro({
       throw new Error()
     }
 
-    const currentUrl = new URL(authorization_endpoint_response_redirect)
+    let currentUrl: URL | URLSearchParams = new URL(authorization_endpoint_response_redirect)
 
     let sub: string
     let access_token: string
     {
       let params: ReturnType<typeof oauth.validateAuthResponse>
 
-      if (usesJarm(plan)) {
+      if (usesJarm(variant)) {
         params = await oauth.validateJwtAuthResponse(as, client, currentUrl, state)
+      } else if (response_type === 'code id_token') {
+        currentUrl = new URLSearchParams(currentUrl.hash.slice(1))
+        const idToken = currentUrl.get('id_token')!
+        if (decodeProtectedHeader(idToken).enc) {
+          currentUrl.set('id_token', await decryptIdToken(idToken))
+        }
+        params = await oauth.experimental_validateDetachedSignatureResponse(
+          as,
+          client,
+          currentUrl,
+          <string>nonce,
+          state,
+        )
       } else {
         params = oauth.validateAuthResponse(as, client, currentUrl, state)
       }
@@ -342,6 +389,23 @@ export const green = test.macro({
           t.log('challenge', challenge)
         }
         throw new Error()
+      }
+
+      if (response_type === 'code id_token') {
+        try {
+          const body = await response.clone().json()
+          const { id_token } = body
+          if (decodeProtectedHeader(id_token).enc) {
+            const newResponse = new Response(
+              JSON.stringify({
+                ...body,
+                id_token: await decryptIdToken(id_token),
+              }),
+              response,
+            )
+            response = newResponse
+          }
+        } catch {}
       }
 
       let result:

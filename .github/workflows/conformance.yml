@@ -34,6 +34,10 @@ jobs:
           - plan: fapi1-advanced-final-client-test-plan
             variant:
               client_auth_type: 'mtls'
+          - plan: fapi1-advanced-final-client-test-plan
+            variant:
+              fapi_response_mode: 'plain_response'
+              fapi_auth_request_method: 'by_value'
 
           # FAPI 2.0 Security Profile ID2
           - plan: fapi2-security-profile-id2-client-test-plan

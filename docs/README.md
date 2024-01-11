@@ -62,6 +62,10 @@
 - [OperationProcessingError](classes/OperationProcessingError.md)
 - [UnsupportedOperationError](classes/UnsupportedOperationError.md)
 
+### FAPI 1.0 Advanced
+
+- [experimental\_validateDetachedSignatureResponse](functions/experimental_validateDetachedSignatureResponse.md)
+
 ### JWT Secured Authorization Response Mode for OAuth 2.0 (JARM)
 
 - [validateJwtAuthResponse](functions/validateJwtAuthResponse.md)

@@ -2521,14 +2521,17 @@ export async function processRefreshTokenResponse(
   return processGenericAccessTokenResponse(as, client, response)
 }
 
-function validateOptionalAudience(expected: string, result: ParsedJWT) {
+function validateOptionalAudience(
+  expected: string,
+  result: Awaited<ReturnType<typeof validateJwt>>,
+) {
   if (result.claims.aud !== undefined) {
     return validateAudience(expected, result)
   }
   return result
 }
 
-function validateAudience(expected: string, result: ParsedJWT) {
+function validateAudience(expected: string, result: Awaited<ReturnType<typeof validateJwt>>) {
   if (Array.isArray(result.claims.aud)) {
     if (!result.claims.aud.includes(expected)) {
       throw new OPE('unexpected JWT "aud" (audience) claim value')
@@ -2540,14 +2543,14 @@ function validateAudience(expected: string, result: ParsedJWT) {
   return result
 }
 
-function validateOptionalIssuer(expected: string, result: ParsedJWT) {
+function validateOptionalIssuer(expected: string, result: Awaited<ReturnType<typeof validateJwt>>) {
   if (result.claims.iss !== undefined) {
     return validateIssuer(expected, result)
   }
   return result
 }
 
-function validateIssuer(expected: string, result: ParsedJWT) {
+function validateIssuer(expected: string, result: Awaited<ReturnType<typeof validateJwt>>) {
   if (result.claims.iss !== expected) {
     throw new OPE('unexpected JWT "iss" (issuer) claim value')
   }
@@ -2654,18 +2657,24 @@ interface ParsedJWT {
   signature: Uint8Array
 }
 
-const claimNames = {
+const idTokenClaimNames = {
   aud: 'audience',
   exp: 'expiration time',
   iat: 'issued at',
   iss: 'issuer',
   sub: 'subject',
+  nonce: 'nonce',
+  s_hash: 'state hash',
+  c_hash: 'code hash',
 }
 
-function validatePresence(required: (keyof typeof claimNames)[], result: ParsedJWT) {
+function validatePresence(
+  required: (keyof typeof idTokenClaimNames)[],
+  result: Awaited<ReturnType<typeof validateJwt>>,
+) {
   for (const claim of required) {
     if (result.claims[claim] === undefined) {
-      throw new OPE(`JWT "${claim}" (${claimNames[claim]}) claim missing`)
+      throw new OPE(`JWT "${claim}" (${idTokenClaimNames[claim]}) claim missing`)
     }
   }
   return result
@@ -2853,7 +2862,7 @@ export async function processAuthorizationCodeOAuth2Response(
   return <OAuth2TokenEndpointResponse>result
 }
 
-function checkJwtType(expected: string, result: ParsedJWT) {
+function checkJwtType(expected: string, result: Awaited<ReturnType<typeof validateJwt>>) {
   if (typeof result.header.typ !== 'string' || normalizeTyp(result.header.typ) !== expected) {
     throw new OPE('unexpected JWT "typ" header parameter value')
   }
@@ -3316,7 +3325,7 @@ async function validateJwt(
   getKey: ((h: CompactJWSHeaderParameters) => Promise<CryptoKey>) | typeof noSignatureCheck,
   clockSkew: number,
   clockTolerance: number,
-): Promise<ParsedJWT> {
+): Promise<ParsedJWT & { key?: CryptoKey }> {
   const { 0: protectedHeader, 1: payload, 2: encodedSignature, length } = jws.split('.')
   if (length === 5) {
     throw new UnsupportedOperationError('JWE structure JWTs are not supported')
@@ -3342,8 +3351,9 @@ async function validateJwt(
   }
 
   const signature = b64u(encodedSignature)
+  let key!: CryptoKey
   if (getKey !== noSignatureCheck) {
-    const key = await getKey(header)
+    key = await getKey(header)
     const input = `${protectedHeader}.${payload}`
     const verified = await crypto.subtle.verify(keyToSubtle(key), key, signature, buf(input))
     if (!verified) {
@@ -3401,7 +3411,7 @@ async function validateJwt(
     }
   }
 
-  return { header, claims, signature }
+  return { header, claims, signature, key }
 }
 
 /**
@@ -3471,6 +3481,216 @@ export async function validateJwtAuthResponse(
   }
 
   return validateAuthResponse(as, client, result, expectedState)
+}
+
+async function idTokenHash(alg: JWSAlgorithm, data: string, key: CryptoKey) {
+  let algorithm: string
+  switch (alg) {
+    case 'RS256': // Fall through
+    case 'PS256': // Fall through
+    case 'ES256':
+      algorithm = 'SHA-256'
+      break
+    case 'RS384': // Fall through
+    case 'PS384': // Fall through
+    case 'ES384':
+      algorithm = 'SHA-384'
+      break
+    case 'RS512': // Fall through
+    case 'PS512': // Fall through
+    case 'ES512':
+      algorithm = 'SHA-512'
+      break
+    case 'EdDSA':
+      if (key.algorithm.name === 'Ed25519') {
+        algorithm = 'SHA-512'
+        break
+      }
+      throw new UnsupportedOperationError()
+    default:
+      throw new UnsupportedOperationError()
+  }
+
+  const digest = await crypto.subtle.digest(algorithm, buf(data))
+  return b64u(digest.slice(0, digest.byteLength / 2))
+}
+
+async function idTokenHashMatches(data: string, actual: string, alg: JWSAlgorithm, key: CryptoKey) {
+  const expected = await idTokenHash(alg, data, key)
+  return actual === expected
+}
+
+/**
+ * This is an experimental feature, it is not subject to semantic versioning rules. Non-backward
+ * compatible changes or removal may occur in any future release.
+ *
+ * Same as {@link validateAuthResponse} but for FAPI 1.0 Advanced Detached Signature authorization
+ * responses.
+ *
+ * @param as Authorization Server Metadata.
+ * @param client Client Metadata.
+ * @param parameters Authorization Response.
+ * @param expectedNonce Expected ID Token `nonce` claim value.
+ * @param expectedState Expected `state` parameter value. Default is {@link expectNoState}.
+ * @param maxAge ID Token {@link IDToken.auth_time `auth_time`} claim value will be checked to be
+ *   present and conform to the `maxAge` value. Use of this option is required if you sent a
+ *   `max_age` parameter in an authorization request. Default is
+ *   {@link Client.default_max_age `client.default_max_age`} and falls back to
+ *   {@link skipAuthTimeCheck}.
+ *
+ * @returns Validated Authorization Response parameters or Authorization Error Response.
+ *
+ * @group FAPI 1.0 Advanced
+ *
+ * @see [Financial-grade API Security Profile 1.0 - Part 2: Advanced](https://openid.net/specs/openid-financial-api-part-2-1_0.html#id-token-as-detached-signature)
+ */
+export async function experimental_validateDetachedSignatureResponse(
+  as: AuthorizationServer,
+  client: Client,
+  parameters: URLSearchParams,
+  expectedNonce: string,
+  expectedState?: string | typeof expectNoState,
+  maxAge?: number | typeof skipAuthTimeCheck,
+  options?: HttpRequestOptions,
+): Promise<URLSearchParams | OAuth2Error> {
+  assertAs(as)
+  assertClient(client)
+
+  if (!(parameters instanceof URLSearchParams)) {
+    throw new TypeError('"parameters" must be an instance of URLSearchParams')
+  }
+
+  parameters = new URLSearchParams(parameters)
+
+  const id_token = getURLSearchParameter(parameters, 'id_token')
+  parameters.delete('id_token')
+
+  switch (expectedState) {
+    case undefined:
+    case expectNoState:
+      break
+    default:
+      if (!validateString(expectedState)) {
+        throw new TypeError('"expectedState" must be a non-empty string')
+      }
+  }
+
+  const result = validateAuthResponse(
+    {
+      ...as,
+      authorization_response_iss_parameter_supported: false,
+    },
+    client,
+    parameters,
+    expectedState,
+  )
+
+  if (isOAuth2Error(result)) {
+    return result
+  }
+
+  if (!id_token) {
+    throw new OPE('"parameters" does not contain an ID Token')
+  }
+  const code = getURLSearchParameter(parameters, 'code')
+  if (!code) {
+    throw new OPE('"parameters" does not contain an Authorization Code')
+  }
+
+  if (typeof as.jwks_uri !== 'string') {
+    throw new TypeError('"as.jwks_uri" must be a string')
+  }
+
+  const requiredClaims: (keyof typeof idTokenClaimNames)[] = [
+    'aud',
+    'exp',
+    'iat',
+    'iss',
+    'sub',
+    'nonce',
+    'c_hash',
+  ]
+
+  if (typeof expectedState === 'string') {
+    requiredClaims.push('s_hash')
+  }
+
+  const { claims, header, key } = await validateJwt(
+    id_token,
+    checkSigningAlgorithm.bind(
+      undefined,
+      client.id_token_signed_response_alg,
+      as.id_token_signing_alg_values_supported,
+    ),
+    getPublicSigKeyFromIssuerJwksUri.bind(undefined, as, options),
+    getClockSkew(client),
+    getClockTolerance(client),
+  )
+    .then(validatePresence.bind(undefined, requiredClaims))
+    .then(validateIssuer.bind(undefined, as.issuer))
+    .then(validateAudience.bind(undefined, client.client_id))
+
+  const clockSkew = getClockSkew(client)
+  const now = epochTime() + clockSkew
+  if (claims.iat! < now - 3600) {
+    throw new OPE('unexpected JWT "iat" (issued at) claim value, it is too far in the past')
+  }
+
+  if (
+    typeof claims.c_hash !== 'string' ||
+    (await idTokenHashMatches(code, claims.c_hash, header.alg, key!)) !== true
+  ) {
+    throw new OPE('invalid ID Token "c_hash" (code hash) claim value')
+  }
+
+  if (claims.s_hash !== undefined && typeof expectedState !== 'string') {
+    throw new OPE('could not verify ID Token "s_hash" (state hash) claim value')
+  }
+
+  if (
+    typeof expectedState === 'string' &&
+    (typeof claims.s_hash !== 'string' ||
+      (await idTokenHashMatches(expectedState, claims.s_hash, header.alg, key!)) !== true)
+  ) {
+    throw new OPE('invalid ID Token "s_hash" (state hash) claim value')
+  }
+
+  if (client.require_auth_time !== undefined && typeof claims.auth_time !== 'number') {
+    throw new OPE('unexpected ID Token "auth_time" (authentication time) claim value')
+  }
+
+  maxAge ??= client.default_max_age ?? skipAuthTimeCheck
+  if (
+    (client.require_auth_time || maxAge !== skipAuthTimeCheck) &&
+    claims.auth_time === undefined
+  ) {
+    throw new OPE('ID Token "auth_time" (authentication time) claim missing')
+  }
+
+  if (maxAge !== skipAuthTimeCheck) {
+    if (typeof maxAge !== 'number' || maxAge < 0) {
+      throw new TypeError('"options.max_age" must be a non-negative number')
+    }
+
+    const now = epochTime() + getClockSkew(client)
+    const tolerance = getClockTolerance(client)
+    if ((<IDToken>claims).auth_time! + maxAge < now - tolerance) {
+      throw new OPE('too much time has elapsed since the last End-User authentication')
+    }
+  }
+
+  if (!validateString(expectedNonce)) {
+    throw new TypeError('"expectedNonce" must be a non-empty string')
+  }
+  if (claims.nonce !== expectedNonce) {
+    throw new OPE('unexpected ID Token "nonce" claim value')
+  }
+
+  if (Array.isArray(claims.aud) && claims.aud.length !== 1 && claims.azp !== client.client_id) {
+    throw new OPE('unexpected ID Token "azp" (authorized party) claim value')
+  }
+
+  return result
 }
 
 /**
