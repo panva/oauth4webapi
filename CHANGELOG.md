@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.6.0](https://github.com/panva/oauth4webapi/compare/v2.5.0...v2.6.0) (2024-01-11)
+
+
+### Features
+
+* add experimental support for FAPI 1.0 ([6b6b496](https://github.com/panva/oauth4webapi/commit/6b6b4967bfd04d7c4193469f27e0fc5ffeaaf5b9))
+
+
+### Refactor
+
+* reorganize experimental features ([c8479b4](https://github.com/panva/oauth4webapi/commit/c8479b46f5ea154cfc25b8d4fc2bb3fb80860f32))
+
+
+### Documentation
+
+* update examples ([779cf60](https://github.com/panva/oauth4webapi/commit/779cf6063b8e4c58223c3904638b80e3930fac1a))
+
 ## [2.5.0](https://github.com/panva/oauth4webapi/compare/v2.4.5...v2.5.0) (2024-01-10)
 
 
