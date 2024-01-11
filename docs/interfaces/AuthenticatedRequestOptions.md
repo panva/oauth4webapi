@@ -4,23 +4,26 @@
 
 ## Table of contents
 
+### Experimental
+
+- [[experimental\_useMtlsAlias]](AuthenticatedRequestOptions.md#experimental_usemtlsalias)
+
 ### Properties
 
-- [[experimentalUseMtlsAlias]](AuthenticatedRequestOptions.md#experimentalusemtlsalias)
 - [clientPrivateKey](AuthenticatedRequestOptions.md#clientprivatekey)
 
-## Properties
+## Experimental
 
-### [experimentalUseMtlsAlias]
+### [experimental\_useMtlsAlias]
 
-• `Optional` **[experimentalUseMtlsAlias]**: `boolean`
+• `Optional` **[experimental\_useMtlsAlias]**: `boolean`
 
 This is an experimental feature, it is not subject to semantic versioning rules. Non-backward
 compatible changes or removal may occur in any future release.
 
-See [experimentalUseMtlsAlias](../variables/experimentalUseMtlsAlias.md) for its documentation.
+See [experimental_useMtlsAlias](../variables/experimental_useMtlsAlias.md) for its documentation.
 
-___
+## Properties
 
 ### clientPrivateKey
 

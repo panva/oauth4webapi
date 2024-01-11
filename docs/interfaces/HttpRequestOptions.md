@@ -4,24 +4,27 @@
 
 ## Table of contents
 
+### Experimental
+
+- [[experimental\_customFetch]](HttpRequestOptions.md#experimental_customfetch)
+
 ### Properties
 
-- [[experimentalCustomFetch]](HttpRequestOptions.md#experimentalcustomfetch)
 - [headers](HttpRequestOptions.md#headers)
 - [signal](HttpRequestOptions.md#signal)
 
-## Properties
+## Experimental
 
-### [experimentalCustomFetch]
+### [experimental\_customFetch]
 
-• `Optional` **[experimentalCustomFetch]**: (`input`: `RequestInfo` \| [`URL`]( https://developer.mozilla.org/docs/Web/API/URL ), `init?`: `RequestInit`) => [`Promise`]( https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise )\<[`Response`]( https://developer.mozilla.org/docs/Web/API/Response )\>
+• `Optional` **[experimental\_customFetch]**: (`input`: `RequestInfo` \| [`URL`]( https://developer.mozilla.org/docs/Web/API/URL ), `init?`: `RequestInit`) => [`Promise`]( https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise )\<[`Response`]( https://developer.mozilla.org/docs/Web/API/Response )\>
 
 This is an experimental feature, it is not subject to semantic versioning rules. Non-backward
 compatible changes or removal may occur in any future release.
 
-See [experimentalCustomFetch](../variables/experimentalCustomFetch.md) for its documentation.
+See [experimental_customFetch](../variables/experimental_customFetch.md) for its documentation.
 
-___
+## Properties
 
 ### headers
 

@@ -62,6 +62,12 @@
 - [OperationProcessingError](classes/OperationProcessingError.md)
 - [UnsupportedOperationError](classes/UnsupportedOperationError.md)
 
+### Experimental
+
+- [experimental\_customFetch](variables/experimental_customFetch.md)
+- [experimental\_useMtlsAlias](variables/experimental_useMtlsAlias.md)
+- [experimental\_validateDetachedSignatureResponse](functions/experimental_validateDetachedSignatureResponse.md)
+
 ### FAPI 1.0 Advanced
 
 - [experimental\_validateDetachedSignatureResponse](functions/experimental_validateDetachedSignatureResponse.md)
@@ -179,8 +185,6 @@
 - [clockTolerance](variables/clockTolerance.md)
 - [expectNoNonce](variables/expectNoNonce.md)
 - [expectNoState](variables/expectNoState.md)
-- [experimentalCustomFetch](variables/experimentalCustomFetch.md)
-- [experimentalUseMtlsAlias](variables/experimentalUseMtlsAlias.md)
 - [skipAuthTimeCheck](variables/skipAuthTimeCheck.md)
 - [skipStateCheck](variables/skipStateCheck.md)
 - [skipSubjectCheck](variables/skipSubjectCheck.md)

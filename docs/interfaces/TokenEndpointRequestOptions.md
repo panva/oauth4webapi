@@ -4,15 +4,40 @@
 
 ## Table of contents
 
+### Experimental
+
+- [[experimental\_customFetch]](TokenEndpointRequestOptions.md#experimental_customfetch)
+- [[experimental\_useMtlsAlias]](TokenEndpointRequestOptions.md#experimental_usemtlsalias)
+
 ### Properties
 
 - [DPoP](TokenEndpointRequestOptions.md#dpop)
-- [[experimentalCustomFetch]](TokenEndpointRequestOptions.md#experimentalcustomfetch)
-- [[experimentalUseMtlsAlias]](TokenEndpointRequestOptions.md#experimentalusemtlsalias)
 - [additionalParameters](TokenEndpointRequestOptions.md#additionalparameters)
 - [clientPrivateKey](TokenEndpointRequestOptions.md#clientprivatekey)
 - [headers](TokenEndpointRequestOptions.md#headers)
 - [signal](TokenEndpointRequestOptions.md#signal)
+
+## Experimental
+
+### [experimental\_customFetch]
+
+• `Optional` **[experimental\_customFetch]**: (`input`: `RequestInfo` \| [`URL`]( https://developer.mozilla.org/docs/Web/API/URL ), `init?`: `RequestInit`) => [`Promise`]( https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise )\<[`Response`]( https://developer.mozilla.org/docs/Web/API/Response )\>
+
+This is an experimental feature, it is not subject to semantic versioning rules. Non-backward
+compatible changes or removal may occur in any future release.
+
+See [experimental_customFetch](../variables/experimental_customFetch.md) for its documentation.
+
+___
+
+### [experimental\_useMtlsAlias]
+
+• `Optional` **[experimental\_useMtlsAlias]**: `boolean`
+
+This is an experimental feature, it is not subject to semantic versioning rules. Non-backward
+compatible changes or removal may occur in any future release.
+
+See [experimental_useMtlsAlias](../variables/experimental_useMtlsAlias.md) for its documentation.
 
 ## Properties
 
@@ -21,28 +46,6 @@
 • `Optional` **DPoP**: [`DPoPOptions`](DPoPOptions.md)
 
 DPoP-related options.
-
-___
-
-### [experimentalCustomFetch]
-
-• `Optional` **[experimentalCustomFetch]**: (`input`: `RequestInfo` \| [`URL`]( https://developer.mozilla.org/docs/Web/API/URL ), `init?`: `RequestInit`) => [`Promise`]( https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise )\<[`Response`]( https://developer.mozilla.org/docs/Web/API/Response )\>
-
-This is an experimental feature, it is not subject to semantic versioning rules. Non-backward
-compatible changes or removal may occur in any future release.
-
-See [experimentalCustomFetch](../variables/experimentalCustomFetch.md) for its documentation.
-
-___
-
-### [experimentalUseMtlsAlias]
-
-• `Optional` **[experimentalUseMtlsAlias]**: `boolean`
-
-This is an experimental feature, it is not subject to semantic versioning rules. Non-backward
-compatible changes or removal may occur in any future release.
-
-See [experimentalUseMtlsAlias](../variables/experimentalUseMtlsAlias.md) for its documentation.
 
 ___
 

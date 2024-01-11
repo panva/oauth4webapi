@@ -4,20 +4,20 @@
 
 ## Table of contents
 
-### Properties
+### Experimental
 
-- [[experimentalUseMtlsAlias]](ExperimentalUseMTLSAliasOptions.md#experimentalusemtlsalias)
+- [[experimental\_useMtlsAlias]](ExperimentalUseMTLSAliasOptions.md#experimental_usemtlsalias)
 
-## Properties
+## Experimental
 
-### [experimentalUseMtlsAlias]
+### [experimental\_useMtlsAlias]
 
-• `Optional` **[experimentalUseMtlsAlias]**: `boolean`
+• `Optional` **[experimental\_useMtlsAlias]**: `boolean`
 
 This is an experimental feature, it is not subject to semantic versioning rules. Non-backward
 compatible changes or removal may occur in any future release.
 
-See [experimentalUseMtlsAlias](../variables/experimentalUseMtlsAlias.md) for its documentation.
+See [experimental_useMtlsAlias](../variables/experimental_useMtlsAlias.md) for its documentation.
 
 ## Hierarchy
 

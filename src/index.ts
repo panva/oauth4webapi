@@ -188,6 +188,7 @@ interface JWK {
 
 export const clockSkew = Symbol()
 export const clockTolerance = Symbol()
+
 /**
  * This is an experimental feature, it is not subject to semantic versioning rules. Non-backward
  * compatible changes or removal may occur in any future release.
@@ -228,7 +229,7 @@ export const clockTolerance = Symbol()
  *
  * // example use
  * await oauth.discoveryRequest(new URL('https://as.example.com'), {
- *   [oauth.experimentalCustomFetch]: (...args) =>
+ *   [oauth.experimental_customFetch]: (...args) =>
  *     ky(args[0], {
  *       ...args[1],
  *       hooks: {
@@ -269,17 +270,21 @@ export const clockTolerance = Symbol()
  *
  * // example use
  * await oauth.discoveryRequest(new URL('https://as.example.com'), {
- *   [oauth.experimentalCustomFetch]: undici.fetch,
+ *   [oauth.experimental_customFetch]: undici.fetch,
  * })
  * ```
+ *
+ * @group Experimental
  */
-export const experimentalCustomFetch = Symbol()
+export const experimental_customFetch = Symbol()
+/** @ignore */
+export const experimentalCustomFetch = experimental_customFetch
 
 /**
  * This is an experimental feature, it is not subject to semantic versioning rules. Non-backward
  * compatible changes or removal may occur in any future release.
  *
- * When combined with {@link experimentalCustomFetch} (to use a Fetch API implementation that
+ * When combined with {@link experimental_customFetch} (to use a Fetch API implementation that
  * supports client certificates) this can be used to target FAPI 2.0 profiles that utilize
  * Mutual-TLS for either client authentication or sender constraining. FAPI 1.0 Advanced profiles
  * that use PAR and JARM can also be targetted.
@@ -298,8 +303,8 @@ export const experimentalCustomFetch = Symbol()
  * import * as oauth from 'oauth4webapi'
  *
  * const response = await oauth.pushedAuthorizationRequest(as, client, params, {
- *   [oauth.experimentalUseMtlsAlias]: true,
- *   [oauth.experimentalCustomFetch]: (...args) => {
+ *   [oauth.experimental_useMtlsAlias]: true,
+ *   [oauth.experimental_customFetch]: (...args) => {
  *     return undici.fetch(args[0], {
  *       ...args[1],
  *       dispatcher: new undici.Agent({
@@ -328,8 +333,8 @@ export const experimentalCustomFetch = Symbol()
  * })
  *
  * const response = await oauth.pushedAuthorizationRequest(as, client, params, {
- *   [oauth.experimentalUseMtlsAlias]: true,
- *   [oauth.experimentalCustomFetch]: (...args) => {
+ *   [oauth.experimental_useMtlsAlias]: true,
+ *   [oauth.experimental_customFetch]: (...args) => {
  *     return fetch(args[0], {
  *       ...args[1],
  *       client: agent,
@@ -338,9 +343,13 @@ export const experimentalCustomFetch = Symbol()
  * })
  * ```
  *
+ * @group Experimental
+ *
  * @see [RFC 8705 - OAuth 2.0 Mutual-TLS Client Authentication and Certificate-Bound Access Tokens](https://www.rfc-editor.org/rfc/rfc8705.html)
  */
-export const experimentalUseMtlsAlias = Symbol()
+export const experimental_useMtlsAlias = Symbol()
+/** @ignore */
+export const experimentalUseMtlsAlias = experimental_useMtlsAlias
 
 /**
  * Authorization Server Metadata
@@ -904,9 +913,11 @@ export interface HttpRequestOptions {
    * This is an experimental feature, it is not subject to semantic versioning rules. Non-backward
    * compatible changes or removal may occur in any future release.
    *
-   * See {@link experimentalCustomFetch} for its documentation.
+   * See {@link experimental_customFetch} for its documentation.
+   *
+   * @group Experimental
    */
-  [experimentalCustomFetch]?: typeof fetch
+  [experimental_customFetch]?: typeof fetch
 }
 
 export interface DiscoveryRequestOptions extends HttpRequestOptions {
@@ -1016,7 +1027,7 @@ export async function discoveryRequest(
   const headers = prepareHeaders(options?.headers)
   headers.set('accept', 'application/json')
 
-  return (options?.[experimentalCustomFetch] || fetch)(url.href, {
+  return (options?.[experimental_customFetch] || fetch)(url.href, {
     headers: Object.fromEntries(headers.entries()),
     method: 'GET',
     redirect: 'manual',
@@ -1193,9 +1204,11 @@ export interface ExperimentalUseMTLSAliasOptions {
    * This is an experimental feature, it is not subject to semantic versioning rules. Non-backward
    * compatible changes or removal may occur in any future release.
    *
-   * See {@link experimentalUseMtlsAlias} for its documentation.
+   * See {@link experimental_useMtlsAlias} for its documentation.
+   *
+   * @group Experimental
    */
-  [experimentalUseMtlsAlias]?: boolean
+  [experimental_useMtlsAlias]?: boolean
 }
 
 export interface AuthenticatedRequestOptions extends ExperimentalUseMTLSAliasOptions {
@@ -1612,7 +1625,7 @@ function validateEndpoint(
   options?: ExperimentalUseMTLSAliasOptions,
 ) {
   if (typeof value !== 'string') {
-    if (options?.[experimentalUseMtlsAlias]) {
+    if (options?.[experimental_useMtlsAlias]) {
       throw new TypeError(`"as.mtls_endpoint_aliases.${endpoint}" must be a string`)
     } else {
       throw new TypeError(`"as.${endpoint}" must be a string`)
@@ -1628,7 +1641,7 @@ function resolveEndpoint(
   options?: ExperimentalUseMTLSAliasOptions,
 ) {
   if (
-    options?.[experimentalUseMtlsAlias] &&
+    options?.[experimental_useMtlsAlias] &&
     as.mtls_endpoint_aliases &&
     endpoint in as.mtls_endpoint_aliases
   ) {
@@ -1962,7 +1975,7 @@ export async function protectedResourceRequest(
     headers.set('authorization', `DPoP ${accessToken}`)
   }
 
-  return (options?.[experimentalCustomFetch] || fetch)(url.href, {
+  return (options?.[experimental_customFetch] || fetch)(url.href, {
     body,
     headers: Object.fromEntries(headers.entries()),
     method,
@@ -2283,7 +2296,7 @@ async function authenticatedRequest(
   await clientAuthentication(as, client, body, headers, options?.clientPrivateKey)
   headers.set('content-type', 'application/x-www-form-urlencoded;charset=UTF-8')
 
-  return (options?.[experimentalCustomFetch] || fetch)(url.href, {
+  return (options?.[experimental_customFetch] || fetch)(url.href, {
     body,
     headers: Object.fromEntries(headers.entries()),
     method,
@@ -3189,7 +3202,7 @@ async function jwksRequest(
   headers.set('accept', 'application/json')
   headers.append('accept', 'application/jwk-set+json')
 
-  return (options?.[experimentalCustomFetch] || fetch)(url.href, {
+  return (options?.[experimental_customFetch] || fetch)(url.href, {
     headers: Object.fromEntries(headers.entries()),
     method: 'GET',
     redirect: 'manual',
@@ -3541,6 +3554,7 @@ async function idTokenHashMatches(data: string, actual: string, alg: JWSAlgorith
  * @returns Validated Authorization Response parameters or Authorization Error Response.
  *
  * @group FAPI 1.0 Advanced
+ * @group Experimental
  *
  * @see [Financial-grade API Security Profile 1.0 - Part 2: Advanced](https://openid.net/specs/openid-financial-api-part-2-1_0.html#id-token-as-detached-signature)
  */

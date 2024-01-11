@@ -162,9 +162,9 @@ export const green = test.macro({
     const httpOptions: oauth.ExperimentalUseMTLSAliasOptions = {}
 
     if (usesClientCert(plan.name, variant)) {
-      httpOptions[oauth.experimentalUseMtlsAlias] = true
+      httpOptions[oauth.experimental_useMtlsAlias] = true
       // @ts-expect-error
-      httpOptions[oauth.experimentalCustomFetch] = (...args) => {
+      httpOptions[oauth.experimental_customFetch] = (...args) => {
         return undici.fetch(args[0], {
           ...args[1],
           dispatcher: new undici.Agent({

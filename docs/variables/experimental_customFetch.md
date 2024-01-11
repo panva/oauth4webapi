@@ -1,8 +1,8 @@
-# Variable: experimentalCustomFetch
+# Variable: experimental\_customFetch
 
 [💗 Help the project](https://github.com/sponsors/panva)
 
-• `Const` **experimentalCustomFetch**: typeof [`experimentalCustomFetch`](experimentalCustomFetch.md)
+• `Const` **experimental\_customFetch**: typeof [`experimental_customFetch`](experimental_customFetch.md)
 
 This is an experimental feature, it is not subject to semantic versioning rules. Non-backward
 compatible changes or removal may occur in any future release.
@@ -43,7 +43,7 @@ import * as oauth from 'oauth4webapi'
 
 // example use
 await oauth.discoveryRequest(new URL('https://as.example.com'), {
-  [oauth.experimentalCustomFetch]: (...args) =>
+  [oauth.experimental_customFetch]: (...args) =>
     ky(args[0], {
       ...args[1],
       hooks: {
@@ -84,6 +84,6 @@ undici.setGlobalDispatcher(mockAgent)
 
 // example use
 await oauth.discoveryRequest(new URL('https://as.example.com'), {
-  [oauth.experimentalCustomFetch]: undici.fetch,
+  [oauth.experimental_customFetch]: undici.fetch,
 })
 ```
