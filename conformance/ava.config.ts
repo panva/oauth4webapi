@@ -215,6 +215,8 @@ export default async () => {
   }
   if (certificationProfileName) {
     logBoth(`- Certification Profile Name: **${certificationProfileName}**`)
+  } else {
+    logBoth(`- Certification Profile Name: **N/A**`)
   }
 
   const files: Set<string> = new Set()
