@@ -12,7 +12,10 @@ export const algs = <lib.JWSAlgorithm[]>[
   'ES384',
 ]
 export const fails = <lib.JWSAlgorithm[]>[]
-;(env.isDeno ? fails : algs).push('ES512')
+// TODO: remove when P-521 integration in Deno is finished
+if (!env.isDeno) {
+  algs.push('ES512')
+}
 ;(env.isBrowser && !(env.isWebKit && env.isWebKitAbove17) ? fails : algs).push('EdDSA')
 
 export const keys = algs.reduce(
