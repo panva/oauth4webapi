@@ -40,7 +40,6 @@ jobs:
 
   node:
     runs-on: ubuntu-latest
-    continue-on-error: ${{ !startsWith(matrix.node-version, 'lts') }}
     strategy:
       fail-fast: false
       matrix:
@@ -162,7 +161,6 @@ jobs:
 
   bun:
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
       - name: Checkout
         uses: actions/checkout@v4
