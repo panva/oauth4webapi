@@ -11,7 +11,7 @@ import * as undici from 'undici'
 
 export const test = anyTest as TestFn<{ instance: Test }>
 
-import { getScope, usesClientCert } from './ava.config.js'
+import { getScope } from './ava.config.js'
 import * as oauth from '../src/index.js'
 import {
   createTestFromPlan,
@@ -165,24 +165,6 @@ export const green = (options?: MacroOptions) =>
         throw new Error()
       }
 
-      const httpOptions: oauth.ExperimentalUseMTLSAliasOptions = {}
-
-      if (usesClientCert(plan.name, variant)) {
-        httpOptions[oauth.experimental_useMtlsAlias] = true
-        // @ts-expect-error
-        httpOptions[oauth.experimental_customFetch] = (...args) => {
-          return undici.fetch(args[0], {
-            ...args[1],
-            dispatcher: new undici.Agent({
-              connect: {
-                key: mtls.key,
-                cert: mtls.cert,
-              },
-            }),
-          })
-        }
-      }
-
       const issuer = new URL(issuerIdentifier)
 
       const as = await oauth
@@ -228,6 +210,52 @@ export const green = (options?: MacroOptions) =>
             kid: jwk.kid,
             key: await importPrivateKey(JWS_ALGORITHM, jwk),
           }
+      }
+
+      const mtlsFetch = (...args: Parameters<typeof fetch>) => {
+        // @ts-expect-error
+        return undici.fetch(args[0], {
+          ...args[1],
+          dispatcher: new undici.Agent({
+            connect: {
+              key: mtls.key,
+              cert: mtls.cert,
+            },
+          }),
+        })
+      }
+
+      function clientAuthOptions(endpoint: 'token'): oauth.TokenEndpointRequestOptions
+      function clientAuthOptions(endpoint: 'par'): oauth.PushedAuthorizationRequestOptions
+      function clientAuthOptions(endpoint: 'userinfo'): oauth.UserInfoRequestOptions
+      function clientAuthOptions(endpoint: 'resource'): oauth.ProtectedResourceRequestOptions
+      function clientAuthOptions(endpoint: 'token' | 'par' | 'userinfo' | 'resource') {
+        const mtlsAuth = variant.client_auth_type === 'mtls'
+        const mtlsConstrain = plan.name.startsWith('fapi1') || variant.sender_constrain === 'mtls'
+
+        switch (endpoint) {
+          case 'token':
+            return <oauth.TokenEndpointRequestOptions>{
+              [oauth.experimental_useMtlsAlias]: mtlsAuth || mtlsConstrain ? true : false,
+              [oauth.experimental_customFetch]: mtlsAuth || mtlsConstrain ? mtlsFetch : undefined,
+            }
+          case 'par':
+            return <oauth.PushedAuthorizationRequestOptions>{
+              [oauth.experimental_useMtlsAlias]: mtlsAuth ? true : false,
+              [oauth.experimental_customFetch]: mtlsAuth ? mtlsFetch : undefined,
+            }
+          case 'userinfo':
+            return <oauth.UserInfoRequestOptions>{
+              [oauth.experimental_useMtlsAlias]: mtlsConstrain ? true : false,
+              [oauth.experimental_customFetch]: mtlsConstrain ? mtlsFetch : undefined,
+            }
+          case 'resource':
+            return <oauth.ProtectedResourceRequestOptions>{
+              [oauth.experimental_customFetch]: mtlsConstrain ? mtlsFetch : undefined,
+            }
+          default:
+            throw new Error()
+        }
       }
 
       const response_type = responseType(plan.name, variant)
@@ -297,7 +325,7 @@ export const green = (options?: MacroOptions) =>
         t.log('PAR request with', Object.fromEntries(authorizationUrl.searchParams.entries()))
         const request = () =>
           oauth.pushedAuthorizationRequest(as, client, authorizationUrl.searchParams, {
-            ...httpOptions,
+            ...clientAuthOptions('par'),
             DPoP,
             clientPrivateKey,
           })
@@ -382,7 +410,7 @@ export const green = (options?: MacroOptions) =>
             configuration.client.redirect_uri,
             code_verifier,
             {
-              ...httpOptions,
+              ...clientAuthOptions('token'),
               clientPrivateKey,
               DPoP,
             },
@@ -462,7 +490,7 @@ export const green = (options?: MacroOptions) =>
         const request = () => {
           t.log('fetching', as.userinfo_endpoint)
           return oauth.userInfoRequest(as, client, access_token, {
-            ...httpOptions,
+            ...clientAuthOptions('userinfo'),
             DPoP,
           })
         }
@@ -502,7 +530,7 @@ export const green = (options?: MacroOptions) =>
             new Headers(),
             null,
             {
-              ...httpOptions,
+              ...clientAuthOptions('resource'),
               DPoP,
             },
           )

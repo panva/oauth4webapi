@@ -84,7 +84,7 @@ const DEFAULTS: Record<typeof PLAN_NAME, Record<string, string>> = {
   },
 }
 
-export function usesClientCert(planName: string, variant: Record<string, string>) {
+function needsClientCertificate(planName: string, variant: Record<string, string>) {
   return (
     variant.client_auth_type === 'mtls' ||
     variant.sender_constrain === 'mtls' ||
@@ -159,7 +159,7 @@ export default async () => {
 
   let mtls: { key: string; cert: string } | undefined
 
-  if (usesClientCert(PLAN_NAME, variant)) {
+  if (needsClientCertificate(PLAN_NAME, variant)) {
     const { generate } = await import('selfsigned')
     const selfsigned = generate(undefined, { keySize: 2048 })
     clientConfig.certificate = selfsigned.cert
