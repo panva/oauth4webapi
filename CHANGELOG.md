@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.7.0](https://github.com/panva/oauth4webapi/compare/v2.6.0...v2.7.0) (2024-01-18)
+
+
+### Features
+
+* allow fragment response as URL in validateDetachedSignatureResponse ([bcbe2f5](https://github.com/panva/oauth4webapi/commit/bcbe2f5a58db2071b8dfa7f200b476ec99f18da4))
+
 ## [2.6.0](https://github.com/panva/oauth4webapi/compare/v2.5.0...v2.6.0) (2024-01-11)
 
 
