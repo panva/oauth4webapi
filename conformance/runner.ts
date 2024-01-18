@@ -369,7 +369,7 @@ export const green = (options?: MacroOptions) =>
         throw new Error()
       }
 
-      let currentUrl: URL | URLSearchParams = new URL(authorization_endpoint_response_redirect)
+      let currentUrl = new URL(authorization_endpoint_response_redirect)
 
       let sub: string
       let access_token: string
@@ -379,15 +379,17 @@ export const green = (options?: MacroOptions) =>
         if (usesJarm(variant)) {
           params = await oauth.validateJwtAuthResponse(as, client, currentUrl, state)
         } else if (response_type === 'code id_token') {
-          currentUrl = new URLSearchParams(currentUrl.hash.slice(1))
-          const idToken = currentUrl.get('id_token')!
+          const fragmentParams = new URLSearchParams(currentUrl.hash.slice(1))
+          const idToken = fragmentParams.get('id_token')!
+          let decrypted
           if (decodeProtectedHeader(idToken).enc) {
-            currentUrl.set('id_token', await decryptIdToken(idToken))
+            fragmentParams.set('id_token', await decryptIdToken(idToken))
+            decrypted = true
           }
           params = await oauth.experimental_validateDetachedSignatureResponse(
             as,
             client,
-            currentUrl,
+            decrypted ? fragmentParams : currentUrl,
             <string>nonce,
             state,
           )

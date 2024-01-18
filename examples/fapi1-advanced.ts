@@ -68,7 +68,7 @@ let request: string
 // one eternity later, the user lands back on the redirect_uri
 {
   // @ts-expect-error
-  const authorizationResponse: URLSearchParams = getAuthorizationResponse()
+  const authorizationResponse: URLSearchParams | URL = getAuthorizationResponseOrURLWithFragment()
   const params = await oauth.experimental_validateDetachedSignatureResponse(
     as,
     client,

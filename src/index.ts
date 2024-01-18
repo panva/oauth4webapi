@@ -3542,7 +3542,8 @@ async function idTokenHashMatches(data: string, actual: string, alg: JWSAlgorith
  *
  * @param as Authorization Server Metadata.
  * @param client Client Metadata.
- * @param parameters Authorization Response.
+ * @param parameters Authorization Response parameters as URLSearchParams or an instance of URL with
+ *   parameters in a fragment/hash.
  * @param expectedNonce Expected ID Token `nonce` claim value.
  * @param expectedState Expected `state` parameter value. Default is {@link expectNoState}.
  * @param maxAge ID Token {@link IDToken.auth_time `auth_time`} claim value will be checked to be
@@ -3561,7 +3562,7 @@ async function idTokenHashMatches(data: string, actual: string, alg: JWSAlgorith
 export async function experimental_validateDetachedSignatureResponse(
   as: AuthorizationServer,
   client: Client,
-  parameters: URLSearchParams,
+  parameters: URLSearchParams | URL,
   expectedNonce: string,
   expectedState?: string | typeof expectNoState,
   maxAge?: number | typeof skipAuthTimeCheck,
@@ -3569,6 +3570,15 @@ export async function experimental_validateDetachedSignatureResponse(
 ): Promise<URLSearchParams | OAuth2Error> {
   assertAs(as)
   assertClient(client)
+
+  if (parameters instanceof URL) {
+    if (!parameters.hash.length) {
+      throw new TypeError(
+        '"parameters" as an instance of URL must contain a hash (fragment) with the Authorization Response parameters',
+      )
+    }
+    parameters = new URLSearchParams(parameters.hash.slice(1))
+  }
 
   if (!(parameters instanceof URLSearchParams)) {
     throw new TypeError('"parameters" must be an instance of URLSearchParams')
