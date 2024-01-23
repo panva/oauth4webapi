@@ -4199,6 +4199,7 @@ async function validateDPoP(
     )
   }
 
+  const clockSkew = getClockSkew(options)
   const proof = await validateJwt(
     request.headers.get('dpop')!,
     checkSigningAlgorithm.bind(
@@ -4216,11 +4217,17 @@ async function validateDPoP(
       }
       return key
     },
-    getClockSkew(options),
+    clockSkew,
     getClockTolerance(options),
   )
     .then(checkJwtType.bind(undefined, 'dpop+jwt'))
     .then(validatePresence.bind(undefined, ['iat', 'jti', 'ath', 'htm', 'htu']))
+
+  const now = epochTime() + clockSkew
+  const diff = Math.abs(now - proof.claims.iat!)
+  if (diff > 300) {
+    throw new OPE('DPoP Proof iat is not recent enough')
+  }
 
   if (proof.claims.htm !== request.method) {
     throw new OPE('DPoP Proof htm mismatch')
