@@ -3,6 +3,7 @@
   "version": "2.7.0",
   "description": "OAuth 2 / OpenID Connect for JavaScript Runtimes",
   "keywords": [
+    "access token",
     "auth",
     "authentication",
     "authorization",
@@ -17,6 +18,7 @@
     "electron",
     "fapi",
     "javascript",
+    "jwt",
     "netlify",
     "next",
     "nextjs",

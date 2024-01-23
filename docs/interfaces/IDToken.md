@@ -2,6 +2,10 @@
 
 [💗 Help the project](https://github.com/sponsors/panva)
 
+## Indexable
+
+▪ [claim: `string`]: [`JsonValue`](../types/JsonValue.md) \| `undefined`
+
 ## Table of contents
 
 ### Properties
@@ -13,6 +17,7 @@
 - [sub](IDToken.md#sub)
 - [auth\_time](IDToken.md#auth_time)
 - [azp](IDToken.md#azp)
+- [cnf](IDToken.md#cnf)
 - [jti](IDToken.md#jti)
 - [nbf](IDToken.md#nbf)
 - [nonce](IDToken.md#nonce)
@@ -58,6 +63,12 @@ ___
 ### azp
 
 • `Optional` `Readonly` **azp**: `string`
+
+___
+
+### cnf
+
+• `Optional` `Readonly` **cnf**: [`ConfirmationClaims`](ConfirmationClaims.md)
 
 ___
 

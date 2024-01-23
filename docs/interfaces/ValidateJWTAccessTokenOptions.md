@@ -1,4 +1,4 @@
-# Interface: HttpRequestOptions
+# Interface: ValidateJWTAccessTokenOptions
 
 [💗 Help the project](https://github.com/sponsors/panva)
 
@@ -6,12 +6,15 @@
 
 ### Experimental
 
-- [[experimental\_customFetch]](HttpRequestOptions.md#experimental_customfetch)
+- [[experimental\_customFetch]](ValidateJWTAccessTokenOptions.md#experimental_customfetch)
 
 ### Properties
 
-- [headers](HttpRequestOptions.md#headers)
-- [signal](HttpRequestOptions.md#signal)
+- [[clockSkew]](ValidateJWTAccessTokenOptions.md#clockskew)
+- [[clockTolerance]](ValidateJWTAccessTokenOptions.md#clocktolerance)
+- [headers](ValidateJWTAccessTokenOptions.md#headers)
+- [requireDPoP](ValidateJWTAccessTokenOptions.md#requiredpop)
+- [signal](ValidateJWTAccessTokenOptions.md#signal)
 
 ## Experimental
 
@@ -26,11 +29,35 @@ See [experimental_customFetch](../variables/experimental_customFetch.md) for its
 
 ## Properties
 
+### [clockSkew]
+
+• `Optional` **[clockSkew]**: `number`
+
+Same functionality as in [Client](Client.md)
+
+___
+
+### [clockTolerance]
+
+• `Optional` **[clockTolerance]**: `number`
+
+Same functionality as in [Client](Client.md)
+
+___
+
 ### headers
 
 • `Optional` **headers**: [`Record`]( https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type )\<`string`, `string`\> \| [`string`, `string`][] \| [`Headers`]( https://developer.mozilla.org/docs/Web/API/Headers )
 
 Headers to additionally send with the HTTP Request(s) triggered by this function's invocation.
+
+___
+
+### requireDPoP
+
+• `Optional` **requireDPoP**: `boolean`
+
+Indicates whether DPoP use is required.
 
 ___
 
@@ -51,22 +78,6 @@ const signal = () => AbortSignal.timeout(5_000) // Note: AbortSignal.timeout may
 
 ## Hierarchy
 
-- **`HttpRequestOptions`**
+- [`HttpRequestOptions`](HttpRequestOptions.md)
 
-  ↳ [`DiscoveryRequestOptions`](DiscoveryRequestOptions.md)
-
-  ↳ [`PushedAuthorizationRequestOptions`](PushedAuthorizationRequestOptions.md)
-
-  ↳ [`UserInfoRequestOptions`](UserInfoRequestOptions.md)
-
-  ↳ [`TokenEndpointRequestOptions`](TokenEndpointRequestOptions.md)
-
-  ↳ [`ClientCredentialsGrantRequestOptions`](ClientCredentialsGrantRequestOptions.md)
-
-  ↳ [`RevocationRequestOptions`](RevocationRequestOptions.md)
-
-  ↳ [`IntrospectionRequestOptions`](IntrospectionRequestOptions.md)
-
-  ↳ [`DeviceAuthorizationRequestOptions`](DeviceAuthorizationRequestOptions.md)
-
-  ↳ [`ValidateJWTAccessTokenOptions`](ValidateJWTAccessTokenOptions.md)
+  ↳ **`ValidateJWTAccessTokenOptions`**

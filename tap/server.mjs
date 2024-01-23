@@ -36,7 +36,15 @@ const provider = new Provider('http://localhost:3000', {
     pushedAuthorizationRequests: { enabled: true },
     resourceIndicators: {
       enabled: true,
-      getResourceServerInfo: () => ({ scope: 'api:write' }),
+      getResourceServerInfo: (ctx, resource) => ({
+        scope: 'api:write',
+        ...(resource.includes('jwt')
+          ? {
+              accessTokenFormat: 'jwt',
+              jwt: { sign: { alg: 'ES256' } },
+            }
+          : { accessTokenFormat: 'opaque' }),
+      }),
     },
     requestObjects: {
       mode: 'strict',

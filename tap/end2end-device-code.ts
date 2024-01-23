@@ -3,6 +3,7 @@ import type QUnit from 'qunit'
 import { isDpopNonceError, setup } from './helper.js'
 import * as lib from '../src/index.js'
 import { keys } from './keys.js'
+import * as jose from 'jose'
 
 export default (QUnit: QUnit) => {
   const { module, test } = QUnit
@@ -37,8 +38,9 @@ export default (QUnit: QUnit) => {
         .discoveryRequest(issuerIdentifier)
         .then((response) => lib.processDiscoveryResponse(issuerIdentifier, response))
 
+      const resource = 'urn:example:resource:jwt'
       const params = new URLSearchParams()
-      params.set('resource', 'urn:example:resource')
+      params.set('resource', resource)
       params.set('scope', 'api:write')
 
       let response = await lib.deviceAuthorizationRequest(as, client, params)
@@ -87,6 +89,45 @@ export default (QUnit: QUnit) => {
         const { access_token, token_type } = result
         t.ok(access_token)
         t.equal(token_type, dpop ? 'dpop' : 'bearer')
+
+        await lib.protectedResourceRequest(
+          access_token,
+          'GET',
+          new URL('http://localhost:3001/resource'),
+          new Headers(),
+          undefined,
+          {
+            DPoP,
+            async [lib.experimental_customFetch](...params: Parameters<typeof fetch>) {
+              const url = new URL(<string>params[0])
+              const { headers, method } = params[1]!
+              const request = new Request(url, { headers, method })
+
+              const jwtAccessToken = await lib.experimental_validateJwtAccessToken(
+                as,
+                request,
+                resource,
+              )
+
+              t.propContains(jwtAccessToken, {
+                client_id: client.client_id,
+                iss: as.issuer,
+                aud: resource,
+              })
+
+              if (DPoP) {
+                t.equal(
+                  jwtAccessToken.cnf!.jkt,
+                  await jose.calculateJwkThumbprint(await jose.exportJWK(DPoP.publicKey)),
+                )
+              } else {
+                t.equal(jwtAccessToken.cnf, undefined)
+              }
+
+              return new Response()
+            },
+          },
+        )
       }
 
       t.ok(1)

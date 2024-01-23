@@ -1,0 +1,44 @@
+# Function: experimental\_validateJwtAccessToken
+
+[💗 Help the project](https://github.com/sponsors/panva)
+
+▸ **experimental_validateJwtAccessToken**(`as`, `request`, `expectedAudience`, `options?`): [`Promise`]( https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise )\<[`JWTAccessTokenClaims`](../interfaces/JWTAccessTokenClaims.md)\>
+
+This is an experimental feature, it is not subject to semantic versioning rules. Non-backward
+compatible changes or removal may occur in any future release.
+
+Validates use of JSON Web Token (JWT) OAuth 2.0 Access Tokens for a given Request as per
+RFC 9068 and optionally also RFC 9449.
+
+This does validate the presence and type of all required claims as well as the values of the
+[`iss`](../interfaces/JWTAccessTokenClaims.md#iss), [`exp`](../interfaces/JWTAccessTokenClaims.md#exp),
+[`aud`](../interfaces/JWTAccessTokenClaims.md#aud) claims.
+
+This does NOT validate the [`sub`](../interfaces/JWTAccessTokenClaims.md#sub),
+[`jti`](../interfaces/JWTAccessTokenClaims.md#jti), and [`client_id`](../interfaces/JWTAccessTokenClaims.md#client_id)
+claims beyond just checking that they're present and that their type is a string. If you need to
+validate these values further you would do so after this function's execution.
+
+This does NOT validate the DPoP Proof JWT nonce. If your server indicates RS-provided nonces to
+clients you would check these after this function's execution.
+
+This does NOT validate authorization claims such as `scope` either, you would do so after this
+function's execution.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server to accept JWT Access Tokens from. |
+| `request` | [`Request`]( https://developer.mozilla.org/docs/Web/API/Request ) |  |
+| `expectedAudience` | `string` | Audience identifier the resource server expects for itself. |
+| `options?` | [`ValidateJWTAccessTokenOptions`](../interfaces/ValidateJWTAccessTokenOptions.md) |  |
+
+#### Returns
+
+[`Promise`]( https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise )\<[`JWTAccessTokenClaims`](../interfaces/JWTAccessTokenClaims.md)\>
+
+**`See`**
+
+ - [RFC 9068 - JSON Web Token (JWT) Profile for OAuth 2.0 Access Tokens](https://www.rfc-editor.org/rfc/rfc9068.html)
+ - [RFC 9449 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)](https://www.rfc-editor.org/rfc/rfc9449.html)

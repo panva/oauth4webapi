@@ -1306,18 +1306,23 @@ function keyToJws(key: CryptoKey) {
   }
 }
 
-function getClockSkew(client: Pick<Client, typeof clockSkew>) {
-  if (Number.isFinite(client[clockSkew])) {
-    return client[clockSkew]!
+function getClockSkew(client?: Pick<Client, typeof clockSkew>) {
+  if (client && clockSkew in client) {
+    if (Number.isFinite(client[clockSkew])) {
+      return client[clockSkew]!
+    }
   }
 
   return 0
 }
 
-function getClockTolerance(client: Pick<Client, typeof clockTolerance>) {
-  const tolerance = client[clockTolerance]
-  if (Number.isFinite(tolerance) && Math.sign(tolerance!) !== -1) {
-    return tolerance!
+function getClockTolerance(client?: Pick<Client, typeof clockTolerance>) {
+  if (client && clockTolerance in client) {
+    const tolerance = client[clockTolerance]
+
+    if (Number.isFinite(tolerance) && Math.sign(tolerance!) !== -1) {
+      return tolerance!
+    }
   }
 
   return 30
@@ -2641,6 +2646,7 @@ interface JWTPayload {
   readonly nbf?: number
   readonly exp?: number
   readonly iat?: number
+  readonly cnf?: ConfirmationClaims
 
   readonly [claim: string]: JsonValue | undefined
 }
@@ -2654,6 +2660,8 @@ export interface IDToken extends JWTPayload {
   readonly nonce?: string
   readonly auth_time?: number
   readonly azp?: string
+
+  readonly [claim: string]: JsonValue | undefined
 }
 
 interface CompactJWSHeaderParameters {
@@ -2670,24 +2678,30 @@ interface ParsedJWT {
   signature: Uint8Array
 }
 
-const idTokenClaimNames = {
+const jwtClaimNames = {
   aud: 'audience',
+  c_hash: 'code hash',
+  client_id: 'client id',
   exp: 'expiration time',
   iat: 'issued at',
   iss: 'issuer',
-  sub: 'subject',
+  jti: 'jwt id',
   nonce: 'nonce',
   s_hash: 'state hash',
-  c_hash: 'code hash',
+  sub: 'subject',
+  ath: 'access token hash',
+  htm: 'http method',
+  htu: 'http uri',
+  cnf: 'confirmation',
 }
 
 function validatePresence(
-  required: (keyof typeof idTokenClaimNames)[],
+  required: (keyof typeof jwtClaimNames)[],
   result: Awaited<ReturnType<typeof validateJwt>>,
 ) {
   for (const claim of required) {
     if (result.claims[claim] === undefined) {
-      throw new OPE(`JWT "${claim}" (${idTokenClaimNames[claim]}) claim missing`)
+      throw new OPE(`JWT "${claim}" (${jwtClaimNames[claim]}) claim missing`)
     }
   }
   return result
@@ -3085,12 +3099,16 @@ export async function introspectionRequest(
   return authenticatedRequest(as, client, 'POST', url, body, headers, options)
 }
 
-export interface IntrospectionConfirmationClaims {
+export interface ConfirmationClaims {
   readonly 'x5t#S256'?: string
   readonly jkt?: string
 
   readonly [claim: string]: JsonValue | undefined
 }
+
+// TODO: remove in v3.x
+/** @ignore */
+export type IntrospectionConfirmationClaims = ConfirmationClaims
 
 export interface IntrospectionResponse {
   readonly active: boolean
@@ -3106,7 +3124,7 @@ export interface IntrospectionResponse {
   readonly sub?: string
   readonly nbf?: number
   readonly token_type?: string
-  readonly cnf?: IntrospectionConfirmationClaims
+  readonly cnf?: ConfirmationClaims
 
   readonly [claim: string]: JsonValue | undefined
 }
@@ -3625,7 +3643,7 @@ export async function experimental_validateDetachedSignatureResponse(
     throw new TypeError('"as.jwks_uri" must be a string')
   }
 
-  const requiredClaims: (keyof typeof idTokenClaimNames)[] = [
+  const requiredClaims: (keyof typeof jwtClaimNames)[] = [
     'aud',
     'exp',
     'iat',
@@ -4127,4 +4145,266 @@ export async function generateKeyPair(alg: JWSAlgorithm, options?: GenerateKeyPa
   return <Promise<CryptoKeyPair>>(
     crypto.subtle.generateKey(algorithm, options?.extractable ?? false, ['sign', 'verify'])
   )
+}
+
+export interface JWTAccessTokenClaims extends JWTPayload {
+  readonly iss: string
+  readonly exp: number
+  readonly aud: string | string[]
+  readonly sub: string
+  readonly iat: number
+  readonly jti: string
+  readonly client_id: string
+
+  readonly [claim: string]: JsonValue | undefined
+}
+
+export interface ValidateJWTAccessTokenOptions extends HttpRequestOptions {
+  /** Indicates whether DPoP use is required. */
+  requireDPoP?: boolean
+
+  /** Same functionality as in {@link Client} */
+  [clockSkew]?: number
+
+  /** Same functionality as in {@link Client} */
+  [clockTolerance]?: number
+}
+
+function normalizeHtu(htu: string) {
+  const url = new URL(htu)
+  url.search = ''
+  url.hash = ''
+  return url.href
+}
+
+async function validateDPoP(
+  as: AuthorizationServer,
+  request: Request,
+  accessTokenClaims: JWTPayload,
+  options?: ValidateJWTAccessTokenOptions,
+) {
+  if (!request.headers.has('dpop')) {
+    throw new OPE('operation indicated DPoP use but the request has no DPoP HTTP Header')
+  }
+
+  if (request.headers.get('authorization')?.toLowerCase().startsWith('dpop ') === false) {
+    throw new OPE(
+      `operation indicated DPoP use but the request's Authorization HTTP Header scheme is not DPoP`,
+    )
+  }
+
+  if (typeof accessTokenClaims.cnf?.jkt !== 'string') {
+    throw new OPE(
+      'operation indicated DPoP use but the JWT Access Token has no jkt confirmation claim',
+    )
+  }
+
+  const proof = await validateJwt(
+    request.headers.get('dpop')!,
+    checkSigningAlgorithm.bind(
+      undefined,
+      undefined,
+      as?.dpop_signing_alg_values_supported || SUPPORTED_JWS_ALGS,
+    ),
+    async ({ jwk, alg }) => {
+      if (!jwk) {
+        throw new OPE('DPoP Proof is missing the jwk header parameter')
+      }
+      const key = await importJwk(alg, jwk)
+      if (key.type !== 'public') {
+        throw new OPE('DPoP Proof jwk header parameter must contain a public key')
+      }
+      return key
+    },
+    getClockSkew(options),
+    getClockTolerance(options),
+  )
+    .then(checkJwtType.bind(undefined, 'dpop+jwt'))
+    .then(validatePresence.bind(undefined, ['iat', 'jti', 'ath', 'htm', 'htu']))
+
+  if (proof.claims.htm !== request.method) {
+    throw new OPE('DPoP Proof htm mismatch')
+  }
+
+  if (
+    typeof proof.claims.htu !== 'string' ||
+    normalizeHtu(proof.claims.htu) !== normalizeHtu(request.url)
+  ) {
+    throw new OPE('DPoP Proof htu mismatch')
+  }
+
+  {
+    const accessToken = request.headers.get('authorization')!.split(' ')[1]
+    const expected = b64u(await crypto.subtle.digest('SHA-256', encoder.encode(accessToken)))
+
+    if (proof.claims.ath !== expected) {
+      throw new OPE('DPoP Proof ath mismatch')
+    }
+  }
+
+  {
+    let components: JWK
+    switch (proof.header.jwk!.kty) {
+      case 'EC':
+        components = {
+          crv: proof.header.jwk!.crv,
+          kty: proof.header.jwk!.kty,
+          x: proof.header.jwk!.x,
+          y: proof.header.jwk!.y,
+        }
+        break
+      case 'OKP':
+        components = {
+          crv: proof.header.jwk!.crv,
+          kty: proof.header.jwk!.kty,
+          x: proof.header.jwk!.x,
+        }
+        break
+      case 'RSA':
+        components = {
+          e: proof.header.jwk!.e,
+          kty: proof.header.jwk!.kty,
+          n: proof.header.jwk!.n,
+        }
+        break
+      default:
+        throw new UnsupportedOperationError()
+    }
+    const expected = b64u(
+      await crypto.subtle.digest('SHA-256', encoder.encode(JSON.stringify(components))),
+    )
+
+    if (accessTokenClaims.cnf.jkt !== expected) {
+      throw new OPE('JWT Access Token confirmation mismatch')
+    }
+  }
+}
+
+/**
+ * This is an experimental feature, it is not subject to semantic versioning rules. Non-backward
+ * compatible changes or removal may occur in any future release.
+ *
+ * Validates use of JSON Web Token (JWT) OAuth 2.0 Access Tokens for a given {@link Request} as per
+ * RFC 9068 and optionally also RFC 9449.
+ *
+ * This does validate the presence and type of all required claims as well as the values of the
+ * {@link JWTAccessTokenClaims.iss `iss`}, {@link JWTAccessTokenClaims.exp `exp`},
+ * {@link JWTAccessTokenClaims.aud `aud`} claims.
+ *
+ * This does NOT validate the {@link JWTAccessTokenClaims.sub `sub`},
+ * {@link JWTAccessTokenClaims.jti `jti`}, and {@link JWTAccessTokenClaims.client_id `client_id`}
+ * claims beyond just checking that they're present and that their type is a string. If you need to
+ * validate these values further you would do so after this function's execution.
+ *
+ * This does NOT validate the DPoP Proof JWT nonce. If your server indicates RS-provided nonces to
+ * clients you would check these after this function's execution.
+ *
+ * This does NOT validate authorization claims such as `scope` either, you would do so after this
+ * function's execution.
+ *
+ * @param as Authorization Server to accept JWT Access Tokens from.
+ * @param request
+ * @param expectedAudience Audience identifier the resource server expects for itself.
+ * @param options
+ *
+ * @group JWT Access Tokens
+ * @group Experimental
+ *
+ * @see [RFC 9068 - JSON Web Token (JWT) Profile for OAuth 2.0 Access Tokens](https://www.rfc-editor.org/rfc/rfc9068.html)
+ * @see [RFC 9449 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)](https://www.rfc-editor.org/rfc/rfc9449.html)
+ */
+export async function experimental_validateJwtAccessToken(
+  as: AuthorizationServer,
+  request: Request,
+  expectedAudience: string,
+  options?: ValidateJWTAccessTokenOptions,
+) {
+  assertAs(as)
+
+  if (!looseInstanceOf(request, Request)) {
+    throw new TypeError('"request" must be an instance of Request')
+  }
+
+  if (!validateString(expectedAudience)) {
+    throw new OPE('"expectedAudience" must be a non-empty string')
+  }
+
+  const authorization = request.headers.get('authorization')
+  if (!authorization) {
+    throw new OPE('"request" is missing an Authorization HTTP Header')
+  }
+  let { 0: scheme, 1: accessToken, length } = authorization.split(' ')
+  scheme = scheme.toLowerCase()
+  switch (scheme) {
+    case 'dpop':
+    case 'bearer':
+      break
+    default:
+      throw new UnsupportedOperationError('unsupported Authorization HTTP Header scheme')
+  }
+
+  if (length !== 2) {
+    throw new OPE('invalid Authorization HTTP Header format')
+  }
+
+  const requiredClaims: (keyof typeof jwtClaimNames)[] = [
+    'iss',
+    'exp',
+    'aud',
+    'sub',
+    'iat',
+    'jti',
+    'client_id',
+  ]
+
+  if (options?.requireDPoP || scheme === 'dpop' || request.headers.has('dpop')) {
+    requiredClaims.push('cnf')
+  }
+
+  const { claims } = await validateJwt(
+    accessToken,
+    checkSigningAlgorithm.bind(undefined, undefined, SUPPORTED_JWS_ALGS),
+    getPublicSigKeyFromIssuerJwksUri.bind(undefined, as, options),
+    getClockSkew(options),
+    getClockTolerance(options),
+  )
+    .then(checkJwtType.bind(undefined, 'at+jwt'))
+    .then(validatePresence.bind(undefined, requiredClaims))
+    .then(validateIssuer.bind(undefined, as.issuer))
+    .then(validateAudience.bind(undefined, expectedAudience))
+
+  for (const claim of ['client_id', 'jti', 'sub']) {
+    if (typeof claims[claim] !== 'string') {
+      throw new OPE(`unexpected JWT "${claim}" claim type`)
+    }
+  }
+
+  if ('cnf' in claims) {
+    if (!isJsonObject(claims.cnf)) {
+      throw new OPE('unexpected JWT "cnf" (confirmation) claim value')
+    }
+
+    const { 0: cnf, length } = Object.keys(claims.cnf)
+
+    if (length) {
+      if (length !== 1) {
+        throw new UnsupportedOperationError('multiple confirmation claims are not supported')
+      }
+
+      if (cnf !== 'jkt') {
+        throw new UnsupportedOperationError('unsupported JWT Confirmation method')
+      }
+    }
+  }
+
+  if (
+    options?.requireDPoP ||
+    scheme === 'dpop' ||
+    claims.cnf?.jkt !== undefined ||
+    request.headers.has('dpop')
+  ) {
+    await validateDPoP(as, request, claims, options)
+  }
+
+  return <JWTAccessTokenClaims>claims
 }

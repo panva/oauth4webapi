@@ -15,6 +15,7 @@ The following features are currently in scope and implemented in this software:
 - UserInfo and Protected Resource Requests
 - Authorization Server Issuer Identification
 - JWT Secured Introspection, Response Mode (JARM), Authorization Request (JAR), and UserInfo
+- Validating incoming JWT Access Tokens
 
 ## [Certification](https://openid.net/certification/faq/)
 

@@ -86,7 +86,8 @@ export default (QUnit: QUnit) => {
         .then((response) => lib.processDiscoveryResponse(issuerIdentifier, response))
 
       const params = new URLSearchParams()
-      params.set('resource', 'urn:example:resource')
+      const resource = 'urn:example:resource:opaque'
+      params.set('resource', resource)
       params.set('scope', 'api:write')
 
       {
@@ -146,7 +147,7 @@ export default (QUnit: QUnit) => {
           t.propContains(result, {
             active: true,
             scope: 'api:write',
-            aud: 'urn:example:resource',
+            aud: resource,
             token_type: dpop ? 'DPoP' : 'Bearer',
           })
         }

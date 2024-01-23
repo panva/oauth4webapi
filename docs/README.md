@@ -67,10 +67,15 @@
 - [experimental\_customFetch](variables/experimental_customFetch.md)
 - [experimental\_useMtlsAlias](variables/experimental_useMtlsAlias.md)
 - [experimental\_validateDetachedSignatureResponse](functions/experimental_validateDetachedSignatureResponse.md)
+- [experimental\_validateJwtAccessToken](functions/experimental_validateJwtAccessToken.md)
 
 ### FAPI 1.0 Advanced
 
 - [experimental\_validateDetachedSignatureResponse](functions/experimental_validateDetachedSignatureResponse.md)
+
+### JWT Access Tokens
+
+- [experimental\_validateJwtAccessToken](functions/experimental_validateJwtAccessToken.md)
 
 ### JWT Secured Authorization Response Mode for OAuth 2.0 (JARM)
 
@@ -141,6 +146,7 @@
 - [Client](interfaces/Client.md)
 - [ClientCredentialsGrantRequestOptions](interfaces/ClientCredentialsGrantRequestOptions.md)
 - [ClientCredentialsGrantResponse](interfaces/ClientCredentialsGrantResponse.md)
+- [ConfirmationClaims](interfaces/ConfirmationClaims.md)
 - [DPoPOptions](interfaces/DPoPOptions.md)
 - [DPoPRequestOptions](interfaces/DPoPRequestOptions.md)
 - [DeviceAuthorizationRequestOptions](interfaces/DeviceAuthorizationRequestOptions.md)
@@ -150,9 +156,9 @@
 - [GenerateKeyPairOptions](interfaces/GenerateKeyPairOptions.md)
 - [HttpRequestOptions](interfaces/HttpRequestOptions.md)
 - [IDToken](interfaces/IDToken.md)
-- [IntrospectionConfirmationClaims](interfaces/IntrospectionConfirmationClaims.md)
 - [IntrospectionRequestOptions](interfaces/IntrospectionRequestOptions.md)
 - [IntrospectionResponse](interfaces/IntrospectionResponse.md)
+- [JWTAccessTokenClaims](interfaces/JWTAccessTokenClaims.md)
 - [MTLSEndpointAliases](interfaces/MTLSEndpointAliases.md)
 - [OAuth2Error](interfaces/OAuth2Error.md)
 - [OAuth2TokenEndpointResponse](interfaces/OAuth2TokenEndpointResponse.md)
@@ -167,6 +173,7 @@
 - [UserInfoAddress](interfaces/UserInfoAddress.md)
 - [UserInfoRequestOptions](interfaces/UserInfoRequestOptions.md)
 - [UserInfoResponse](interfaces/UserInfoResponse.md)
+- [ValidateJWTAccessTokenOptions](interfaces/ValidateJWTAccessTokenOptions.md)
 - [WWWAuthenticateChallenge](interfaces/WWWAuthenticateChallenge.md)
 - [WWWAuthenticateChallengeParameters](interfaces/WWWAuthenticateChallengeParameters.md)
 

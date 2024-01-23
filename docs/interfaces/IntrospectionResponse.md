@@ -53,7 +53,7 @@ ___
 
 ### cnf
 
-• `Optional` `Readonly` **cnf**: [`IntrospectionConfirmationClaims`](IntrospectionConfirmationClaims.md)
+• `Optional` `Readonly` **cnf**: [`ConfirmationClaims`](ConfirmationClaims.md)
 
 ___
 

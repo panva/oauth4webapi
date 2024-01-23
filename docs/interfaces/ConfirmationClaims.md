@@ -1,4 +1,4 @@
-# Interface: IntrospectionConfirmationClaims
+# Interface: ConfirmationClaims
 
 [💗 Help the project](https://github.com/sponsors/panva)
 
@@ -10,8 +10,8 @@
 
 ### Properties
 
-- [jkt](IntrospectionConfirmationClaims.md#jkt)
-- [x5t#S256](IntrospectionConfirmationClaims.md#x5t#s256)
+- [jkt](ConfirmationClaims.md#jkt)
+- [x5t#S256](ConfirmationClaims.md#x5t#s256)
 
 ## Properties
 
