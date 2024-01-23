@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.8.0](https://github.com/panva/oauth4webapi/compare/v2.7.0...v2.8.0) (2024-01-23)
+
+
+### Features
+
+* add experimental support for validating JWT Access Tokens ([f65deae](https://github.com/panva/oauth4webapi/commit/f65deae3a7a970f2808fa54896deac335f62d11b))
+
 ## [2.7.0](https://github.com/panva/oauth4webapi/compare/v2.6.0...v2.7.0) (2024-01-18)
 
 
