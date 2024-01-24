@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.8.1](https://github.com/panva/oauth4webapi/compare/v2.8.0...v2.8.1) (2024-01-24)
+
+
+### Fixes
+
+* check that DPoP Proof iat is recent enough ([a6159e3](https://github.com/panva/oauth4webapi/commit/a6159e3d35720e09d43735d13818bea69b399d26))
+
 ## [2.8.0](https://github.com/panva/oauth4webapi/compare/v2.7.0...v2.8.0) (2024-01-23)
 
 
