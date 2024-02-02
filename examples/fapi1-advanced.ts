@@ -71,7 +71,7 @@ let request: string
 {
   // @ts-expect-error
   const authorizationResponse: URLSearchParams | URL = getAuthorizationResponseOrURLWithFragment()
-  const params = await oauth.experimental_validateDetachedSignatureResponse(
+  const params = await oauth.validateDetachedSignatureResponse(
     as,
     client,
     authorizationResponse,
@@ -90,9 +90,9 @@ let request: string
     code_verifier,
     {
       clientPrivateKey,
-      [oauth.experimental_useMtlsAlias]: true,
+      [oauth.useMtlsAlias]: true,
       // @ts-expect-error
-      [oauth.experimental_customFetch]: (...args) => {
+      [oauth.customFetch]: (...args) => {
         // @ts-expect-error
         return undici.fetch(args[0], {
           ...args[1],

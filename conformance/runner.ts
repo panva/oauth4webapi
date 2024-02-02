@@ -236,22 +236,22 @@ export const green = (options?: MacroOptions) =>
         switch (endpoint) {
           case 'token':
             return <oauth.TokenEndpointRequestOptions>{
-              [oauth.experimental_useMtlsAlias]: mtlsAuth || mtlsConstrain ? true : false,
-              [oauth.experimental_customFetch]: mtlsAuth || mtlsConstrain ? mtlsFetch : undefined,
+              [oauth.useMtlsAlias]: mtlsAuth || mtlsConstrain ? true : false,
+              [oauth.customFetch]: mtlsAuth || mtlsConstrain ? mtlsFetch : undefined,
             }
           case 'par':
             return <oauth.PushedAuthorizationRequestOptions>{
-              [oauth.experimental_useMtlsAlias]: mtlsAuth ? true : false,
-              [oauth.experimental_customFetch]: mtlsAuth ? mtlsFetch : undefined,
+              [oauth.useMtlsAlias]: mtlsAuth ? true : false,
+              [oauth.customFetch]: mtlsAuth ? mtlsFetch : undefined,
             }
           case 'userinfo':
             return <oauth.UserInfoRequestOptions>{
-              [oauth.experimental_useMtlsAlias]: mtlsConstrain ? true : false,
-              [oauth.experimental_customFetch]: mtlsConstrain ? mtlsFetch : undefined,
+              [oauth.useMtlsAlias]: mtlsConstrain ? true : false,
+              [oauth.customFetch]: mtlsConstrain ? mtlsFetch : undefined,
             }
           case 'resource':
             return <oauth.ProtectedResourceRequestOptions>{
-              [oauth.experimental_customFetch]: mtlsConstrain ? mtlsFetch : undefined,
+              [oauth.customFetch]: mtlsConstrain ? mtlsFetch : undefined,
             }
           default:
             throw new Error()
@@ -386,7 +386,7 @@ export const green = (options?: MacroOptions) =>
             fragmentParams.set('id_token', await decryptIdToken(idToken))
             decrypted = true
           }
-          params = await oauth.experimental_validateDetachedSignatureResponse(
+          params = await oauth.validateDetachedSignatureResponse(
             as,
             client,
             decrypted ? fragmentParams : currentUrl,

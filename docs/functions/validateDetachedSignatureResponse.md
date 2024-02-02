@@ -1,11 +1,8 @@
-# Function: experimental\_validateDetachedSignatureResponse
+# Function: validateDetachedSignatureResponse
 
 [💗 Help the project](https://github.com/sponsors/panva)
 
-▸ **experimental_validateDetachedSignatureResponse**(`as`, `client`, `parameters`, `expectedNonce`, `expectedState?`, `maxAge?`, `options?`): [`Promise`]( https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise )\<[`URLSearchParams`]( https://developer.mozilla.org/docs/Web/API/URLSearchParams ) \| [`OAuth2Error`](../interfaces/OAuth2Error.md)\>
-
-This is an experimental feature, it is not subject to semantic versioning rules. Non-backward
-compatible changes or removal may occur in any future release.
+▸ **validateDetachedSignatureResponse**(`as`, `client`, `parameters`, `expectedNonce`, `expectedState?`, `maxAge?`, `options?`): [`Promise`]( https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise )\<[`URLSearchParams`]( https://developer.mozilla.org/docs/Web/API/URLSearchParams ) \| [`OAuth2Error`](../interfaces/OAuth2Error.md)\>
 
 Same as [validateAuthResponse](validateAuthResponse.md) but for FAPI 1.0 Advanced Detached Signature authorization
 responses.

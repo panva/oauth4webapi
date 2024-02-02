@@ -1,19 +1,16 @@
-# Variable: experimental\_useMtlsAlias
+# Variable: useMtlsAlias
 
 [💗 Help the project](https://github.com/sponsors/panva)
 
-• `Const` **experimental\_useMtlsAlias**: typeof [`experimental_useMtlsAlias`](experimental_useMtlsAlias.md)
+• `Const` **useMtlsAlias**: typeof [`useMtlsAlias`](useMtlsAlias.md)
 
-This is an experimental feature, it is not subject to semantic versioning rules. Non-backward
-compatible changes or removal may occur in any future release.
+When combined with [customFetch](customFetch.md) (to use a Fetch API implementation that supports client
+certificates) this can be used to target FAPI 2.0 profiles that utilize Mutual-TLS for either
+client authentication or sender constraining. FAPI 1.0 Advanced profiles that use PAR and JARM
+can also be targetted.
 
-When combined with [experimental_customFetch](experimental_customFetch.md) (to use a Fetch API implementation that
-supports client certificates) this can be used to target FAPI 2.0 profiles that utilize
-Mutual-TLS for either client authentication or sender constraining. FAPI 1.0 Advanced profiles
-that use PAR and JARM can also be targetted.
-
-When configured on an interface that extends [ExperimentalUseMTLSAliasOptions](../interfaces/ExperimentalUseMTLSAliasOptions.md) this makes
-the client prioritize an endpoint URL present in
+When configured on an interface that extends [UseMTLSAliasOptions](../interfaces/UseMTLSAliasOptions.md) this makes the client
+prioritize an endpoint URL present in
 [`as.mtls_endpoint_aliases`](../interfaces/AuthorizationServer.md#mtls_endpoint_aliases).
 
 **`Example`**
@@ -26,8 +23,8 @@ import * as undici from 'undici'
 import * as oauth from 'oauth4webapi'
 
 const response = await oauth.pushedAuthorizationRequest(as, client, params, {
-  [oauth.experimental_useMtlsAlias]: true,
-  [oauth.experimental_customFetch]: (...args) => {
+  [oauth.useMtlsAlias]: true,
+  [oauth.customFetch]: (...args) => {
     return undici.fetch(args[0], {
       ...args[1],
       dispatcher: new undici.Agent({
@@ -56,8 +53,8 @@ const agent = Deno.createHttpClient({
 })
 
 const response = await oauth.pushedAuthorizationRequest(as, client, params, {
-  [oauth.experimental_useMtlsAlias]: true,
-  [oauth.experimental_customFetch]: (...args) => {
+  [oauth.useMtlsAlias]: true,
+  [oauth.customFetch]: (...args) => {
     return fetch(args[0], {
       ...args[1],
       client: agent,

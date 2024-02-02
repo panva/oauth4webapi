@@ -1,11 +1,8 @@
-# Function: experimental\_validateJwtAccessToken
+# Function: validateJwtAccessToken
 
 [💗 Help the project](https://github.com/sponsors/panva)
 
-▸ **experimental_validateJwtAccessToken**(`as`, `request`, `expectedAudience`, `options?`): [`Promise`]( https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise )\<[`JWTAccessTokenClaims`](../interfaces/JWTAccessTokenClaims.md)\>
-
-This is an experimental feature, it is not subject to semantic versioning rules. Non-backward
-compatible changes or removal may occur in any future release.
+▸ **validateJwtAccessToken**(`as`, `request`, `expectedAudience`, `options?`): [`Promise`]( https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise )\<[`JWTAccessTokenClaims`](../interfaces/JWTAccessTokenClaims.md)\>
 
 Validates use of JSON Web Token (JWT) OAuth 2.0 Access Tokens for a given Request as per
 RFC 9068 and optionally also RFC 9449.

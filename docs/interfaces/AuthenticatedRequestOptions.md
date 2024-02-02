@@ -4,26 +4,20 @@
 
 ## Table of contents
 
-### Experimental
-
-- [[experimental\_useMtlsAlias]](AuthenticatedRequestOptions.md#experimental_usemtlsalias)
-
 ### Properties
 
+- [[useMtlsAlias]](AuthenticatedRequestOptions.md#usemtlsalias)
 - [clientPrivateKey](AuthenticatedRequestOptions.md#clientprivatekey)
 
-## Experimental
-
-### [experimental\_useMtlsAlias]
-
-• `Optional` **[experimental\_useMtlsAlias]**: `boolean`
-
-This is an experimental feature, it is not subject to semantic versioning rules. Non-backward
-compatible changes or removal may occur in any future release.
-
-See [experimental_useMtlsAlias](../variables/experimental_useMtlsAlias.md) for its documentation.
-
 ## Properties
+
+### [useMtlsAlias]
+
+• `Optional` **[useMtlsAlias]**: `boolean`
+
+See [useMtlsAlias](../variables/useMtlsAlias.md).
+
+___
 
 ### clientPrivateKey
 
@@ -35,7 +29,7 @@ a supported [JWS `alg` Algorithm](../types/JWSAlgorithm.md).
 
 ## Hierarchy
 
-- [`ExperimentalUseMTLSAliasOptions`](ExperimentalUseMTLSAliasOptions.md)
+- [`UseMTLSAliasOptions`](UseMTLSAliasOptions.md)
 
   ↳ **`AuthenticatedRequestOptions`**
 

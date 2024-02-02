@@ -62,20 +62,13 @@
 - [OperationProcessingError](classes/OperationProcessingError.md)
 - [UnsupportedOperationError](classes/UnsupportedOperationError.md)
 
-### Experimental
-
-- [experimental\_customFetch](variables/experimental_customFetch.md)
-- [experimental\_useMtlsAlias](variables/experimental_useMtlsAlias.md)
-- [experimental\_validateDetachedSignatureResponse](functions/experimental_validateDetachedSignatureResponse.md)
-- [experimental\_validateJwtAccessToken](functions/experimental_validateJwtAccessToken.md)
-
 ### FAPI 1.0 Advanced
 
-- [experimental\_validateDetachedSignatureResponse](functions/experimental_validateDetachedSignatureResponse.md)
+- [validateDetachedSignatureResponse](functions/validateDetachedSignatureResponse.md)
 
 ### JWT Access Tokens
 
-- [experimental\_validateJwtAccessToken](functions/experimental_validateJwtAccessToken.md)
+- [validateJwtAccessToken](functions/validateJwtAccessToken.md)
 
 ### JWT Secured Authorization Response Mode for OAuth 2.0 (JARM)
 
@@ -152,7 +145,6 @@
 - [DeviceAuthorizationRequestOptions](interfaces/DeviceAuthorizationRequestOptions.md)
 - [DeviceAuthorizationResponse](interfaces/DeviceAuthorizationResponse.md)
 - [DiscoveryRequestOptions](interfaces/DiscoveryRequestOptions.md)
-- [ExperimentalUseMTLSAliasOptions](interfaces/ExperimentalUseMTLSAliasOptions.md)
 - [GenerateKeyPairOptions](interfaces/GenerateKeyPairOptions.md)
 - [HttpRequestOptions](interfaces/HttpRequestOptions.md)
 - [IDToken](interfaces/IDToken.md)
@@ -170,6 +162,7 @@
 - [RevocationRequestOptions](interfaces/RevocationRequestOptions.md)
 - [TokenEndpointRequestOptions](interfaces/TokenEndpointRequestOptions.md)
 - [TokenEndpointResponse](interfaces/TokenEndpointResponse.md)
+- [UseMTLSAliasOptions](interfaces/UseMTLSAliasOptions.md)
 - [UserInfoAddress](interfaces/UserInfoAddress.md)
 - [UserInfoRequestOptions](interfaces/UserInfoRequestOptions.md)
 - [UserInfoResponse](interfaces/UserInfoResponse.md)
@@ -190,10 +183,12 @@
 
 - [clockSkew](variables/clockSkew.md)
 - [clockTolerance](variables/clockTolerance.md)
+- [customFetch](variables/customFetch.md)
 - [expectNoNonce](variables/expectNoNonce.md)
 - [expectNoState](variables/expectNoState.md)
 - [skipAuthTimeCheck](variables/skipAuthTimeCheck.md)
 - [skipStateCheck](variables/skipStateCheck.md)
 - [skipSubjectCheck](variables/skipSubjectCheck.md)
+- [useMtlsAlias](variables/useMtlsAlias.md)
 
 </details>

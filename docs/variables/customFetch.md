@@ -1,11 +1,8 @@
-# Variable: experimental\_customFetch
+# Variable: customFetch
 
 [💗 Help the project](https://github.com/sponsors/panva)
 
-• `Const` **experimental\_customFetch**: typeof [`experimental_customFetch`](experimental_customFetch.md)
-
-This is an experimental feature, it is not subject to semantic versioning rules. Non-backward
-compatible changes or removal may occur in any future release.
+• `Const` **customFetch**: typeof [`customFetch`](customFetch.md)
 
 When configured on an interface that extends [HttpRequestOptions](../interfaces/HttpRequestOptions.md), that's every `options`
 parameter for functions that trigger HTTP Requests, this replaces the use of global fetch. As a
@@ -43,7 +40,7 @@ import * as oauth from 'oauth4webapi'
 
 // example use
 await oauth.discoveryRequest(new URL('https://as.example.com'), {
-  [oauth.experimental_customFetch]: (...args) =>
+  [oauth.customFetch]: (...args) =>
     ky(args[0], {
       ...args[1],
       hooks: {
@@ -84,6 +81,6 @@ undici.setGlobalDispatcher(mockAgent)
 
 // example use
 await oauth.discoveryRequest(new URL('https://as.example.com'), {
-  [oauth.experimental_customFetch]: undici.fetch,
+  [oauth.customFetch]: undici.fetch,
 })
 ```

@@ -98,16 +98,12 @@ export default (QUnit: QUnit) => {
           undefined,
           {
             DPoP,
-            async [lib.experimental_customFetch](...params: Parameters<typeof fetch>) {
+            async [lib.customFetch](...params: Parameters<typeof fetch>) {
               const url = new URL(<string>params[0])
               const { headers, method } = params[1]!
               const request = new Request(url, { headers, method })
 
-              const jwtAccessToken = await lib.experimental_validateJwtAccessToken(
-                as,
-                request,
-                resource,
-              )
+              const jwtAccessToken = await lib.validateJwtAccessToken(as, request, resource)
 
               t.propContains(jwtAccessToken, {
                 client_id: client.client_id,

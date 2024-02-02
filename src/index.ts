@@ -198,9 +198,6 @@ export const clockSkew = Symbol()
 export const clockTolerance = Symbol()
 
 /**
- * This is an experimental feature, it is not subject to semantic versioning rules. Non-backward
- * compatible changes or removal may occur in any future release.
- *
  * When configured on an interface that extends {@link HttpRequestOptions}, that's every `options`
  * parameter for functions that trigger HTTP Requests, this replaces the use of global fetch. As a
  * fetch replacement the arguments and expected return are the same as fetch.
@@ -237,7 +234,7 @@ export const clockTolerance = Symbol()
  *
  * // example use
  * await oauth.discoveryRequest(new URL('https://as.example.com'), {
- *   [oauth.experimental_customFetch]: (...args) =>
+ *   [oauth.customFetch]: (...args) =>
  *     ky(args[0], {
  *       ...args[1],
  *       hooks: {
@@ -278,29 +275,20 @@ export const clockTolerance = Symbol()
  *
  * // example use
  * await oauth.discoveryRequest(new URL('https://as.example.com'), {
- *   [oauth.experimental_customFetch]: undici.fetch,
+ *   [oauth.customFetch]: undici.fetch,
  * })
  * ```
- *
- * @group Experimental
  */
-export const experimental_customFetch = Symbol()
-/**
- * @ignore
- */
-export const experimentalCustomFetch = experimental_customFetch
+export const customFetch = Symbol()
 
 /**
- * This is an experimental feature, it is not subject to semantic versioning rules. Non-backward
- * compatible changes or removal may occur in any future release.
+ * When combined with {@link customFetch} (to use a Fetch API implementation that supports client
+ * certificates) this can be used to target FAPI 2.0 profiles that utilize Mutual-TLS for either
+ * client authentication or sender constraining. FAPI 1.0 Advanced profiles that use PAR and JARM
+ * can also be targetted.
  *
- * When combined with {@link experimental_customFetch} (to use a Fetch API implementation that
- * supports client certificates) this can be used to target FAPI 2.0 profiles that utilize
- * Mutual-TLS for either client authentication or sender constraining. FAPI 1.0 Advanced profiles
- * that use PAR and JARM can also be targetted.
- *
- * When configured on an interface that extends {@link ExperimentalUseMTLSAliasOptions} this makes
- * the client prioritize an endpoint URL present in
+ * When configured on an interface that extends {@link UseMTLSAliasOptions} this makes the client
+ * prioritize an endpoint URL present in
  * {@link AuthorizationServer.mtls_endpoint_aliases `as.mtls_endpoint_aliases`}.
  *
  * @example
@@ -313,8 +301,8 @@ export const experimentalCustomFetch = experimental_customFetch
  * import * as oauth from 'oauth4webapi'
  *
  * const response = await oauth.pushedAuthorizationRequest(as, client, params, {
- *   [oauth.experimental_useMtlsAlias]: true,
- *   [oauth.experimental_customFetch]: (...args) => {
+ *   [oauth.useMtlsAlias]: true,
+ *   [oauth.customFetch]: (...args) => {
  *     return undici.fetch(args[0], {
  *       ...args[1],
  *       dispatcher: new undici.Agent({
@@ -343,8 +331,8 @@ export const experimentalCustomFetch = experimental_customFetch
  * })
  *
  * const response = await oauth.pushedAuthorizationRequest(as, client, params, {
- *   [oauth.experimental_useMtlsAlias]: true,
- *   [oauth.experimental_customFetch]: (...args) => {
+ *   [oauth.useMtlsAlias]: true,
+ *   [oauth.customFetch]: (...args) => {
  *     return fetch(args[0], {
  *       ...args[1],
  *       client: agent,
@@ -353,15 +341,9 @@ export const experimentalCustomFetch = experimental_customFetch
  * })
  * ```
  *
- * @group Experimental
- *
  * @see [RFC 8705 - OAuth 2.0 Mutual-TLS Client Authentication and Certificate-Bound Access Tokens](https://www.rfc-editor.org/rfc/rfc8705.html)
  */
-export const experimental_useMtlsAlias = Symbol()
-/**
- * @ignore
- */
-export const experimentalUseMtlsAlias = experimental_useMtlsAlias
+export const useMtlsAlias = Symbol()
 
 /**
  * Authorization Server Metadata
@@ -988,14 +970,9 @@ export interface HttpRequestOptions {
   headers?: [string, string][] | Record<string, string> | Headers
 
   /**
-   * This is an experimental feature, it is not subject to semantic versioning rules. Non-backward
-   * compatible changes or removal may occur in any future release.
-   *
-   * See {@link experimental_customFetch} for its documentation.
-   *
-   * @group Experimental
+   * See {@link customFetch}.
    */
-  [experimental_customFetch]?: typeof fetch
+  [customFetch]?: typeof fetch
 }
 
 export interface DiscoveryRequestOptions extends HttpRequestOptions {
@@ -1107,7 +1084,7 @@ export async function discoveryRequest(
   const headers = prepareHeaders(options?.headers)
   headers.set('accept', 'application/json')
 
-  return (options?.[experimental_customFetch] || fetch)(url.href, {
+  return (options?.[customFetch] || fetch)(url.href, {
     headers: Object.fromEntries(headers.entries()),
     method: 'GET',
     redirect: 'manual',
@@ -1285,19 +1262,14 @@ export interface DPoPRequestOptions {
   DPoP?: DPoPOptions
 }
 
-export interface ExperimentalUseMTLSAliasOptions {
+export interface UseMTLSAliasOptions {
   /**
-   * This is an experimental feature, it is not subject to semantic versioning rules. Non-backward
-   * compatible changes or removal may occur in any future release.
-   *
-   * See {@link experimental_useMtlsAlias} for its documentation.
-   *
-   * @group Experimental
+   * See {@link useMtlsAlias}.
    */
-  [experimental_useMtlsAlias]?: boolean
+  [useMtlsAlias]?: boolean
 }
 
-export interface AuthenticatedRequestOptions extends ExperimentalUseMTLSAliasOptions {
+export interface AuthenticatedRequestOptions extends UseMTLSAliasOptions {
   /**
    * Private key to use for `private_key_jwt`
    * {@link ClientAuthenticationMethod client authentication}. Its algorithm must be compatible with
@@ -1731,10 +1703,10 @@ async function publicJwk(key: CryptoKey) {
 function validateEndpoint(
   value: unknown,
   endpoint: keyof AuthorizationServer,
-  options?: ExperimentalUseMTLSAliasOptions,
+  options?: UseMTLSAliasOptions,
 ) {
   if (typeof value !== 'string') {
-    if (options?.[experimental_useMtlsAlias]) {
+    if (options?.[useMtlsAlias]) {
       throw new TypeError(`"as.mtls_endpoint_aliases.${endpoint}" must be a string`)
     } else {
       throw new TypeError(`"as.${endpoint}" must be a string`)
@@ -1747,13 +1719,9 @@ function validateEndpoint(
 function resolveEndpoint(
   as: AuthorizationServer,
   endpoint: keyof AuthorizationServer,
-  options?: ExperimentalUseMTLSAliasOptions,
+  options?: UseMTLSAliasOptions,
 ) {
-  if (
-    options?.[experimental_useMtlsAlias] &&
-    as.mtls_endpoint_aliases &&
-    endpoint in as.mtls_endpoint_aliases
-  ) {
+  if (options?.[useMtlsAlias] && as.mtls_endpoint_aliases && endpoint in as.mtls_endpoint_aliases) {
     return validateEndpoint(as.mtls_endpoint_aliases[endpoint], endpoint, options)
   }
 
@@ -2088,7 +2056,7 @@ export async function protectedResourceRequest(
     headers.set('authorization', `DPoP ${accessToken}`)
   }
 
-  return (options?.[experimental_customFetch] || fetch)(url.href, {
+  return (options?.[customFetch] || fetch)(url.href, {
     body,
     headers: Object.fromEntries(headers.entries()),
     method,
@@ -2100,7 +2068,7 @@ export async function protectedResourceRequest(
 export interface UserInfoRequestOptions
   extends HttpRequestOptions,
     DPoPRequestOptions,
-    ExperimentalUseMTLSAliasOptions {}
+    UseMTLSAliasOptions {}
 
 /**
  * Performs a UserInfo Request at the
@@ -2409,7 +2377,7 @@ async function authenticatedRequest(
   await clientAuthentication(as, client, body, headers, options?.clientPrivateKey)
   headers.set('content-type', 'application/x-www-form-urlencoded;charset=UTF-8')
 
-  return (options?.[experimental_customFetch] || fetch)(url.href, {
+  return (options?.[customFetch] || fetch)(url.href, {
     body,
     headers: Object.fromEntries(headers.entries()),
     method,
@@ -3228,12 +3196,6 @@ export interface ConfirmationClaims {
   readonly [claim: string]: JsonValue | undefined
 }
 
-// TODO: remove in v3.x
-/**
- * @ignore
- */
-export type IntrospectionConfirmationClaims = ConfirmationClaims
-
 export interface IntrospectionResponse {
   readonly active: boolean
   readonly client_id?: string
@@ -3344,7 +3306,7 @@ async function jwksRequest(
   headers.set('accept', 'application/json')
   headers.append('accept', 'application/jwk-set+json')
 
-  return (options?.[experimental_customFetch] || fetch)(url.href, {
+  return (options?.[customFetch] || fetch)(url.href, {
     headers: Object.fromEntries(headers.entries()),
     method: 'GET',
     redirect: 'manual',
@@ -3678,9 +3640,6 @@ async function idTokenHashMatches(data: string, actual: string, alg: JWSAlgorith
 }
 
 /**
- * This is an experimental feature, it is not subject to semantic versioning rules. Non-backward
- * compatible changes or removal may occur in any future release.
- *
  * Same as {@link validateAuthResponse} but for FAPI 1.0 Advanced Detached Signature authorization
  * responses.
  *
@@ -3699,11 +3658,10 @@ async function idTokenHashMatches(data: string, actual: string, alg: JWSAlgorith
  * @returns Validated Authorization Response parameters or Authorization Error Response.
  *
  * @group FAPI 1.0 Advanced
- * @group Experimental
  *
  * @see [Financial-grade API Security Profile 1.0 - Part 2: Advanced](https://openid.net/specs/openid-financial-api-part-2-1_0.html#id-token-as-detached-signature)
  */
-export async function experimental_validateDetachedSignatureResponse(
+export async function validateDetachedSignatureResponse(
   as: AuthorizationServer,
   client: Client,
   parameters: URLSearchParams | URL,
@@ -4426,9 +4384,6 @@ async function validateDPoP(
 }
 
 /**
- * This is an experimental feature, it is not subject to semantic versioning rules. Non-backward
- * compatible changes or removal may occur in any future release.
- *
  * Validates use of JSON Web Token (JWT) OAuth 2.0 Access Tokens for a given {@link Request} as per
  * RFC 9068 and optionally also RFC 9449.
  *
@@ -4453,12 +4408,11 @@ async function validateDPoP(
  * @param options
  *
  * @group JWT Access Tokens
- * @group Experimental
  *
  * @see [RFC 9068 - JSON Web Token (JWT) Profile for OAuth 2.0 Access Tokens](https://www.rfc-editor.org/rfc/rfc9068.html)
  * @see [RFC 9449 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)](https://www.rfc-editor.org/rfc/rfc9449.html)
  */
-export async function experimental_validateJwtAccessToken(
+export async function validateJwtAccessToken(
   as: AuthorizationServer,
   request: Request,
   expectedAudience: string,
@@ -4553,3 +4507,52 @@ export async function experimental_validateJwtAccessToken(
 
   return <JWTAccessTokenClaims>claims
 }
+
+/**
+ * @ignore
+ *
+ * @deprecated Use {@link customFetch}.
+ */
+export const experimentalCustomFetch = customFetch
+/**
+ * @ignore
+ *
+ * @deprecated Use {@link customFetch}.
+ */
+export const experimental_customFetch = customFetch
+/**
+ * @ignore
+ *
+ * @deprecated Use {@link useMtlsAlias}.
+ */
+export const experimentalUseMtlsAlias = useMtlsAlias
+/**
+ * @ignore
+ *
+ * @deprecated Use {@link useMtlsAlias}.
+ */
+export const experimental_useMtlsAlias = useMtlsAlias
+/**
+ * @ignore
+ *
+ * @deprecated Use {@link UseMTLSAliasOptions}.
+ */
+export type ExperimentalUseMTLSAliasOptions = UseMTLSAliasOptions
+/**
+ * @ignore
+ *
+ * @deprecated Use {@link ConfirmationClaims}.
+ */
+export type IntrospectionConfirmationClaims = ConfirmationClaims
+/**
+ * @ignore
+ *
+ * @deprecated Use {@link validateDetachedSignatureResponse}.
+ */
+export const experimental_validateDetachedSignatureResponse = validateDetachedSignatureResponse
+/**
+ * @ignore
+ *
+ * @deprecated Use {@link validateJwtAccessToken}.
+ */
+export const experimental_validateJwtAccessToken = validateJwtAccessToken

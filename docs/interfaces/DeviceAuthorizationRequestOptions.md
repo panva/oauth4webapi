@@ -4,40 +4,31 @@
 
 ## Table of contents
 
-### Experimental
-
-- [[experimental\_customFetch]](DeviceAuthorizationRequestOptions.md#experimental_customfetch)
-- [[experimental\_useMtlsAlias]](DeviceAuthorizationRequestOptions.md#experimental_usemtlsalias)
-
 ### Properties
 
+- [[customFetch]](DeviceAuthorizationRequestOptions.md#customfetch)
+- [[useMtlsAlias]](DeviceAuthorizationRequestOptions.md#usemtlsalias)
 - [clientPrivateKey](DeviceAuthorizationRequestOptions.md#clientprivatekey)
 - [headers](DeviceAuthorizationRequestOptions.md#headers)
 - [signal](DeviceAuthorizationRequestOptions.md#signal)
 
-## Experimental
+## Properties
 
-### [experimental\_customFetch]
+### [customFetch]
 
-• `Optional` **[experimental\_customFetch]**: (`input`: `RequestInfo` \| [`URL`]( https://developer.mozilla.org/docs/Web/API/URL ), `init?`: `RequestInit`) => [`Promise`]( https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise )\<[`Response`]( https://developer.mozilla.org/docs/Web/API/Response )\>
+• `Optional` **[customFetch]**: (`input`: `RequestInfo` \| [`URL`]( https://developer.mozilla.org/docs/Web/API/URL ), `init?`: `RequestInit`) => [`Promise`]( https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise )\<[`Response`]( https://developer.mozilla.org/docs/Web/API/Response )\>
 
-This is an experimental feature, it is not subject to semantic versioning rules. Non-backward
-compatible changes or removal may occur in any future release.
-
-See [experimental_customFetch](../variables/experimental_customFetch.md) for its documentation.
+See [customFetch](../variables/customFetch.md).
 
 ___
 
-### [experimental\_useMtlsAlias]
+### [useMtlsAlias]
 
-• `Optional` **[experimental\_useMtlsAlias]**: `boolean`
+• `Optional` **[useMtlsAlias]**: `boolean`
 
-This is an experimental feature, it is not subject to semantic versioning rules. Non-backward
-compatible changes or removal may occur in any future release.
+See [useMtlsAlias](../variables/useMtlsAlias.md).
 
-See [experimental_useMtlsAlias](../variables/experimental_useMtlsAlias.md) for its documentation.
-
-## Properties
+___
 
 ### clientPrivateKey
 

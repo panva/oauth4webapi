@@ -4,41 +4,32 @@
 
 ## Table of contents
 
-### Experimental
-
-- [[experimental\_customFetch]](RevocationRequestOptions.md#experimental_customfetch)
-- [[experimental\_useMtlsAlias]](RevocationRequestOptions.md#experimental_usemtlsalias)
-
 ### Properties
 
+- [[customFetch]](RevocationRequestOptions.md#customfetch)
+- [[useMtlsAlias]](RevocationRequestOptions.md#usemtlsalias)
 - [additionalParameters](RevocationRequestOptions.md#additionalparameters)
 - [clientPrivateKey](RevocationRequestOptions.md#clientprivatekey)
 - [headers](RevocationRequestOptions.md#headers)
 - [signal](RevocationRequestOptions.md#signal)
 
-## Experimental
+## Properties
 
-### [experimental\_customFetch]
+### [customFetch]
 
-• `Optional` **[experimental\_customFetch]**: (`input`: `RequestInfo` \| [`URL`]( https://developer.mozilla.org/docs/Web/API/URL ), `init?`: `RequestInit`) => [`Promise`]( https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise )\<[`Response`]( https://developer.mozilla.org/docs/Web/API/Response )\>
+• `Optional` **[customFetch]**: (`input`: `RequestInfo` \| [`URL`]( https://developer.mozilla.org/docs/Web/API/URL ), `init?`: `RequestInit`) => [`Promise`]( https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise )\<[`Response`]( https://developer.mozilla.org/docs/Web/API/Response )\>
 
-This is an experimental feature, it is not subject to semantic versioning rules. Non-backward
-compatible changes or removal may occur in any future release.
-
-See [experimental_customFetch](../variables/experimental_customFetch.md) for its documentation.
+See [customFetch](../variables/customFetch.md).
 
 ___
 
-### [experimental\_useMtlsAlias]
+### [useMtlsAlias]
 
-• `Optional` **[experimental\_useMtlsAlias]**: `boolean`
+• `Optional` **[useMtlsAlias]**: `boolean`
 
-This is an experimental feature, it is not subject to semantic versioning rules. Non-backward
-compatible changes or removal may occur in any future release.
+See [useMtlsAlias](../variables/useMtlsAlias.md).
 
-See [experimental_useMtlsAlias](../variables/experimental_useMtlsAlias.md) for its documentation.
-
-## Properties
+___
 
 ### additionalParameters
 

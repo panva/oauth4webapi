@@ -4,27 +4,21 @@
 
 ## Table of contents
 
-### Experimental
-
-- [[experimental\_customFetch]](HttpRequestOptions.md#experimental_customfetch)
-
 ### Properties
 
+- [[customFetch]](HttpRequestOptions.md#customfetch)
 - [headers](HttpRequestOptions.md#headers)
 - [signal](HttpRequestOptions.md#signal)
 
-## Experimental
-
-### [experimental\_customFetch]
-
-• `Optional` **[experimental\_customFetch]**: (`input`: `RequestInfo` \| [`URL`]( https://developer.mozilla.org/docs/Web/API/URL ), `init?`: `RequestInit`) => [`Promise`]( https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise )\<[`Response`]( https://developer.mozilla.org/docs/Web/API/Response )\>
-
-This is an experimental feature, it is not subject to semantic versioning rules. Non-backward
-compatible changes or removal may occur in any future release.
-
-See [experimental_customFetch](../variables/experimental_customFetch.md) for its documentation.
-
 ## Properties
+
+### [customFetch]
+
+• `Optional` **[customFetch]**: (`input`: `RequestInfo` \| [`URL`]( https://developer.mozilla.org/docs/Web/API/URL ), `init?`: `RequestInit`) => [`Promise`]( https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise )\<[`Response`]( https://developer.mozilla.org/docs/Web/API/Response )\>
+
+See [customFetch](../variables/customFetch.md).
+
+___
 
 ### headers
 

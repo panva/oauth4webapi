@@ -4,38 +4,13 @@
 
 ## Table of contents
 
-### Experimental
-
-- [[experimental\_customFetch]](UserInfoRequestOptions.md#experimental_customfetch)
-- [[experimental\_useMtlsAlias]](UserInfoRequestOptions.md#experimental_usemtlsalias)
-
 ### Properties
 
 - [DPoP](UserInfoRequestOptions.md#dpop)
+- [[customFetch]](UserInfoRequestOptions.md#customfetch)
+- [[useMtlsAlias]](UserInfoRequestOptions.md#usemtlsalias)
 - [headers](UserInfoRequestOptions.md#headers)
 - [signal](UserInfoRequestOptions.md#signal)
-
-## Experimental
-
-### [experimental\_customFetch]
-
-• `Optional` **[experimental\_customFetch]**: (`input`: `RequestInfo` \| [`URL`]( https://developer.mozilla.org/docs/Web/API/URL ), `init?`: `RequestInit`) => [`Promise`]( https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise )\<[`Response`]( https://developer.mozilla.org/docs/Web/API/Response )\>
-
-This is an experimental feature, it is not subject to semantic versioning rules. Non-backward
-compatible changes or removal may occur in any future release.
-
-See [experimental_customFetch](../variables/experimental_customFetch.md) for its documentation.
-
-___
-
-### [experimental\_useMtlsAlias]
-
-• `Optional` **[experimental\_useMtlsAlias]**: `boolean`
-
-This is an experimental feature, it is not subject to semantic versioning rules. Non-backward
-compatible changes or removal may occur in any future release.
-
-See [experimental_useMtlsAlias](../variables/experimental_useMtlsAlias.md) for its documentation.
 
 ## Properties
 
@@ -44,6 +19,22 @@ See [experimental_useMtlsAlias](../variables/experimental_useMtlsAlias.md) for i
 • `Optional` **DPoP**: [`DPoPOptions`](DPoPOptions.md)
 
 DPoP-related options.
+
+___
+
+### [customFetch]
+
+• `Optional` **[customFetch]**: (`input`: `RequestInfo` \| [`URL`]( https://developer.mozilla.org/docs/Web/API/URL ), `init?`: `RequestInit`) => [`Promise`]( https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise )\<[`Response`]( https://developer.mozilla.org/docs/Web/API/Response )\>
+
+See [customFetch](../variables/customFetch.md).
+
+___
+
+### [useMtlsAlias]
+
+• `Optional` **[useMtlsAlias]**: `boolean`
+
+See [useMtlsAlias](../variables/useMtlsAlias.md).
 
 ___
 
@@ -76,6 +67,6 @@ const signal = () => AbortSignal.timeout(5_000) // Note: AbortSignal.timeout may
 
 - [`DPoPRequestOptions`](DPoPRequestOptions.md)
 
-- [`ExperimentalUseMTLSAliasOptions`](ExperimentalUseMTLSAliasOptions.md)
+- [`UseMTLSAliasOptions`](UseMTLSAliasOptions.md)
 
   ↳ **`UserInfoRequestOptions`**
