@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.9.0](https://github.com/panva/oauth4webapi/compare/v2.8.1...v2.9.0) (2024-02-02)
+
+
+### Features
+
+* graduate recently added experimental features to stable API ([94da0c9](https://github.com/panva/oauth4webapi/commit/94da0c940096ccc48d01d0998ae4326f7c209110))
+
 ## [2.8.1](https://github.com/panva/oauth4webapi/compare/v2.8.0...v2.8.1) (2024-01-24)
 
 
