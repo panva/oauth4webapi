@@ -1163,9 +1163,9 @@ function randomBytes() {
  * @group Utilities
  * @group Authorization Code Grant
  * @group Authorization Code Grant w/ OpenID Connect (OIDC)
- * @group Proof Key for Code Exchange by OAuth Public Clients (PKCE)
+ * @group Proof Key for Code Exchange (PKCE)
  *
- * @see [RFC 7636 - Proof Key for Code Exchange by OAuth Public Clients (PKCE)](https://www.rfc-editor.org/rfc/rfc7636.html#section-4)
+ * @see [RFC 7636 - Proof Key for Code Exchange (PKCE)](https://www.rfc-editor.org/rfc/rfc7636.html#section-4)
  */
 export function generateRandomCodeVerifier() {
   return randomBytes()
@@ -1201,9 +1201,9 @@ export function generateRandomNonce() {
  *
  * @group Authorization Code Grant
  * @group Authorization Code Grant w/ OpenID Connect (OIDC)
- * @group Proof Key for Code Exchange by OAuth Public Clients (PKCE)
+ * @group Proof Key for Code Exchange (PKCE)
  *
- * @see [RFC 7636 - Proof Key for Code Exchange by OAuth Public Clients (PKCE)](https://www.rfc-editor.org/rfc/rfc7636.html#section-4)
+ * @see [RFC 7636 - Proof Key for Code Exchange (PKCE)](https://www.rfc-editor.org/rfc/rfc7636.html#section-4)
  */
 export async function calculatePKCECodeChallenge(codeVerifier: string) {
   if (!validateString(codeVerifier)) {
@@ -2675,7 +2675,7 @@ function brand(searchParams: URLSearchParams) {
  *
  * @see [RFC 6749 - The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html#section-4.1)
  * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#CodeFlowAuth)
- * @see [RFC 7636 - Proof Key for Code Exchange by OAuth Public Clients (PKCE)](https://www.rfc-editor.org/rfc/rfc7636.html#section-4)
+ * @see [RFC 7636 - Proof Key for Code Exchange (PKCE)](https://www.rfc-editor.org/rfc/rfc7636.html#section-4)
  * @see [RFC 9449 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)](https://www.rfc-editor.org/rfc/rfc9449.html#name-dpop-access-token-request)
  */
 export async function authorizationCodeGrantRequest(

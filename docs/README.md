@@ -88,7 +88,7 @@
 - [processUserInfoResponse](functions/processUserInfoResponse.md)
 - [userInfoRequest](functions/userInfoRequest.md)
 
-### Proof Key for Code Exchange by OAuth Public Clients (PKCE)
+### Proof Key for Code Exchange (PKCE)
 
 - [calculatePKCECodeChallenge](functions/calculatePKCECodeChallenge.md)
 - [generateRandomCodeVerifier](functions/generateRandomCodeVerifier.md)
