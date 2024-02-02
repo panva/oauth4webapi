@@ -6,13 +6,21 @@ if (typeof navigator === 'undefined' || !navigator.userAgent?.startsWith?.('Mozi
   USER_AGENT = `${NAME}/${VERSION}`
 }
 
-/** JSON Object */
+/**
+ * JSON Object
+ */
 export type JsonObject = { [Key in string]?: JsonValue }
-/** JSON Array */
+/**
+ * JSON Array
+ */
 export type JsonArray = JsonValue[]
-/** JSON Primitives */
+/**
+ * JSON Primitives
+ */
 export type JsonPrimitive = string | number | boolean | null
-/** JSON Values */
+/**
+ * JSON Values
+ */
 export type JsonValue = JsonPrimitive | JsonObject | JsonArray
 
 type Constructor<T extends {} = {}> = new (...args: any[]) => T
@@ -277,7 +285,9 @@ export const clockTolerance = Symbol()
  * @group Experimental
  */
 export const experimental_customFetch = Symbol()
-/** @ignore */
+/**
+ * @ignore
+ */
 export const experimentalCustomFetch = experimental_customFetch
 
 /**
@@ -348,7 +358,9 @@ export const experimentalCustomFetch = experimental_customFetch
  * @see [RFC 8705 - OAuth 2.0 Mutual-TLS Client Authentication and Certificate-Bound Access Tokens](https://www.rfc-editor.org/rfc/rfc8705.html)
  */
 export const experimental_useMtlsAlias = Symbol()
-/** @ignore */
+/**
+ * @ignore
+ */
 export const experimentalUseMtlsAlias = experimental_useMtlsAlias
 
 /**
@@ -357,17 +369,29 @@ export const experimentalUseMtlsAlias = experimental_useMtlsAlias
  * @see [IANA OAuth Authorization Server Metadata registry](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#authorization-server-metadata)
  */
 export interface AuthorizationServer {
-  /** Authorization server's Issuer Identifier URL. */
+  /**
+   * Authorization server's Issuer Identifier URL.
+   */
   readonly issuer: string
-  /** URL of the authorization server's authorization endpoint. */
+  /**
+   * URL of the authorization server's authorization endpoint.
+   */
   readonly authorization_endpoint?: string
-  /** URL of the authorization server's token endpoint. */
+  /**
+   * URL of the authorization server's token endpoint.
+   */
   readonly token_endpoint?: string
-  /** URL of the authorization server's JWK Set document. */
+  /**
+   * URL of the authorization server's JWK Set document.
+   */
   readonly jwks_uri?: string
-  /** URL of the authorization server's Dynamic Client Registration Endpoint. */
+  /**
+   * URL of the authorization server's Dynamic Client Registration Endpoint.
+   */
   readonly registration_endpoint?: string
-  /** JSON array containing a list of the `scope` values that this authorization server supports. */
+  /**
+   * JSON array containing a list of the `scope` values that this authorization server supports.
+   */
   readonly scopes_supported?: string[]
   /**
    * JSON array containing a list of the `response_type` values that this authorization server
@@ -384,7 +408,9 @@ export interface AuthorizationServer {
    * supports.
    */
   readonly grant_types_supported?: string[]
-  /** JSON array containing a list of client authentication methods supported by this token endpoint. */
+  /**
+   * JSON array containing a list of client authentication methods supported by this token endpoint.
+   */
   readonly token_endpoint_auth_methods_supported?: string[]
   /**
    * JSON array containing a list of the JWS signing algorithms supported by the token endpoint for
@@ -412,7 +438,9 @@ export interface AuthorizationServer {
    * the authorization server's terms of service.
    */
   readonly op_tos_uri?: string
-  /** URL of the authorization server's revocation endpoint. */
+  /**
+   * URL of the authorization server's revocation endpoint.
+   */
   readonly revocation_endpoint?: string
   /**
    * JSON array containing a list of client authentication methods supported by this revocation
@@ -424,7 +452,9 @@ export interface AuthorizationServer {
    * for the signature on the JWT used to authenticate the client at the revocation endpoint.
    */
   readonly revocation_endpoint_auth_signing_alg_values_supported?: string[]
-  /** URL of the authorization server's introspection endpoint. */
+  /**
+   * URL of the authorization server's introspection endpoint.
+   */
   readonly introspection_endpoint?: string
   /**
    * JSON array containing a list of client authentication methods supported by this introspection
@@ -437,20 +467,30 @@ export interface AuthorizationServer {
    * endpoint.
    */
   readonly introspection_endpoint_auth_signing_alg_values_supported?: string[]
-  /** PKCE code challenge methods supported by this authorization server. */
+  /**
+   * PKCE code challenge methods supported by this authorization server.
+   */
   readonly code_challenge_methods_supported?: string[]
-  /** Signed JWT containing metadata values about the authorization server as claims. */
+  /**
+   * Signed JWT containing metadata values about the authorization server as claims.
+   */
   readonly signed_metadata?: string
-  /** URL of the authorization server's device authorization endpoint. */
+  /**
+   * URL of the authorization server's device authorization endpoint.
+   */
   readonly device_authorization_endpoint?: string
-  /** Indicates authorization server support for mutual-TLS client certificate-bound access tokens. */
+  /**
+   * Indicates authorization server support for mutual-TLS client certificate-bound access tokens.
+   */
   readonly tls_client_certificate_bound_access_tokens?: boolean
   /**
    * JSON object containing alternative authorization server endpoints, which a client intending to
    * do mutual TLS will use in preference to the conventional endpoints.
    */
   readonly mtls_endpoint_aliases?: MTLSEndpointAliases
-  /** URL of the authorization server's UserInfo Endpoint. */
+  /**
+   * URL of the authorization server's UserInfo Endpoint.
+   */
   readonly userinfo_endpoint?: string
   /**
    * JSON array containing a list of the Authentication Context Class References that this
@@ -477,11 +517,17 @@ export interface AuthorizationServer {
    * the ID Token.
    */
   readonly id_token_encryption_enc_values_supported?: string[]
-  /** JSON array containing a list of the JWS `alg` values supported by the UserInfo Endpoint. */
+  /**
+   * JSON array containing a list of the JWS `alg` values supported by the UserInfo Endpoint.
+   */
   readonly userinfo_signing_alg_values_supported?: string[]
-  /** JSON array containing a list of the JWE `alg` values supported by the UserInfo Endpoint. */
+  /**
+   * JSON array containing a list of the JWE `alg` values supported by the UserInfo Endpoint.
+   */
   readonly userinfo_encryption_alg_values_supported?: string[]
-  /** JSON array containing a list of the JWE `enc` values supported by the UserInfo Endpoint. */
+  /**
+   * JSON array containing a list of the JWE `enc` values supported by the UserInfo Endpoint.
+   */
   readonly userinfo_encryption_enc_values_supported?: string[]
   /**
    * JSON array containing a list of the JWS `alg` values supported by the authorization server for
@@ -503,7 +549,9 @@ export interface AuthorizationServer {
    * supports.
    */
   readonly display_values_supported?: string[]
-  /** JSON array containing a list of the Claim Types that the authorization server supports. */
+  /**
+   * JSON array containing a list of the Claim Types that the authorization server supports.
+   */
   readonly claim_types_supported?: string[]
   /**
    * JSON array containing a list of the Claim Names of the Claims that the authorization server MAY
@@ -540,9 +588,13 @@ export interface AuthorizationServer {
    * through either `request` or `request_uri` parameter.
    */
   readonly require_signed_request_object?: boolean
-  /** URL of the authorization server's pushed authorization request endpoint. */
+  /**
+   * URL of the authorization server's pushed authorization request endpoint.
+   */
   readonly pushed_authorization_request_endpoint?: string
-  /** Indicates whether the authorization server accepts authorization requests only via PAR. */
+  /**
+   * Indicates whether the authorization server accepts authorization requests only via PAR.
+   */
   readonly require_pushed_authorization_requests?: boolean
   /**
    * JSON array containing a list of algorithms supported by the authorization server for
@@ -579,23 +631,31 @@ export interface AuthorizationServer {
    * introspection response encryption (`enc` value).
    */
   readonly authorization_encryption_enc_values_supported?: string[]
-  /** CIBA Backchannel Authentication Endpoint. */
+  /**
+   * CIBA Backchannel Authentication Endpoint.
+   */
   readonly backchannel_authentication_endpoint?: string
   /**
    * JSON array containing a list of the JWS signing algorithms supported for validation of signed
    * CIBA authentication requests.
    */
   readonly backchannel_authentication_request_signing_alg_values_supported?: string[]
-  /** Supported CIBA authentication result delivery modes. */
+  /**
+   * Supported CIBA authentication result delivery modes.
+   */
   readonly backchannel_token_delivery_modes_supported?: string[]
-  /** Indicates whether the authorization server supports the use of the CIBA `user_code` parameter. */
+  /**
+   * Indicates whether the authorization server supports the use of the CIBA `user_code` parameter.
+   */
   readonly backchannel_user_code_parameter_supported?: boolean
   /**
    * URL of an authorization server iframe that supports cross-origin communications for session
    * state information with the RP Client, using the HTML5 postMessage API.
    */
   readonly check_session_iframe?: string
-  /** JSON array containing a list of the JWS algorithms supported for DPoP proof JWTs. */
+  /**
+   * JSON array containing a list of the JWS algorithms supported for DPoP proof JWTs.
+   */
   readonly dpop_signing_alg_values_supported?: string[]
   /**
    * URL at the authorization server to which an RP can perform a redirect to request that the
@@ -608,14 +668,18 @@ export interface AuthorizationServer {
    * `frontchannel_logout_uri` is used.
    */
   readonly frontchannel_logout_session_supported?: boolean
-  /** Boolean value specifying whether the authorization server supports HTTP-based logout. */
+  /**
+   * Boolean value specifying whether the authorization server supports HTTP-based logout.
+   */
   readonly frontchannel_logout_supported?: boolean
   /**
    * Boolean value specifying whether the authorization server can pass a `sid` (session ID) Claim
    * in the Logout Token to identify the RP session with the OP.
    */
   readonly backchannel_logout_session_supported?: boolean
-  /** Boolean value specifying whether the authorization server supports back-channel logout. */
+  /**
+   * Boolean value specifying whether the authorization server supports back-channel logout.
+   */
   readonly backchannel_logout_supported?: boolean
 
   readonly [metadata: string]: JsonValue | undefined
@@ -640,9 +704,13 @@ export interface MTLSEndpointAliases
  * @see [IANA OAuth Client Registration Metadata registry](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#client-metadata)
  */
 export interface Client {
-  /** Client identifier. */
+  /**
+   * Client identifier.
+   */
   client_id: string
-  /** Client secret. */
+  /**
+   * Client secret.
+   */
   client_secret?: string
   /**
    * Client {@link ClientAuthenticationMethod authentication method} for the client's authenticated
@@ -682,7 +750,9 @@ export interface Client {
    * and fall back to `RS256` when the authorization server metadata is not set.
    */
   introspection_signed_response_alg?: string
-  /** Default Maximum Authentication Age. */
+  /**
+   * Default Maximum Authentication Age.
+   */
   default_max_age?: number
 
   /**
@@ -786,7 +856,9 @@ function b64u(input: string | Uint8Array | ArrayBuffer) {
   return encodeBase64Url(input)
 }
 
-/** Simple LRU */
+/**
+ * Simple LRU
+ */
 class LRU<T1, T2> {
   cache = new Map<T1, T2>()
   _cache = new Map<T1, T2>()
@@ -842,7 +914,9 @@ class LRU<T1, T2> {
   }
 }
 
-/** @group Errors */
+/**
+ * @group Errors
+ */
 export class UnsupportedOperationError extends Error {
   constructor(message?: string) {
     super(message ?? 'operation not supported')
@@ -852,7 +926,9 @@ export class UnsupportedOperationError extends Error {
   }
 }
 
-/** @group Errors */
+/**
+ * @group Errors
+ */
 export class OperationProcessingError extends Error {
   constructor(message: string, options?: { cause?: unknown }) {
     super(message, options)
@@ -906,7 +982,9 @@ export interface HttpRequestOptions {
    */
   signal?: (() => AbortSignal) | AbortSignal
 
-  /** Headers to additionally send with the HTTP Request(s) triggered by this function's invocation. */
+  /**
+   * Headers to additionally send with the HTTP Request(s) triggered by this function's invocation.
+   */
   headers?: [string, string][] | Record<string, string> | Headers
 
   /**
@@ -921,7 +999,9 @@ export interface HttpRequestOptions {
 }
 
 export interface DiscoveryRequestOptions extends HttpRequestOptions {
-  /** The issuer transformation algorithm to use. */
+  /**
+   * The issuer transformation algorithm to use.
+   */
   algorithm?: 'oidc' | 'oauth2'
 }
 
@@ -1093,7 +1173,9 @@ export async function processDiscoveryResponse(
   return json
 }
 
-/** Generates 32 random bytes and encodes them using base64url. */
+/**
+ * Generates 32 random bytes and encodes them using base64url.
+ */
 function randomBytes() {
   return b64u(crypto.getRandomValues(new Uint8Array(32)))
 }
@@ -1183,7 +1265,9 @@ export interface DPoPOptions extends CryptoKeyPair {
    */
   privateKey: CryptoKey
 
-  /** The public key corresponding to {@link DPoPOptions.privateKey}. */
+  /**
+   * The public key corresponding to {@link DPoPOptions.privateKey}.
+   */
   publicKey: CryptoKey
 
   /**
@@ -1195,7 +1279,9 @@ export interface DPoPOptions extends CryptoKeyPair {
 }
 
 export interface DPoPRequestOptions {
-  /** DPoP-related options. */
+  /**
+   * DPoP-related options.
+   */
   DPoP?: DPoPOptions
 }
 
@@ -1247,7 +1333,9 @@ function clientSecretBasic(clientId: string, clientSecret: string) {
   return `Basic ${credentials}`
 }
 
-/** Determines an RSASSA-PSS algorithm identifier from CryptoKey instance properties. */
+/**
+ * Determines an RSASSA-PSS algorithm identifier from CryptoKey instance properties.
+ */
 function psAlg(key: CryptoKey): JWSAlgorithm {
   switch ((<RsaHashedKeyAlgorithm>key.algorithm).hash.name) {
     case 'SHA-256':
@@ -1261,7 +1349,9 @@ function psAlg(key: CryptoKey): JWSAlgorithm {
   }
 }
 
-/** Determines an RSASSA-PKCS1-v1_5 algorithm identifier from CryptoKey instance properties. */
+/**
+ * Determines an RSASSA-PKCS1-v1_5 algorithm identifier from CryptoKey instance properties.
+ */
 function rsAlg(key: CryptoKey): JWSAlgorithm {
   switch ((<RsaHashedKeyAlgorithm>key.algorithm).hash.name) {
     case 'SHA-256':
@@ -1275,7 +1365,9 @@ function rsAlg(key: CryptoKey): JWSAlgorithm {
   }
 }
 
-/** Determines an ECDSA algorithm identifier from CryptoKey instance properties. */
+/**
+ * Determines an ECDSA algorithm identifier from CryptoKey instance properties.
+ */
 function esAlg(key: CryptoKey): JWSAlgorithm {
   switch ((<EcKeyAlgorithm>key.algorithm).namedCurve) {
     case 'P-256':
@@ -1289,7 +1381,9 @@ function esAlg(key: CryptoKey): JWSAlgorithm {
   }
 }
 
-/** Determines a supported JWS `alg` identifier from CryptoKey instance properties. */
+/**
+ * Determines a supported JWS `alg` identifier from CryptoKey instance properties.
+ */
 function keyToJws(key: CryptoKey) {
   switch (key.algorithm.name) {
     case 'RSA-PSS':
@@ -1328,7 +1422,9 @@ function getClockTolerance(client?: Pick<Client, typeof clockTolerance>) {
   return 30
 }
 
-/** Returns the current unix timestamp in seconds. */
+/**
+ * Returns the current unix timestamp in seconds.
+ */
 function epochTime() {
   return Math.floor(Date.now() / 1000)
 }
@@ -1346,7 +1442,9 @@ function clientAssertion(as: AuthorizationServer, client: Client) {
   }
 }
 
-/** Generates a unique client assertion to be used in `private_key_jwt` authenticated requests. */
+/**
+ * Generates a unique client assertion to be used in `private_key_jwt` authenticated requests.
+ */
 async function privateKeyJwt(
   as: AuthorizationServer,
   client: Client,
@@ -1469,7 +1567,9 @@ async function clientAuthentication(
   }
 }
 
-/** Minimal JWT sign() implementation. */
+/**
+ * Minimal JWT sign() implementation.
+ */
 async function jwt(
   header: CompactJWSHeaderParameters,
   claimsSet: Record<string, unknown>,
@@ -1563,7 +1663,9 @@ export async function issueRequestObject(
   )
 }
 
-/** Generates a unique DPoP Proof JWT */
+/**
+ * Generates a unique DPoP Proof JWT
+ */
 async function dpopProofJwt(
   headers: Headers,
   options: DPoPOptions,
@@ -1612,7 +1714,9 @@ async function dpopProofJwt(
 }
 
 let jwkCache: WeakMap<CryptoKey, JWK>
-/** Exports an asymmetric crypto key as bare JWK */
+/**
+ * Exports an asymmetric crypto key as bare JWK
+ */
 async function publicJwk(key: CryptoKey) {
   jwkCache ||= new WeakMap()
   if (jwkCache.has(key)) {
@@ -1753,12 +1857,16 @@ export interface WWWAuthenticateChallengeParameters {
   readonly algs?: string
   readonly scope?: string
 
-  /** NOTE: because the parameter names are case insensitive they are always returned lowercased */
+  /**
+   * NOTE: because the parameter names are case insensitive they are always returned lowercased
+   */
   readonly [parameter: Lowercase<string>]: string | undefined
 }
 
 export interface WWWAuthenticateChallenge {
-  /** NOTE: because the value is case insensitive it is always returned lowercased */
+  /**
+   * NOTE: because the value is case insensitive it is always returned lowercased
+   */
   readonly scheme: Lowercase<string>
   readonly parameters: WWWAuthenticateChallengeParameters
 }
@@ -2314,7 +2422,9 @@ export interface TokenEndpointRequestOptions
   extends HttpRequestOptions,
     AuthenticatedRequestOptions,
     DPoPRequestOptions {
-  /** Any additional parameters to send. This cannot override existing parameter values. */
+  /**
+   * Any additional parameters to send. This cannot override existing parameter values.
+   */
   additionalParameters?: URLSearchParams | Record<string, string> | string[][]
 }
 
@@ -2713,7 +2823,9 @@ export interface TokenEndpointResponse {
   readonly id_token?: string
   readonly refresh_token?: string
   readonly scope?: string
-  /** NOTE: because the value is case insensitive it is always returned lowercased */
+  /**
+   * NOTE: because the value is case insensitive it is always returned lowercased
+   */
   readonly token_type: 'bearer' | 'dpop' | Lowercase<string>
 
   readonly [parameter: string]: JsonValue | undefined
@@ -2725,7 +2837,9 @@ export interface OpenIDTokenEndpointResponse {
   readonly id_token: string
   readonly refresh_token?: string
   readonly scope?: string
-  /** NOTE: because the value is case insensitive it is always returned lowercased */
+  /**
+   * NOTE: because the value is case insensitive it is always returned lowercased
+   */
   readonly token_type: 'bearer' | 'dpop' | Lowercase<string>
 
   readonly [parameter: string]: JsonValue | undefined
@@ -2737,7 +2851,9 @@ export interface OAuth2TokenEndpointResponse {
   readonly id_token?: undefined
   readonly refresh_token?: string
   readonly scope?: string
-  /** NOTE: because the value is case insensitive it is always returned lowercased */
+  /**
+   * NOTE: because the value is case insensitive it is always returned lowercased
+   */
   readonly token_type: 'bearer' | 'dpop' | Lowercase<string>
 
   readonly [parameter: string]: JsonValue | undefined
@@ -2747,7 +2863,9 @@ export interface ClientCredentialsGrantResponse {
   readonly access_token: string
   readonly expires_in?: number
   readonly scope?: string
-  /** NOTE: because the value is case insensitive it is always returned lowercased */
+  /**
+   * NOTE: because the value is case insensitive it is always returned lowercased
+   */
   readonly token_type: 'bearer' | 'dpop' | Lowercase<string>
 
   readonly [parameter: string]: JsonValue | undefined
@@ -2963,7 +3081,9 @@ export async function processClientCredentialsResponse(
 }
 
 export interface RevocationRequestOptions extends HttpRequestOptions, AuthenticatedRequestOptions {
-  /** Any additional parameters to send. This cannot override existing parameter values. */
+  /**
+   * Any additional parameters to send. This cannot override existing parameter values.
+   */
   additionalParameters?: URLSearchParams | Record<string, string> | string[][]
 }
 
@@ -3038,7 +3158,9 @@ export async function processRevocationResponse(
 export interface IntrospectionRequestOptions
   extends HttpRequestOptions,
     AuthenticatedRequestOptions {
-  /** Any additional parameters to send. This cannot override existing parameter values. */
+  /**
+   * Any additional parameters to send. This cannot override existing parameter values.
+   */
   additionalParameters?: URLSearchParams | Record<string, string> | string[][]
   /**
    * Request a JWT Response from the
@@ -3107,7 +3229,9 @@ export interface ConfirmationClaims {
 }
 
 // TODO: remove in v3.x
-/** @ignore */
+/**
+ * @ignore
+ */
 export type IntrospectionConfirmationClaims = ConfirmationClaims
 
 export interface IntrospectionResponse {
@@ -3349,7 +3473,9 @@ function keyToSubtle(key: CryptoKey): AlgorithmIdentifier | RsaPssParams | Ecdsa
 
 const noSignatureCheck = Symbol()
 
-/** Minimal JWT validation implementation. */
+/**
+ * Minimal JWT validation implementation.
+ */
 async function validateJwt(
   jws: string,
   checkAlg: (h: CompactJWSHeaderParameters) => void,
@@ -4109,13 +4235,19 @@ export async function processDeviceCodeResponse(
 }
 
 export interface GenerateKeyPairOptions {
-  /** Indicates whether or not the private key may be exported. Default is `false`. */
+  /**
+   * Indicates whether or not the private key may be exported. Default is `false`.
+   */
   extractable?: boolean
 
-  /** (RSA algorithms only) The length, in bits, of the RSA modulus. Default is `2048`. */
+  /**
+   * (RSA algorithms only) The length, in bits, of the RSA modulus. Default is `2048`.
+   */
   modulusLength?: number
 
-  /** (EdDSA algorithms only) The EdDSA sub-type. Default is `Ed25519`. */
+  /**
+   * (EdDSA algorithms only) The EdDSA sub-type. Default is `Ed25519`.
+   */
   crv?: 'Ed25519' | 'Ed448'
 }
 
@@ -4160,13 +4292,19 @@ export interface JWTAccessTokenClaims extends JWTPayload {
 }
 
 export interface ValidateJWTAccessTokenOptions extends HttpRequestOptions {
-  /** Indicates whether DPoP use is required. */
+  /**
+   * Indicates whether DPoP use is required.
+   */
   requireDPoP?: boolean
 
-  /** Same functionality as in {@link Client} */
+  /**
+   * Same functionality as in {@link Client}
+   */
   [clockSkew]?: number
 
-  /** Same functionality as in {@link Client} */
+  /**
+   * Same functionality as in {@link Client}
+   */
   [clockTolerance]?: number
 }
 

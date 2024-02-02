@@ -7,5 +7,6 @@
   "tsdoc": true,
   "jsdocSeparateReturnsFromParam": true,
   "jsdocSeparateTagGroups": true,
-  "jsdocPrintWidth": 100
+  "jsdocPrintWidth": 100,
+  "jsdocCommentLineStrategy": "multiline"
 }

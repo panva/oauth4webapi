@@ -10,7 +10,9 @@ let client_id!: string
  * Server.
  */
 let redirect_uri!: string
-/** A key corresponding to the mtlsClientCertificate. */
+/**
+ * A key corresponding to the mtlsClientCertificate.
+ */
 let mtlsClientKey!: string
 /**
  * A certificate the client has pre-registered at the Authorization Server for use with Mutual-TLS
