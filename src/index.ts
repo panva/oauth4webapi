@@ -984,13 +984,12 @@ export interface DiscoveryRequestOptions extends HttpRequestOptions {
 
 function processDpopNonce(response: Response) {
   try {
-    if (response.headers.has('dpop-nonce')) {
-      const url = new URL(response.url)
-      dpopNonces.set(url.origin, response.headers.get('dpop-nonce')!)
+    const nonce = response.headers.get('dpop-nonce')
+    if (nonce) {
+      dpopNonces.set(new URL(response.url).origin, nonce)
     }
-  } finally {
-    return response
-  }
+  } catch {}
+  return response
 }
 
 function normalizeTyp(value: string) {
@@ -1072,7 +1071,7 @@ export async function discoveryRequest(
       break
     case 'oauth2':
       if (url.pathname === '/') {
-        url.pathname = `.well-known/oauth-authorization-server`
+        url.pathname = '.well-known/oauth-authorization-server'
       } else {
         url.pathname = `.well-known/oauth-authorization-server/${url.pathname}`.replace('//', '/')
       }
@@ -1373,25 +1372,17 @@ function keyToJws(key: CryptoKey) {
 }
 
 function getClockSkew(client?: Pick<Client, typeof clockSkew>) {
-  if (client && clockSkew in client) {
-    if (Number.isFinite(client[clockSkew])) {
-      return client[clockSkew]!
-    }
-  }
+  const skew = client?.[clockSkew]
 
-  return 0
+  return typeof skew === 'number' && Number.isFinite(skew) ? skew : 0
 }
 
 function getClockTolerance(client?: Pick<Client, typeof clockTolerance>) {
-  if (client && clockTolerance in client) {
-    const tolerance = client[clockTolerance]
+  const tolerance = client?.[clockTolerance]
 
-    if (Number.isFinite(tolerance) && Math.sign(tolerance!) !== -1) {
-      return tolerance!
-    }
-  }
-
-  return 30
+  return typeof tolerance === 'number' && Number.isFinite(tolerance) && Math.sign(tolerance) !== -1
+    ? tolerance
+    : 30
 }
 
 /**
@@ -1608,8 +1599,8 @@ export async function issueRequestObject(
     claims.resource = resource
   }
 
-  if (parameters.has('claims')) {
-    const value = parameters.get('claims')!
+  let value = parameters.get('claims')
+  if (value) {
     if (value === '[object Object]') {
       throw new OPE('"claims" parameter must be passed as a UTF-8 encoded JSON')
     }
@@ -1686,18 +1677,20 @@ async function dpopProofJwt(
 }
 
 let jwkCache: WeakMap<CryptoKey, JWK>
+
+async function getSetPublicJwkCache(key: CryptoKey) {
+  const { kty, e, n, x, y, crv } = await crypto.subtle.exportKey('jwk', key)
+  const jwk = { kty, e, n, x, y, crv }
+  jwkCache.set(key, jwk)
+  return jwk
+}
+
 /**
  * Exports an asymmetric crypto key as bare JWK
  */
 async function publicJwk(key: CryptoKey) {
   jwkCache ||= new WeakMap()
-  if (jwkCache.has(key)) {
-    return jwkCache.get(key)!
-  }
-  const { kty, e, n, x, y, crv } = await crypto.subtle.exportKey('jwk', key)
-  const jwk = { kty, e, n, x, y, crv }
-  jwkCache.set(key, jwk)
-  return jwk
+  return jwkCache.get(key) || getSetPublicJwkCache(key)
 }
 
 function validateEndpoint(
@@ -1708,9 +1701,9 @@ function validateEndpoint(
   if (typeof value !== 'string') {
     if (options?.[useMtlsAlias]) {
       throw new TypeError(`"as.mtls_endpoint_aliases.${endpoint}" must be a string`)
-    } else {
-      throw new TypeError(`"as.${endpoint}" must be a string`)
     }
+
+    throw new TypeError(`"as.${endpoint}" must be a string`)
   }
 
   return new URL(value)
@@ -1899,11 +1892,10 @@ export function parseWwwAuthenticateChallenges(
     throw new TypeError('"response" must be an instance of Response')
   }
 
-  if (!response.headers.has('www-authenticate')) {
+  const header = response.headers.get('www-authenticate')
+  if (header === null) {
     return undefined
   }
-
-  const header = response.headers.get('www-authenticate')!
 
   const result: [string, number][] = []
   for (const { 1: scheme, index } of header.matchAll(SCHEMES_REGEXP)) {
@@ -2246,7 +2238,9 @@ async function getPublicSigKeyFromIssuerJwksUri(
       return getPublicSigKeyFromIssuerJwksUri(as, options, header)
     }
     throw new OPE('error when selecting a JWT verification key, no applicable keys found')
-  } else if (length !== 1) {
+  }
+
+  if (length !== 1) {
     throw new OPE(
       'error when selecting a JWT verification key, multiple applicable keys found, a "kid" JWT Header Parameter is required',
     )
@@ -4276,10 +4270,12 @@ function normalizeHtu(htu: string) {
 async function validateDPoP(
   as: AuthorizationServer,
   request: Request,
+  accessToken: string,
   accessTokenClaims: JWTPayload,
   options?: ValidateJWTAccessTokenOptions,
 ) {
-  if (!request.headers.has('dpop')) {
+  const header = request.headers.get('dpop')
+  if (header === null) {
     throw new OPE('operation indicated DPoP use but the request has no DPoP HTTP Header')
   }
 
@@ -4297,7 +4293,7 @@ async function validateDPoP(
 
   const clockSkew = getClockSkew(options)
   const proof = await validateJwt(
-    request.headers.get('dpop')!,
+    header,
     checkSigningAlgorithm.bind(
       undefined,
       undefined,
@@ -4337,7 +4333,6 @@ async function validateDPoP(
   }
 
   {
-    const accessToken = request.headers.get('authorization')!.split(' ')[1]
     const expected = b64u(await crypto.subtle.digest('SHA-256', encoder.encode(accessToken)))
 
     if (proof.claims.ath !== expected) {
@@ -4429,7 +4424,7 @@ export async function validateJwtAccessToken(
   }
 
   const authorization = request.headers.get('authorization')
-  if (!authorization) {
+  if (authorization === null) {
     throw new OPE('"request" is missing an Authorization HTTP Header')
   }
   let { 0: scheme, 1: accessToken, length } = authorization.split(' ')
@@ -4502,7 +4497,7 @@ export async function validateJwtAccessToken(
     claims.cnf?.jkt !== undefined ||
     request.headers.has('dpop')
   ) {
-    await validateDPoP(as, request, claims, options)
+    await validateDPoP(as, request, accessToken, claims, options)
   }
 
   return <JWTAccessTokenClaims>claims
