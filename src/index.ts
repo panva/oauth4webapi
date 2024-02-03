@@ -221,12 +221,13 @@ export const clockTolerance = Symbol()
  *
  * - Expect Type-related issues when passing the inputs through to fetch-like modules, they hardly
  *   ever get their typings inline with actual fetch, you should `@ts-expect-error` them.
- * - Returning self-constructed {@link Response} instances prohibits AS-signalled DPoP Nonce caching.
+ * - Returning self-constructed {@link Response} instances prohibits AS/RS-signalled DPoP Nonce
+ *   caching.
  *
  * @example
  *
- * Using [sindresorhus/ky](https://github.com/sindresorhus/ky) hooks feature for logging outgoing
- * requests and their responses.
+ * Using [sindresorhus/ky](https://github.com/sindresorhus/ky) for retries and its hooks feature for
+ * logging outgoing requests and their responses.
  *
  * ```js
  * import ky from 'ky'
@@ -260,7 +261,7 @@ export const clockTolerance = Symbol()
  *
  * @example
  *
- * Using [nodejs/undici](https://github.com/nodejs/undici) for mocking.
+ * Using [nodejs/undici](https://github.com/nodejs/undici) to mock responses in tests.
  *
  * ```js
  * import * as undici from 'undici'
