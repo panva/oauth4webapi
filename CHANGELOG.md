@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.10.0](https://github.com/panva/oauth4webapi/compare/v2.9.0...v2.10.0) (2024-02-04)
+
+
+### Features
+
+* **types:** add interfaces for RFC 9396 (Rich Authorization Requests) ([1c606ea](https://github.com/panva/oauth4webapi/commit/1c606eaf67707e05c71c2defa292d3e9d28b2e3a))
+
+
+### Refactor
+
+* some biome identified smells and less non-null assertions ([bc508f6](https://github.com/panva/oauth4webapi/commit/bc508f62725f7bea1a2bd5150434aed0764cbc13))
+
+
+### Documentation
+
+* update customFetch and useMtlsAlias a bit ([627e716](https://github.com/panva/oauth4webapi/commit/627e71689fa537293b0ce8538d7ed583f1783826))
+
+
+### Fixes
+
+* **types:** add missing and optional scope to interfaces ([5dc6d17](https://github.com/panva/oauth4webapi/commit/5dc6d17f78a94e29da7c4e950c0e9781cd4e025d))
+
 ## [2.9.0](https://github.com/panva/oauth4webapi/compare/v2.8.1...v2.9.0) (2024-02-02)
 
 
