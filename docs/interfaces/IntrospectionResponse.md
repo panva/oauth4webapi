@@ -11,7 +11,6 @@
 ### Properties
 
 - [active](IntrospectionResponse.md#active)
-- [scope](IntrospectionResponse.md#scope)
 - [aud](IntrospectionResponse.md#aud)
 - [client\_id](IntrospectionResponse.md#client_id)
 - [cnf](IntrospectionResponse.md#cnf)
@@ -20,6 +19,7 @@
 - [iss](IntrospectionResponse.md#iss)
 - [jti](IntrospectionResponse.md#jti)
 - [nbf](IntrospectionResponse.md#nbf)
+- [scope](IntrospectionResponse.md#scope)
 - [sid](IntrospectionResponse.md#sid)
 - [sub](IntrospectionResponse.md#sub)
 - [token\_type](IntrospectionResponse.md#token_type)
@@ -30,12 +30,6 @@
 ### active
 
 • `Readonly` **active**: `boolean`
-
-___
-
-### scope
-
-• `Readonly` **scope**: `string`
 
 ___
 
@@ -84,6 +78,12 @@ ___
 ### nbf
 
 • `Optional` `Readonly` **nbf**: `number`
+
+___
+
+### scope
+
+• `Optional` `Readonly` **scope**: `string`
 
 ___
 

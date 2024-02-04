@@ -19,6 +19,7 @@
 - [sub](JWTAccessTokenClaims.md#sub)
 - [cnf](JWTAccessTokenClaims.md#cnf)
 - [nbf](JWTAccessTokenClaims.md#nbf)
+- [scope](JWTAccessTokenClaims.md#scope)
 
 ## Properties
 
@@ -73,6 +74,12 @@ ___
 ### nbf
 
 • `Optional` `Readonly` **nbf**: `number`
+
+___
+
+### scope
+
+• `Optional` `Readonly` **scope**: `string`
 
 ## Hierarchy
 

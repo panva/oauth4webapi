@@ -3201,7 +3201,7 @@ export interface IntrospectionResponse {
   readonly jti?: string
   readonly username?: string
   readonly aud?: string | string[]
-  readonly scope: string
+  readonly scope?: string
   readonly sub?: string
   readonly nbf?: number
   readonly token_type?: string
@@ -4240,6 +4240,7 @@ export interface JWTAccessTokenClaims extends JWTPayload {
   readonly iat: number
   readonly jti: string
   readonly client_id: string
+  readonly scope?: string
 
   readonly [claim: string]: JsonValue | undefined
 }
