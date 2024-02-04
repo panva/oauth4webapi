@@ -2780,12 +2780,24 @@ function validatePresence(
   return result
 }
 
+export interface AuthorizationDetails {
+  readonly type: string
+  readonly locations?: string[]
+  readonly actions?: string[]
+  readonly datatypes?: string[]
+  readonly privileges?: string[]
+  readonly identifier?: string
+
+  readonly [parameter: string]: JsonValue | undefined
+}
+
 export interface TokenEndpointResponse {
   readonly access_token: string
   readonly expires_in?: number
   readonly id_token?: string
   readonly refresh_token?: string
   readonly scope?: string
+  readonly authorization_details?: AuthorizationDetails[]
   /**
    * NOTE: because the value is case insensitive it is always returned lowercased
    */
@@ -2800,6 +2812,7 @@ export interface OpenIDTokenEndpointResponse {
   readonly id_token: string
   readonly refresh_token?: string
   readonly scope?: string
+  readonly authorization_details?: AuthorizationDetails[]
   /**
    * NOTE: because the value is case insensitive it is always returned lowercased
    */
@@ -2814,6 +2827,7 @@ export interface OAuth2TokenEndpointResponse {
   readonly id_token?: undefined
   readonly refresh_token?: string
   readonly scope?: string
+  readonly authorization_details?: AuthorizationDetails[]
   /**
    * NOTE: because the value is case insensitive it is always returned lowercased
    */
@@ -2826,6 +2840,7 @@ export interface ClientCredentialsGrantResponse {
   readonly access_token: string
   readonly expires_in?: number
   readonly scope?: string
+  readonly authorization_details?: AuthorizationDetails[]
   /**
    * NOTE: because the value is case insensitive it is always returned lowercased
    */
@@ -3206,6 +3221,7 @@ export interface IntrospectionResponse {
   readonly nbf?: number
   readonly token_type?: string
   readonly cnf?: ConfirmationClaims
+  readonly authorization_details?: AuthorizationDetails[]
 
   readonly [claim: string]: JsonValue | undefined
 }
@@ -4240,6 +4256,7 @@ export interface JWTAccessTokenClaims extends JWTPayload {
   readonly iat: number
   readonly jti: string
   readonly client_id: string
+  readonly authorization_details?: AuthorizationDetails[]
   readonly scope?: string
 
   readonly [claim: string]: JsonValue | undefined

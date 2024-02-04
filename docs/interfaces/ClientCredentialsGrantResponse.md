@@ -12,6 +12,7 @@
 
 - [access\_token](ClientCredentialsGrantResponse.md#access_token)
 - [token\_type](ClientCredentialsGrantResponse.md#token_type)
+- [authorization\_details](ClientCredentialsGrantResponse.md#authorization_details)
 - [expires\_in](ClientCredentialsGrantResponse.md#expires_in)
 - [scope](ClientCredentialsGrantResponse.md#scope)
 
@@ -28,6 +29,12 @@ ___
 • `Readonly` **token\_type**: ``"dpop"`` \| [`Lowercase`]( https://www.typescriptlang.org/docs/handbook/2/template-literal-types.html#lowercasestringtype )\<`string`\> \| ``"bearer"``
 
 NOTE: because the value is case insensitive it is always returned lowercased
+
+___
+
+### authorization\_details
+
+• `Optional` `Readonly` **authorization\_details**: [`AuthorizationDetails`](AuthorizationDetails.md)[]
 
 ___
 

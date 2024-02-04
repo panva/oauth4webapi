@@ -13,6 +13,7 @@
 - [access\_token](OpenIDTokenEndpointResponse.md#access_token)
 - [id\_token](OpenIDTokenEndpointResponse.md#id_token)
 - [token\_type](OpenIDTokenEndpointResponse.md#token_type)
+- [authorization\_details](OpenIDTokenEndpointResponse.md#authorization_details)
 - [expires\_in](OpenIDTokenEndpointResponse.md#expires_in)
 - [refresh\_token](OpenIDTokenEndpointResponse.md#refresh_token)
 - [scope](OpenIDTokenEndpointResponse.md#scope)
@@ -36,6 +37,12 @@ ___
 • `Readonly` **token\_type**: ``"dpop"`` \| [`Lowercase`]( https://www.typescriptlang.org/docs/handbook/2/template-literal-types.html#lowercasestringtype )\<`string`\> \| ``"bearer"``
 
 NOTE: because the value is case insensitive it is always returned lowercased
+
+___
+
+### authorization\_details
+
+• `Optional` `Readonly` **authorization\_details**: [`AuthorizationDetails`](AuthorizationDetails.md)[]
 
 ___
 

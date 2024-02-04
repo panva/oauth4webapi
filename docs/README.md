@@ -135,6 +135,7 @@
 ### Interfaces
 
 - [AuthenticatedRequestOptions](interfaces/AuthenticatedRequestOptions.md)
+- [AuthorizationDetails](interfaces/AuthorizationDetails.md)
 - [AuthorizationServer](interfaces/AuthorizationServer.md)
 - [Client](interfaces/Client.md)
 - [ClientCredentialsGrantRequestOptions](interfaces/ClientCredentialsGrantRequestOptions.md)

@@ -17,6 +17,7 @@
 - [iss](JWTAccessTokenClaims.md#iss)
 - [jti](JWTAccessTokenClaims.md#jti)
 - [sub](JWTAccessTokenClaims.md#sub)
+- [authorization\_details](JWTAccessTokenClaims.md#authorization_details)
 - [cnf](JWTAccessTokenClaims.md#cnf)
 - [nbf](JWTAccessTokenClaims.md#nbf)
 - [scope](JWTAccessTokenClaims.md#scope)
@@ -62,6 +63,12 @@ ___
 ### sub
 
 • `Readonly` **sub**: `string`
+
+___
+
+### authorization\_details
+
+• `Optional` `Readonly` **authorization\_details**: [`AuthorizationDetails`](AuthorizationDetails.md)[]
 
 ___
 

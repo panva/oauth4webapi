@@ -12,6 +12,7 @@
 
 - [active](IntrospectionResponse.md#active)
 - [aud](IntrospectionResponse.md#aud)
+- [authorization\_details](IntrospectionResponse.md#authorization_details)
 - [client\_id](IntrospectionResponse.md#client_id)
 - [cnf](IntrospectionResponse.md#cnf)
 - [exp](IntrospectionResponse.md#exp)
@@ -36,6 +37,12 @@ ___
 ### aud
 
 • `Optional` `Readonly` **aud**: `string` \| `string`[]
+
+___
+
+### authorization\_details
+
+• `Optional` `Readonly` **authorization\_details**: [`AuthorizationDetails`](AuthorizationDetails.md)[]
 
 ___
 
