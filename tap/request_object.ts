@@ -62,13 +62,6 @@ export default (QUnit: QUnit) => {
     const kp = await keys.ES256
 
     await t.rejects(
-      lib.issueRequestObject(issuer, client, new URLSearchParams([['claims', <string>{}]]), {
-        key: kp.privateKey,
-      }),
-      /must be passed as a UTF-8 encoded JSON/,
-    )
-
-    await t.rejects(
       lib.issueRequestObject(issuer, client, new URLSearchParams([['claims', '"']]), {
         key: kp.privateKey,
       }),
@@ -79,7 +72,7 @@ export default (QUnit: QUnit) => {
       lib.issueRequestObject(issuer, client, new URLSearchParams([['claims', 'null']]), {
         key: kp.privateKey,
       }),
-      /parameter must be a top level object/,
+      /parameter must be a JSON with a top level object/,
     )
 
     const jwt = await lib.issueRequestObject(
@@ -103,6 +96,67 @@ export default (QUnit: QUnit) => {
       userinfo: { nickname: null },
       id_token: { email: null },
     })
+  })
+
+  test('issueRequestObject() authorization_details parameter', async (t) => {
+    const kp = await keys.ES256
+
+    await t.rejects(
+      lib.issueRequestObject(
+        issuer,
+        client,
+        new URLSearchParams([['authorization_details', '"']]),
+        {
+          key: kp.privateKey,
+        },
+      ),
+      /failed to parse the "authorization_details" parameter as JSON/,
+    )
+
+    await t.rejects(
+      lib.issueRequestObject(
+        issuer,
+        client,
+        new URLSearchParams([['authorization_details', 'null']]),
+        {
+          key: kp.privateKey,
+        },
+      ),
+      /parameter must be a JSON with a top level array/,
+    )
+
+    const jwt = await lib.issueRequestObject(
+      issuer,
+      client,
+      new URLSearchParams([['authorization_details', JSON.stringify([{ type: 'foo' }])]]),
+      { key: kp.privateKey },
+    )
+
+    const { payload } = await jose.jwtVerify(jwt, kp.publicKey)
+    const { authorization_details } = payload
+    t.propEqual(authorization_details, [{ type: 'foo' }])
+  })
+
+  test('issueRequestObject() max_age parameter', async (t) => {
+    const kp = await keys.ES256
+
+    await t.rejects(
+      lib.issueRequestObject(issuer, client, new URLSearchParams([['max_age', 'null']]), {
+        key: kp.privateKey,
+      }),
+      /parameter must be a number/,
+    )
+
+    const jwt = await lib.issueRequestObject(
+      issuer,
+      client,
+      new URLSearchParams([['max_age', '10']]),
+      { key: kp.privateKey },
+    )
+
+    const { payload } = await jose.jwtVerify(jwt, kp.publicKey)
+    const { max_age } = payload
+    t.propEqual(max_age, 10)
   })
 
   test('issueRequestObject() signature kid', async (t) => {

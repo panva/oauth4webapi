@@ -1600,19 +1600,44 @@ export async function issueRequestObject(
     claims.resource = resource
   }
 
-  let value = parameters.get('claims')
-  if (value) {
-    if (value === '[object Object]') {
-      throw new OPE('"claims" parameter must be passed as a UTF-8 encoded JSON')
-    }
-    try {
-      claims.claims = JSON.parse(value)
-    } catch (cause) {
-      throw new OPE('failed to parse the "claims" parameter as JSON', { cause })
-    }
+  {
+    let value = parameters.get('max_age')
+    if (value !== null) {
+      claims.max_age = parseInt(value, 10)
 
-    if (!isJsonObject(claims.claims)) {
-      throw new OPE('"claims" parameter must be a top level object')
+      if (!Number.isFinite(claims.max_age)) {
+        throw new OPE('"max_age" parameter must be a number')
+      }
+    }
+  }
+
+  {
+    let value = parameters.get('claims')
+    if (value !== null) {
+      try {
+        claims.claims = JSON.parse(value)
+      } catch (cause) {
+        throw new OPE('failed to parse the "claims" parameter as JSON', { cause })
+      }
+
+      if (!isJsonObject(claims.claims)) {
+        throw new OPE('"claims" parameter must be a JSON with a top level object')
+      }
+    }
+  }
+
+  {
+    let value = parameters.get('authorization_details')
+    if (value !== null) {
+      try {
+        claims.authorization_details = JSON.parse(value)
+      } catch (cause) {
+        throw new OPE('failed to parse the "authorization_details" parameter as JSON', { cause })
+      }
+
+      if (!Array.isArray(claims.authorization_details)) {
+        throw new OPE('"authorization_details" parameter must be a JSON with a top level array')
+      }
     }
   }
 
