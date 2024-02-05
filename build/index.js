@@ -1,7 +1,7 @@
 let USER_AGENT;
 if (typeof navigator === 'undefined' || !navigator.userAgent?.startsWith?.('Mozilla/5.0 ')) {
     const NAME = 'oauth4webapi';
-    const VERSION = 'v2.10.0';
+    const VERSION = 'v2.10.1';
     USER_AGENT = `${NAME}/${VERSION}`;
 }
 function looseInstanceOf(input, expected) {
@@ -481,19 +481,41 @@ export async function issueRequestObject(as, client, parameters, privateKey) {
         resource.length > 1) {
         claims.resource = resource;
     }
-    let value = parameters.get('claims');
-    if (value) {
-        if (value === '[object Object]') {
-            throw new OPE('"claims" parameter must be passed as a UTF-8 encoded JSON');
+    {
+        let value = parameters.get('max_age');
+        if (value !== null) {
+            claims.max_age = parseInt(value, 10);
+            if (!Number.isFinite(claims.max_age)) {
+                throw new OPE('"max_age" parameter must be a number');
+            }
         }
-        try {
-            claims.claims = JSON.parse(value);
+    }
+    {
+        let value = parameters.get('claims');
+        if (value !== null) {
+            try {
+                claims.claims = JSON.parse(value);
+            }
+            catch (cause) {
+                throw new OPE('failed to parse the "claims" parameter as JSON', { cause });
+            }
+            if (!isJsonObject(claims.claims)) {
+                throw new OPE('"claims" parameter must be a JSON with a top level object');
+            }
         }
-        catch (cause) {
-            throw new OPE('failed to parse the "claims" parameter as JSON', { cause });
-        }
-        if (!isJsonObject(claims.claims)) {
-            throw new OPE('"claims" parameter must be a top level object');
+    }
+    {
+        let value = parameters.get('authorization_details');
+        if (value !== null) {
+            try {
+                claims.authorization_details = JSON.parse(value);
+            }
+            catch (cause) {
+                throw new OPE('failed to parse the "authorization_details" parameter as JSON', { cause });
+            }
+            if (!Array.isArray(claims.authorization_details)) {
+                throw new OPE('"authorization_details" parameter must be a JSON with a top level array');
+            }
         }
     }
     return jwt({
