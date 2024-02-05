@@ -930,34 +930,65 @@ function buf(input: string | Uint8Array) {
   return decoder.decode(input)
 }
 
-const CHUNK_SIZE = 0x8000
-function encodeBase64Url(input: Uint8Array | ArrayBuffer) {
-  if (input instanceof ArrayBuffer) {
-    input = new Uint8Array(input)
-  }
+let encodeBase64Url: (input: Uint8Array | ArrayBuffer) => string
+// @ts-expect-error
+if (Uint8Array.prototype.toBase64) {
+  encodeBase64Url = (input) => {
+    if (input instanceof ArrayBuffer) {
+      input = new Uint8Array(input)
+    }
 
-  const arr = []
-  for (let i = 0; i < input.byteLength; i += CHUNK_SIZE) {
     // @ts-expect-error
-    arr.push(String.fromCharCode.apply(null, input.subarray(i, i + CHUNK_SIZE)))
+    return input.toBase64({ alphabet: 'base64url', omitPadding: true })
   }
-  return btoa(arr.join('')).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_')
+} else {
+  const CHUNK_SIZE = 0x8000
+  encodeBase64Url = (input) => {
+    if (input instanceof ArrayBuffer) {
+      input = new Uint8Array(input)
+    }
+
+    const arr = []
+    for (let i = 0; i < input.byteLength; i += CHUNK_SIZE) {
+      // @ts-expect-error
+      arr.push(String.fromCharCode.apply(null, input.subarray(i, i + CHUNK_SIZE)))
+    }
+    return btoa(arr.join('')).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_')
+  }
 }
 
-function decodeBase64Url(input: string) {
-  try {
-    const binary = atob(input.replace(/-/g, '+').replace(/_/g, '/').replace(/\s/g, ''))
-    const bytes = new Uint8Array(binary.length)
-    for (let i = 0; i < binary.length; i++) {
-      bytes[i] = binary.charCodeAt(i)
+let decodeBase64Url: (input: string) => Uint8Array
+
+// @ts-expect-error
+if (Uint8Array.fromBase64) {
+  decodeBase64Url = (input) => {
+    try {
+      // @ts-expect-error
+      return Uint8Array.fromBase64(input, { alphabet: 'base64url' })
+    } catch (cause) {
+      throw CodedTypeError(
+        'The input to be decoded is not correctly encoded.',
+        ERR_INVALID_ARG_VALUE,
+        cause,
+      )
     }
-    return bytes
-  } catch (cause) {
-    throw CodedTypeError(
-      'The input to be decoded is not correctly encoded.',
-      ERR_INVALID_ARG_VALUE,
-      cause,
-    )
+  }
+} else {
+  decodeBase64Url = (input) => {
+    try {
+      const binary = atob(input.replace(/-/g, '+').replace(/_/g, '/').replace(/\s/g, ''))
+      const bytes = new Uint8Array(binary.length)
+      for (let i = 0; i < binary.length; i++) {
+        bytes[i] = binary.charCodeAt(i)
+      }
+      return bytes
+    } catch (cause) {
+      throw CodedTypeError(
+        'The input to be decoded is not correctly encoded.',
+        ERR_INVALID_ARG_VALUE,
+        cause,
+      )
+    }
   }
 }
 
