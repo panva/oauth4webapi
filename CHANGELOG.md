@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.10.2](https://github.com/panva/oauth4webapi/compare/v2.10.0...v2.10.2) (2024-02-05)
+
+
+### Fixes
+
+* normalize authorization_details and max_age in issueRequestObject ([f8d267e](https://github.com/panva/oauth4webapi/commit/f8d267e2a876de01676d42d67a919044542fb13a))
+
 ## [2.10.0](https://github.com/panva/oauth4webapi/compare/v2.9.0...v2.10.0) (2024-02-04)
 
 
