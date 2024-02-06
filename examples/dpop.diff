@@ -1,5 +1,5 @@
 diff --git a/examples/code.ts b/examples/dpop.ts
-index 1405ead..b61a991 100644
+index 1405ead..84a34e4 100644
 --- a/examples/code.ts
 +++ b/examples/dpop.ts
 @@ -10,6 +10,12 @@ let client_secret!: string
@@ -76,7 +76,7 @@ index 1405ead..b61a991 100644
 +      challenge.scheme === 'dpop' &&
 +      challenge.parameters.error === 'use_dpop_nonce'
 +    ) {
-+      // the AS-signalled nonce is now cached, retying
++      // the AS-signalled nonce is now cached, retrying
 +      response = await userInfoRequest()
 +    } else {
 +      for (const challenge of challenges) {

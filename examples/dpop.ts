@@ -122,7 +122,7 @@ let access_token: string
       challenge.scheme === 'dpop' &&
       challenge.parameters.error === 'use_dpop_nonce'
     ) {
-      // the AS-signalled nonce is now cached, retying
+      // the AS-signalled nonce is now cached, retrying
       response = await userInfoRequest()
     } else {
       for (const challenge of challenges) {
