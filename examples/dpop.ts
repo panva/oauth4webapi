@@ -71,14 +71,10 @@ let access_token: string
     throw new Error() // Handle OAuth 2.0 redirect error
   }
 
-  const response = await oauth.authorizationCodeGrantRequest(
-    as,
-    client,
-    params,
-    redirect_uri,
-    code_verifier,
-    { DPoP },
-  )
+  const authorizationCodeGrantRequest = () =>
+    oauth.authorizationCodeGrantRequest(as, client, params, redirect_uri, code_verifier, { DPoP })
+
+  let response = await authorizationCodeGrantRequest()
 
   let challenges: oauth.WWWAuthenticateChallenge[] | undefined
   if ((challenges = oauth.parseWwwAuthenticateChallenges(response))) {
@@ -88,13 +84,22 @@ let access_token: string
     throw new Error() // Handle www-authenticate challenges as needed
   }
 
-  const result = await oauth.processAuthorizationCodeOpenIDResponse(as, client, response, nonce)
+  const processAuthorizationCodeOpenIDResponse = () =>
+    oauth.processAuthorizationCodeOpenIDResponse(as, client, response, nonce)
+
+  let result = await processAuthorizationCodeOpenIDResponse()
   if (oauth.isOAuth2Error(result)) {
     console.log('error', result)
     if (result.error === 'use_dpop_nonce') {
-      // the AS-signalled nonce is now cached, you should retry
+      // the AS-signalled nonce is now cached, retrying
+      response = await authorizationCodeGrantRequest()
+      result = await processAuthorizationCodeOpenIDResponse()
+      if (oauth.isOAuth2Error(result)) {
+        throw new Error() // Handle OAuth 2.0 response body error
+      }
+    } else {
+      throw new Error() // Handle OAuth 2.0 response body error
     }
-    throw new Error() // Handle OAuth 2.0 response body error
   }
 
   console.log('result', result)
@@ -106,17 +111,25 @@ let access_token: string
 
 // fetch userinfo response
 {
-  const response = await oauth.userInfoRequest(as, client, access_token, { DPoP })
+  const userInfoRequest = () => oauth.userInfoRequest(as, client, access_token, { DPoP })
+  let response = await userInfoRequest()
 
   let challenges: oauth.WWWAuthenticateChallenge[] | undefined
   if ((challenges = oauth.parseWwwAuthenticateChallenges(response))) {
-    for (const challenge of challenges) {
-      console.log('challenge', challenge)
-      if (challenge.scheme === 'dpop' && challenge.parameters.error === 'use_dpop_nonce') {
-        // the AS-signalled nonce is now cached, you should retry
+    const { 0: challenge, length } = challenges
+    if (
+      length === 1 &&
+      challenge.scheme === 'dpop' &&
+      challenge.parameters.error === 'use_dpop_nonce'
+    ) {
+      // the AS-signalled nonce is now cached, retying
+      response = await userInfoRequest()
+    } else {
+      for (const challenge of challenges) {
+        console.log('challenge', challenge)
       }
+      throw new Error() // Handle www-authenticate challenges as needed
     }
-    throw new Error() // Handle www-authenticate challenges as needed
   }
 
   const result = await oauth.processUserInfoResponse(as, client, sub, response)
