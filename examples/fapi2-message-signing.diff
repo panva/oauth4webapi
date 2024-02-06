@@ -1,5 +1,5 @@
 diff --git a/examples/fapi2.ts b/examples/fapi2-message-signing.ts
-index 2f73b7a..f49f057 100644
+index 6899fee..d558e4e 100644
 --- a/examples/fapi2.ts
 +++ b/examples/fapi2-message-signing.ts
 @@ -20,6 +20,11 @@ let DPoP!: CryptoKeyPair
@@ -46,8 +46,8 @@ index 2f73b7a..f49f057 100644
  {
    // @ts-expect-error
    const currentUrl: URL = getCurrentUrl()
--  const params = oauth.validateAuthResponse(as, client, currentUrl, oauth.expectNoState)
-+  const params = await oauth.validateJwtAuthResponse(as, client, currentUrl, oauth.expectNoState)
+-  const params = oauth.validateAuthResponse(as, client, currentUrl)
++  const params = await oauth.validateJwtAuthResponse(as, client, currentUrl)
    if (oauth.isOAuth2Error(params)) {
      console.log('error', params)
      throw new Error() // Handle OAuth 2.0 redirect error

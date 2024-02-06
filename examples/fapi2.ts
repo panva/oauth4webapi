@@ -82,7 +82,7 @@ let request_uri: string
 {
   // @ts-expect-error
   const currentUrl: URL = getCurrentUrl()
-  const params = oauth.validateAuthResponse(as, client, currentUrl, oauth.expectNoState)
+  const params = oauth.validateAuthResponse(as, client, currentUrl)
   if (oauth.isOAuth2Error(params)) {
     console.log('error', params)
     throw new Error() // Handle OAuth 2.0 redirect error

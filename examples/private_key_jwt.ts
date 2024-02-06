@@ -26,27 +26,34 @@ const client: oauth.Client = {
   token_endpoint_auth_method: 'private_key_jwt',
 }
 
-if (as.code_challenge_methods_supported?.includes('S256') !== true) {
-  /**
-   * This example assumes S256 PKCE support is signalled. If it isn't supported, a unique random
-   * `nonce` for each authorization request must be used for CSRF protection.
-   */
-  throw new Error()
-}
-
+const code_challenge_method = 'S256'
+/**
+ * The following MUST be generated for every redirect to the authorization_endpoint. You must store
+ * the code_verifier and nonce in the end-user session such that it can be recovered as the user
+ * gets redirected from the authorization server back to your application.
+ */
 const code_verifier = oauth.generateRandomCodeVerifier()
 const code_challenge = await oauth.calculatePKCECodeChallenge(code_verifier)
-const code_challenge_method = 'S256'
+let nonce: string | undefined
 
 {
   // redirect user to as.authorization_endpoint
   const authorizationUrl = new URL(as.authorization_endpoint!)
   authorizationUrl.searchParams.set('client_id', client.client_id)
-  authorizationUrl.searchParams.set('code_challenge', code_challenge)
-  authorizationUrl.searchParams.set('code_challenge_method', code_challenge_method)
   authorizationUrl.searchParams.set('redirect_uri', redirect_uri)
   authorizationUrl.searchParams.set('response_type', 'code')
   authorizationUrl.searchParams.set('scope', 'openid email')
+  authorizationUrl.searchParams.set('code_challenge', code_challenge)
+  authorizationUrl.searchParams.set('code_challenge_method', code_challenge_method)
+
+  /**
+   * We cannot be sure the AS supports PKCE so we're going to use nonce too. Use of PKCE is
+   * backwards compatible even if the AS doesn't support it which is why we're using it regardless.
+   */
+  if (as.code_challenge_methods_supported?.includes('S256') !== true) {
+    nonce = oauth.generateRandomNonce()
+    authorizationUrl.searchParams.set('nonce', nonce)
+  }
 }
 
 // one eternity later, the user lands back on the redirect_uri
@@ -55,7 +62,7 @@ let access_token: string
 {
   // @ts-expect-error
   const currentUrl: URL = getCurrentUrl()
-  const params = oauth.validateAuthResponse(as, client, currentUrl, oauth.expectNoState)
+  const params = oauth.validateAuthResponse(as, client, currentUrl)
   if (oauth.isOAuth2Error(params)) {
     console.log('error', params)
     throw new Error() // Handle OAuth 2.0 redirect error
@@ -78,7 +85,7 @@ let access_token: string
     throw new Error() // Handle www-authenticate challenges as needed
   }
 
-  const result = await oauth.processAuthorizationCodeOpenIDResponse(as, client, response)
+  const result = await oauth.processAuthorizationCodeOpenIDResponse(as, client, response, nonce)
   if (oauth.isOAuth2Error(result)) {
     console.log('error', result)
     throw new Error() // Handle OAuth 2.0 response body error

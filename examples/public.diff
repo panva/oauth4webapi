@@ -1,5 +1,5 @@
 diff --git a/examples/code.ts b/examples/public.ts
-index 895d96e..ba360f4 100644
+index 1405ead..2dab8af 100644
 --- a/examples/code.ts
 +++ b/examples/public.ts
 @@ -4,7 +4,6 @@ import * as oauth from '../src/index.js' // replace with an import of oauth4weba
@@ -19,4 +19,4 @@ index 895d96e..ba360f4 100644
 +  token_endpoint_auth_method: 'none',
  }
  
- if (as.code_challenge_methods_supported?.includes('S256') !== true) {
+ const code_challenge_method = 'S256'
