@@ -124,21 +124,25 @@ export default (QUnit: QUnit) => {
 
       let request_uri!: string
       if (par) {
-        let response = await lib.pushedAuthorizationRequest(as, client, params, { DPoP })
+        const pushedAuthorizationRequest = () =>
+          lib.pushedAuthorizationRequest(as, client, params, { DPoP })
+        let response = await pushedAuthorizationRequest()
         if (lib.parseWwwAuthenticateChallenges(response)) {
           t.ok(0)
           throw new Error()
         }
 
-        let result = await lib.processPushedAuthorizationResponse(as, client, response)
+        const processPushedAuthorizationResponse = () =>
+          lib.processPushedAuthorizationResponse(as, client, response)
+        let result = await processPushedAuthorizationResponse()
         if (lib.isOAuth2Error(result)) {
           if (isDpopNonceError(result)) {
-            response = await lib.pushedAuthorizationRequest(as, client, params, { DPoP })
+            response = await pushedAuthorizationRequest()
             if (lib.parseWwwAuthenticateChallenges(response)) {
               t.ok(0)
               throw new Error()
             }
-            result = await lib.processPushedAuthorizationResponse(as, client, response)
+            result = await processPushedAuthorizationResponse()
             if (lib.isOAuth2Error(result)) {
               t.ok(0)
               throw new Error()
@@ -185,32 +189,29 @@ export default (QUnit: QUnit) => {
       }
 
       {
-        let response = await lib.authorizationCodeGrantRequest(
-          as,
-          client,
-          callbackParams,
-          'http://localhost:3000/cb',
-          code_verifier,
-          { DPoP },
-        )
+        const authorizationCodeGrantRequest = () =>
+          lib.authorizationCodeGrantRequest(
+            as,
+            client,
+            callbackParams,
+            'http://localhost:3000/cb',
+            code_verifier,
+            { DPoP },
+          )
+        let response = await authorizationCodeGrantRequest()
 
         if (lib.parseWwwAuthenticateChallenges(response)) {
           t.ok(0)
           throw new Error()
         }
 
-        let result = await lib.processAuthorizationCodeOpenIDResponse(as, client, response)
+        const processAuthorizationCodeOpenIDResponse = () =>
+          lib.processAuthorizationCodeOpenIDResponse(as, client, response)
+        let result = await processAuthorizationCodeOpenIDResponse()
         if (lib.isOAuth2Error(result)) {
           if (isDpopNonceError(result)) {
-            response = await lib.authorizationCodeGrantRequest(
-              as,
-              client,
-              callbackParams,
-              'http://localhost:3000/cb',
-              code_verifier,
-              { DPoP },
-            )
-            result = await lib.processAuthorizationCodeOpenIDResponse(as, client, response)
+            response = await authorizationCodeGrantRequest()
+            result = await processAuthorizationCodeOpenIDResponse()
             if (lib.isOAuth2Error(result)) {
               t.ok(0)
               throw new Error()
@@ -230,7 +231,18 @@ export default (QUnit: QUnit) => {
         const { sub } = lib.getValidatedIdTokenClaims(result)
 
         {
-          let response = await lib.userInfoRequest(as, client, access_token, { DPoP })
+          const userInfoRequest = () => lib.userInfoRequest(as, client, access_token, { DPoP })
+          let response = await userInfoRequest()
+
+          let challenges: lib.WWWAuthenticateChallenge[] | undefined
+          if ((challenges = lib.parseWwwAuthenticateChallenges(response))) {
+            if (isDpopNonceError(challenges)) {
+              response = await userInfoRequest()
+            } else {
+              t.ok(0)
+              throw new Error()
+            }
+          }
 
           const clone = await response.clone().text()
           if (jwtUserinfo) {
@@ -239,26 +251,18 @@ export default (QUnit: QUnit) => {
             t.ok(JSON.parse(clone))
           }
 
-          let challenges: lib.WWWAuthenticateChallenge[] | undefined
-          if ((challenges = lib.parseWwwAuthenticateChallenges(response))) {
-            if (isDpopNonceError(challenges)) {
-              response = await lib.userInfoRequest(as, client, access_token, { DPoP })
-            } else {
-              t.ok(0)
-              throw new Error()
-            }
-          }
-
           await lib.processUserInfoResponse(as, client, sub, response)
         }
 
         {
-          let response = await lib.refreshTokenGrantRequest(as, client, refresh_token, { DPoP })
+          const refreshTokenGrantRequest = () =>
+            lib.refreshTokenGrantRequest(as, client, refresh_token, { DPoP })
+          let response = await refreshTokenGrantRequest()
 
           let challenges: lib.WWWAuthenticateChallenge[] | undefined
           if ((challenges = lib.parseWwwAuthenticateChallenges(response))) {
             if (isDpopNonceError(challenges)) {
-              response = await lib.refreshTokenGrantRequest(as, client, refresh_token, { DPoP })
+              response = await refreshTokenGrantRequest()
             } else {
               t.ok(0)
               throw new Error()

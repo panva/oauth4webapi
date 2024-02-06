@@ -91,24 +91,25 @@ export default (QUnit: QUnit) => {
       params.set('scope', 'api:write')
 
       {
-        let response = await lib.clientCredentialsGrantRequest(as, client, params, {
-          DPoP,
-          ...authenticated,
-        })
+        const clientCredentialsGrantRequest = () =>
+          lib.clientCredentialsGrantRequest(as, client, params, {
+            DPoP,
+            ...authenticated,
+          })
+        let response = await clientCredentialsGrantRequest()
 
         if (lib.parseWwwAuthenticateChallenges(response)) {
           t.ok(0)
           throw new Error()
         }
 
-        let result = await lib.processClientCredentialsResponse(as, client, response)
+        const processClientCredentialsResponse = () =>
+          lib.processClientCredentialsResponse(as, client, response)
+        let result = await processClientCredentialsResponse()
         if (lib.isOAuth2Error(result)) {
           if (isDpopNonceError(result)) {
-            response = await lib.clientCredentialsGrantRequest(as, client, params, {
-              DPoP,
-              ...authenticated,
-            })
-            result = await lib.processClientCredentialsResponse(as, client, response)
+            response = await clientCredentialsGrantRequest()
+            result = await processClientCredentialsResponse()
             if (lib.isOAuth2Error(result)) {
               t.ok(0)
               throw new Error()

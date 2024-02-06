@@ -64,18 +64,21 @@ export default (QUnit: QUnit) => {
       })
 
       {
-        let response = await lib.deviceCodeGrantRequest(as, client, device_code, { DPoP })
+        const deviceCodeGrantRequest = () =>
+          lib.deviceCodeGrantRequest(as, client, device_code, { DPoP })
+        let response = await deviceCodeGrantRequest()
 
         if (lib.parseWwwAuthenticateChallenges(response)) {
           t.ok(0)
           throw new Error()
         }
 
-        let result = await lib.processDeviceCodeResponse(as, client, response)
+        const processDeviceCodeResponse = () => lib.processDeviceCodeResponse(as, client, response)
+        let result = await processDeviceCodeResponse()
         if (lib.isOAuth2Error(result)) {
           if (isDpopNonceError(result)) {
-            response = await lib.deviceCodeGrantRequest(as, client, device_code, { DPoP })
-            result = await lib.processDeviceCodeResponse(as, client, response)
+            response = await deviceCodeGrantRequest()
+            result = await processDeviceCodeResponse()
             if (lib.isOAuth2Error(result)) {
               t.ok(0)
               throw new Error()
