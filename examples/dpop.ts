@@ -57,6 +57,8 @@ let nonce: string | undefined
     nonce = oauth.generateRandomNonce()
     authorizationUrl.searchParams.set('nonce', nonce)
   }
+
+  // now redirect the user to authorizationUrl.href
 }
 
 // one eternity later, the user lands back on the redirect_uri

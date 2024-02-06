@@ -65,6 +65,8 @@ let request: string
   const authorizationUrl = new URL(as.authorization_endpoint!)
   authorizationUrl.searchParams.set('client_id', client.client_id)
   authorizationUrl.searchParams.set('request', request)
+
+  // now redirect the user to authorizationUrl.href
 }
 
 // one eternity later, the user lands back on the redirect_uri

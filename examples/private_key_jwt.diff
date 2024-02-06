@@ -1,5 +1,5 @@
 diff --git a/examples/code.ts b/examples/private_key_jwt.ts
-index 1405ead..3bd51c2 100644
+index a7303f1..9a34637 100644
 --- a/examples/code.ts
 +++ b/examples/private_key_jwt.ts
 @@ -4,12 +4,16 @@ import * as oauth from '../src/index.js' // replace with an import of oauth4weba
@@ -30,7 +30,7 @@ index 1405ead..3bd51c2 100644
  }
  
  const code_challenge_method = 'S256'
-@@ -71,6 +74,7 @@ let access_token: string
+@@ -73,6 +76,7 @@ let access_token: string
      params,
      redirect_uri,
      code_verifier,

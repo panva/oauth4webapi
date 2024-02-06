@@ -1,5 +1,5 @@
 diff --git a/examples/code.ts b/examples/public.ts
-index 1405ead..2dab8af 100644
+index a7303f1..c8b525e 100644
 --- a/examples/code.ts
 +++ b/examples/public.ts
 @@ -4,7 +4,6 @@ import * as oauth from '../src/index.js' // replace with an import of oauth4weba

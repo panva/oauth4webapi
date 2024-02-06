@@ -1,5 +1,5 @@
 diff --git a/examples/code.ts b/examples/par.ts
-index 1405ead..7da916d 100644
+index a7303f1..e31489e 100644
 --- a/examples/code.ts
 +++ b/examples/par.ts
 @@ -33,15 +33,15 @@ const code_verifier = oauth.generateRandomCodeVerifier()
@@ -26,7 +26,7 @@ index 1405ead..7da916d 100644
  
    /**
     * We cannot be sure the AS supports PKCE so we're going to use nonce too. Use of PKCE is
-@@ -49,8 +49,33 @@ let nonce: string | undefined
+@@ -49,9 +49,34 @@ let nonce: string | undefined
     */
    if (as.code_challenge_methods_supported?.includes('S256') !== true) {
      nonce = oauth.generateRandomNonce()
@@ -48,7 +48,7 @@ index 1405ead..7da916d 100644
 +    console.log('error', result)
 +    throw new Error() // Handle OAuth 2.0 response body error
    }
-+
+ 
 +  console.log('result', result)
 +  ;({ request_uri } = result)
 +}
@@ -58,6 +58,7 @@ index 1405ead..7da916d 100644
 +  const authorizationUrl = new URL(as.authorization_endpoint!)
 +  authorizationUrl.searchParams.set('client_id', client.client_id)
 +  authorizationUrl.searchParams.set('request_uri', request_uri)
++
+   // now redirect the user to authorizationUrl.href
  }
  
- // one eternity later, the user lands back on the redirect_uri

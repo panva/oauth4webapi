@@ -51,6 +51,8 @@ let state: string | undefined
     state = oauth.generateRandomState()
     authorizationUrl.searchParams.set('state', state)
   }
+
+  // now redirect the user to authorizationUrl.href
 }
 
 // one eternity later, the user lands back on the redirect_uri
