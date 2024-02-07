@@ -56,7 +56,7 @@ import * as oauth2 from 'https://deno.land/x/oauth4webapi@v2.10.2/mod.ts'
 - Device Authorization Grant - [source](examples/device_authorization_grant.ts)
 - FAPI 1.0 Advanced (Private Key JWT, MTLS, JAR) - [source](examples/fapi1-advanced.ts)
 - FAPI 2.0 Security Profile (Private Key JWT, PAR, DPoP) - [source](examples/fapi2.ts)
-- FAPI 2.0 Message Signing (Private Key JWT, PAR, DPoP, JAR, JARM) - [source](examples/fapi2-message-signing.ts) | [diff](examples/fapi2-message-signing.diff)
+- FAPI 2.0 Message Signing (Private Key JWT, PAR, DPoP, JAR, JARM) - [source](examples/fapi2-message-signing.ts) | [diff from FAPI 2.0 SP](examples/fapi2-message-signing.diff)
 
 ## Supported Runtimes
 
