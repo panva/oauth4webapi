@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.10.3](https://github.com/panva/oauth4webapi/compare/v2.10.2...v2.10.3) (2024-02-07)
+
+
+### Refactor
+
+* make protectedResourceRequest headers argument optional ([bcbc872](https://github.com/panva/oauth4webapi/commit/bcbc8726265e98d8db87c3564e3725183dd8c9ee))
+
+
+### Documentation
+
+* update all examples ([cdcbbde](https://github.com/panva/oauth4webapi/commit/cdcbbdef6d94da9420b906d3dfb68bb618e4f9d7))
+
 ## [2.10.2](https://github.com/panva/oauth4webapi/compare/v2.10.0...v2.10.2) (2024-02-05)
 
 
