@@ -529,8 +529,8 @@ export const green = (options?: MacroOptions) =>
             access_token,
             'GET',
             new URL(accounts_endpoint),
-            new Headers(),
-            null,
+            undefined,
+            undefined,
             {
               ...clientAuthOptions('resource'),
               DPoP,

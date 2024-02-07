@@ -23,8 +23,8 @@ export default async (QUnit: QUnit) => {
           'accessToken',
           'GET',
           new URL('https://rs.example.com/api'),
-          new Headers(),
-          null,
+          undefined,
+          undefined,
           { DPoP: { privateKey, publicKey } },
         ),
         (err: Error) => {

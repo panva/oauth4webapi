@@ -97,7 +97,7 @@ export default (QUnit: QUnit) => {
           access_token,
           'GET',
           new URL('http://localhost:3001/resource'),
-          new Headers(),
+          undefined,
           undefined,
           {
             DPoP,

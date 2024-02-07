@@ -2038,7 +2038,7 @@ export async function protectedResourceRequest(
   accessToken: string,
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | string,
   url: URL,
-  headers: Headers,
+  headers?: Headers,
   body?:
     | ReadableStream
     | Blob

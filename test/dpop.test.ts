@@ -36,7 +36,7 @@ test('dpop()', async (t) => {
     .reply(200, '')
 
   const url = new URL('https://rs.example.com/resource?foo#bar')
-  const response = await lib.protectedResourceRequest('token', 'GET', url, new Headers(), null, {
+  const response = await lib.protectedResourceRequest('token', 'GET', url, undefined, undefined, {
     DPoP: sign,
   })
   t.true(response instanceof Response)
@@ -61,7 +61,7 @@ test('dpop() w/ a nonce', async (t) => {
     .reply(401, '', { headers: { 'DPoP-Nonce': 'foo' } })
 
   const url = new URL('https://rs2.example.com/resource?foo#bar')
-  await lib.protectedResourceRequest('token', 'GET', url, new Headers(), null, {
+  await lib.protectedResourceRequest('token', 'GET', url, undefined, undefined, {
     DPoP: sign,
   })
 
@@ -80,7 +80,7 @@ test('dpop() w/ a nonce', async (t) => {
     })
     .reply(200, '')
 
-  await lib.protectedResourceRequest('token', 'GET', url, new Headers(), null, {
+  await lib.protectedResourceRequest('token', 'GET', url, undefined, undefined, {
     DPoP: sign,
   })
 })

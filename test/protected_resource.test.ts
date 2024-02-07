@@ -19,6 +19,6 @@ test('protectedResource()', async (t) => {
     })
     .reply(200, '')
   const url = new URL('https://rs.example.com/resource')
-  const response = await lib.protectedResourceRequest('token', 'GET', url, new Headers(), null)
+  const response = await lib.protectedResourceRequest('token', 'GET', url)
   t.true(response instanceof Response)
 })
