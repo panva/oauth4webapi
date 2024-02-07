@@ -3,6 +3,10 @@ import * as oauth from '../src/index.js' // replace with an import of oauth4weba
 // Prerequisites
 
 let issuer!: URL // Authorization server's Issuer Identifier URL
+let algorithm!:
+  | 'oauth2' /* For .well-known/oauth-authorization-server discovery */
+  | 'oidc' /* For .well-known/openid-configuration discovery */
+  | undefined /* Defaults to 'oidc' */
 let client_id!: string
 let client_secret!: string
 /**
@@ -20,7 +24,7 @@ let DPoP!: CryptoKeyPair
 // End of prerequisites
 
 const as = await oauth
-  .discoveryRequest(issuer)
+  .discoveryRequest(issuer, { algorithm })
   .then((response) => oauth.processDiscoveryResponse(issuer, response))
 
 const client: oauth.Client = {
@@ -37,7 +41,7 @@ const code_challenge_method = 'S256'
  */
 const code_verifier = oauth.generateRandomCodeVerifier()
 const code_challenge = await oauth.calculatePKCECodeChallenge(code_verifier)
-let nonce: string | undefined
+let state: string | undefined
 
 {
   // redirect user to as.authorization_endpoint
@@ -45,31 +49,31 @@ let nonce: string | undefined
   authorizationUrl.searchParams.set('client_id', client.client_id)
   authorizationUrl.searchParams.set('redirect_uri', redirect_uri)
   authorizationUrl.searchParams.set('response_type', 'code')
-  authorizationUrl.searchParams.set('scope', 'openid email')
+  authorizationUrl.searchParams.set('scope', 'api:read')
   authorizationUrl.searchParams.set('code_challenge', code_challenge)
   authorizationUrl.searchParams.set('code_challenge_method', code_challenge_method)
 
   /**
-   * We cannot be sure the AS supports PKCE so we're going to use nonce too. Use of PKCE is
+   * We cannot be sure the AS supports PKCE so we're going to use state too. Use of PKCE is
    * backwards compatible even if the AS doesn't support it which is why we're using it regardless.
    */
   if (as.code_challenge_methods_supported?.includes('S256') !== true) {
-    nonce = oauth.generateRandomNonce()
-    authorizationUrl.searchParams.set('nonce', nonce)
+    state = oauth.generateRandomState()
+    authorizationUrl.searchParams.set('state', state)
   }
 
   // now redirect the user to authorizationUrl.href
 }
 
 // one eternity later, the user lands back on the redirect_uri
-let sub: string
+// Authorization Code Grant Request & Response
 let access_token: string
 {
   // @ts-expect-error
   const currentUrl: URL = getCurrentUrl()
-  const params = oauth.validateAuthResponse(as, client, currentUrl)
+  const params = oauth.validateAuthResponse(as, client, currentUrl, state)
   if (oauth.isOAuth2Error(params)) {
-    console.log('error', params)
+    console.error('Error Response', params)
     throw new Error() // Handle OAuth 2.0 redirect error
   }
 
@@ -81,21 +85,21 @@ let access_token: string
   let challenges: oauth.WWWAuthenticateChallenge[] | undefined
   if ((challenges = oauth.parseWwwAuthenticateChallenges(response))) {
     for (const challenge of challenges) {
-      console.log('challenge', challenge)
+      console.error('WWW-Authenticate Challenge', challenge)
     }
-    throw new Error() // Handle www-authenticate challenges as needed
+    throw new Error() // Handle WWW-Authenticate Challenges as needed
   }
 
-  const processAuthorizationCodeOpenIDResponse = () =>
-    oauth.processAuthorizationCodeOpenIDResponse(as, client, response, nonce)
+  const processAuthorizationCodeOAuth2Response = () =>
+    oauth.processAuthorizationCodeOAuth2Response(as, client, response)
 
-  let result = await processAuthorizationCodeOpenIDResponse()
+  let result = await processAuthorizationCodeOAuth2Response()
   if (oauth.isOAuth2Error(result)) {
-    console.log('error', result)
+    console.error('Error Response', result)
     if (result.error === 'use_dpop_nonce') {
       // the AS-signalled nonce is now cached, retrying
       response = await authorizationCodeGrantRequest()
-      result = await processAuthorizationCodeOpenIDResponse()
+      result = await processAuthorizationCodeOAuth2Response()
       if (oauth.isOAuth2Error(result)) {
         throw new Error() // Handle OAuth 2.0 response body error
       }
@@ -104,17 +108,22 @@ let access_token: string
     }
   }
 
-  console.log('result', result)
+  console.log('Access Token Response', result)
   ;({ access_token } = result)
-  const claims = oauth.getValidatedIdTokenClaims(result)
-  console.log('ID Token Claims', claims)
-  ;({ sub } = claims)
 }
 
-// fetch userinfo response
+// Protected Resource Request
 {
-  const userInfoRequest = () => oauth.userInfoRequest(as, client, access_token, { DPoP })
-  let response = await userInfoRequest()
+  const protectedResourceRequest = () =>
+    oauth.protectedResourceRequest(
+      access_token,
+      'GET',
+      new URL('https://rs.example.com/api'),
+      undefined,
+      undefined,
+      { DPoP },
+    )
+  let response = await protectedResourceRequest()
 
   let challenges: oauth.WWWAuthenticateChallenge[] | undefined
   if ((challenges = oauth.parseWwwAuthenticateChallenges(response))) {
@@ -125,15 +134,14 @@ let access_token: string
       challenge.parameters.error === 'use_dpop_nonce'
     ) {
       // the AS-signalled nonce is now cached, retrying
-      response = await userInfoRequest()
+      response = await protectedResourceRequest()
     } else {
       for (const challenge of challenges) {
-        console.log('challenge', challenge)
+        console.error('WWW-Authenticate Challenge', challenge)
       }
-      throw new Error() // Handle www-authenticate challenges as needed
+      throw new Error() // Handle WWW-Authenticate Challenges as needed
     }
   }
 
-  const result = await oauth.processUserInfoResponse(as, client, sub, response)
-  console.log('result', result)
+  console.log('Protected Resource Response', await response.json())
 }

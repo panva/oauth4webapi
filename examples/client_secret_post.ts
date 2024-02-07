@@ -24,7 +24,7 @@ const as = await oauth
 const client: oauth.Client = {
   client_id,
   client_secret,
-  token_endpoint_auth_method: 'client_secret_basic',
+  token_endpoint_auth_method: 'client_secret_post',
 }
 
 const code_challenge_method = 'S256'
@@ -37,16 +37,15 @@ const code_verifier = oauth.generateRandomCodeVerifier()
 const code_challenge = await oauth.calculatePKCECodeChallenge(code_verifier)
 let state: string | undefined
 
-// Pushed Authorization Request & Response (PAR)
-let request_uri: string
 {
-  const params = new URLSearchParams()
-  params.set('client_id', client.client_id)
-  params.set('redirect_uri', redirect_uri)
-  params.set('response_type', 'code')
-  params.set('scope', 'api:read')
-  params.set('code_challenge', code_challenge)
-  params.set('code_challenge_method', code_challenge_method)
+  // redirect user to as.authorization_endpoint
+  const authorizationUrl = new URL(as.authorization_endpoint!)
+  authorizationUrl.searchParams.set('client_id', client.client_id)
+  authorizationUrl.searchParams.set('redirect_uri', redirect_uri)
+  authorizationUrl.searchParams.set('response_type', 'code')
+  authorizationUrl.searchParams.set('scope', 'api:read')
+  authorizationUrl.searchParams.set('code_challenge', code_challenge)
+  authorizationUrl.searchParams.set('code_challenge_method', code_challenge_method)
 
   /**
    * We cannot be sure the AS supports PKCE so we're going to use state too. Use of PKCE is
@@ -54,32 +53,8 @@ let request_uri: string
    */
   if (as.code_challenge_methods_supported?.includes('S256') !== true) {
     state = oauth.generateRandomState()
-    params.set('state', state)
+    authorizationUrl.searchParams.set('state', state)
   }
-
-  const response = await oauth.pushedAuthorizationRequest(as, client, params)
-  let challenges: oauth.WWWAuthenticateChallenge[] | undefined
-  if ((challenges = oauth.parseWwwAuthenticateChallenges(response))) {
-    for (const challenge of challenges) {
-      console.error('WWW-Authenticate Challenge', challenge)
-    }
-    throw new Error() // Handle WWW-Authenticate Challenges as needed
-  }
-
-  const result = await oauth.processPushedAuthorizationResponse(as, client, response)
-  if (oauth.isOAuth2Error(result)) {
-    console.error('Error Response', result)
-    throw new Error() // Handle OAuth 2.0 response body error
-  }
-
-  ;({ request_uri } = result)
-}
-
-{
-  // redirect user to as.authorization_endpoint
-  const authorizationUrl = new URL(as.authorization_endpoint!)
-  authorizationUrl.searchParams.set('client_id', client.client_id)
-  authorizationUrl.searchParams.set('request_uri', request_uri)
 
   // now redirect the user to authorizationUrl.href
 }

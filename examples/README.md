@@ -1,12 +1,21 @@
 A collection of examples for the most common use cases.
 
-- Authorization Code Flow - OpenID Connect [source](code.ts), or plain OAuth 2 [source](oauth.ts)
-- Public Client Authorization Code Flow - [source](public.ts) | [diff from code flow](public.diff)
-- Private Key JWT Client Authentication - [source](private_key_jwt.ts) | [diff from code flow](private_key_jwt.diff)
-- DPoP - [source](dpop.ts) | [diff from code flow](dpop.diff)
-- Pushed Authorization Request (PAR) - [source](par.ts) | [diff from code flow](par.diff)
-- Client Credentials Grant - [source](client_credentials.ts)
-- Device Authorization Grant - [source](device_authorization_grant.ts)
-- FAPI 1.0 Advanced (Private Key JWT, MTLS, JAR) - [source](fapi1-advanced.ts)
-- FAPI 2.0 Security Profile (Private Key JWT, PAR, DPoP) - [source](fapi2.ts)
-- FAPI 2.0 Message Signing (Private Key JWT, PAR, DPoP, JAR, JARM) - [source](fapi2-message-signing.ts) | [diff from FAPI 2.0 SP](fapi2-message-signing.diff)
+- Authorization Code Flow (OAuth 2.0) - [source](oauth.ts)
+- Authorization Code Flow (OpenID Connect) - [source](oidc.ts) | [diff](oidc.diff)
+- Extensions
+  - DPoP - [source](dpop.ts) | [diff](dpop.diff)
+  - JWT Secured Authorization Request (JAR) - [source](jar.ts) | [diff](jar.diff)
+  - JWT Secured Authorization Response Mode (JARM) - [source](jarm.ts) | [diff](jarm.diff)
+  - Pushed Authorization Request (PAR) - [source](par.ts) | [diff](par.diff)
+- Client Authentication
+  - Client Secret in HTTP Authorization Header - [source](oauth.ts)
+  - Client Secret in HTTP Body - [source](client_secret_post.ts) | [diff](client_secret_post.diff)
+  - Private Key JWT Client Authentication - [source](private_key_jwt.ts) | [diff](private_key_jwt.diff)
+  - Public Client - [source](public.ts) | [diff](public.diff)
+- Other Grants
+  - Client Credentials Grant - [source](client_credentials.ts)
+  - Device Authorization Grant - [source](device_authorization_grant.ts)
+  - Refresh Token Grant - [source](refresh_token.ts) | [diff](refresh_token.diff)
+- FAPI
+  - FAPI 1.0 Advanced (Private Key JWT, MTLS, JAR) - [source](fapi1-advanced.ts) | [diff](fapi1-advanced.diff)
+  - FAPI 2.0 Security Profile (Private Key JWT, PAR, DPoP) - [source](fapi2.ts) | [diff](fapi2.diff)

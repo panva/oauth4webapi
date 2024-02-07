@@ -1,8 +1,8 @@
-diff --git a/examples/code.ts b/examples/dpop.ts
-index a7303f1..7c6f907 100644
---- a/examples/code.ts
+diff --git a/examples/oauth.ts b/examples/dpop.ts
+index cc6d632..c3266a7 100644
+--- a/examples/oauth.ts
 +++ b/examples/dpop.ts
-@@ -10,6 +10,12 @@ let client_secret!: string
+@@ -14,6 +14,12 @@ let client_secret!: string
   * Server.
   */
  let redirect_uri!: string
@@ -15,7 +15,7 @@ index a7303f1..7c6f907 100644
  
  // End of prerequisites
  
-@@ -67,13 +73,10 @@ let access_token: string
+@@ -71,13 +77,10 @@ let access_token: string
      throw new Error() // Handle OAuth 2.0 redirect error
    }
  
@@ -33,22 +33,22 @@ index a7303f1..7c6f907 100644
  
    let challenges: oauth.WWWAuthenticateChallenge[] | undefined
    if ((challenges = oauth.parseWwwAuthenticateChallenges(response))) {
-@@ -83,10 +86,22 @@ let access_token: string
-     throw new Error() // Handle www-authenticate challenges as needed
+@@ -87,10 +90,22 @@ let access_token: string
+     throw new Error() // Handle WWW-Authenticate Challenges as needed
    }
  
--  const result = await oauth.processAuthorizationCodeOpenIDResponse(as, client, response, nonce)
-+  const processAuthorizationCodeOpenIDResponse = () =>
-+    oauth.processAuthorizationCodeOpenIDResponse(as, client, response, nonce)
+-  const result = await oauth.processAuthorizationCodeOAuth2Response(as, client, response)
++  const processAuthorizationCodeOAuth2Response = () =>
++    oauth.processAuthorizationCodeOAuth2Response(as, client, response)
 +
-+  let result = await processAuthorizationCodeOpenIDResponse()
++  let result = await processAuthorizationCodeOAuth2Response()
    if (oauth.isOAuth2Error(result)) {
-     console.log('error', result)
+     console.error('Error Response', result)
 -    throw new Error() // Handle OAuth 2.0 response body error
 +    if (result.error === 'use_dpop_nonce') {
 +      // the AS-signalled nonce is now cached, retrying
 +      response = await authorizationCodeGrantRequest()
-+      result = await processAuthorizationCodeOpenIDResponse()
++      result = await processAuthorizationCodeOAuth2Response()
 +      if (oauth.isOAuth2Error(result)) {
 +        throw new Error() // Handle OAuth 2.0 response body error
 +      }
@@ -57,19 +57,31 @@ index a7303f1..7c6f907 100644
 +    }
    }
  
-   console.log('result', result)
-@@ -98,14 +113,25 @@ let access_token: string
+   console.log('Access Token Response', result)
+@@ -99,18 +114,33 @@ let access_token: string
  
- // fetch userinfo response
+ // Protected Resource Request
  {
--  const response = await oauth.userInfoRequest(as, client, access_token)
-+  const userInfoRequest = () => oauth.userInfoRequest(as, client, access_token, { DPoP })
-+  let response = await userInfoRequest()
+-  const response = await oauth.protectedResourceRequest(
+-    access_token,
+-    'GET',
+-    new URL('https://rs.example.com/api'),
+-  )
++  const protectedResourceRequest = () =>
++    oauth.protectedResourceRequest(
++      access_token,
++      'GET',
++      new URL('https://rs.example.com/api'),
++      undefined,
++      undefined,
++      { DPoP },
++    )
++  let response = await protectedResourceRequest()
  
    let challenges: oauth.WWWAuthenticateChallenge[] | undefined
    if ((challenges = oauth.parseWwwAuthenticateChallenges(response))) {
 -    for (const challenge of challenges) {
--      console.log('challenge', challenge)
+-      console.error('WWW-Authenticate Challenge', challenge)
 +    const { 0: challenge, length } = challenges
 +    if (
 +      length === 1 &&
@@ -77,14 +89,14 @@ index a7303f1..7c6f907 100644
 +      challenge.parameters.error === 'use_dpop_nonce'
 +    ) {
 +      // the AS-signalled nonce is now cached, retrying
-+      response = await userInfoRequest()
++      response = await protectedResourceRequest()
 +    } else {
 +      for (const challenge of challenges) {
-+        console.log('challenge', challenge)
++        console.error('WWW-Authenticate Challenge', challenge)
 +      }
-+      throw new Error() // Handle www-authenticate challenges as needed
++      throw new Error() // Handle WWW-Authenticate Challenges as needed
      }
--    throw new Error() // Handle www-authenticate challenges as needed
+-    throw new Error() // Handle WWW-Authenticate Challenges as needed
    }
  
-   const result = await oauth.processUserInfoResponse(as, client, sub, response)
+   console.log('Protected Resource Response', await response.json())

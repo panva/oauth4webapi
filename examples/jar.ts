@@ -14,6 +14,11 @@ let client_secret!: string
  * Server.
  */
 let redirect_uri!: string
+/**
+ * A key that is pre-registered at the Authorization Server that the client is supposed to sign its
+ * Request Objects with.
+ */
+let jarPrivateKey!: CryptoKey
 
 // End of prerequisites
 
@@ -37,8 +42,8 @@ const code_verifier = oauth.generateRandomCodeVerifier()
 const code_challenge = await oauth.calculatePKCECodeChallenge(code_verifier)
 let state: string | undefined
 
-// Pushed Authorization Request & Response (PAR)
-let request_uri: string
+// Signed Request Object (JAR)
+let request: string
 {
   const params = new URLSearchParams()
   params.set('client_id', client.client_id)
@@ -57,29 +62,14 @@ let request_uri: string
     params.set('state', state)
   }
 
-  const response = await oauth.pushedAuthorizationRequest(as, client, params)
-  let challenges: oauth.WWWAuthenticateChallenge[] | undefined
-  if ((challenges = oauth.parseWwwAuthenticateChallenges(response))) {
-    for (const challenge of challenges) {
-      console.error('WWW-Authenticate Challenge', challenge)
-    }
-    throw new Error() // Handle WWW-Authenticate Challenges as needed
-  }
-
-  const result = await oauth.processPushedAuthorizationResponse(as, client, response)
-  if (oauth.isOAuth2Error(result)) {
-    console.error('Error Response', result)
-    throw new Error() // Handle OAuth 2.0 response body error
-  }
-
-  ;({ request_uri } = result)
+  request = await oauth.issueRequestObject(as, client, params, jarPrivateKey)
 }
 
 {
   // redirect user to as.authorization_endpoint
   const authorizationUrl = new URL(as.authorization_endpoint!)
   authorizationUrl.searchParams.set('client_id', client.client_id)
-  authorizationUrl.searchParams.set('request_uri', request_uri)
+  authorizationUrl.searchParams.set('request', request)
 
   // now redirect the user to authorizationUrl.href
 }

@@ -47,16 +47,26 @@ import * as oauth2 from 'oauth4webapi'
 import * as oauth2 from 'https://deno.land/x/oauth4webapi@v2.10.2/mod.ts'
 ```
 
-- Authorization Code Flow - OpenID Connect [source](examples/code.ts), or plain OAuth 2 [source](examples/oauth.ts)
-- Public Client Authorization Code Flow - [source](examples/public.ts) | [diff from code flow](examples/public.diff)
-- Private Key JWT Client Authentication - [source](examples/private_key_jwt.ts) | [diff from code flow](examples/private_key_jwt.diff)
-- DPoP - [source](examples/dpop.ts) | [diff from code flow](examples/dpop.diff)
-- Pushed Authorization Request (PAR) - [source](examples/par.ts) | [diff from code flow](examples/par.diff)
-- Client Credentials Grant - [source](examples/client_credentials.ts)
-- Device Authorization Grant - [source](examples/device_authorization_grant.ts)
-- FAPI 1.0 Advanced (Private Key JWT, MTLS, JAR) - [source](examples/fapi1-advanced.ts)
-- FAPI 2.0 Security Profile (Private Key JWT, PAR, DPoP) - [source](examples/fapi2.ts)
-- FAPI 2.0 Message Signing (Private Key JWT, PAR, DPoP, JAR, JARM) - [source](examples/fapi2-message-signing.ts) | [diff from FAPI 2.0 SP](examples/fapi2-message-signing.diff)
+- Authorization Code Flow (OAuth 2.0) - [source](examples/oauth.ts)
+- Authorization Code Flow (OpenID Connect) - [source](examples/oidc.ts) | [diff](examples/oidc.diff)
+- Extensions
+  - DPoP - [source](examples/dpop.ts) | [diff](examples/dpop.diff)
+  - JWT Secured Authorization Request (JAR) - [source](examples/jar.ts) | [diff](examples/jar.diff)
+  - JWT Secured Authorization Response Mode (JARM) - [source](examples/jarm.ts) | [diff](examples/jarm.diff)
+  - Pushed Authorization Request (PAR) - [source](examples/par.ts) | [diff](examples/par.diff)
+- Client Authentication
+  - Client Secret in HTTP Authorization Header - [source](examples/oauth.ts)
+  - Client Secret in HTTP Body - [source](examples/client_secret_post.ts) | [diff](examples/client_secret_post.diff)
+  - Private Key JWT Client Authentication - [source](examples/private_key_jwt.ts) | [diff](examples/private_key_jwt.diff)
+  - Public Client - [source](examples/public.ts) | [diff](examples/public.diff)
+- Other Grants
+  - Client Credentials Grant - [source](examples/client_credentials.ts)
+  - Device Authorization Grant - [source](examples/device_authorization_grant.ts)
+  - Refresh Token Grant - [source](examples/refresh_token.ts) | [diff](examples/refresh_token.diff)
+- FAPI
+  - FAPI 1.0 Advanced (Private Key JWT, MTLS, JAR) - [source](examples/fapi1-advanced.ts) | [diff](examples/fapi1-advanced.diff)
+  - FAPI 2.0 Security Profile (Private Key JWT, PAR, DPoP) - [source](examples/fapi2.ts) | [diff](examples/fapi2.diff)
+
 
 ## Supported Runtimes
 

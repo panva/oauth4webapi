@@ -35,62 +35,38 @@ const code_challenge_method = 'S256'
  */
 const code_verifier = oauth.generateRandomCodeVerifier()
 const code_challenge = await oauth.calculatePKCECodeChallenge(code_verifier)
-let state: string | undefined
-
-// Pushed Authorization Request & Response (PAR)
-let request_uri: string
-{
-  const params = new URLSearchParams()
-  params.set('client_id', client.client_id)
-  params.set('redirect_uri', redirect_uri)
-  params.set('response_type', 'code')
-  params.set('scope', 'api:read')
-  params.set('code_challenge', code_challenge)
-  params.set('code_challenge_method', code_challenge_method)
-
-  /**
-   * We cannot be sure the AS supports PKCE so we're going to use state too. Use of PKCE is
-   * backwards compatible even if the AS doesn't support it which is why we're using it regardless.
-   */
-  if (as.code_challenge_methods_supported?.includes('S256') !== true) {
-    state = oauth.generateRandomState()
-    params.set('state', state)
-  }
-
-  const response = await oauth.pushedAuthorizationRequest(as, client, params)
-  let challenges: oauth.WWWAuthenticateChallenge[] | undefined
-  if ((challenges = oauth.parseWwwAuthenticateChallenges(response))) {
-    for (const challenge of challenges) {
-      console.error('WWW-Authenticate Challenge', challenge)
-    }
-    throw new Error() // Handle WWW-Authenticate Challenges as needed
-  }
-
-  const result = await oauth.processPushedAuthorizationResponse(as, client, response)
-  if (oauth.isOAuth2Error(result)) {
-    console.error('Error Response', result)
-    throw new Error() // Handle OAuth 2.0 response body error
-  }
-
-  ;({ request_uri } = result)
-}
+let nonce: string | undefined
 
 {
   // redirect user to as.authorization_endpoint
   const authorizationUrl = new URL(as.authorization_endpoint!)
   authorizationUrl.searchParams.set('client_id', client.client_id)
-  authorizationUrl.searchParams.set('request_uri', request_uri)
+  authorizationUrl.searchParams.set('redirect_uri', redirect_uri)
+  authorizationUrl.searchParams.set('response_type', 'code')
+  authorizationUrl.searchParams.set('scope', 'openid email')
+  authorizationUrl.searchParams.set('code_challenge', code_challenge)
+  authorizationUrl.searchParams.set('code_challenge_method', code_challenge_method)
+
+  /**
+   * We cannot be sure the AS supports PKCE so we're going to use nonce too. Use of PKCE is
+   * backwards compatible even if the AS doesn't support it which is why we're using it regardless.
+   */
+  if (as.code_challenge_methods_supported?.includes('S256') !== true) {
+    nonce = oauth.generateRandomNonce()
+    authorizationUrl.searchParams.set('nonce', nonce)
+  }
 
   // now redirect the user to authorizationUrl.href
 }
 
 // one eternity later, the user lands back on the redirect_uri
 // Authorization Code Grant Request & Response
+let sub: string
 let access_token: string
 {
   // @ts-expect-error
   const currentUrl: URL = getCurrentUrl()
-  const params = oauth.validateAuthResponse(as, client, currentUrl, state)
+  const params = oauth.validateAuthResponse(as, client, currentUrl)
   if (oauth.isOAuth2Error(params)) {
     console.error('Error Response', params)
     throw new Error() // Handle OAuth 2.0 redirect error
@@ -112,7 +88,7 @@ let access_token: string
     throw new Error() // Handle WWW-Authenticate Challenges as needed
   }
 
-  const result = await oauth.processAuthorizationCodeOAuth2Response(as, client, response)
+  const result = await oauth.processAuthorizationCodeOpenIDResponse(as, client, response, nonce)
   if (oauth.isOAuth2Error(result)) {
     console.error('Error Response', result)
     throw new Error() // Handle OAuth 2.0 response body error
@@ -120,15 +96,14 @@ let access_token: string
 
   console.log('Access Token Response', result)
   ;({ access_token } = result)
+  const claims = oauth.getValidatedIdTokenClaims(result)
+  console.log('ID Token Claims', claims)
+  ;({ sub } = claims)
 }
 
-// Protected Resource Request
+// UserInfo Request
 {
-  const response = await oauth.protectedResourceRequest(
-    access_token,
-    'GET',
-    new URL('https://rs.example.com/api'),
-  )
+  const response = await oauth.userInfoRequest(as, client, access_token)
 
   let challenges: oauth.WWWAuthenticateChallenge[] | undefined
   if ((challenges = oauth.parseWwwAuthenticateChallenges(response))) {
@@ -138,5 +113,6 @@ let access_token: string
     throw new Error() // Handle WWW-Authenticate Challenges as needed
   }
 
-  console.log('Protected Resource Response', await response.json())
+  const result = await oauth.processUserInfoResponse(as, client, sub, response)
+  console.log('UserInfo Response', result)
 }

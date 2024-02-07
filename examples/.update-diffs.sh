@@ -1,5 +1,11 @@
-git diff HEAD:examples/code.ts examples/dpop.ts > examples/dpop.diff
-git diff HEAD:examples/code.ts examples/par.ts > examples/par.diff
-git diff HEAD:examples/code.ts examples/private_key_jwt.ts > examples/private_key_jwt.diff
-git diff HEAD:examples/code.ts examples/public.ts > examples/public.diff
-git diff HEAD:examples/fapi2.ts examples/fapi2-message-signing.ts > examples/fapi2-message-signing.diff
+git diff HEAD:examples/oauth.ts examples/oidc.ts > examples/oidc.diff
+git diff HEAD:examples/oauth.ts examples/dpop.ts > examples/dpop.diff
+git diff HEAD:examples/oauth.ts examples/par.ts > examples/par.diff
+git diff HEAD:examples/oauth.ts examples/jar.ts > examples/jar.diff
+git diff HEAD:examples/oauth.ts examples/jarm.ts > examples/jarm.diff
+git diff HEAD:examples/oauth.ts examples/client_secret_post.ts > examples/client_secret_post.diff
+git diff HEAD:examples/oauth.ts examples/private_key_jwt.ts > examples/private_key_jwt.diff
+git diff HEAD:examples/oauth.ts examples/public.ts > examples/public.diff
+git diff HEAD:examples/oauth.ts examples/fapi2.ts > examples/fapi2.diff
+git diff HEAD:examples/oauth.ts examples/fapi1-advanced.ts > examples/fapi1-advanced.diff
+git diff HEAD:examples/oauth.ts examples/refresh_token.ts > examples/refresh_token.diff

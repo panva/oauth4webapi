@@ -1,16 +1,16 @@
-diff --git a/examples/code.ts b/examples/public.ts
-index a7303f1..c8b525e 100644
---- a/examples/code.ts
+diff --git a/examples/oauth.ts b/examples/public.ts
+index cc6d632..25585b3 100644
+--- a/examples/oauth.ts
 +++ b/examples/public.ts
-@@ -4,7 +4,6 @@ import * as oauth from '../src/index.js' // replace with an import of oauth4weba
- 
- let issuer!: URL // Authorization server's Issuer Identifier URL
+@@ -8,7 +8,6 @@ let algorithm!:
+   | 'oidc' /* For .well-known/openid-configuration discovery */
+   | undefined /* Defaults to 'oidc' */
  let client_id!: string
 -let client_secret!: string
  /**
   * Value used in the authorization request as redirect_uri pre-registered at the Authorization
   * Server.
-@@ -19,8 +18,7 @@ const as = await oauth
+@@ -23,8 +22,7 @@ const as = await oauth
  
  const client: oauth.Client = {
    client_id,

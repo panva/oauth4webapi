@@ -1,10 +1,10 @@
-diff --git a/examples/code.ts b/examples/private_key_jwt.ts
-index a7303f1..9a34637 100644
---- a/examples/code.ts
+diff --git a/examples/oauth.ts b/examples/private_key_jwt.ts
+index cc6d632..7bf6b06 100644
+--- a/examples/oauth.ts
 +++ b/examples/private_key_jwt.ts
-@@ -4,12 +4,16 @@ import * as oauth from '../src/index.js' // replace with an import of oauth4weba
- 
- let issuer!: URL // Authorization server's Issuer Identifier URL
+@@ -8,12 +8,16 @@ let algorithm!:
+   | 'oidc' /* For .well-known/openid-configuration discovery */
+   | undefined /* Defaults to 'oidc' */
  let client_id!: string
 -let client_secret!: string
  /**
@@ -20,7 +20,7 @@ index a7303f1..9a34637 100644
  
  // End of prerequisites
  
-@@ -19,8 +23,7 @@ const as = await oauth
+@@ -23,8 +27,7 @@ const as = await oauth
  
  const client: oauth.Client = {
    client_id,
@@ -30,7 +30,7 @@ index a7303f1..9a34637 100644
  }
  
  const code_challenge_method = 'S256'
-@@ -73,6 +76,7 @@ let access_token: string
+@@ -77,6 +80,7 @@ let access_token: string
      params,
      redirect_uri,
      code_verifier,

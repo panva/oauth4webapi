@@ -3,6 +3,10 @@ import * as oauth from '../src/index.js' // replace with an import of oauth4weba
 // Prerequisites
 
 let issuer!: URL // Authorization server's Issuer Identifier URL
+let algorithm!:
+  | 'oauth2' /* For .well-known/oauth-authorization-server discovery */
+  | 'oidc' /* For .well-known/openid-configuration discovery */
+  | undefined /* Defaults to 'oidc' */
 let client_id!: string
 let client_secret!: string
 /**
@@ -14,7 +18,7 @@ let redirect_uri!: string
 // End of prerequisites
 
 const as = await oauth
-  .discoveryRequest(issuer, { algorithm: 'oauth2' })
+  .discoveryRequest(issuer, { algorithm })
   .then((response) => oauth.processDiscoveryResponse(issuer, response))
 
 const client: oauth.Client = {
@@ -56,35 +60,58 @@ let state: string | undefined
 }
 
 // one eternity later, the user lands back on the redirect_uri
-
-// @ts-expect-error
-const currentUrl: URL = getCurrentUrl()
-const parameters = oauth.validateAuthResponse(as, client, currentUrl, state)
-if (oauth.isOAuth2Error(parameters)) {
-  console.log('error', parameters)
-  throw new Error() // Handle OAuth 2.0 redirect error
-}
-
-const response = await oauth.authorizationCodeGrantRequest(
-  as,
-  client,
-  parameters,
-  redirect_uri,
-  code_verifier,
-)
-
-let challenges: oauth.WWWAuthenticateChallenge[] | undefined
-if ((challenges = oauth.parseWwwAuthenticateChallenges(response))) {
-  for (const challenge of challenges) {
-    console.log('challenge', challenge)
+// Authorization Code Grant Request & Response
+let access_token: string
+{
+  // @ts-expect-error
+  const currentUrl: URL = getCurrentUrl()
+  const params = oauth.validateAuthResponse(as, client, currentUrl, state)
+  if (oauth.isOAuth2Error(params)) {
+    console.error('Error Response', params)
+    throw new Error() // Handle OAuth 2.0 redirect error
   }
-  throw new Error() // Handle www-authenticate challenges as needed
+
+  const response = await oauth.authorizationCodeGrantRequest(
+    as,
+    client,
+    params,
+    redirect_uri,
+    code_verifier,
+  )
+
+  let challenges: oauth.WWWAuthenticateChallenge[] | undefined
+  if ((challenges = oauth.parseWwwAuthenticateChallenges(response))) {
+    for (const challenge of challenges) {
+      console.error('WWW-Authenticate Challenge', challenge)
+    }
+    throw new Error() // Handle WWW-Authenticate Challenges as needed
+  }
+
+  const result = await oauth.processAuthorizationCodeOAuth2Response(as, client, response)
+  if (oauth.isOAuth2Error(result)) {
+    console.error('Error Response', result)
+    throw new Error() // Handle OAuth 2.0 response body error
+  }
+
+  console.log('Access Token Response', result)
+  ;({ access_token } = result)
 }
 
-const result = await oauth.processAuthorizationCodeOAuth2Response(as, client, response)
-if (oauth.isOAuth2Error(result)) {
-  console.log('error', result)
-  throw new Error() // Handle OAuth 2.0 response body error
-}
+// Protected Resource Request
+{
+  const response = await oauth.protectedResourceRequest(
+    access_token,
+    'GET',
+    new URL('https://rs.example.com/api'),
+  )
 
-console.log('result', result)
+  let challenges: oauth.WWWAuthenticateChallenge[] | undefined
+  if ((challenges = oauth.parseWwwAuthenticateChallenges(response))) {
+    for (const challenge of challenges) {
+      console.error('WWW-Authenticate Challenge', challenge)
+    }
+    throw new Error() // Handle WWW-Authenticate Challenges as needed
+  }
+
+  console.log('Protected Resource Response', await response.json())
+}
