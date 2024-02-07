@@ -46,7 +46,7 @@ let state: string | undefined
   authorizationUrl.searchParams.set('scope', 'api:read')
   authorizationUrl.searchParams.set('code_challenge', code_challenge)
   authorizationUrl.searchParams.set('code_challenge_method', code_challenge_method)
-  authorizationUrl.searchParams.set('response_mode', 'jwt') // JARM
+  authorizationUrl.searchParams.set('response_mode', 'jwt')
 
   /**
    * We cannot be sure the AS supports PKCE so we're going to use state too. Use of PKCE is
@@ -66,7 +66,7 @@ let access_token: string
 {
   // @ts-expect-error
   const currentUrl: URL = getCurrentUrl()
-  const params = await oauth.validateJwtAuthResponse(as, client, currentUrl) // JARM
+  const params = await oauth.validateJwtAuthResponse(as, client, currentUrl)
   if (oauth.isOAuth2Error(params)) {
     console.error('Error Response', params)
     throw new Error() // Handle OAuth 2.0 redirect error
