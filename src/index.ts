@@ -2036,7 +2036,7 @@ export interface ProtectedResourceRequestOptions
  */
 export async function protectedResourceRequest(
   accessToken: string,
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | string,
+  method: string,
   url: URL,
   headers?: Headers,
   body?:
