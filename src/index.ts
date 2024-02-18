@@ -1005,6 +1005,24 @@ function isJsonObject<T = JsonObject>(input: unknown): input is T {
   return true
 }
 
+/**
+ * Some providers(like Naver) do not adhere to OAuth 2.0 specs, "expires_in" is not an integer but an string(not 3600 but "3600").
+ * If a response(json) has "expires_in" field and its type is string, this function will convert it to a number.
+ * @author hotsixman(https://github.com/Hotsixisbest)
+ * 
+ * @param json 
+ * @returns json
+ */
+function convertStringExpiresInToNumber(json:JsonValue|null){
+  if(json !== null && typeof json === "object" && !Array.isArray(json) && json.expires_in !== undefined && typeof json.expires_in === 'string'){
+    let expiresIn = Number(json.expires_in);
+    if(!isNaN(expiresIn)){
+      json.expires_in = expiresIn
+    }
+  }
+  return json;
+}
+
 function prepareHeaders(input?: [string, string][] | Record<string, string> | Headers): Headers {
   if (looseInstanceOf(input, Headers)) {
     input = Object.fromEntries(input.entries())
@@ -1990,6 +2008,8 @@ export async function processPushedAuthorizationResponse(
     throw new OPE('failed to parse "response" body as JSON', { cause })
   }
 
+  json = convertStringExpiresInToNumber(json);
+
   if (!isJsonObject<PushedAuthorizationResponse>(json)) {
     throw new OPE('"response" body must be a top level object')
   }
@@ -2538,10 +2558,12 @@ async function processGenericAccessTokenResponse(
     throw new OPE('failed to parse "response" body as JSON', { cause })
   }
 
+  json = convertStringExpiresInToNumber(json);
+  
   if (!isJsonObject<TokenEndpointResponse>(json)) {
     throw new OPE('"response" body must be a top level object')
   }
-
+  
   if (!validateString(json.access_token)) {
     throw new OPE('"response" body "access_token" property must be a non-empty string')
   }
@@ -2549,21 +2571,21 @@ async function processGenericAccessTokenResponse(
   if (!validateString(json.token_type)) {
     throw new OPE('"response" body "token_type" property must be a non-empty string')
   }
-
+  
   // @ts-expect-error
   json.token_type = json.token_type.toLowerCase()
 
   if (json.token_type !== 'dpop' && json.token_type !== 'bearer') {
     throw new UnsupportedOperationError('unsupported `token_type` value')
   }
-
+  
   if (
     json.expires_in !== undefined &&
     (typeof json.expires_in !== 'number' || json.expires_in <= 0)
   ) {
     throw new OPE('"response" body "expires_in" property must be a positive number')
   }
-
+  
   if (
     !ignoreRefreshToken &&
     json.refresh_token !== undefined &&
@@ -4132,6 +4154,8 @@ export async function processDeviceAuthorizationResponse(
   } catch (cause) {
     throw new OPE('failed to parse "response" body as JSON', { cause })
   }
+
+  json = convertStringExpiresInToNumber(json);
 
   if (!isJsonObject<DeviceAuthorizationResponse>(json)) {
     throw new OPE('"response" body must be a top level object')
