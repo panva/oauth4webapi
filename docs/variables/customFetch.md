@@ -2,7 +2,7 @@
 
 [💗 Help the project](https://github.com/sponsors/panva)
 
-• `Const` **customFetch**: typeof [`customFetch`](customFetch.md)
+• `Const` **customFetch**: unique `symbol`
 
 When configured on an interface that extends [HttpRequestOptions](../interfaces/HttpRequestOptions.md), that's every `options`
 parameter for functions that trigger HTTP Requests, this replaces the use of global fetch. As a

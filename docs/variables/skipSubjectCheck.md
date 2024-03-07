@@ -2,7 +2,7 @@
 
 [💗 Help the project](https://github.com/sponsors/panva)
 
-• `Const` **skipSubjectCheck**: typeof [`skipSubjectCheck`](skipSubjectCheck.md)
+• `Const` **skipSubjectCheck**: unique `symbol`
 
 DANGER ZONE
 

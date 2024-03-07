@@ -194,8 +194,8 @@ interface JWK {
   readonly [parameter: string]: JsonValue | undefined
 }
 
-export const clockSkew = Symbol()
-export const clockTolerance = Symbol()
+export const clockSkew: unique symbol = Symbol()
+export const clockTolerance: unique symbol = Symbol()
 
 /**
  * When configured on an interface that extends {@link HttpRequestOptions}, that's every `options`
@@ -280,7 +280,7 @@ export const clockTolerance = Symbol()
  * })
  * ```
  */
-export const customFetch = Symbol()
+export const customFetch: unique symbol = Symbol()
 
 /**
  * When combined with {@link customFetch} (to use a Fetch API implementation that supports client
@@ -344,7 +344,7 @@ export const customFetch = Symbol()
  *
  * @see [RFC 8705 - OAuth 2.0 Mutual-TLS Client Authentication and Certificate-Bound Access Tokens](https://www.rfc-editor.org/rfc/rfc8705.html)
  */
-export const useMtlsAlias = Symbol()
+export const useMtlsAlias: unique symbol = Symbol()
 
 /**
  * Authorization Server Metadata
@@ -2288,7 +2288,7 @@ async function getPublicSigKeyFromIssuerJwksUri(
  *
  * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#UserInfoResponse)
  */
-export const skipSubjectCheck = Symbol()
+export const skipSubjectCheck: unique symbol = Symbol()
 
 function getContentType(response: Response) {
   return response.headers.get('content-type')?.split(';')[0]
@@ -2879,13 +2879,13 @@ export interface ClientCredentialsGrantResponse {
  * indicate no `nonce` ID Token claim value is expected, i.e. no `nonce` parameter value was sent
  * with the authorization request.
  */
-export const expectNoNonce = Symbol()
+export const expectNoNonce: unique symbol = Symbol()
 
 /**
  * Use this as a value to {@link processAuthorizationCodeOpenIDResponse} `maxAge` parameter to
  * indicate no `auth_time` ID Token claim value check should be performed.
  */
-export const skipAuthTimeCheck = Symbol()
+export const skipAuthTimeCheck: unique symbol = Symbol()
 
 /**
  * (OpenID Connect only) Validates Authorization Code Grant Response instance to be one coming from
@@ -3904,14 +3904,14 @@ function getURLSearchParameter(parameters: URLSearchParams, name: string): strin
  * [draft-bradley-oauth-jwt-encoded-state-09](https://datatracker.ietf.org/doc/html/draft-bradley-oauth-jwt-encoded-state-09).
  * It is expected you'll validate such `state` value yourself.
  */
-export const skipStateCheck = Symbol()
+export const skipStateCheck: unique symbol = Symbol()
 
 /**
  * Use this as a value to {@link validateAuthResponse} `expectedState` parameter to indicate no
  * `state` parameter value is expected, i.e. no `state` parameter value was sent with the
  * authorization request.
  */
-export const expectNoState = Symbol()
+export const expectNoState: unique symbol = Symbol()
 
 /**
  * Validates an OAuth 2.0 Authorization Response or Authorization Error Response message returned
