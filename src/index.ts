@@ -1153,7 +1153,7 @@ export async function processDiscoveryResponse(
 /**
  * Generates 32 random bytes and encodes them using base64url.
  */
-function randomBytes() {
+function randomBytes(): string {
   return b64u(crypto.getRandomValues(new Uint8Array(32)))
 }
 
@@ -1167,7 +1167,7 @@ function randomBytes() {
  *
  * @see [RFC 7636 - Proof Key for Code Exchange (PKCE)](https://www.rfc-editor.org/rfc/rfc7636.html#section-4)
  */
-export function generateRandomCodeVerifier() {
+export function generateRandomCodeVerifier(): string {
   return randomBytes()
 }
 
@@ -1178,7 +1178,7 @@ export function generateRandomCodeVerifier() {
  *
  * @see [RFC 6749 - The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html#section-4.1.1)
  */
-export function generateRandomState() {
+export function generateRandomState(): string {
   return randomBytes()
 }
 
@@ -1189,7 +1189,7 @@ export function generateRandomState() {
  *
  * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#IDToken)
  */
-export function generateRandomNonce() {
+export function generateRandomNonce(): string {
   return randomBytes()
 }
 
@@ -1205,7 +1205,7 @@ export function generateRandomNonce() {
  *
  * @see [RFC 7636 - Proof Key for Code Exchange (PKCE)](https://www.rfc-editor.org/rfc/rfc7636.html#section-4)
  */
-export async function calculatePKCECodeChallenge(codeVerifier: string) {
+export async function calculatePKCECodeChallenge(codeVerifier: string): Promise<string> {
   if (!validateString(codeVerifier)) {
     throw new TypeError('"codeVerifier" must be a non-empty string')
   }
@@ -1567,7 +1567,7 @@ export async function issueRequestObject(
   client: Client,
   parameters: URLSearchParams | Record<string, string> | string[][],
   privateKey: CryptoKey | PrivateKey,
-) {
+): Promise<string> {
   assertAs(as)
   assertClient(client)
 
@@ -4252,7 +4252,10 @@ export interface GenerateKeyPairOptions {
  *
  * @group Utilities
  */
-export async function generateKeyPair(alg: JWSAlgorithm, options?: GenerateKeyPairOptions) {
+export async function generateKeyPair(
+  alg: JWSAlgorithm,
+  options?: GenerateKeyPairOptions,
+): Promise<CryptoKeyPair> {
   if (!validateString(alg)) {
     throw new TypeError('"alg" must be a non-empty string')
   }
@@ -4456,7 +4459,7 @@ export async function validateJwtAccessToken(
   request: Request,
   expectedAudience: string,
   options?: ValidateJWTAccessTokenOptions,
-) {
+): Promise<JWTAccessTokenClaims> {
   assertAs(as)
 
   if (!looseInstanceOf(request, Request)) {
