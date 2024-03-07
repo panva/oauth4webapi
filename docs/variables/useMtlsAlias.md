@@ -2,7 +2,7 @@
 
 [💗 Help the project](https://github.com/sponsors/panva)
 
-• `Const` **useMtlsAlias**: typeof [`useMtlsAlias`](useMtlsAlias.md)
+• `Const` **useMtlsAlias**: unique `symbol`
 
 When combined with [customFetch](customFetch.md) (to use a Fetch API implementation that supports client
 certificates) this can be used to target FAPI 2.0 profiles that utilize Mutual-TLS for either
