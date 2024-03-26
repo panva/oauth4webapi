@@ -28,7 +28,7 @@ ___
 
 ### token\_type
 
-• `Readonly` **token\_type**: ``"dpop"`` \| [`Lowercase`]( https://www.typescriptlang.org/docs/handbook/2/template-literal-types.html#lowercasestringtype )\<`string`\> \| ``"bearer"``
+• `Readonly` **token\_type**: [`Lowercase`]( https://www.typescriptlang.org/docs/handbook/2/template-literal-types.html#lowercasestringtype )\<`string`\>
 
 NOTE: because the value is case insensitive it is always returned lowercased
 
