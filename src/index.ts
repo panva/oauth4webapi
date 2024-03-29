@@ -4427,7 +4427,10 @@ async function validateDPoP(
 
 /**
  * Validates use of JSON Web Token (JWT) OAuth 2.0 Access Tokens for a given {@link Request} as per
- * RFC 9068 and optionally also RFC 9449.
+ * RFC 6750, RFC 9068, and RFC 9449.
+ *
+ * The only support means of sending access tokens is via the Authorization Request Header Field
+ * method.
  *
  * This does validate the presence and type of all required claims as well as the values of the
  * {@link JWTAccessTokenClaims.iss `iss`}, {@link JWTAccessTokenClaims.exp `exp`},
@@ -4451,6 +4454,7 @@ async function validateDPoP(
  *
  * @group JWT Access Tokens
  *
+ * @see [RFC 6750 - OAuth 2.0 Bearer Token Usage](https://www.rfc-editor.org/rfc/rfc6750.html)
  * @see [RFC 9068 - JSON Web Token (JWT) Profile for OAuth 2.0 Access Tokens](https://www.rfc-editor.org/rfc/rfc9068.html)
  * @see [RFC 9449 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)](https://www.rfc-editor.org/rfc/rfc9449.html)
  */

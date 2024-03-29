@@ -5,7 +5,10 @@
 ▸ **validateJwtAccessToken**(`as`, `request`, `expectedAudience`, `options?`): [`Promise`]( https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise )\<[`JWTAccessTokenClaims`](../interfaces/JWTAccessTokenClaims.md)\>
 
 Validates use of JSON Web Token (JWT) OAuth 2.0 Access Tokens for a given Request as per
-RFC 9068 and optionally also RFC 9449.
+RFC 6750, RFC 9068, and RFC 9449.
+
+The only support means of sending access tokens is via the Authorization Request Header Field
+method.
 
 This does validate the presence and type of all required claims as well as the values of the
 [`iss`](../interfaces/JWTAccessTokenClaims.md#iss), [`exp`](../interfaces/JWTAccessTokenClaims.md#exp),
@@ -37,5 +40,6 @@ function's execution.
 
 **`See`**
 
+ - [RFC 6750 - OAuth 2.0 Bearer Token Usage](https://www.rfc-editor.org/rfc/rfc6750.html)
  - [RFC 9068 - JSON Web Token (JWT) Profile for OAuth 2.0 Access Tokens](https://www.rfc-editor.org/rfc/rfc9068.html)
  - [RFC 9449 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)](https://www.rfc-editor.org/rfc/rfc9449.html)
