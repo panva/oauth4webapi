@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.10.4](https://github.com/panva/oauth4webapi/compare/v2.10.3...v2.10.4) (2024-03-29)
+
+
+### Refactor
+
+* **types:** add explicit type to all exported functions ([76e8d19](https://github.com/panva/oauth4webapi/commit/76e8d19071733e65aae323232391a5716c34d401))
+* **types:** add explicit type to all exported symbols ([c66c595](https://github.com/panva/oauth4webapi/commit/c66c595dcd57feae5d4184331b5ed1eb9cfa36fd))
+* **types:** protectedResourceRequest method argument is just a string ([a15d76c](https://github.com/panva/oauth4webapi/commit/a15d76cdce58afaf4b65a0cdb95e1fb190927936))
+
+
+### Documentation
+
+* mention RFC 6750 in validateJwtAccessToken ([f61b68e](https://github.com/panva/oauth4webapi/commit/f61b68ef0971d8bfdff3bdd8a8fac3c85f7a1e08)), closes [#115](https://github.com/panva/oauth4webapi/issues/115)
+
 ## [2.10.3](https://github.com/panva/oauth4webapi/compare/v2.10.2...v2.10.3) (2024-02-07)
 
 
