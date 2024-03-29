@@ -7,7 +7,7 @@
 Validates use of JSON Web Token (JWT) OAuth 2.0 Access Tokens for a given Request as per
 RFC 6750, RFC 9068, and RFC 9449.
 
-The only support means of sending access tokens is via the Authorization Request Header Field
+The only supported means of sending access tokens is via the Authorization Request Header Field
 method.
 
 This does validate the presence and type of all required claims as well as the values of the
