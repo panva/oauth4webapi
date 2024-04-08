@@ -9,6 +9,7 @@
   "excludeProtected": true,
   "gitRevision": "main",
   "hideGenerator": true,
+  "indexTitle": "oauth4webapi API Reference",
   "out": "docs",
   "plugin": ["typedoc-plugin-markdown", "typedoc-plugin-mdn-links"],
   "readme": "none",

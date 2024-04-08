@@ -29,7 +29,7 @@ The following features are currently in scope and implemented in this software:
 
 `oauth4webapi` has no dependencies and it exports tree-shakeable ESM.
 
-## [Documentation](docs/README.md)
+## [API Reference](docs/README.md)
 
 `oauth4webapi` is distributed via [npmjs.com](https://www.npmjs.com/package/oauth4webapi), [deno.land/x](https://deno.land/x/oauth4webapi), [cdnjs.com](https://cdnjs.com/libraries/oauth4webapi), [jsdelivr.com](https://www.jsdelivr.com/package/npm/oauth4webapi), and [github.com](https://github.com/panva/oauth4webapi).
 

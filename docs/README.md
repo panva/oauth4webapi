@@ -1,4 +1,4 @@
-# oauth4webapi
+# oauth4webapi API Reference
 
 [💗 Help the project](https://github.com/sponsors/panva)
 
