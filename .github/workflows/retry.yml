@@ -4,6 +4,7 @@ on:
   workflow_run:
     workflows:
       - Conformance Checks
+      - Test
     types:
       - completed
 
