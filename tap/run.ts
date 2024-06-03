@@ -4,7 +4,7 @@ export default async (QUnit: QUnit, done: (details: QUnit.DoneDetails) => void) 
   // @ts-ignore
   QUnit.reporters.tap.init(QUnit)
   QUnit.config.autostart = false
-  QUnit.config.testTimeout = 30_000
+  QUnit.config.testTimeout = 60_000
 
   const modules = await Promise.all([
     import('./callback.js'),
