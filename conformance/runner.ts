@@ -143,8 +143,8 @@ interface MacroOptions {
   useState?: boolean
 }
 
-export const flow = (options?: MacroOptions) =>
-  test.macro({
+export const flow = (options?: MacroOptions) => {
+  return test.macro({
     async exec(t, module: ModulePrescription) {
       t.timeout(15000)
 
@@ -449,6 +449,7 @@ export const flow = (options?: MacroOptions) =>
           | oauth.OAuth2TokenEndpointResponse
           | oauth.OpenIDTokenEndpointResponse
           | oauth.OAuth2Error
+
         if (scope.includes('openid')) {
           result = await oauth.processAuthorizationCodeOpenIDResponse(as, client, response, nonce)
         } else {
@@ -570,7 +571,6 @@ export const flow = (options?: MacroOptions) =>
 
       await waitForState(instance)
 
-      t.log('Test Finished')
       t.pass()
     },
     title(providedTitle = '', module: ModulePrescription) {
@@ -582,6 +582,7 @@ export const flow = (options?: MacroOptions) =>
       return `${providedTitle}${plan.name} (${plan.id}) - ${module.testModule}`
     },
   })
+}
 
 export const rejects = (macro: Macro<[module: ModulePrescription], { instance: Test }>) => {
   return test.macro({
@@ -606,7 +607,6 @@ export const rejects = (macro: Macro<[module: ModulePrescription], { instance: T
         })
 
       await waitForState(t.context.instance)
-      t.log('Test Finished')
       t.pass()
     },
     title: <any>macro.title,
@@ -619,7 +619,6 @@ export const skippable = (macro: Macro<[module: ModulePrescription], { instance:
       await Promise.allSettled([macro.exec(t, module)])
 
       await waitForState(t.context.instance, { results: new Set(['SKIPPED', 'PASSED']) })
-      t.log('Test result is SKIPPED')
       t.pass()
     },
     title: <any>macro.title,
