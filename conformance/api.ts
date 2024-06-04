@@ -5,6 +5,7 @@ const { SUITE_BASE_URL = 'https://www.certification.openid.net', SUITE_ACCESS_TO
 export interface ModulePrescription {
   testModule: string
   variant: null | Record<string, string>
+  skipLogTestFinished?: boolean
 }
 
 export interface Test {

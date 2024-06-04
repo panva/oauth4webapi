@@ -65,7 +65,7 @@ rl.on('line', (line) => {
 
   fs.writeFileSync(currentFile, `${line}\n`, { flag: 'a' })
 
-  if (line.includes('Test Finished') || line.includes('Test result is SKIPPED')) {
+  if (line.includes('Test Finished')) {
     const fullname = `${testName}-${testId}.txt`
     files.push(fullname)
     fs.renameSync(currentFile, fullname)

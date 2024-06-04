@@ -570,7 +570,9 @@ export const flow = (options?: MacroOptions) => {
       }
 
       await waitForState(instance)
-
+      if (module.skipLogTestFinished !== true) {
+        t.log('Test Finished')
+      }
       t.pass()
     },
     title(providedTitle = '', module: ModulePrescription) {
@@ -593,7 +595,7 @@ export const rejects = (macro: Macro<[module: ModulePrescription], { instance: T
       expectedErrorName: string = 'OperationProcessingError',
     ) {
       await t
-        .throwsAsync(() => <any>macro.exec(t, module), {
+        .throwsAsync(() => <any>macro.exec(t, { ...module, skipLogTestFinished: true }), {
           message: expectedMessage,
           name: expectedErrorName,
         })
@@ -607,6 +609,7 @@ export const rejects = (macro: Macro<[module: ModulePrescription], { instance: T
         })
 
       await waitForState(t.context.instance)
+      t.log('Test Finished')
       t.pass()
     },
     title: <any>macro.title,
@@ -616,9 +619,10 @@ export const rejects = (macro: Macro<[module: ModulePrescription], { instance: T
 export const skippable = (macro: Macro<[module: ModulePrescription], { instance: Test }>) => {
   return test.macro({
     async exec(t, module: ModulePrescription) {
-      await Promise.allSettled([macro.exec(t, module)])
+      await Promise.allSettled([macro.exec(t, { ...module, skipLogTestFinished: true })])
 
       await waitForState(t.context.instance, { results: new Set(['SKIPPED', 'PASSED']) })
+      t.log('Test Finished')
       t.pass()
     },
     title: <any>macro.title,
