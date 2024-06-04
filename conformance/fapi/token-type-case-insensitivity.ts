@@ -1,5 +1,5 @@
-import { test, green, modules } from '../runner.js'
+import { test, flow, modules } from '../runner.js'
 
 for (const module of modules('token-type-case-insensitivity')) {
-  test.serial(green(), module)
+  test.serial(flow(), module)
 }

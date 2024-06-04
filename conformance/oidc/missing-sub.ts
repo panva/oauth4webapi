@@ -1,5 +1,5 @@
-import { test, red, modules } from '../runner.js'
+import { test, rejects, flow, modules } from '../runner.js'
 
 for (const module of modules('missing-sub')) {
-  test.serial(red(), module, 'JWT "sub" (subject) claim missing')
+  test.serial(rejects(flow()), module, 'JWT "sub" (subject) claim missing')
 }

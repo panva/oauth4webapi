@@ -1,4 +1,5 @@
-import anyTest, { type TestFn } from 'ava'
+import anyTest from 'ava'
+import type { Macro, TestFn } from 'ava'
 import {
   importJWK,
   type JWK,
@@ -142,7 +143,7 @@ interface MacroOptions {
   useState?: boolean
 }
 
-export const green = (options?: MacroOptions) =>
+export const flow = (options?: MacroOptions) =>
   test.macro({
     async exec(t, module: ModulePrescription) {
       t.timeout(15000)
@@ -582,8 +583,7 @@ export const green = (options?: MacroOptions) =>
     },
   })
 
-export const red = (options?: MacroOptions) => {
-  const macro = green(options)
+export const rejects = (macro: Macro<[module: ModulePrescription], { instance: Test }>) => {
   return test.macro({
     async exec(
       t,
@@ -613,8 +613,7 @@ export const red = (options?: MacroOptions) => {
   })
 }
 
-export const skippable = (options?: MacroOptions) => {
-  const macro = green(options)
+export const skippable = (macro: Macro<[module: ModulePrescription], { instance: Test }>) => {
   return test.macro({
     async exec(t, module: ModulePrescription) {
       await Promise.allSettled([macro.exec(t, module)])

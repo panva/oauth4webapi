@@ -1,5 +1,5 @@
-import { test, red, modules } from '../runner.js'
+import { test, rejects, flow, modules } from '../runner.js'
 
 for (const module of modules('userinfo-invalid-sub')) {
-  test.serial(red(), module, 'unexpected "response" body "sub" value')
+  test.serial(rejects(flow()), module, 'unexpected "response" body "sub" value')
 }
