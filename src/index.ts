@@ -695,6 +695,7 @@ export interface Client {
    * Client secret.
    */
   client_secret?: string
+  // TODO: Make client_secret_post the default in v3.x
   /**
    * Client {@link ClientAuthenticationMethod authentication method} for the client's authenticated
    * requests. Default is `client_secret_basic`.
