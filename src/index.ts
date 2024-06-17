@@ -198,8 +198,8 @@ export const clockSkew: unique symbol = Symbol()
 export const clockTolerance: unique symbol = Symbol()
 
 /**
- * When configured on an interface that extends {@link HttpRequestOptions}, that's every `options`
- * parameter for functions that trigger HTTP Requests, this replaces the use of global fetch. As a
+ * When configured on an interface that extends {@link HttpRequestOptions}, this applies to `options`
+ * parameter for functions that trigger HTTP requests, this replaces the use of global fetch. As a
  * fetch replacement the arguments and expected return are the same as fetch.
  *
  * In theory any module that claims to be compatible with the Fetch API can be used but your mileage
@@ -953,7 +953,7 @@ const SUPPORTED_JWS_ALGS: JWSAlgorithm[] = [
 
 export interface HttpRequestOptions {
   /**
-   * An AbortSignal instance, or a factory returning one, to abort the HTTP Request(s) triggered by
+   * An AbortSignal instance, or a factory returning one, to abort the HTTP request(s) triggered by
    * this function's invocation.
    *
    * @example
@@ -967,7 +967,7 @@ export interface HttpRequestOptions {
   signal?: (() => AbortSignal) | AbortSignal
 
   /**
-   * Headers to additionally send with the HTTP Request(s) triggered by this function's invocation.
+   * Headers to additionally send with the HTTP request(s) triggered by this function's invocation.
    */
   headers?: [string, string][] | Record<string, string> | Headers
 
@@ -2282,7 +2282,8 @@ async function getPublicSigKeyFromIssuerJwksUri(
 }
 
 /**
- * DANGER ZONE
+ * DANGER ZONE - This option has security implications that must be understood, assessed for
+ * applicability, and accepted before use.
  *
  * Use this as a value to {@link processUserInfoResponse} `expectedSubject` parameter to skip the
  * `sub` claim value check.
@@ -3897,13 +3898,14 @@ function getURLSearchParameter(parameters: URLSearchParams, name: string): strin
 }
 
 /**
- * DANGER ZONE
+ * DANGER ZONE - This option has security implications that must be understood, assessed for
+ * applicability, and accepted before use.
  *
  * Use this as a value to {@link validateAuthResponse} `expectedState` parameter to skip the `state`
- * value check. This should only ever be done if you use a `state` parameter value that is integrity
- * protected and bound to the browsing session. One such mechanism to do so is described in an I-D
+ * value check when you'll be validating such `state` value yourself instead. This should only be
+ * done if you use a `state` parameter value that is integrity protected and bound to the browsing
+ * session. One such mechanism to do so is described in an I-D
  * [draft-bradley-oauth-jwt-encoded-state-09](https://datatracker.ietf.org/doc/html/draft-bradley-oauth-jwt-encoded-state-09).
- * It is expected you'll validate such `state` value yourself.
  */
 export const skipStateCheck: unique symbol = Symbol()
 

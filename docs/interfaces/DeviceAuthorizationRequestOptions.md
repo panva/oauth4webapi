@@ -44,7 +44,7 @@ ___
 
 • `Optional` **headers**: [`Record`]( https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type )\<`string`, `string`\> \| [`string`, `string`][] \| [`Headers`]( https://developer.mozilla.org/docs/Web/API/Headers )
 
-Headers to additionally send with the HTTP Request(s) triggered by this function's invocation.
+Headers to additionally send with the HTTP request(s) triggered by this function's invocation.
 
 ___
 
@@ -52,7 +52,7 @@ ___
 
 • `Optional` **signal**: [`AbortSignal`]( https://developer.mozilla.org/docs/Web/API/AbortSignal ) \| () => [`AbortSignal`]( https://developer.mozilla.org/docs/Web/API/AbortSignal )
 
-An AbortSignal instance, or a factory returning one, to abort the HTTP Request(s) triggered by
+An AbortSignal instance, or a factory returning one, to abort the HTTP request(s) triggered by
 this function's invocation.
 
 **`Example`**

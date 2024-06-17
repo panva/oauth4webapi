@@ -4,7 +4,8 @@
 
 • `Const` **skipSubjectCheck**: unique `symbol`
 
-DANGER ZONE
+DANGER ZONE - This option has security implications that must be understood, assessed for
+applicability, and accepted before use.
 
 Use this as a value to [processUserInfoResponse](../functions/processUserInfoResponse.md) `expectedSubject` parameter to skip the
 `sub` claim value check.

@@ -4,8 +4,8 @@
 
 • `Const` **customFetch**: unique `symbol`
 
-When configured on an interface that extends [HttpRequestOptions](../interfaces/HttpRequestOptions.md), that's every `options`
-parameter for functions that trigger HTTP Requests, this replaces the use of global fetch. As a
+When configured on an interface that extends [HttpRequestOptions](../interfaces/HttpRequestOptions.md), this applies to `options`
+parameter for functions that trigger HTTP requests, this replaces the use of global fetch. As a
 fetch replacement the arguments and expected return are the same as fetch.
 
 In theory any module that claims to be compatible with the Fetch API can be used but your mileage
