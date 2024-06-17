@@ -2939,7 +2939,7 @@ export async function processAuthorizationCodeOpenIDResponse(
 
   if (maxAge !== skipAuthTimeCheck) {
     if (typeof maxAge !== 'number' || maxAge < 0) {
-      throw new TypeError('"options.max_age" must be a non-negative number')
+      throw new TypeError('"maxAge" must be a non-negative number')
     }
 
     const now = epochTime() + getClockSkew(client)
@@ -3832,7 +3832,7 @@ export async function validateDetachedSignatureResponse(
 
   if (maxAge !== skipAuthTimeCheck) {
     if (typeof maxAge !== 'number' || maxAge < 0) {
-      throw new TypeError('"options.max_age" must be a non-negative number')
+      throw new TypeError('"maxAge" must be a non-negative number')
     }
 
     const now = epochTime() + getClockSkew(client)
