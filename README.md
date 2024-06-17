@@ -38,13 +38,13 @@ The following features are currently in scope and implemented in this software:
 **`example`** ESM import
 
 ```js
-import * as oauth2 from 'oauth4webapi'
+import * as oauth from 'oauth4webapi'
 ```
 
 **`example`** Deno import
 
 ```js
-import * as oauth2 from 'https://deno.land/x/oauth4webapi@v2.10.4/mod.ts'
+import * as oauth from 'https://deno.land/x/oauth4webapi@v2.10.4/mod.ts'
 ```
 
 - Authorization Code Flow (OAuth 2.0) - [source](examples/oauth.ts)
