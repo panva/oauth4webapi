@@ -85,6 +85,10 @@ provider.use(async (ctx, next) => {
         encoding: ctx.charset,
       })
       const params = new URLSearchParams(body.toString())
+      const target = params.get('goto')
+
+      console.log('\n\n=====')
+      console.log('starting user interaction on', target)
 
       browser = await puppeteer.launch({
         executablePath: getChromePath(),
@@ -95,21 +99,48 @@ provider.use(async (ctx, next) => {
 
       const page = await browser.newPage()
       await Promise.all([
-        page.goto(params.get('goto')),
+        page.goto(target),
         page.waitForSelector(s),
-        page.waitForNetworkIdle(),
+        page.waitForNetworkIdle({ idleTime: 100 }),
       ])
 
-      if ((await page.title()) === 'Device Login Confirmation') {
-        await Promise.all([page.click(s), page.waitForSelector(s), page.waitForNetworkIdle()])
+      let pending = true
+      while (pending) {
+        let title
+        try {
+          title = await page.title()
+        } catch {
+          continue
+        }
+        switch (title) {
+          case 'Device Login Confirmation':
+            await Promise.all([
+              page.click(s),
+              page.waitForFunction('document.title === "Sign-in"'),
+              page.waitForNetworkIdle({ idleTime: 100 }),
+            ])
+            break
+          case 'Sign-in':
+            await page.type('[name="login"]', 'user')
+            await page.type('[name="password"]', 'pass')
+            await Promise.all([
+              page.click(s),
+              page.waitForFunction('document.title === "Consent"'),
+              page.waitForNetworkIdle({ idleTime: 100 }),
+            ])
+            break
+          case 'Consent':
+            await Promise.all([page.click(s), page.waitForNetworkIdle({ idleTime: 100 })])
+            pending = false
+            break
+          default:
+            throw new Error(title)
+        }
       }
 
-      await page.type('[name="login"]', 'user')
-      await page.type('[name="password"]', 'pass')
-      await Promise.all([page.click(s), page.waitForSelector(s), page.waitForNetworkIdle()])
-      await Promise.all([page.click(s), page.waitForNetworkIdle(s)])
-
       ctx.body = page.url()
+      console.log('done on title:', await page.title(), 'url:', ctx.body)
+      console.log('=====\n\n')
     } finally {
       await browser?.close()
     }
@@ -117,6 +148,9 @@ provider.use(async (ctx, next) => {
     ctx.body = ctx.URL.href
   } else {
     await next()
+    if (typeof ctx.body === 'string' && ctx.body.includes('Continue')) {
+      ctx.body = ctx.body.replace('<title>Sign-in</title>', '<title>Consent</title>')
+    }
   }
 })
 

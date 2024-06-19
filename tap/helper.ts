@@ -16,6 +16,34 @@ export function isDpopNonceError(input: lib.OAuth2Error | lib.WWWAuthenticateCha
   }
 }
 
+export function unexpectedAuthorizationServerError(
+  input: lib.WWWAuthenticateChallenge[] | lib.OAuth2Error,
+) {
+  let msg: string
+  if ('error' in input) {
+    msg = `${input.error}: ${input.error_description}`
+  } else {
+    msg = `${input[0].parameters.error}: ${input[0].parameters.error_description}`
+  }
+  return new Error(msg, { cause: input })
+}
+
+export function assertNotOAuth2Error(
+  input: Parameters<typeof lib.isOAuth2Error>[0],
+): input is Exclude<Parameters<typeof lib.isOAuth2Error>[0], lib.OAuth2Error> {
+  if (lib.isOAuth2Error(input)) {
+    throw unexpectedAuthorizationServerError(input)
+  }
+  return true
+}
+
+export function assertNoWwwAuthenticateChallenges(response: Response) {
+  let challenges: lib.WWWAuthenticateChallenge[] | undefined
+  if ((challenges = lib.parseWwwAuthenticateChallenges(response))) {
+    throw unexpectedAuthorizationServerError(challenges)
+  }
+}
+
 export async function setup(
   alg: lib.JWSAlgorithm,
   kp: CryptoKeyPair,

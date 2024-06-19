@@ -1,7 +1,13 @@
 import type QUnit from 'qunit'
 import * as jose from 'jose'
 
-import { isDpopNonceError, setup } from './helper.js'
+import {
+  assertNoWwwAuthenticateChallenges,
+  isDpopNonceError,
+  assertNotOAuth2Error,
+  setup,
+  unexpectedAuthorizationServerError,
+} from './helper.js'
 import * as lib from '../src/index.js'
 import { keys } from './keys.js'
 
@@ -98,10 +104,7 @@ export default (QUnit: QUnit) => {
           })
         let response = await clientCredentialsGrantRequest()
 
-        if (lib.parseWwwAuthenticateChallenges(response)) {
-          t.ok(0)
-          throw new Error()
-        }
+        assertNoWwwAuthenticateChallenges(response)
 
         const processClientCredentialsResponse = () =>
           lib.processClientCredentialsResponse(as, client, response)
@@ -110,13 +113,9 @@ export default (QUnit: QUnit) => {
           if (isDpopNonceError(result)) {
             response = await clientCredentialsGrantRequest()
             result = await processClientCredentialsResponse()
-            if (lib.isOAuth2Error(result)) {
-              t.ok(0)
-              throw new Error()
-            }
+            if (!assertNotOAuth2Error(result)) return
           } else {
-            t.ok(0)
-            throw new Error()
+            throw unexpectedAuthorizationServerError(result)
           }
         }
 
@@ -133,17 +132,11 @@ export default (QUnit: QUnit) => {
             t.ok(JSON.parse(clone))
           }
 
-          if (lib.parseWwwAuthenticateChallenges(response)) {
-            t.ok(0)
-            throw new Error()
-          }
+          assertNoWwwAuthenticateChallenges(response)
 
           const result = await lib.processIntrospectionResponse(as, client, response)
 
-          if (lib.isOAuth2Error(result)) {
-            t.ok(0)
-            throw new Error()
-          }
+          if (!assertNotOAuth2Error(result)) return
 
           t.propContains(result, {
             active: true,
@@ -156,16 +149,10 @@ export default (QUnit: QUnit) => {
         {
           let response = await lib.revocationRequest(as, client, access_token, authenticated)
 
-          if (lib.parseWwwAuthenticateChallenges(response)) {
-            t.ok(0)
-            throw new Error()
-          }
+          assertNoWwwAuthenticateChallenges(response)
 
           const result = await lib.processRevocationResponse(response)
-          if (lib.isOAuth2Error(result)) {
-            t.ok(0)
-            throw new Error()
-          }
+          if (!assertNotOAuth2Error(result)) return
         }
       }
 

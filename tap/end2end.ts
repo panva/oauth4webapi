@@ -1,7 +1,13 @@
 import type QUnit from 'qunit'
 import * as jose from 'jose'
 
-import { isDpopNonceError, setup } from './helper.js'
+import {
+  assertNoWwwAuthenticateChallenges,
+  isDpopNonceError,
+  assertNotOAuth2Error,
+  setup,
+  unexpectedAuthorizationServerError,
+} from './helper.js'
 import * as lib from '../src/index.js'
 import { keys } from './keys.js'
 
@@ -127,10 +133,7 @@ export default (QUnit: QUnit) => {
         const pushedAuthorizationRequest = () =>
           lib.pushedAuthorizationRequest(as, client, params, { DPoP })
         let response = await pushedAuthorizationRequest()
-        if (lib.parseWwwAuthenticateChallenges(response)) {
-          t.ok(0)
-          throw new Error()
-        }
+        assertNoWwwAuthenticateChallenges(response)
 
         const processPushedAuthorizationResponse = () =>
           lib.processPushedAuthorizationResponse(as, client, response)
@@ -138,18 +141,11 @@ export default (QUnit: QUnit) => {
         if (lib.isOAuth2Error(result)) {
           if (isDpopNonceError(result)) {
             response = await pushedAuthorizationRequest()
-            if (lib.parseWwwAuthenticateChallenges(response)) {
-              t.ok(0)
-              throw new Error()
-            }
+            assertNoWwwAuthenticateChallenges(response)
             result = await processPushedAuthorizationResponse()
-            if (lib.isOAuth2Error(result)) {
-              t.ok(0)
-              throw new Error()
-            }
+            if (!assertNotOAuth2Error(result)) return
           } else {
-            t.ok(0)
-            throw new Error()
+            throw unexpectedAuthorizationServerError(result)
           }
         }
         for (const param of [...params.keys()]) {
@@ -183,10 +179,7 @@ export default (QUnit: QUnit) => {
         currentUrl,
         lib.expectNoState,
       )
-      if (lib.isOAuth2Error(callbackParams)) {
-        t.ok(0)
-        throw new Error()
-      }
+      if (!assertNotOAuth2Error(callbackParams)) return
 
       {
         const authorizationCodeGrantRequest = () =>
@@ -200,10 +193,7 @@ export default (QUnit: QUnit) => {
           )
         let response = await authorizationCodeGrantRequest()
 
-        if (lib.parseWwwAuthenticateChallenges(response)) {
-          t.ok(0)
-          throw new Error()
-        }
+        assertNoWwwAuthenticateChallenges(response)
 
         const processAuthorizationCodeOpenIDResponse = () =>
           lib.processAuthorizationCodeOpenIDResponse(as, client, response)
@@ -212,20 +202,16 @@ export default (QUnit: QUnit) => {
           if (isDpopNonceError(result)) {
             response = await authorizationCodeGrantRequest()
             result = await processAuthorizationCodeOpenIDResponse()
-            if (lib.isOAuth2Error(result)) {
-              t.ok(0)
-              throw new Error()
-            }
+            if (!assertNotOAuth2Error(result)) return
           } else {
-            t.ok(0)
-            throw new Error()
+            throw unexpectedAuthorizationServerError(result)
           }
         }
 
         const { access_token, refresh_token, token_type } = result
         t.equal(token_type, dpop ? 'dpop' : 'bearer')
         if (!refresh_token) {
-          t.ok(0)
+          t.ok(0, 'expected a refresh token to be returned')
           throw new Error()
         }
         const { sub } = lib.getValidatedIdTokenClaims(result)
@@ -239,8 +225,7 @@ export default (QUnit: QUnit) => {
             if (isDpopNonceError(challenges)) {
               response = await userInfoRequest()
             } else {
-              t.ok(0)
-              throw new Error()
+              throw unexpectedAuthorizationServerError(challenges)
             }
           }
 
@@ -264,16 +249,12 @@ export default (QUnit: QUnit) => {
             if (isDpopNonceError(challenges)) {
               response = await refreshTokenGrantRequest()
             } else {
-              t.ok(0)
-              throw new Error()
+              throw unexpectedAuthorizationServerError(challenges)
             }
           }
 
           const result = await lib.processRefreshTokenResponse(as, client, response)
-          if (lib.isOAuth2Error(result)) {
-            t.ok(0)
-            throw new Error()
-          }
+          if (!assertNotOAuth2Error(result)) return
         }
       }
 

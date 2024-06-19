@@ -1,6 +1,12 @@
 import type QUnit from 'qunit'
 
-import { isDpopNonceError, setup } from './helper.js'
+import {
+  assertNotOAuth2Error,
+  assertNoWwwAuthenticateChallenges,
+  isDpopNonceError,
+  setup,
+  unexpectedAuthorizationServerError,
+} from './helper.js'
 import * as lib from '../src/index.js'
 import { keys } from './keys.js'
 import * as jose from 'jose'
@@ -44,16 +50,10 @@ export default (QUnit: QUnit) => {
       params.set('scope', 'api:write')
 
       let response = await lib.deviceAuthorizationRequest(as, client, params)
-      if (lib.parseWwwAuthenticateChallenges(response)) {
-        t.ok(0)
-        throw new Error()
-      }
+      assertNoWwwAuthenticateChallenges(response)
 
       let result = await lib.processDeviceAuthorizationResponse(as, client, response)
-      if (lib.isOAuth2Error(result)) {
-        t.ok(0)
-        throw new Error()
-      }
+      if (!assertNotOAuth2Error(result)) return
       const { verification_uri_complete, device_code } = result
 
       await fetch('http://localhost:3000/drive', {
@@ -68,24 +68,26 @@ export default (QUnit: QUnit) => {
           lib.deviceCodeGrantRequest(as, client, device_code, { DPoP })
         let response = await deviceCodeGrantRequest()
 
-        if (lib.parseWwwAuthenticateChallenges(response)) {
-          t.ok(0)
-          throw new Error()
-        }
+        assertNoWwwAuthenticateChallenges(response)
 
         const processDeviceCodeResponse = () => lib.processDeviceCodeResponse(as, client, response)
         let result = await processDeviceCodeResponse()
+        let i = 0
+        while (lib.isOAuth2Error(result) && result.error === 'authorization_pending') {
+          await new Promise((resolve) => setTimeout(resolve, 100))
+          response = await deviceCodeGrantRequest()
+          result = await processDeviceCodeResponse()
+          i++
+          if (i === 5) break
+        }
+
         if (lib.isOAuth2Error(result)) {
           if (isDpopNonceError(result)) {
             response = await deviceCodeGrantRequest()
             result = await processDeviceCodeResponse()
-            if (lib.isOAuth2Error(result)) {
-              t.ok(0)
-              throw new Error()
-            }
+            if (!assertNotOAuth2Error(result)) return
           } else {
-            t.ok(0)
-            throw new Error()
+            throw unexpectedAuthorizationServerError(result)
           }
         }
 
