@@ -1,7 +1,16 @@
 diff --git a/examples/oauth.ts b/examples/refresh_token.ts
-index cc6d632..357e55d 100644
+index cc6d632..4bf648d 100644
 --- a/examples/oauth.ts
 +++ b/examples/refresh_token.ts
+@@ -43,7 +43,7 @@ let state: string | undefined
+   authorizationUrl.searchParams.set('client_id', client.client_id)
+   authorizationUrl.searchParams.set('redirect_uri', redirect_uri)
+   authorizationUrl.searchParams.set('response_type', 'code')
+-  authorizationUrl.searchParams.set('scope', 'api:read')
++  authorizationUrl.searchParams.set('scope', 'api:read offline_access')
+   authorizationUrl.searchParams.set('code_challenge', code_challenge)
+   authorizationUrl.searchParams.set('code_challenge_method', code_challenge_method)
+ 
 @@ -62,6 +62,7 @@ let state: string | undefined
  // one eternity later, the user lands back on the redirect_uri
  // Authorization Code Grant Request & Response

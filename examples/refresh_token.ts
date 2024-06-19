@@ -43,7 +43,7 @@ let state: string | undefined
   authorizationUrl.searchParams.set('client_id', client.client_id)
   authorizationUrl.searchParams.set('redirect_uri', redirect_uri)
   authorizationUrl.searchParams.set('response_type', 'code')
-  authorizationUrl.searchParams.set('scope', 'api:read')
+  authorizationUrl.searchParams.set('scope', 'api:read offline_access')
   authorizationUrl.searchParams.set('code_challenge', code_challenge)
   authorizationUrl.searchParams.set('code_challenge_method', code_challenge_method)
 
