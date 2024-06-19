@@ -17,7 +17,7 @@ responses.
 | `expectedNonce` | `string` | Expected ID Token `nonce` claim value. |
 | `expectedState?` | `string` \| typeof [`expectNoState`](../variables/expectNoState.md) | Expected `state` parameter value. Default is [expectNoState](../variables/expectNoState.md). |
 | `maxAge?` | `number` \| typeof [`skipAuthTimeCheck`](../variables/skipAuthTimeCheck.md) | ID Token [`auth_time`](../interfaces/IDToken.md#auth_time) claim value will be checked to be present and conform to the `maxAge` value. Use of this option is required if you sent a `max_age` parameter in an authorization request. Default is [`client.default_max_age`](../interfaces/Client.md#default_max_age) and falls back to [skipAuthTimeCheck](../variables/skipAuthTimeCheck.md). |
-| `options?` | [`HttpRequestOptions`](../interfaces/HttpRequestOptions.md) | - |
+| `options?` | [`ValidateDetachedSignatureResponseOptions`](../interfaces/ValidateDetachedSignatureResponseOptions.md) | - |
 
 #### Returns
 

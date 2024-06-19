@@ -61,6 +61,10 @@ const signal = () => AbortSignal.timeout(5_000) // Note: AbortSignal.timeout may
 
   ↳ [`IntrospectionRequestOptions`](IntrospectionRequestOptions.md)
 
+  ↳ [`ValidateJwtAuthResponseOptions`](ValidateJwtAuthResponseOptions.md)
+
+  ↳ [`ValidateDetachedSignatureResponseOptions`](ValidateDetachedSignatureResponseOptions.md)
+
   ↳ [`DeviceAuthorizationRequestOptions`](DeviceAuthorizationRequestOptions.md)
 
   ↳ [`ValidateJWTAccessTokenOptions`](ValidateJWTAccessTokenOptions.md)

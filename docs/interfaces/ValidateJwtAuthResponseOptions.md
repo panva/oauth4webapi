@@ -1,4 +1,4 @@
-# Interface: ValidateJWTAccessTokenOptions
+# Interface: ValidateJwtAuthResponseOptions
 
 [💗 Help the project](https://github.com/sponsors/panva)
 
@@ -6,31 +6,12 @@
 
 ### Properties
 
-- [[clockSkew]](ValidateJWTAccessTokenOptions.md#clockskew)
-- [[clockTolerance]](ValidateJWTAccessTokenOptions.md#clocktolerance)
-- [[customFetch]](ValidateJWTAccessTokenOptions.md#customfetch)
-- [[experimental\_jwksCache]](ValidateJWTAccessTokenOptions.md#experimental_jwkscache)
-- [headers](ValidateJWTAccessTokenOptions.md#headers)
-- [requireDPoP](ValidateJWTAccessTokenOptions.md#requiredpop)
-- [signal](ValidateJWTAccessTokenOptions.md#signal)
+- [[customFetch]](ValidateJwtAuthResponseOptions.md#customfetch)
+- [[experimental\_jwksCache]](ValidateJwtAuthResponseOptions.md#experimental_jwkscache)
+- [headers](ValidateJwtAuthResponseOptions.md#headers)
+- [signal](ValidateJwtAuthResponseOptions.md#signal)
 
 ## Properties
-
-### [clockSkew]
-
-• `Optional` **[clockSkew]**: `number`
-
-Same functionality as in [Client](Client.md)
-
-___
-
-### [clockTolerance]
-
-• `Optional` **[clockTolerance]**: `number`
-
-Same functionality as in [Client](Client.md)
-
-___
 
 ### [customFetch]
 
@@ -56,14 +37,6 @@ Headers to additionally send with the HTTP request(s) triggered by this function
 
 ___
 
-### requireDPoP
-
-• `Optional` **requireDPoP**: `boolean`
-
-Indicates whether DPoP use is required.
-
-___
-
 ### signal
 
 • `Optional` **signal**: [`AbortSignal`]( https://developer.mozilla.org/docs/Web/API/AbortSignal ) \| () => [`AbortSignal`]( https://developer.mozilla.org/docs/Web/API/AbortSignal )
@@ -85,4 +58,4 @@ const signal = () => AbortSignal.timeout(5_000) // Note: AbortSignal.timeout may
 
 - [`JWKSCacheOptions`](JWKSCacheOptions.md)
 
-  ↳ **`ValidateJWTAccessTokenOptions`**
+  ↳ **`ValidateJwtAuthResponseOptions`**

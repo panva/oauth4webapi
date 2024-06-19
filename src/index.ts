@@ -179,7 +179,7 @@ export type JWSAlgorithm =
   | 'PS512'
   | 'RS512'
 
-interface JWK {
+export interface JWK {
   readonly kty?: string
   readonly kid?: string
   readonly alg?: string
@@ -281,6 +281,64 @@ export const clockTolerance: unique symbol = Symbol()
  * ```
  */
 export const customFetch: unique symbol = Symbol()
+
+/**
+ * This is an experimental feature, it is not subject to semantic versioning rules. Non-backward
+ * compatible changes or removal may occur in any future release.
+ *
+ * DANGER ZONE - This option has security implications that must be understood, assessed for
+ * applicability, and accepted before use. It is critical that the JSON Web Key Set cache only be
+ * writable by your own code.
+ *
+ * This option is intended for cloud computing runtimes that cannot keep an in memory cache between
+ * their code's invocations. Use in runtimes where an in memory cache between requests is available
+ * is not desirable.
+ *
+ * When configured on an interface that extends {@link JWKSCacheOptions}, this applies to `options`
+ * parameter for functions that trigger HTTP requests for the
+ * {@link AuthorizationServer.jwks_uri `as.jwks_uri`}, this allows the passed in object to:
+ *
+ * - Serve as an initial value for the JSON Web Key Set that the module would otherwise need to
+ *   trigger an HTTP request for
+ * - Have the JSON Web Key Set the function optionally ended up triggering an HTTP request for
+ *   assigned to it as properties
+ *
+ * The intended use pattern is:
+ *
+ * - Before executing a function with {@link JWKSCacheOptions} in its `options` parameter you pull the
+ *   previously cached object from a low-latency key-value store offered by the cloud computing
+ *   runtime it is executed on;
+ * - Default to an empty object `{}` instead when there's no previously cached value;
+ * - Pass it into the options interfaces that extend {@link JWKSCacheOptions};
+ * - Afterwards, update the key-value storage if the {@link ExportedJWKSCache.uat `uat`} property of
+ *   the object has changed.
+ *
+ * @example
+ *
+ * ```ts
+ * import * as oauth from 'oauth4webapi'
+ *
+ * // Prerequisites
+ * let as!: oauth.AuthorizationServer
+ * let request!: Request
+ * let expectedAudience!: string
+ *
+ * // Load JSON Web Key Set cache
+ * const jwksCache: oauth.JWKSCacheInput = (await getPreviouslyCachedJWKS()) || {}
+ * const { uat } = jwksCache
+ *
+ * // Use JSON Web Key Set cache
+ * const accessTokenClaims = await validateJwtAccessToken(as, request, expectedAudience, {
+ *   [oauth.experimental_jwksCache]: jwksCache,
+ * })
+ *
+ * if (uat !== jwksCache.uat) {
+ *   // Update JSON Web Key Set cache
+ *   await storeNewJWKScache(jwksCache)
+ * }
+ * ```
+ */
+export const experimental_jwksCache: unique symbol = Symbol()
 
 /**
  * When combined with {@link customFetch} (to use a Fetch API implementation that supports client
@@ -950,6 +1008,13 @@ const SUPPORTED_JWS_ALGS: JWSAlgorithm[] = [
   'RS512',
   'EdDSA',
 ]
+
+export interface JWKSCacheOptions {
+  /**
+   * See {@link experimental_jwksCache}.
+   */
+  [experimental_jwksCache]?: JWKSCacheInput
+}
 
 export interface HttpRequestOptions {
   /**
@@ -2165,41 +2230,88 @@ export interface UserInfoResponse {
   readonly [claim: string]: JsonValue | undefined
 }
 
-let jwksCache: WeakMap<AuthorizationServer, JWKSCache>
-interface JWKSCache {
-  jwks: JsonWebKeySet
-  iat: number
-  age: number
+let jwksMap: WeakMap<AuthorizationServer, ExportedJWKSCache & { age: number }>
+
+export interface ExportedJWKSCache {
+  jwks: JWKS
+  uat: number
+}
+
+export type JWKSCacheInput = ExportedJWKSCache | Record<string, never>
+
+function setJwksCache(
+  as: AuthorizationServer,
+  jwks: JWKS,
+  uat: number,
+  cache?: JWKSCacheInput,
+): undefined {
+  jwksMap ||= new WeakMap()
+  jwksMap.set(as, {
+    jwks,
+    uat,
+    get age() {
+      return epochTime() - this.uat
+    },
+  })
+
+  if (cache) {
+    Object.assign(cache, { jwks: structuredClone(jwks), uat })
+  }
+}
+
+function isFreshJwksCache(input: unknown): input is ExportedJWKSCache {
+  if (typeof input !== 'object' || input === null) {
+    return false
+  }
+
+  if (!('uat' in input) || typeof input.uat !== 'number' || epochTime() - input.uat >= 300) {
+    return false
+  }
+
+  if (
+    !('jwks' in input) ||
+    !isJsonObject(input.jwks) ||
+    !Array.isArray(input.jwks.keys) ||
+    !Array.prototype.every.call(input.jwks.keys, isJsonObject)
+  ) {
+    return false
+  }
+
+  return true
+}
+
+function clearJwksCache(as: AuthorizationServer, cache?: Partial<JWKSCacheInput>) {
+  jwksMap?.delete(as)
+  delete cache?.jwks
+  delete cache?.uat
 }
 
 async function getPublicSigKeyFromIssuerJwksUri(
   as: AuthorizationServer,
-  options: HttpRequestOptions | undefined,
+  options: (HttpRequestOptions & JWKSCacheOptions) | undefined,
   header: CompactJWSHeaderParameters,
 ): Promise<CryptoKey> {
   const { alg, kid } = header
   checkSupportedJwsAlg(alg)
 
-  let jwks: JsonWebKeySet
+  if (!jwksMap?.has(as) && isFreshJwksCache(options?.[experimental_jwksCache])) {
+    setJwksCache(as, options?.[experimental_jwksCache].jwks, options?.[experimental_jwksCache].uat)
+  }
+
+  let jwks: JWKS
   let age: number
-  jwksCache ||= new WeakMap()
-  if (jwksCache.has(as)) {
-    ;({ jwks, age } = jwksCache.get(as)!)
+
+  if (jwksMap?.has(as)) {
+    ;({ jwks, age } = jwksMap.get(as)!)
     if (age >= 300) {
       // force a re-fetch every 5 minutes
-      jwksCache.delete(as)
+      clearJwksCache(as, options?.[experimental_jwksCache])
       return getPublicSigKeyFromIssuerJwksUri(as, options, header)
     }
   } else {
     jwks = await jwksRequest(as, options).then(processJwksResponse)
     age = 0
-    jwksCache.set(as, {
-      jwks,
-      iat: epochTime(),
-      get age() {
-        return epochTime() - this.iat
-      },
-    })
+    setJwksCache(as, jwks, epochTime(), options?.[experimental_jwksCache])
   }
 
   let kty: string
@@ -2261,7 +2373,7 @@ async function getPublicSigKeyFromIssuerJwksUri(
   if (!length) {
     if (age >= 60) {
       // allow re-fetch if cache is at least 1 minute old
-      jwksCache.delete(as)
+      clearJwksCache(as, options?.[experimental_jwksCache])
       return getPublicSigKeyFromIssuerJwksUri(as, options, header)
     }
     throw new OPE('error when selecting a JWT verification key, no applicable keys found')
@@ -3352,11 +3464,11 @@ async function jwksRequest(
   }).then(processDpopNonce)
 }
 
-interface JsonWebKeySet {
+export interface JWKS {
   readonly keys: JWK[]
 }
 
-async function processJwksResponse(response: Response): Promise<JsonWebKeySet> {
+async function processJwksResponse(response: Response): Promise<JWKS> {
   if (!looseInstanceOf(response, Response)) {
     throw new TypeError('"response" must be an instance of Response')
   }
@@ -3373,7 +3485,7 @@ async function processJwksResponse(response: Response): Promise<JsonWebKeySet> {
     throw new OPE('failed to parse "response" body as JSON', { cause })
   }
 
-  if (!isJsonObject<JsonWebKeySet>(json)) {
+  if (!isJsonObject<JWKS>(json)) {
     throw new OPE('"response" body must be a top level object')
   }
 
@@ -3571,6 +3683,8 @@ async function validateJwt(
   return { header, claims, signature, key }
 }
 
+export interface ValidateJwtAuthResponseOptions extends HttpRequestOptions, JWKSCacheOptions {}
+
 /**
  * Same as {@link validateAuthResponse} but for signed JARM responses.
  *
@@ -3592,7 +3706,7 @@ export async function validateJwtAuthResponse(
   client: Client,
   parameters: URLSearchParams | URL,
   expectedState?: string | typeof expectNoState | typeof skipStateCheck,
-  options?: HttpRequestOptions,
+  options?: ValidateJwtAuthResponseOptions,
 ): Promise<URLSearchParams | OAuth2Error> {
   assertAs(as)
   assertClient(client)
@@ -3677,6 +3791,10 @@ async function idTokenHashMatches(data: string, actual: string, alg: JWSAlgorith
   return actual === expected
 }
 
+export interface ValidateDetachedSignatureResponseOptions
+  extends HttpRequestOptions,
+    JWKSCacheOptions {}
+
 /**
  * Same as {@link validateAuthResponse} but for FAPI 1.0 Advanced Detached Signature authorization
  * responses.
@@ -3706,7 +3824,7 @@ export async function validateDetachedSignatureResponse(
   expectedNonce: string,
   expectedState?: string | typeof expectNoState,
   maxAge?: number | typeof skipAuthTimeCheck,
-  options?: HttpRequestOptions,
+  options?: ValidateDetachedSignatureResponseOptions,
 ): Promise<URLSearchParams | OAuth2Error> {
   assertAs(as)
   assertClient(client)
@@ -4293,7 +4411,7 @@ export interface JWTAccessTokenClaims extends JWTPayload {
   readonly [claim: string]: JsonValue | undefined
 }
 
-export interface ValidateJWTAccessTokenOptions extends HttpRequestOptions {
+export interface ValidateJWTAccessTokenOptions extends HttpRequestOptions, JWKSCacheOptions {
   /**
    * Indicates whether DPoP use is required.
    */
@@ -4322,7 +4440,7 @@ async function validateDPoP(
   request: Request,
   accessToken: string,
   accessTokenClaims: JWTPayload,
-  options?: ValidateJWTAccessTokenOptions,
+  options?: Pick<ValidateJWTAccessTokenOptions, typeof clockSkew | typeof clockTolerance>,
 ) {
   const header = request.headers.get('dpop')
   if (header === null) {
