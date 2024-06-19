@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.11.0](https://github.com/panva/oauth4webapi/compare/v2.10.4...v2.11.0) (2024-06-19)
+
+
+### Features
+
+* add experimental support for edge compute runtimes JWKS caching ([15b7aff](https://github.com/panva/oauth4webapi/commit/15b7aff4575dc0f784f945ab3cfe7ada66c591a7))
+
+
+### Refactor
+
+* update maxAge option type check error message ([7fe3454](https://github.com/panva/oauth4webapi/commit/7fe34547e03b097d4ee9d59690033111c8df2549))
+
+
+### Documentation
+
+* clarify documentation is more an API Reference ([c96c8e0](https://github.com/panva/oauth4webapi/commit/c96c8e04065a16282dadde82828e77c23bb92c49))
+* update example import ([651e8ea](https://github.com/panva/oauth4webapi/commit/651e8ea4edee5c1dba731615ffabb8fc2bc8b36e))
+* updates for readability and consistency ([b1b8b7d](https://github.com/panva/oauth4webapi/commit/b1b8b7d35f6bedfd68f24d35b029ac474efa4608))
+
 ## [2.10.4](https://github.com/panva/oauth4webapi/compare/v2.10.3...v2.10.4) (2024-03-29)
 
 
