@@ -17,26 +17,23 @@ export default (QUnit: QUnit) => {
 
   const alg = 'ES256'
 
-  const jarmOptions = [false, true]
-  const parOptions = [false, true]
-  const jarOptions = [false, true]
-  const dpopOptions = [false, true]
-  const jwtUserinfoOptions = [false, true]
-
   const cartesianMatrix = []
 
-  for (const jarm of jarmOptions) {
-    for (const par of parOptions) {
-      for (const jar of jarOptions) {
-        for (const dpop of dpopOptions) {
-          for (const jwtUserinfo of jwtUserinfoOptions) {
-            cartesianMatrix.push({
-              jarm,
-              par,
-              jar,
-              dpop,
-              jwtUserinfo,
-            })
+  for (const jarm of [false, true]) {
+    for (const par of [false, true]) {
+      for (const jar of [false, true]) {
+        for (const dpop of [false, true]) {
+          for (const jwtUserinfo of [false, true]) {
+            for (const hybrid of [false, true]) {
+              cartesianMatrix.push({
+                hybrid,
+                jarm,
+                par,
+                jar,
+                dpop,
+                jwtUserinfo,
+              })
+            }
           }
         }
       }
@@ -48,9 +45,9 @@ export default (QUnit: QUnit) => {
   }
 
   for (const config of cartesianMatrix) {
-    const { jarm, par, jar, dpop, jwtUserinfo } = config
+    const { jarm, par, jar, dpop, jwtUserinfo, hybrid } = config
 
-    const options = [jarm, par, jar, dpop, jwtUserinfo]
+    const options = [jarm, par, jar, dpop, jwtUserinfo, hybrid]
 
     // Test
     // - individual options
@@ -63,8 +60,13 @@ export default (QUnit: QUnit) => {
     switch (trueCount(options)) {
       case 0:
       case 1:
-      case options.length:
         break
+      case options.length - 1:
+        if (hybrid) {
+          continue
+        } else {
+          break
+        }
       case 2:
         if ((par && jar) || (par && dpop)) {
           break
@@ -81,10 +83,11 @@ export default (QUnit: QUnit) => {
       const keys = Object.keys(
         Object.fromEntries(Object.entries(config).filter(([, v]) => v === true)),
       )
-      return keys.length ? `w/ ${keys.join(', ')}` : ''
+      let msg = `w/ response_type=${hybrid ? 'code id_token' : 'code'}`
+      return keys.length ? `${msg}, ${keys.join(', ')}` : msg
     }
 
-    test(`end-to-end code flow ${label(config)}`, async (t) => {
+    test(`end-to-end ${label(config)}`, async (t) => {
       const kp = await keys[alg]
       const { client, issuerIdentifier, clientPrivateKey } = await setup(
         alg,
@@ -106,11 +109,17 @@ export default (QUnit: QUnit) => {
 
       let params = new URLSearchParams()
 
+      let nonce: string | undefined
+      if (hybrid) {
+        nonce = lib.generateRandomNonce()
+        params.set('nonce', nonce)
+      }
+
       params.set('client_id', client.client_id)
       params.set('code_challenge', code_challenge)
       params.set('code_challenge_method', code_challenge_method)
       params.set('redirect_uri', 'http://localhost:3000/cb')
-      params.set('response_type', 'code')
+      params.set('response_type', hybrid ? 'code id_token' : 'code')
       params.set('scope', 'openid offline_access')
       params.set('prompt', 'consent')
 
@@ -173,12 +182,23 @@ export default (QUnit: QUnit) => {
         )
       }
 
-      const callbackParams = await (jarm ? lib.validateJwtAuthResponse : lib.validateAuthResponse)(
-        as,
-        client,
-        currentUrl,
-        lib.expectNoState,
-      )
+      let callbackParams: URLSearchParams | lib.OAuth2Error
+      if (hybrid) {
+        callbackParams = await lib.validateDetachedSignatureResponse(
+          as,
+          client,
+          currentUrl,
+          nonce!,
+          lib.expectNoState,
+        )
+      } else {
+        callbackParams = await (jarm ? lib.validateJwtAuthResponse : lib.validateAuthResponse)(
+          as,
+          client,
+          currentUrl,
+          lib.expectNoState,
+        )
+      }
       if (!assertNotOAuth2Error(callbackParams)) return
 
       {
@@ -196,7 +216,7 @@ export default (QUnit: QUnit) => {
         assertNoWwwAuthenticateChallenges(response)
 
         const processAuthorizationCodeOpenIDResponse = () =>
-          lib.processAuthorizationCodeOpenIDResponse(as, client, response)
+          lib.processAuthorizationCodeOpenIDResponse(as, client, response, nonce)
         let result = await processAuthorizationCodeOpenIDResponse()
         if (lib.isOAuth2Error(result)) {
           if (isDpopNonceError(result)) {

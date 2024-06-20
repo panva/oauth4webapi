@@ -67,6 +67,16 @@ const provider = new Provider('http://localhost:3000', {
   ],
 })
 
+const { invalidate: orig } = provider.Client.Schema.prototype
+
+provider.Client.Schema.prototype.invalidate = function invalidate(message, code) {
+  if (code === 'implicit-force-https' || code === 'implicit-forbid-localhost') {
+    return
+  }
+
+  orig.call(this, message)
+}
+
 const cors = koaCors()
 provider.use((ctx, next) => {
   if (ctx.URL.pathname === '/drive' || ctx.URL.pathname === '/reg') {

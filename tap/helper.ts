@@ -78,8 +78,10 @@ export async function setup(
       userinfo_signed_response_alg: jwtUserinfo ? alg : undefined,
       introspection_signed_response_alg: alg,
       authorization_signed_response_alg: alg,
+      response_types: ['code', 'code id_token'],
       grant_types: [
         'client_credentials',
+        'implicit',
         'authorization_code',
         'refresh_token',
         'urn:ietf:params:oauth:grant-type:device_code',
