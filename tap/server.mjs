@@ -105,6 +105,8 @@ provider.use(async (ctx, next) => {
       ])
 
       let pending = true
+      let deviceFlow
+      let destination
       while (pending) {
         let title
         try {
@@ -114,6 +116,7 @@ provider.use(async (ctx, next) => {
         }
         switch (title) {
           case 'Device Login Confirmation':
+            deviceFlow = true
             await Promise.all([
               page.click(s),
               page.waitForFunction('document.title === "Sign-in"'),
@@ -132,10 +135,15 @@ provider.use(async (ctx, next) => {
           case 'Consent':
             await Promise.all([page.click(s), page.waitForNetworkIdle({ idleTime: 100 })])
             pending = false
+            destination = deviceFlow ? '/device/' : '/cb'
             break
           default:
             throw new Error(title)
         }
+      }
+
+      while (page.url().includes(destination) === false) {
+        await page.waitForNetworkIdle({ idleTime: 100 })
       }
 
       ctx.body = page.url()
