@@ -2715,8 +2715,11 @@ async function processGenericAccessTokenResponse(
         throw new OPE('unexpected ID Token "azp" (authorized party) claim value')
       }
 
-      if (client.require_auth_time && typeof claims.auth_time !== 'number') {
-        throw new OPE('unexpected ID Token "auth_time" (authentication time) claim value')
+      if (
+        claims.auth_time !== undefined &&
+        (!Number.isFinite(claims.auth_time) || Math.sign(<number>claims.auth_time) !== 1)
+      ) {
+        throw new OPE('ID Token "auth_time" (authentication time) must be a positive number')
       }
 
       idTokenClaims.set(json, <IDToken>claims)
@@ -3937,8 +3940,11 @@ export async function validateDetachedSignatureResponse(
     throw new OPE('invalid ID Token "s_hash" (state hash) claim value')
   }
 
-  if (client.require_auth_time !== undefined && typeof claims.auth_time !== 'number') {
-    throw new OPE('unexpected ID Token "auth_time" (authentication time) claim value')
+  if (
+    claims.auth_time !== undefined &&
+    (!Number.isFinite(claims.auth_time) || Math.sign(<number>claims.auth_time) !== 1)
+  ) {
+    throw new OPE('ID Token "auth_time" (authentication time) must be a positive number')
   }
 
   maxAge ??= client.default_max_age ?? skipAuthTimeCheck

@@ -828,32 +828,29 @@ test('processAuthorizationCodeOpenIDResponse() nonce checks', async (t) => {
 test('processAuthorizationCodeOpenIDResponse() auth_time checks', async (t) => {
   const tIssuer: lib.AuthorizationServer = { ...issuer, jwks_uri: endpoint('jwks') }
 
-  await t.throwsAsync(
-    lib.processAuthorizationCodeOpenIDResponse(
-      tIssuer,
-      {
-        ...client,
-        require_auth_time: true,
-      },
-      getResponse(
-        JSON.stringify({
-          access_token: 'token',
-          token_type: 'Bearer',
-          id_token: await new jose.SignJWT({
-            auth_time: '0',
-          })
-            .setProtectedHeader({ alg: 'RS256' })
-            .setIssuer(issuer.issuer)
-            .setSubject('urn:example:subject')
-            .setAudience(client.client_id)
-            .setExpirationTime('5m')
-            .setIssuedAt()
-            .sign(t.context.RS256.privateKey),
-        }),
+  for (const auth_time of [0, -1, null, '1', [], {}, true]) {
+    await t.throwsAsync(
+      lib.processAuthorizationCodeOpenIDResponse(
+        tIssuer,
+        client,
+        getResponse(
+          JSON.stringify({
+            access_token: 'token',
+            token_type: 'Bearer',
+            id_token: await new jose.SignJWT({ auth_time })
+              .setProtectedHeader({ alg: 'RS256' })
+              .setIssuer(issuer.issuer)
+              .setSubject('urn:example:subject')
+              .setAudience(client.client_id)
+              .setExpirationTime('5m')
+              .setIssuedAt()
+              .sign(t.context.RS256.privateKey),
+          }),
+        ),
       ),
-    ),
-    { message: 'unexpected ID Token "auth_time" (authentication time) claim value' },
-  )
+      { message: 'ID Token "auth_time" (authentication time) must be a positive number' },
+    )
+  }
 })
 
 test('processAuthorizationCodeOpenIDResponse() azp checks', async (t) => {
