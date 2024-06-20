@@ -200,7 +200,7 @@ export interface JWK {
  *
  * @example
  *
- * When the client's local clock is mistakenly 1 hour in the past
+ * When the local clock is mistakenly 1 hour in the past
  *
  * ```ts
  * const client: oauth.Client = {
@@ -212,7 +212,7 @@ export interface JWK {
  *
  * @example
  *
- * When the client's local clock is mistakenly 1 hour in the future
+ * When the local clock is mistakenly 1 hour in the future
  *
  * ```ts
  * const client: oauth.Client = {
