@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.11.1](https://github.com/panva/oauth4webapi/compare/v2.11.0...v2.11.1) (2024-06-20)
+
+
+### Fixes
+
+* allow ID Token auth_time to be present even if client.require_auth_time is false ([caa9ab3](https://github.com/panva/oauth4webapi/commit/caa9ab3233942faec8d1fcadcb26cd75bb3854cd))
+
 ## [2.11.0](https://github.com/panva/oauth4webapi/compare/v2.10.4...v2.11.0) (2024-06-19)
 
 
