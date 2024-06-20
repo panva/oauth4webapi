@@ -7,6 +7,7 @@ import {
   assertNotOAuth2Error,
   setup,
   unexpectedAuthorizationServerError,
+  random,
 } from './helper.js'
 import * as lib from '../src/index.js'
 import { keys } from './keys.js'
@@ -96,6 +97,9 @@ export default (QUnit: QUnit) => {
         jar,
         jwtUserinfo,
         false,
+        hybrid
+          ? ['implicit', 'authorization_code', 'refresh_token']
+          : ['authorization_code', 'refresh_token'],
       )
       const DPoP = dpop ? await lib.generateKeyPair(<lib.JWSAlgorithm>alg) : undefined
 
@@ -108,6 +112,7 @@ export default (QUnit: QUnit) => {
       const code_challenge_method = 'S256'
 
       let params = new URLSearchParams()
+      const maxAge = random() ? (random() ? 30 : 0) : undefined
 
       let nonce: string | undefined
       if (hybrid) {
@@ -122,6 +127,10 @@ export default (QUnit: QUnit) => {
       params.set('response_type', hybrid ? 'code id_token' : 'code')
       params.set('scope', 'openid offline_access')
       params.set('prompt', 'consent')
+
+      if (maxAge !== undefined) {
+        params.set('max_age', maxAge.toString())
+      }
 
       if (jarm) {
         params.set('response_mode', 'jwt')
@@ -190,6 +199,7 @@ export default (QUnit: QUnit) => {
           currentUrl,
           nonce!,
           lib.expectNoState,
+          maxAge,
         )
       } else {
         callbackParams = await (jarm ? lib.validateJwtAuthResponse : lib.validateAuthResponse)(
@@ -216,7 +226,7 @@ export default (QUnit: QUnit) => {
         assertNoWwwAuthenticateChallenges(response)
 
         const processAuthorizationCodeOpenIDResponse = () =>
-          lib.processAuthorizationCodeOpenIDResponse(as, client, response, nonce)
+          lib.processAuthorizationCodeOpenIDResponse(as, client, response, nonce, maxAge)
         let result = await processAuthorizationCodeOpenIDResponse()
         if (lib.isOAuth2Error(result)) {
           if (isDpopNonceError(result)) {

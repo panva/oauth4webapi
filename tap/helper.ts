@@ -16,6 +16,10 @@ export function isDpopNonceError(input: lib.OAuth2Error | lib.WWWAuthenticateCha
   }
 }
 
+export function random() {
+  return Math.random() < 0.5
+}
+
 export function unexpectedAuthorizationServerError(
   input: lib.WWWAuthenticateChallenge[] | lib.OAuth2Error,
 ) {
@@ -51,6 +55,7 @@ export async function setup(
   jar: boolean,
   jwtUserinfo: boolean,
   jwtIntrospection: boolean,
+  grantTypes: string[],
 ): Promise<{
   client: lib.Client
   issuerIdentifier: URL
@@ -67,32 +72,41 @@ export async function setup(
     ext: undefined,
   }
 
+  const authEndpoint = grantTypes.includes('authorization_code')
+
+  const metadata = {
+    token_endpoint_auth_method: authMethod,
+    redirect_uris: <string[]>[],
+    id_token_signed_response_alg: alg,
+    request_object_signing_alg: jar ? alg : undefined,
+    userinfo_signed_response_alg: jwtUserinfo ? alg : undefined,
+    introspection_signed_response_alg: alg,
+    authorization_signed_response_alg: alg,
+    response_types: <string[]>[],
+    require_auth_time: authEndpoint && random(),
+    default_max_age: authEndpoint ? (random() ? (random() ? 30 : 0) : undefined) : undefined,
+    grant_types: grantTypes,
+    jwks:
+      authMethod === 'private_key_jwt' || jar
+        ? {
+            keys: [clientJwk],
+          }
+        : undefined,
+  }
+
+  if (authEndpoint) {
+    metadata.redirect_uris.push('http://localhost:3000/cb')
+    if (grantTypes.includes('implicit')) {
+      metadata.response_types.push('code id_token')
+    } else {
+      metadata.response_types.push('code')
+    }
+  }
+
   let response = await fetch(new URL('http://localhost:3000/reg'), {
     method: 'POST',
     headers: { 'content-type': 'application/json;charset=utf-8' },
-    body: JSON.stringify({
-      token_endpoint_auth_method: authMethod,
-      redirect_uris: ['http://localhost:3000/cb'],
-      id_token_signed_response_alg: alg,
-      request_object_signing_alg: jar ? alg : undefined,
-      userinfo_signed_response_alg: jwtUserinfo ? alg : undefined,
-      introspection_signed_response_alg: alg,
-      authorization_signed_response_alg: alg,
-      response_types: ['code', 'code id_token'],
-      grant_types: [
-        'client_credentials',
-        'implicit',
-        'authorization_code',
-        'refresh_token',
-        'urn:ietf:params:oauth:grant-type:device_code',
-      ],
-      jwks:
-        authMethod === 'private_key_jwt' || jar
-          ? {
-              keys: [clientJwk],
-            }
-          : undefined,
-    }),
+    body: JSON.stringify(metadata),
   })
 
   if (response.status !== 201) {

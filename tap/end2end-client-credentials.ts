@@ -80,6 +80,7 @@ export default (QUnit: QUnit) => {
         false,
         false,
         jwtIntrospection,
+        ['client_credentials'],
       )
       const DPoP = dpop ? await lib.generateKeyPair(<lib.JWSAlgorithm>alg) : undefined
 
