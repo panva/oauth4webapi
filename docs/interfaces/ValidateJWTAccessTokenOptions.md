@@ -20,7 +20,7 @@
 
 • `Optional` **[clockSkew]**: `number`
 
-Same functionality as in [Client](Client.md)
+See [clockSkew](../variables/clockSkew.md).
 
 ___
 
@@ -28,7 +28,7 @@ ___
 
 • `Optional` **[clockTolerance]**: `number`
 
-Same functionality as in [Client](Client.md)
+See [clockTolerance](../variables/clockTolerance.md).
 
 ___
 

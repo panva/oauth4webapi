@@ -42,32 +42,7 @@ ___
 
 • `Optional` **[clockSkew]**: `number`
 
-Use to adjust the client's assumed current time. Positive and negative finite values
-representing seconds are allowed. Default is `0` (Date.now() + 0 seconds is used).
-
-**`Example`**
-
-When the client's local clock is mistakenly 1 hour in the past
-
-```ts
-const client: oauth.Client = {
-  client_id: 'abc4ba37-4ab8-49b5-99d4-9441ba35d428',
-  // ... other metadata
-  [oauth.clockSkew]: +(60 * 60),
-}
-```
-
-**`Example`**
-
-When the client's local clock is mistakenly 1 hour in the future
-
-```ts
-const client: oauth.Client = {
-  client_id: 'abc4ba37-4ab8-49b5-99d4-9441ba35d428',
-  // ... other metadata
-  [oauth.clockSkew]: -(60 * 60),
-}
-```
+See [clockSkew](../variables/clockSkew.md).
 
 ___
 
@@ -75,20 +50,7 @@ ___
 
 • `Optional` **[clockTolerance]**: `number`
 
-Use to set allowed client's clock tolerance when checking DateTime JWT Claims. Only positive
-finite values representing seconds are allowed. Default is `30` (30 seconds).
-
-**`Example`**
-
-Tolerate 30 seconds clock skew when validating JWT claims like exp or nbf.
-
-```ts
-const client: oauth.Client = {
-  client_id: 'abc4ba37-4ab8-49b5-99d4-9441ba35d428',
-  // ... other metadata
-  [oauth.clockTolerance]: 30,
-}
-```
+See [clockTolerance](../variables/clockTolerance.md).
 
 ___
 
