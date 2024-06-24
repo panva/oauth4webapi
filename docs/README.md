@@ -2,14 +2,12 @@
 
 [💗 Help the project](https://github.com/sponsors/panva)
 
-## Table of contents
-
-### Accessing Protected Resources
+## Accessing Protected Resources
 
 - [parseWwwAuthenticateChallenges](functions/parseWwwAuthenticateChallenges.md)
 - [protectedResourceRequest](functions/protectedResourceRequest.md)
 
-### Authorization Code Grant
+## Authorization Code Grant
 
 - [authorizationCodeGrantRequest](functions/authorizationCodeGrantRequest.md)
 - [calculatePKCECodeChallenge](functions/calculatePKCECodeChallenge.md)
@@ -21,7 +19,7 @@
 - [validateAuthResponse](functions/validateAuthResponse.md)
 - [validateJwtAuthResponse](functions/validateJwtAuthResponse.md)
 
-### Authorization Code Grant w/ OpenID Connect (OIDC)
+## Authorization Code Grant w/ OpenID Connect (OIDC)
 
 - [authorizationCodeGrantRequest](functions/authorizationCodeGrantRequest.md)
 - [calculatePKCECodeChallenge](functions/calculatePKCECodeChallenge.md)
@@ -36,19 +34,19 @@
 - [validateAuthResponse](functions/validateAuthResponse.md)
 - [validateJwtAuthResponse](functions/validateJwtAuthResponse.md)
 
-### Authorization Server Metadata
+## Authorization Server Metadata
 
 - [discoveryRequest](functions/discoveryRequest.md)
 - [processDiscoveryResponse](functions/processDiscoveryResponse.md)
 
-### Client Credentials Grant
+## Client Credentials Grant
 
 - [clientCredentialsGrantRequest](functions/clientCredentialsGrantRequest.md)
 - [isOAuth2Error](functions/isOAuth2Error.md)
 - [parseWwwAuthenticateChallenges](functions/parseWwwAuthenticateChallenges.md)
 - [processClientCredentialsResponse](functions/processClientCredentialsResponse.md)
 
-### Device Authorization Grant
+## Device Authorization Grant
 
 - [deviceAuthorizationRequest](functions/deviceAuthorizationRequest.md)
 - [deviceCodeGrantRequest](functions/deviceCodeGrantRequest.md)
@@ -57,71 +55,71 @@
 - [processDeviceAuthorizationResponse](functions/processDeviceAuthorizationResponse.md)
 - [processDeviceCodeResponse](functions/processDeviceCodeResponse.md)
 
-### Errors
+## Errors
 
 - [OperationProcessingError](classes/OperationProcessingError.md)
 - [UnsupportedOperationError](classes/UnsupportedOperationError.md)
 
-### FAPI 1.0 Advanced
+## FAPI 1.0 Advanced
 
 - [validateDetachedSignatureResponse](functions/validateDetachedSignatureResponse.md)
 
-### JWT Access Tokens
+## JWT Access Tokens
 
 - [validateJwtAccessToken](functions/validateJwtAccessToken.md)
 
-### JWT Secured Authorization Response Mode for OAuth 2.0 (JARM)
+## JWT Secured Authorization Response Mode for OAuth 2.0 (JARM)
 
 - [validateJwtAuthResponse](functions/validateJwtAuthResponse.md)
 
-### JWT-Secured Authorization Request (JAR)
+## JWT-Secured Authorization Request (JAR)
 
 - [issueRequestObject](functions/issueRequestObject.md)
 
-### OpenID Connect (OIDC) Discovery
+## OpenID Connect (OIDC) Discovery
 
 - [discoveryRequest](functions/discoveryRequest.md)
 - [processDiscoveryResponse](functions/processDiscoveryResponse.md)
 
-### OpenID Connect (OIDC) UserInfo
+## OpenID Connect (OIDC) UserInfo
 
 - [processUserInfoResponse](functions/processUserInfoResponse.md)
 - [userInfoRequest](functions/userInfoRequest.md)
 
-### Proof Key for Code Exchange (PKCE)
+## Proof Key for Code Exchange (PKCE)
 
 - [calculatePKCECodeChallenge](functions/calculatePKCECodeChallenge.md)
 - [generateRandomCodeVerifier](functions/generateRandomCodeVerifier.md)
 
-### Pushed Authorization Requests (PAR)
+## Pushed Authorization Requests (PAR)
 
 - [isOAuth2Error](functions/isOAuth2Error.md)
 - [parseWwwAuthenticateChallenges](functions/parseWwwAuthenticateChallenges.md)
 - [processPushedAuthorizationResponse](functions/processPushedAuthorizationResponse.md)
 - [pushedAuthorizationRequest](functions/pushedAuthorizationRequest.md)
 
-### Refreshing an Access Token
+## Refreshing an Access Token
 
 - [isOAuth2Error](functions/isOAuth2Error.md)
 - [parseWwwAuthenticateChallenges](functions/parseWwwAuthenticateChallenges.md)
 - [processRefreshTokenResponse](functions/processRefreshTokenResponse.md)
 - [refreshTokenGrantRequest](functions/refreshTokenGrantRequest.md)
 
-### Token Introspection
+## Token Introspection
 
 - [introspectionRequest](functions/introspectionRequest.md)
 - [isOAuth2Error](functions/isOAuth2Error.md)
 - [parseWwwAuthenticateChallenges](functions/parseWwwAuthenticateChallenges.md)
 - [processIntrospectionResponse](functions/processIntrospectionResponse.md)
 
-### Token Revocation
+## Token Revocation
 
 - [isOAuth2Error](functions/isOAuth2Error.md)
 - [parseWwwAuthenticateChallenges](functions/parseWwwAuthenticateChallenges.md)
 - [processRevocationResponse](functions/processRevocationResponse.md)
 - [revocationRequest](functions/revocationRequest.md)
 
-### Utilities
+## Utilities
 
 - [generateKeyPair](functions/generateKeyPair.md)
 - [generateRandomCodeVerifier](functions/generateRandomCodeVerifier.md)
@@ -130,9 +128,7 @@
 - [isOAuth2Error](functions/isOAuth2Error.md)
 - [parseWwwAuthenticateChallenges](functions/parseWwwAuthenticateChallenges.md)
 
-<details><summary>Uncategorized</summary>
-
-### Interfaces
+## Interfaces
 
 - [AuthenticatedRequestOptions](interfaces/AuthenticatedRequestOptions.md)
 - [AuthorizationDetails](interfaces/AuthorizationDetails.md)
@@ -177,17 +173,17 @@
 - [WWWAuthenticateChallenge](interfaces/WWWAuthenticateChallenge.md)
 - [WWWAuthenticateChallengeParameters](interfaces/WWWAuthenticateChallengeParameters.md)
 
-### Type Aliases
+## Type Aliases
 
-- [ClientAuthenticationMethod](types/ClientAuthenticationMethod.md)
-- [JWKSCacheInput](types/JWKSCacheInput.md)
-- [JWSAlgorithm](types/JWSAlgorithm.md)
-- [JsonArray](types/JsonArray.md)
-- [JsonObject](types/JsonObject.md)
-- [JsonPrimitive](types/JsonPrimitive.md)
-- [JsonValue](types/JsonValue.md)
+- [ClientAuthenticationMethod](type-aliases/ClientAuthenticationMethod.md)
+- [JWKSCacheInput](type-aliases/JWKSCacheInput.md)
+- [JWSAlgorithm](type-aliases/JWSAlgorithm.md)
+- [JsonArray](type-aliases/JsonArray.md)
+- [JsonObject](type-aliases/JsonObject.md)
+- [JsonPrimitive](type-aliases/JsonPrimitive.md)
+- [JsonValue](type-aliases/JsonValue.md)
 
-### Variables
+## Variables
 
 - [clockSkew](variables/clockSkew.md)
 - [clockTolerance](variables/clockTolerance.md)
@@ -199,5 +195,3 @@
 - [skipStateCheck](variables/skipStateCheck.md)
 - [skipSubjectCheck](variables/skipSubjectCheck.md)
 - [useMtlsAlias](variables/useMtlsAlias.md)
-
-</details>

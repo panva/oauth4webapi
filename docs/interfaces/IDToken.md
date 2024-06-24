@@ -4,92 +4,70 @@
 
 ## Indexable
 
-▪ [claim: `string`]: [`JsonValue`](../types/JsonValue.md) \| `undefined`
-
-## Table of contents
-
-### Properties
-
-- [aud](IDToken.md#aud)
-- [exp](IDToken.md#exp)
-- [iat](IDToken.md#iat)
-- [iss](IDToken.md#iss)
-- [sub](IDToken.md#sub)
-- [auth\_time](IDToken.md#auth_time)
-- [azp](IDToken.md#azp)
-- [cnf](IDToken.md#cnf)
-- [jti](IDToken.md#jti)
-- [nbf](IDToken.md#nbf)
-- [nonce](IDToken.md#nonce)
+ \[`claim`: `string`\]: [`JsonValue`](../type-aliases/JsonValue.md) \| `undefined`
 
 ## Properties
 
 ### aud
 
-• `Readonly` **aud**: `string` \| `string`[]
+• `readonly` **aud**: `string` \| `string`[]
 
-___
+***
 
 ### exp
 
-• `Readonly` **exp**: `number`
+• `readonly` **exp**: `number`
 
-___
+***
 
 ### iat
 
-• `Readonly` **iat**: `number`
+• `readonly` **iat**: `number`
 
-___
+***
 
 ### iss
 
-• `Readonly` **iss**: `string`
+• `readonly` **iss**: `string`
 
-___
+***
 
 ### sub
 
-• `Readonly` **sub**: `string`
+• `readonly` **sub**: `string`
 
-___
+***
 
-### auth\_time
+### auth\_time?
 
-• `Optional` `Readonly` **auth\_time**: `number`
+• `readonly` `optional` **auth\_time**: `number`
 
-___
+***
 
-### azp
+### azp?
 
-• `Optional` `Readonly` **azp**: `string`
+• `readonly` `optional` **azp**: `string`
 
-___
+***
 
-### cnf
+### cnf?
 
-• `Optional` `Readonly` **cnf**: [`ConfirmationClaims`](ConfirmationClaims.md)
+• `readonly` `optional` **cnf**: [`ConfirmationClaims`](ConfirmationClaims.md)
 
-___
+***
 
-### jti
+### jti?
 
-• `Optional` `Readonly` **jti**: `string`
+• `readonly` `optional` **jti**: `string`
 
-___
+***
 
-### nbf
+### nbf?
 
-• `Optional` `Readonly` **nbf**: `number`
+• `readonly` `optional` **nbf**: `number`
 
-___
+***
 
-### nonce
+### nonce?
 
-• `Optional` `Readonly` **nonce**: `string`
-
-## Hierarchy
-
-- `JWTPayload`
-
-  ↳ **`IDToken`**
+• `readonly` `optional` **nonce**: `string`

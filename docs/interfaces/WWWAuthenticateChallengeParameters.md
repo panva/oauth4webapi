@@ -4,53 +4,40 @@
 
 ## Indexable
 
-▪ [parameter: [`Lowercase`]( https://www.typescriptlang.org/docs/handbook/2/template-literal-types.html#lowercasestringtype )\<`string`\>]: `string` \| `undefined`
-
-NOTE: because the parameter names are case insensitive they are always returned lowercased
-
-## Table of contents
-
-### Properties
-
-- [algs](WWWAuthenticateChallengeParameters.md#algs)
-- [error](WWWAuthenticateChallengeParameters.md#error)
-- [error\_description](WWWAuthenticateChallengeParameters.md#error_description)
-- [error\_uri](WWWAuthenticateChallengeParameters.md#error_uri)
-- [realm](WWWAuthenticateChallengeParameters.md#realm)
-- [scope](WWWAuthenticateChallengeParameters.md#scope)
+ \[`parameter`: [`Lowercase`](https://www.typescriptlang.org/docs/handbook/2/template-literal-types.html#lowercasestringtype)\<`string`\>\]: `string` \| `undefined`
 
 ## Properties
 
-### algs
+### algs?
 
-• `Optional` `Readonly` **algs**: `string`
+• `readonly` `optional` **algs**: `string`
 
-___
+***
 
-### error
+### error?
 
-• `Optional` `Readonly` **error**: `string`
+• `readonly` `optional` **error**: `string`
 
-___
+***
 
-### error\_description
+### error\_description?
 
-• `Optional` `Readonly` **error\_description**: `string`
+• `readonly` `optional` **error\_description**: `string`
 
-___
+***
 
-### error\_uri
+### error\_uri?
 
-• `Optional` `Readonly` **error\_uri**: `string`
+• `readonly` `optional` **error\_uri**: `string`
 
-___
+***
 
-### realm
+### realm?
 
-• `Optional` `Readonly` **realm**: `string`
+• `readonly` `optional` **realm**: `string`
 
-___
+***
 
-### scope
+### scope?
 
-• `Optional` `Readonly` **scope**: `string`
+• `readonly` `optional` **scope**: `string`

@@ -4,142 +4,118 @@
 
 ## Indexable
 
-▪ [claim: `string`]: [`JsonValue`](../types/JsonValue.md) \| `undefined`
-
-## Table of contents
-
-### Properties
-
-- [sub](UserInfoResponse.md#sub)
-- [address](UserInfoResponse.md#address)
-- [birthdate](UserInfoResponse.md#birthdate)
-- [email](UserInfoResponse.md#email)
-- [email\_verified](UserInfoResponse.md#email_verified)
-- [family\_name](UserInfoResponse.md#family_name)
-- [gender](UserInfoResponse.md#gender)
-- [given\_name](UserInfoResponse.md#given_name)
-- [locale](UserInfoResponse.md#locale)
-- [middle\_name](UserInfoResponse.md#middle_name)
-- [name](UserInfoResponse.md#name)
-- [nickname](UserInfoResponse.md#nickname)
-- [phone\_number](UserInfoResponse.md#phone_number)
-- [picture](UserInfoResponse.md#picture)
-- [preferred\_username](UserInfoResponse.md#preferred_username)
-- [profile](UserInfoResponse.md#profile)
-- [updated\_at](UserInfoResponse.md#updated_at)
-- [website](UserInfoResponse.md#website)
-- [zoneinfo](UserInfoResponse.md#zoneinfo)
+ \[`claim`: `string`\]: [`JsonValue`](../type-aliases/JsonValue.md) \| `undefined`
 
 ## Properties
 
 ### sub
 
-• `Readonly` **sub**: `string`
+• `readonly` **sub**: `string`
 
-___
+***
 
-### address
+### address?
 
-• `Optional` `Readonly` **address**: [`UserInfoAddress`](UserInfoAddress.md)
+• `readonly` `optional` **address**: [`UserInfoAddress`](UserInfoAddress.md)
 
-___
+***
 
-### birthdate
+### birthdate?
 
-• `Optional` `Readonly` **birthdate**: `string`
+• `readonly` `optional` **birthdate**: `string`
 
-___
+***
 
-### email
+### email?
 
-• `Optional` `Readonly` **email**: `string`
+• `readonly` `optional` **email**: `string`
 
-___
+***
 
-### email\_verified
+### email\_verified?
 
-• `Optional` `Readonly` **email\_verified**: `boolean`
+• `readonly` `optional` **email\_verified**: `boolean`
 
-___
+***
 
-### family\_name
+### family\_name?
 
-• `Optional` `Readonly` **family\_name**: `string`
+• `readonly` `optional` **family\_name**: `string`
 
-___
+***
 
-### gender
+### gender?
 
-• `Optional` `Readonly` **gender**: `string`
+• `readonly` `optional` **gender**: `string`
 
-___
+***
 
-### given\_name
+### given\_name?
 
-• `Optional` `Readonly` **given\_name**: `string`
+• `readonly` `optional` **given\_name**: `string`
 
-___
+***
 
-### locale
+### locale?
 
-• `Optional` `Readonly` **locale**: `string`
+• `readonly` `optional` **locale**: `string`
 
-___
+***
 
-### middle\_name
+### middle\_name?
 
-• `Optional` `Readonly` **middle\_name**: `string`
+• `readonly` `optional` **middle\_name**: `string`
 
-___
+***
 
-### name
+### name?
 
-• `Optional` `Readonly` **name**: `string`
+• `readonly` `optional` **name**: `string`
 
-___
+***
 
-### nickname
+### nickname?
 
-• `Optional` `Readonly` **nickname**: `string`
+• `readonly` `optional` **nickname**: `string`
 
-___
+***
 
-### phone\_number
+### phone\_number?
 
-• `Optional` `Readonly` **phone\_number**: `string`
+• `readonly` `optional` **phone\_number**: `string`
 
-___
+***
 
-### picture
+### picture?
 
-• `Optional` `Readonly` **picture**: `string`
+• `readonly` `optional` **picture**: `string`
 
-___
+***
 
-### preferred\_username
+### preferred\_username?
 
-• `Optional` `Readonly` **preferred\_username**: `string`
+• `readonly` `optional` **preferred\_username**: `string`
 
-___
+***
 
-### profile
+### profile?
 
-• `Optional` `Readonly` **profile**: `string`
+• `readonly` `optional` **profile**: `string`
 
-___
+***
 
-### updated\_at
+### updated\_at?
 
-• `Optional` `Readonly` **updated\_at**: `number`
+• `readonly` `optional` **updated\_at**: `number`
 
-___
+***
 
-### website
+### website?
 
-• `Optional` `Readonly` **website**: `string`
+• `readonly` `optional` **website**: `string`
 
-___
+***
 
-### zoneinfo
+### zoneinfo?
 
-• `Optional` `Readonly` **zoneinfo**: `string`
+• `readonly` `optional` **zoneinfo**: `string`

@@ -1,18 +1,18 @@
-# Function: generateKeyPair
+# Function: generateKeyPair()
 
 [💗 Help the project](https://github.com/sponsors/panva)
 
-▸ **generateKeyPair**(`alg`, `options?`): [`Promise`]( https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise )\<`CryptoKeyPair`\>
+▸ **generateKeyPair**(`alg`, `options`?): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`CryptoKeyPair`\>
 
 Generates a CryptoKeyPair for a given JWS `alg` Algorithm identifier.
 
-#### Parameters
+## Parameters
 
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `alg` | [`JWSAlgorithm`](../types/JWSAlgorithm.md) | Supported JWS `alg` Algorithm identifier. |
-| `options?` | [`GenerateKeyPairOptions`](../interfaces/GenerateKeyPairOptions.md) | - |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `alg` | [`JWSAlgorithm`](../type-aliases/JWSAlgorithm.md) | Supported JWS `alg` Algorithm identifier. |
+| `options`? | [`GenerateKeyPairOptions`](../interfaces/GenerateKeyPairOptions.md) | - |
 
-#### Returns
+## Returns
 
-[`Promise`]( https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise )\<`CryptoKeyPair`\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`CryptoKeyPair`\>

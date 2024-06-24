@@ -2,60 +2,54 @@
 
 [💗 Help the project](https://github.com/sponsors/panva)
 
-## Table of contents
-
-### Properties
-
-- [[customFetch]](ValidateDetachedSignatureResponseOptions.md#customfetch)
-- [[experimental\_jwksCache]](ValidateDetachedSignatureResponseOptions.md#experimental_jwkscache)
-- [headers](ValidateDetachedSignatureResponseOptions.md#headers)
-- [signal](ValidateDetachedSignatureResponseOptions.md#signal)
-
 ## Properties
 
-### [customFetch]
+### \[customFetch\]()?
 
-• `Optional` **[customFetch]**: (`input`: `RequestInfo` \| [`URL`]( https://developer.mozilla.org/docs/Web/API/URL ), `init?`: `RequestInit`) => [`Promise`]( https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise )\<[`Response`]( https://developer.mozilla.org/docs/Web/API/Response )\>
+• `optional` **\[customFetch\]**: (`input`, `init`?) => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Response`](https://developer.mozilla.org/docs/Web/API/Response)\>
 
 See [customFetch](../variables/customFetch.md).
 
-___
+#### Parameters
 
-### [experimental\_jwksCache]
+| Parameter | Type |
+| ------ | ------ |
+| `input` | `RequestInfo` \| [`URL`](https://developer.mozilla.org/docs/Web/API/URL) |
+| `init`? | `RequestInit` |
 
-• `Optional` **[experimental\_jwksCache]**: [`JWKSCacheInput`](../types/JWKSCacheInput.md)
+#### Returns
+
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Response`](https://developer.mozilla.org/docs/Web/API/Response)\>
+
+***
+
+### \[experimental\_jwksCache\]?
+
+• `optional` **\[experimental\_jwksCache\]**: [`JWKSCacheInput`](../type-aliases/JWKSCacheInput.md)
 
 See [experimental_jwksCache](../variables/experimental_jwksCache.md).
 
-___
+***
 
-### headers
+### headers?
 
-• `Optional` **headers**: [`Record`]( https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type )\<`string`, `string`\> \| [`string`, `string`][] \| [`Headers`]( https://developer.mozilla.org/docs/Web/API/Headers )
+• `optional` **headers**: [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `string`\> \| [`string`, `string`][] \| [`Headers`](https://developer.mozilla.org/docs/Web/API/Headers)
 
 Headers to additionally send with the HTTP request(s) triggered by this function's invocation.
 
-___
+***
 
-### signal
+### signal?
 
-• `Optional` **signal**: [`AbortSignal`]( https://developer.mozilla.org/docs/Web/API/AbortSignal ) \| () => [`AbortSignal`]( https://developer.mozilla.org/docs/Web/API/AbortSignal )
+• `optional` **signal**: [`AbortSignal`](https://developer.mozilla.org/docs/Web/API/AbortSignal) \| () => [`AbortSignal`](https://developer.mozilla.org/docs/Web/API/AbortSignal)
 
 An AbortSignal instance, or a factory returning one, to abort the HTTP request(s) triggered by
 this function's invocation.
 
-**`Example`**
+#### Example
 
 A 5000ms timeout AbortSignal for every request
 
 ```js
 const signal = () => AbortSignal.timeout(5_000) // Note: AbortSignal.timeout may not yet be available in all runtimes.
 ```
-
-## Hierarchy
-
-- [`HttpRequestOptions`](HttpRequestOptions.md)
-
-- [`JWKSCacheOptions`](JWKSCacheOptions.md)
-
-  ↳ **`ValidateDetachedSignatureResponseOptions`**

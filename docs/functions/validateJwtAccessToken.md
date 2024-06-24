@@ -1,8 +1,8 @@
-# Function: validateJwtAccessToken
+# Function: validateJwtAccessToken()
 
 [💗 Help the project](https://github.com/sponsors/panva)
 
-▸ **validateJwtAccessToken**(`as`, `request`, `expectedAudience`, `options?`): [`Promise`]( https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise )\<[`JWTAccessTokenClaims`](../interfaces/JWTAccessTokenClaims.md)\>
+▸ **validateJwtAccessToken**(`as`, `request`, `expectedAudience`, `options`?): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`JWTAccessTokenClaims`](../interfaces/JWTAccessTokenClaims.md)\>
 
 Validates use of JSON Web Token (JWT) OAuth 2.0 Access Tokens for a given Request as per
 RFC 6750, RFC 9068, and RFC 9449.
@@ -25,20 +25,20 @@ clients you would check these after this function's execution.
 This does NOT validate authorization claims such as `scope` either, you would do so after this
 function's execution.
 
-#### Parameters
+## Parameters
 
-| Name | Type | Description |
-| :------ | :------ | :------ |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
 | `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server to accept JWT Access Tokens from. |
-| `request` | [`Request`]( https://developer.mozilla.org/docs/Web/API/Request ) |  |
+| `request` | [`Request`](https://developer.mozilla.org/docs/Web/API/Request) |  |
 | `expectedAudience` | `string` | Audience identifier the resource server expects for itself. |
-| `options?` | [`ValidateJWTAccessTokenOptions`](../interfaces/ValidateJWTAccessTokenOptions.md) |  |
+| `options`? | [`ValidateJWTAccessTokenOptions`](../interfaces/ValidateJWTAccessTokenOptions.md) |  |
 
-#### Returns
+## Returns
 
-[`Promise`]( https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise )\<[`JWTAccessTokenClaims`](../interfaces/JWTAccessTokenClaims.md)\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`JWTAccessTokenClaims`](../interfaces/JWTAccessTokenClaims.md)\>
 
-**`See`**
+## See
 
  - [RFC 6750 - OAuth 2.0 Bearer Token Usage](https://www.rfc-editor.org/rfc/rfc6750.html)
  - [RFC 9068 - JSON Web Token (JWT) Profile for OAuth 2.0 Access Tokens](https://www.rfc-editor.org/rfc/rfc9068.html)

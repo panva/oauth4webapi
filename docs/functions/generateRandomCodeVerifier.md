@@ -1,4 +1,4 @@
-# Function: generateRandomCodeVerifier
+# Function: generateRandomCodeVerifier()
 
 [💗 Help the project](https://github.com/sponsors/panva)
 
@@ -6,10 +6,10 @@
 
 Generate random `code_verifier` value.
 
-#### Returns
+## Returns
 
 `string`
 
-**`See`**
+## See
 
 [RFC 7636 - Proof Key for Code Exchange (PKCE)](https://www.rfc-editor.org/rfc/rfc7636.html#section-4)

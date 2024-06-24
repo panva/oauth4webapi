@@ -2,32 +2,20 @@
 
 [💗 Help the project](https://github.com/sponsors/panva)
 
-## Table of contents
-
-### Constructors
-
-- [constructor](OperationProcessingError.md#constructor)
-
 ## Constructors
 
-### constructor
+### new OperationProcessingError()
 
-• **new OperationProcessingError**(`message`, `options?`): [`OperationProcessingError`](OperationProcessingError.md)
+▸ **new OperationProcessingError**(`message`, `options`?): [`OperationProcessingError`](OperationProcessingError.md)
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
+| Parameter | Type |
+| ------ | ------ |
 | `message` | `string` |
-| `options?` | `Object` |
-| `options.cause?` | `unknown` |
+| `options`? | `object` |
+| `options.cause`? | `unknown` |
 
 #### Returns
 
 [`OperationProcessingError`](OperationProcessingError.md)
-
-## Hierarchy
-
-- [`Error`]( https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error )
-
-  ↳ **`OperationProcessingError`**

@@ -1046,7 +1046,7 @@ export interface HttpRequestOptions {
   /**
    * See {@link customFetch}.
    */
-  [customFetch]?: typeof fetch
+  [customFetch]?: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>
 }
 
 export interface DiscoveryRequestOptions extends HttpRequestOptions {
@@ -4725,10 +4725,14 @@ export type IntrospectionConfirmationClaims = ConfirmationClaims
  *
  * @deprecated Use {@link validateDetachedSignatureResponse}.
  */
-export const experimental_validateDetachedSignatureResponse = validateDetachedSignatureResponse
+export const experimental_validateDetachedSignatureResponse = (
+  ...args: Parameters<typeof validateDetachedSignatureResponse>
+) => validateDetachedSignatureResponse(...args)
 /**
  * @ignore
  *
  * @deprecated Use {@link validateJwtAccessToken}.
  */
-export const experimental_validateJwtAccessToken = validateJwtAccessToken
+export const experimental_validateJwtAccessToken = (
+  ...args: Parameters<typeof validateJwtAccessToken>
+) => validateJwtAccessToken(...args)

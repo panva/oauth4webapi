@@ -4,79 +4,64 @@
 
 ## Indexable
 
-▪ [parameter: `string`]: [`JsonValue`](../types/JsonValue.md) \| `undefined`
-
-## Table of contents
-
-### Properties
-
-- [alg](JWK.md#alg)
-- [crv](JWK.md#crv)
-- [e](JWK.md#e)
-- [key\_ops](JWK.md#key_ops)
-- [kid](JWK.md#kid)
-- [kty](JWK.md#kty)
-- [n](JWK.md#n)
-- [use](JWK.md#use)
-- [x](JWK.md#x)
-- [y](JWK.md#y)
+ \[`parameter`: `string`\]: [`JsonValue`](../type-aliases/JsonValue.md) \| `undefined`
 
 ## Properties
 
-### alg
+### alg?
 
-• `Optional` `Readonly` **alg**: `string`
+• `readonly` `optional` **alg**: `string`
 
-___
+***
 
-### crv
+### crv?
 
-• `Optional` `Readonly` **crv**: `string`
+• `readonly` `optional` **crv**: `string`
 
-___
+***
 
-### e
+### e?
 
-• `Optional` `Readonly` **e**: `string`
+• `readonly` `optional` **e**: `string`
 
-___
+***
 
-### key\_ops
+### key\_ops?
 
-• `Optional` `Readonly` **key\_ops**: `string`[]
+• `readonly` `optional` **key\_ops**: `string`[]
 
-___
+***
 
-### kid
+### kid?
 
-• `Optional` `Readonly` **kid**: `string`
+• `readonly` `optional` **kid**: `string`
 
-___
+***
 
-### kty
+### kty?
 
-• `Optional` `Readonly` **kty**: `string`
+• `readonly` `optional` **kty**: `string`
 
-___
+***
 
-### n
+### n?
 
-• `Optional` `Readonly` **n**: `string`
+• `readonly` `optional` **n**: `string`
 
-___
+***
 
-### use
+### use?
 
-• `Optional` `Readonly` **use**: `string`
+• `readonly` `optional` **use**: `string`
 
-___
+***
 
-### x
+### x?
 
-• `Optional` `Readonly` **x**: `string`
+• `readonly` `optional` **x**: `string`
 
-___
+***
 
-### y
+### y?
 
-• `Optional` `Readonly` **y**: `string`
+• `readonly` `optional` **y**: `string`

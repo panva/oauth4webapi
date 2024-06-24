@@ -1,12 +1,12 @@
-# Type alias: JWSAlgorithm
+# Type Alias: JWSAlgorithm
 
 [💗 Help the project](https://github.com/sponsors/panva)
 
-Ƭ **JWSAlgorithm**: ``"PS256"`` \| ``"ES256"`` \| ``"RS256"`` \| ``"EdDSA"`` \| ``"ES384"`` \| ``"PS384"`` \| ``"RS384"`` \| ``"ES512"`` \| ``"PS512"`` \| ``"RS512"``
+• **JWSAlgorithm**: `"PS256"` \| `"ES256"` \| `"RS256"` \| `"EdDSA"` \| `"ES384"` \| `"PS384"` \| `"RS384"` \| `"ES512"` \| `"PS512"` \| `"RS512"`
 
 Supported JWS `alg` Algorithm identifiers.
 
-**`Example`**
+## Examples
 
 CryptoKey algorithm for the `PS256`, `PS384`, or `PS512` JWS Algorithm Identifiers
 
@@ -27,8 +27,6 @@ interface PS512 extends RsaHashedKeyAlgorithm {
 }
 ```
 
-**`Example`**
-
 CryptoKey algorithm for the `ES256`, `ES384`, or `ES512` JWS Algorithm Identifiers
 
 ```ts
@@ -48,8 +46,6 @@ interface ES512 extends EcKeyAlgorithm {
 }
 ```
 
-**`Example`**
-
 CryptoKey algorithm for the `RS256`, `RS384`, or `RS512` JWS Algorithm Identifiers
 
 ```ts
@@ -68,8 +64,6 @@ interface RS512 extends RsaHashedKeyAlgorithm {
   hash: 'SHA-512'
 }
 ```
-
-**`Example`**
 
 CryptoKey algorithm for the `EdDSA` JWS Algorithm Identifier (Experimental)
 

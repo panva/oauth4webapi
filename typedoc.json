@@ -1,15 +1,19 @@
 {
   "$schema": "https://typedoc.org/schema.json",
-  "allReflectionsHaveOwnDocument": true,
   "disableSources": true,
+  "parametersFormat": "table",
+  "textContentMappings": {
+    "title.memberPage": "{kind}: {name}\n\n[💗 Help the project](https://github.com/sponsors/panva)",
+    "title.indexPage": "{projectName} API Reference"
+  },
   "hideBreadcrumbs": true,
+  "hidePageHeader": true,
   "entryPoints": ["src/index.ts"],
   "excludeExternals": true,
   "excludePrivate": true,
   "excludeProtected": true,
   "gitRevision": "main",
   "hideGenerator": true,
-  "indexTitle": "oauth4webapi API Reference",
   "out": "docs",
   "plugin": ["typedoc-plugin-markdown", "typedoc-plugin-mdn-links"],
   "readme": "none",

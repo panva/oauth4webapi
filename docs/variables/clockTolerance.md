@@ -2,12 +2,12 @@
 
 [💗 Help the project](https://github.com/sponsors/panva)
 
-• `Const` **clockTolerance**: unique `symbol`
+• `const` **clockTolerance**: unique `symbol`
 
 Use to set allowed clock tolerance when checking DateTime JWT Claims. Only positive finite values
 representing seconds are allowed. Default is `30` (30 seconds).
 
-**`Example`**
+## Example
 
 Tolerate 30 seconds clock skew when validating JWT claims like exp or nbf.
 

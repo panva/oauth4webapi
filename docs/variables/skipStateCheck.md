@@ -2,7 +2,7 @@
 
 [💗 Help the project](https://github.com/sponsors/panva)
 
-• `Const` **skipStateCheck**: unique `symbol`
+• `const` **skipStateCheck**: unique `symbol`
 
 DANGER ZONE - This option has security implications that must be understood, assessed for
 applicability, and accepted before use.

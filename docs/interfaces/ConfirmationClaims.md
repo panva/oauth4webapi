@@ -4,23 +4,16 @@
 
 ## Indexable
 
-▪ [claim: `string`]: [`JsonValue`](../types/JsonValue.md) \| `undefined`
-
-## Table of contents
-
-### Properties
-
-- [jkt](ConfirmationClaims.md#jkt)
-- [x5t#S256](ConfirmationClaims.md#x5t#s256)
+ \[`claim`: `string`\]: [`JsonValue`](../type-aliases/JsonValue.md) \| `undefined`
 
 ## Properties
 
-### jkt
+### jkt?
 
-• `Optional` `Readonly` **jkt**: `string`
+• `readonly` `optional` **jkt**: `string`
 
-___
+***
 
-### x5t#S256
+### x5t#S256?
 
-• `Optional` `Readonly` **x5t#S256**: `string`
+• `readonly` `optional` **x5t#S256**: `string`

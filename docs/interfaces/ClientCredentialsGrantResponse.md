@@ -4,46 +4,36 @@
 
 ## Indexable
 
-▪ [parameter: `string`]: [`JsonValue`](../types/JsonValue.md) \| `undefined`
-
-## Table of contents
-
-### Properties
-
-- [access\_token](ClientCredentialsGrantResponse.md#access_token)
-- [token\_type](ClientCredentialsGrantResponse.md#token_type)
-- [authorization\_details](ClientCredentialsGrantResponse.md#authorization_details)
-- [expires\_in](ClientCredentialsGrantResponse.md#expires_in)
-- [scope](ClientCredentialsGrantResponse.md#scope)
+ \[`parameter`: `string`\]: [`JsonValue`](../type-aliases/JsonValue.md) \| `undefined`
 
 ## Properties
 
 ### access\_token
 
-• `Readonly` **access\_token**: `string`
+• `readonly` **access\_token**: `string`
 
-___
+***
 
 ### token\_type
 
-• `Readonly` **token\_type**: [`Lowercase`]( https://www.typescriptlang.org/docs/handbook/2/template-literal-types.html#lowercasestringtype )\<`string`\>
+• `readonly` **token\_type**: [`Lowercase`](https://www.typescriptlang.org/docs/handbook/2/template-literal-types.html#lowercasestringtype)\<`string`\>
 
 NOTE: because the value is case insensitive it is always returned lowercased
 
-___
+***
 
-### authorization\_details
+### authorization\_details?
 
-• `Optional` `Readonly` **authorization\_details**: [`AuthorizationDetails`](AuthorizationDetails.md)[]
+• `readonly` `optional` **authorization\_details**: [`AuthorizationDetails`](AuthorizationDetails.md)[]
 
-___
+***
 
-### expires\_in
+### expires\_in?
 
-• `Optional` `Readonly` **expires\_in**: `number`
+• `readonly` `optional` **expires\_in**: `number`
 
-___
+***
 
-### scope
+### scope?
 
-• `Optional` `Readonly` **scope**: `string`
+• `readonly` `optional` **scope**: `string`

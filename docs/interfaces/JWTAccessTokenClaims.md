@@ -4,92 +4,70 @@
 
 ## Indexable
 
-▪ [claim: `string`]: [`JsonValue`](../types/JsonValue.md) \| `undefined`
-
-## Table of contents
-
-### Properties
-
-- [aud](JWTAccessTokenClaims.md#aud)
-- [client\_id](JWTAccessTokenClaims.md#client_id)
-- [exp](JWTAccessTokenClaims.md#exp)
-- [iat](JWTAccessTokenClaims.md#iat)
-- [iss](JWTAccessTokenClaims.md#iss)
-- [jti](JWTAccessTokenClaims.md#jti)
-- [sub](JWTAccessTokenClaims.md#sub)
-- [authorization\_details](JWTAccessTokenClaims.md#authorization_details)
-- [cnf](JWTAccessTokenClaims.md#cnf)
-- [nbf](JWTAccessTokenClaims.md#nbf)
-- [scope](JWTAccessTokenClaims.md#scope)
+ \[`claim`: `string`\]: [`JsonValue`](../type-aliases/JsonValue.md) \| `undefined`
 
 ## Properties
 
 ### aud
 
-• `Readonly` **aud**: `string` \| `string`[]
+• `readonly` **aud**: `string` \| `string`[]
 
-___
+***
 
 ### client\_id
 
-• `Readonly` **client\_id**: `string`
+• `readonly` **client\_id**: `string`
 
-___
+***
 
 ### exp
 
-• `Readonly` **exp**: `number`
+• `readonly` **exp**: `number`
 
-___
+***
 
 ### iat
 
-• `Readonly` **iat**: `number`
+• `readonly` **iat**: `number`
 
-___
+***
 
 ### iss
 
-• `Readonly` **iss**: `string`
+• `readonly` **iss**: `string`
 
-___
+***
 
 ### jti
 
-• `Readonly` **jti**: `string`
+• `readonly` **jti**: `string`
 
-___
+***
 
 ### sub
 
-• `Readonly` **sub**: `string`
+• `readonly` **sub**: `string`
 
-___
+***
 
-### authorization\_details
+### authorization\_details?
 
-• `Optional` `Readonly` **authorization\_details**: [`AuthorizationDetails`](AuthorizationDetails.md)[]
+• `readonly` `optional` **authorization\_details**: [`AuthorizationDetails`](AuthorizationDetails.md)[]
 
-___
+***
 
-### cnf
+### cnf?
 
-• `Optional` `Readonly` **cnf**: [`ConfirmationClaims`](ConfirmationClaims.md)
+• `readonly` `optional` **cnf**: [`ConfirmationClaims`](ConfirmationClaims.md)
 
-___
+***
 
-### nbf
+### nbf?
 
-• `Optional` `Readonly` **nbf**: `number`
+• `readonly` `optional` **nbf**: `number`
 
-___
+***
 
-### scope
+### scope?
 
-• `Optional` `Readonly` **scope**: `string`
-
-## Hierarchy
-
-- `JWTPayload`
-
-  ↳ **`JWTAccessTokenClaims`**
+• `readonly` `optional` **scope**: `string`

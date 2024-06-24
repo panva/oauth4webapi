@@ -2,7 +2,7 @@
 
 [💗 Help the project](https://github.com/sponsors/panva)
 
-• `Const` **experimental\_jwksCache**: unique `symbol`
+• `const` **experimental\_jwksCache**: unique `symbol`
 
 This is an experimental feature, it is not subject to semantic versioning rules. Non-backward
 compatible changes or removal may occur in any future release.
@@ -34,7 +34,7 @@ The intended use pattern is:
 - Afterwards, update the key-value storage if the [`uat`](../interfaces/ExportedJWKSCache.md#uat) property of
   the object has changed.
 
-**`Example`**
+## Example
 
 ```ts
 import * as oauth from 'oauth4webapi'

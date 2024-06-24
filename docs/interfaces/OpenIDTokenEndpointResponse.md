@@ -4,60 +4,48 @@
 
 ## Indexable
 
-▪ [parameter: `string`]: [`JsonValue`](../types/JsonValue.md) \| `undefined`
-
-## Table of contents
-
-### Properties
-
-- [access\_token](OpenIDTokenEndpointResponse.md#access_token)
-- [id\_token](OpenIDTokenEndpointResponse.md#id_token)
-- [token\_type](OpenIDTokenEndpointResponse.md#token_type)
-- [authorization\_details](OpenIDTokenEndpointResponse.md#authorization_details)
-- [expires\_in](OpenIDTokenEndpointResponse.md#expires_in)
-- [refresh\_token](OpenIDTokenEndpointResponse.md#refresh_token)
-- [scope](OpenIDTokenEndpointResponse.md#scope)
+ \[`parameter`: `string`\]: [`JsonValue`](../type-aliases/JsonValue.md) \| `undefined`
 
 ## Properties
 
 ### access\_token
 
-• `Readonly` **access\_token**: `string`
+• `readonly` **access\_token**: `string`
 
-___
+***
 
 ### id\_token
 
-• `Readonly` **id\_token**: `string`
+• `readonly` **id\_token**: `string`
 
-___
+***
 
 ### token\_type
 
-• `Readonly` **token\_type**: [`Lowercase`]( https://www.typescriptlang.org/docs/handbook/2/template-literal-types.html#lowercasestringtype )\<`string`\>
+• `readonly` **token\_type**: [`Lowercase`](https://www.typescriptlang.org/docs/handbook/2/template-literal-types.html#lowercasestringtype)\<`string`\>
 
 NOTE: because the value is case insensitive it is always returned lowercased
 
-___
+***
 
-### authorization\_details
+### authorization\_details?
 
-• `Optional` `Readonly` **authorization\_details**: [`AuthorizationDetails`](AuthorizationDetails.md)[]
+• `readonly` `optional` **authorization\_details**: [`AuthorizationDetails`](AuthorizationDetails.md)[]
 
-___
+***
 
-### expires\_in
+### expires\_in?
 
-• `Optional` `Readonly` **expires\_in**: `number`
+• `readonly` `optional` **expires\_in**: `number`
 
-___
+***
 
-### refresh\_token
+### refresh\_token?
 
-• `Optional` `Readonly` **refresh\_token**: `string`
+• `readonly` `optional` **refresh\_token**: `string`
 
-___
+***
 
-### scope
+### scope?
 
-• `Optional` `Readonly` **scope**: `string`
+• `readonly` `optional` **scope**: `string`
