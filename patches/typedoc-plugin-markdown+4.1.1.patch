@@ -33,6 +33,18 @@ index 7116469..469a57b 100644
      const md = [];
      if (model.implementationOf) {
          if (options.headingLevel !== -1) {
+diff --git a/node_modules/typedoc-plugin-markdown/dist/theme/context/partials/member.reflectionIndex.js b/node_modules/typedoc-plugin-markdown/dist/theme/context/partials/member.reflectionIndex.js
+index aed0c6e..3fcc53c 100644
+--- a/node_modules/typedoc-plugin-markdown/dist/theme/context/partials/member.reflectionIndex.js
++++ b/node_modules/typedoc-plugin-markdown/dist/theme/context/partials/member.reflectionIndex.js
+@@ -17,6 +17,7 @@ function reflectionIndex(model, options) {
+     else {
+         const groups = model.groups?.filter((group) => group.allChildrenHaveOwnDocument() &&
+             group.title !== typedoc_1.ReflectionKind.pluralString(typedoc_1.ReflectionKind.Document));
++        groups.push(...groups.splice(0, 3));
+         groups?.forEach((reflectionGroup) => {
+             if (reflectionGroup.categories) {
+                 md.push((0, markdown_1.heading)(options.headingLevel, reflectionGroup.title) + '\n');
 diff --git a/node_modules/typedoc-plugin-markdown/dist/theme/context/partials/member.signatureTitle.js b/node_modules/typedoc-plugin-markdown/dist/theme/context/partials/member.signatureTitle.js
 index 86ad268..038a191 100644
 --- a/node_modules/typedoc-plugin-markdown/dist/theme/context/partials/member.signatureTitle.js
