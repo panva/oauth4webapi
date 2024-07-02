@@ -1,3 +1,9 @@
+## [💗 Help the project](https://github.com/sponsors/panva)
+
+Support from the community to continue maintaining and improving this module is welcome. If you find the module useful, please consider supporting the project by [becoming a sponsor](https://github.com/sponsors/panva).
+
+## Examples
+
 A collection of examples for the most common use cases.
 
 - Authorization Code Flow (OAuth 2.0) - [source](oauth.ts)

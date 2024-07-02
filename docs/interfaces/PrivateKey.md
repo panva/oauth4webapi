@@ -2,6 +2,10 @@
 
 [💗 Help the project](https://github.com/sponsors/panva)
 
+Support from the community to continue maintaining and improving this module is welcome. If you find the module useful, please consider supporting the project by [becoming a sponsor](https://github.com/sponsors/panva).
+
+***
+
 Interface to pass an asymmetric private key and, optionally, its associated JWK Key ID to be
 added as a `kid` JOSE Header Parameter.
 

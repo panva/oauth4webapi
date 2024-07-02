@@ -2,6 +2,10 @@
 
 [💗 Help the project](https://github.com/sponsors/panva)
 
+Support from the community to continue maintaining and improving this module is welcome. If you find the module useful, please consider supporting the project by [becoming a sponsor](https://github.com/sponsors/panva).
+
+***
+
 • **ClientAuthenticationMethod**: `"client_secret_basic"` \| `"client_secret_post"` \| `"private_key_jwt"` \| `"none"`
 
 Supported Client Authentication Methods.

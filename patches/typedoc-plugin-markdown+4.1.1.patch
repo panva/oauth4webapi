@@ -57,7 +57,7 @@ index 86ad268..038a191 100644
 +    return useCodeBlocks ? (0, markdown_1.codeBlock)(result) : `▸ ${result}`;
  }
 diff --git a/node_modules/typedoc-plugin-markdown/dist/theme/context/partials/page.pageTitle.js b/node_modules/typedoc-plugin-markdown/dist/theme/context/partials/page.pageTitle.js
-index d1473ac..7aaf27e 100644
+index d1473ac..a829f9b 100644
 --- a/node_modules/typedoc-plugin-markdown/dist/theme/context/partials/page.pageTitle.js
 +++ b/node_modules/typedoc-plugin-markdown/dist/theme/context/partials/page.pageTitle.js
 @@ -6,7 +6,7 @@ function pageTitle() {
@@ -65,7 +65,7 @@ index d1473ac..7aaf27e 100644
      const page = this.page;
      if (page.model?.url === page.project.url) {
 -        return this.helpers.getProjectName(textContentMappings['title.indexPage'], page);
-+        return this.helpers.getProjectName(textContentMappings['title.indexPage'], page) + '\n\n[💗 Help the project](https://github.com/sponsors/panva)';
++        return this.helpers.getProjectName(textContentMappings['title.indexPage'], page) + '\n\n[💗 Help the project](https://github.com/sponsors/panva)\n\nSupport from the community to continue maintaining and improving this module is welcome. If you find the module useful, please consider supporting the project by [becoming a sponsor](https://github.com/sponsors/panva).\n\n';
      }
      const name = this.partials.memberTitle(page.model);
      const kind = this.internationalization.kindSingularString(page.model.kind);

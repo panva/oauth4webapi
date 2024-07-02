@@ -2,6 +2,10 @@
 
 [💗 Help the project](https://github.com/sponsors/panva)
 
+Support from the community to continue maintaining and improving this module is welcome. If you find the module useful, please consider supporting the project by [becoming a sponsor](https://github.com/sponsors/panva).
+
+***
+
 ▸ **validateJwtAccessToken**(`as`, `request`, `expectedAudience`, `options`?): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`JWTAccessTokenClaims`](../interfaces/JWTAccessTokenClaims.md)\>
 
 Validates use of JSON Web Token (JWT) OAuth 2.0 Access Tokens for a given Request as per
