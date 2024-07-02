@@ -6,6 +6,4 @@ export NODE_OPTIONS='--no-warnings --tls-cipher-list="ECDHE-RSA-AES128-GCM-SHA25
 
 if [[ $NODE_VERSION -eq 18 ]]; then
   export NODE_OPTIONS+=' --experimental-global-webcrypto'
-elif [[ $NODE_VERSION -eq 16 ]]; then
-  export NODE_OPTIONS+=' --experimental-global-webcrypto --experimental-fetch'
 fi
