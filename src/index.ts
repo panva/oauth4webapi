@@ -4391,7 +4391,7 @@ export async function generateKeyPair(
   }
   const algorithm: RsaHashedKeyGenParams | EcKeyGenParams | AlgorithmIdentifier = algToSubtle(
     alg,
-    alg === 'EdDSA' ? options?.crv ?? 'Ed25519' : undefined,
+    alg === 'EdDSA' ? (options?.crv ?? 'Ed25519') : undefined,
   )
 
   if (alg.startsWith('PS') || alg.startsWith('RS')) {
