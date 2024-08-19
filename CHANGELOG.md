@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.12.0](https://github.com/panva/oauth4webapi/compare/v2.11.1...v2.12.0) (2024-08-19)
+
+
+### Features
+
+* graduate jwksCache to stable API ([0e0e1d2](https://github.com/panva/oauth4webapi/commit/0e0e1d2adf7f045ac29ad5df2db65496c95a88a0))
+
+
+### Documentation
+
+* move clockSkew and clockTolerance docs to the symbol ([3b5d2ea](https://github.com/panva/oauth4webapi/commit/3b5d2eacfa9c7606467507b4e2054655e4813cbb))
+* update clockSkew and clockTolerance docs ([c97313a](https://github.com/panva/oauth4webapi/commit/c97313adc954890b6b292ce794bcb39ed0a8eac8))
+
 ## [2.11.1](https://github.com/panva/oauth4webapi/compare/v2.11.0...v2.11.1) (2024-06-20)
 
 

@@ -46,7 +46,7 @@ import * as oauth from 'oauth4webapi'
 **`example`** Deno import
 
 ```js
-import * as oauth from 'https://deno.land/x/oauth4webapi@v2.11.1/mod.ts'
+import * as oauth from 'https://deno.land/x/oauth4webapi@v2.12.0/mod.ts'
 ```
 
 - Authorization Code Flow (OAuth 2.0) - [source](examples/oauth.ts)
