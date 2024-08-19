@@ -192,7 +192,7 @@ Support from the community to continue maintaining and improving this module is 
 - [customFetch](variables/customFetch.md)
 - [expectNoNonce](variables/expectNoNonce.md)
 - [expectNoState](variables/expectNoState.md)
-- [experimental\_jwksCache](variables/experimental_jwksCache.md)
+- [jwksCache](variables/jwksCache.md)
 - [skipAuthTimeCheck](variables/skipAuthTimeCheck.md)
 - [skipStateCheck](variables/skipStateCheck.md)
 - [skipSubjectCheck](variables/skipSubjectCheck.md)

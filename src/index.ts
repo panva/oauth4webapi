@@ -328,9 +328,6 @@ export const clockTolerance: unique symbol = Symbol()
 export const customFetch: unique symbol = Symbol()
 
 /**
- * This is an experimental feature, it is not subject to semantic versioning rules. Non-backward
- * compatible changes or removal may occur in any future release.
- *
  * DANGER ZONE - This option has security implications that must be understood, assessed for
  * applicability, and accepted before use. It is critical that the JSON Web Key Set cache only be
  * writable by your own code.
@@ -374,7 +371,7 @@ export const customFetch: unique symbol = Symbol()
  *
  * // Use JSON Web Key Set cache
  * const accessTokenClaims = await validateJwtAccessToken(as, request, expectedAudience, {
- *   [oauth.experimental_jwksCache]: jwksCache,
+ *   [oauth.jwksCache]: jwksCache,
  * })
  *
  * if (uat !== jwksCache.uat) {
@@ -383,7 +380,7 @@ export const customFetch: unique symbol = Symbol()
  * }
  * ```
  */
-export const experimental_jwksCache: unique symbol = Symbol()
+export const jwksCache: unique symbol = Symbol()
 
 /**
  * When combined with {@link customFetch} (to use a Fetch API implementation that supports client
@@ -1018,9 +1015,9 @@ const SUPPORTED_JWS_ALGS: JWSAlgorithm[] = [
 
 export interface JWKSCacheOptions {
   /**
-   * See {@link experimental_jwksCache}.
+   * See {@link jwksCache}.
    */
-  [experimental_jwksCache]?: JWKSCacheInput
+  [jwksCache]?: JWKSCacheInput
 }
 
 export interface HttpRequestOptions {
@@ -2297,8 +2294,8 @@ async function getPublicSigKeyFromIssuerJwksUri(
   const { alg, kid } = header
   checkSupportedJwsAlg(alg)
 
-  if (!jwksMap?.has(as) && isFreshJwksCache(options?.[experimental_jwksCache])) {
-    setJwksCache(as, options?.[experimental_jwksCache].jwks, options?.[experimental_jwksCache].uat)
+  if (!jwksMap?.has(as) && isFreshJwksCache(options?.[jwksCache])) {
+    setJwksCache(as, options?.[jwksCache].jwks, options?.[jwksCache].uat)
   }
 
   let jwks: JWKS
@@ -2308,13 +2305,13 @@ async function getPublicSigKeyFromIssuerJwksUri(
     ;({ jwks, age } = jwksMap.get(as)!)
     if (age >= 300) {
       // force a re-fetch every 5 minutes
-      clearJwksCache(as, options?.[experimental_jwksCache])
+      clearJwksCache(as, options?.[jwksCache])
       return getPublicSigKeyFromIssuerJwksUri(as, options, header)
     }
   } else {
     jwks = await jwksRequest(as, options).then(processJwksResponse)
     age = 0
-    setJwksCache(as, jwks, epochTime(), options?.[experimental_jwksCache])
+    setJwksCache(as, jwks, epochTime(), options?.[jwksCache])
   }
 
   let kty: string
@@ -2376,7 +2373,7 @@ async function getPublicSigKeyFromIssuerJwksUri(
   if (!length) {
     if (age >= 60) {
       // allow re-fetch if cache is at least 1 minute old
-      clearJwksCache(as, options?.[experimental_jwksCache])
+      clearJwksCache(as, options?.[jwksCache])
       return getPublicSigKeyFromIssuerJwksUri(as, options, header)
     }
     throw new OPE('error when selecting a JWT verification key, no applicable keys found')
@@ -4736,3 +4733,9 @@ export const experimental_validateDetachedSignatureResponse = (
 export const experimental_validateJwtAccessToken = (
   ...args: Parameters<typeof validateJwtAccessToken>
 ) => validateJwtAccessToken(...args)
+/**
+ * @ignore
+ *
+ * @deprecated Use {@link jwksCache}.
+ */
+export const experimental_jwksCache = jwksCache

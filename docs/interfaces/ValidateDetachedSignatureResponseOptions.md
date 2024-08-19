@@ -27,11 +27,11 @@ See [customFetch](../variables/customFetch.md).
 
 ***
 
-### \[experimental\_jwksCache\]?
+### \[jwksCache\]?
 
-• `optional` **\[experimental\_jwksCache\]**: [`JWKSCacheInput`](../type-aliases/JWKSCacheInput.md)
+• `optional` **\[jwksCache\]**: [`JWKSCacheInput`](../type-aliases/JWKSCacheInput.md)
 
-See [experimental_jwksCache](../variables/experimental_jwksCache.md).
+See [jwksCache](../variables/jwksCache.md).
 
 ***
 

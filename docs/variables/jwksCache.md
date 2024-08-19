@@ -1,4 +1,4 @@
-# Variable: experimental\_jwksCache
+# Variable: jwksCache
 
 [💗 Help the project](https://github.com/sponsors/panva)
 
@@ -6,10 +6,7 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
-• `const` **experimental\_jwksCache**: unique `symbol`
-
-This is an experimental feature, it is not subject to semantic versioning rules. Non-backward
-compatible changes or removal may occur in any future release.
+• `const` **jwksCache**: unique `symbol`
 
 DANGER ZONE - This option has security implications that must be understood, assessed for
 applicability, and accepted before use. It is critical that the JSON Web Key Set cache only be
@@ -54,7 +51,7 @@ const { uat } = jwksCache
 
 // Use JSON Web Key Set cache
 const accessTokenClaims = await validateJwtAccessToken(as, request, expectedAudience, {
-  [oauth.experimental_jwksCache]: jwksCache,
+  [oauth.jwksCache]: jwksCache,
 })
 
 if (uat !== jwksCache.uat) {

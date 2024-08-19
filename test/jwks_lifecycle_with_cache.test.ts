@@ -45,7 +45,7 @@ test.serial('cache is empty at first and set after', async (t) => {
   let params = new URLSearchParams({ response: jwt })
 
   await lib.validateJwtAuthResponse(as, c, params, undefined, {
-    [lib.experimental_jwksCache]: cache,
+    [lib.jwksCache]: cache,
   })
 
   t.truthy(cache.uat)
@@ -75,7 +75,7 @@ test.serial('cache is set and not updated', async (t) => {
   let params = new URLSearchParams({ response: jwt })
 
   await lib.validateJwtAuthResponse(as, c, params, undefined, {
-    [lib.experimental_jwksCache]: cache,
+    [lib.jwksCache]: cache,
   })
 
   t.deepEqual(before, cache)
@@ -114,7 +114,7 @@ test.serial('cache is set and updated', async (t) => {
   let params = new URLSearchParams({ response: jwt })
 
   await lib.validateJwtAuthResponse(as, c, params, undefined, {
-    [lib.experimental_jwksCache]: cache,
+    [lib.jwksCache]: cache,
   })
 
   t.deepEqual(before.jwks, cache.jwks)
