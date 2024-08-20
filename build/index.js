@@ -1030,10 +1030,15 @@ function validateOptionalIssuer(expected, result) {
     return result;
 }
 function validateIssuer(expected, result) {
-    if (result.claims.iss !== expected) {
-        throw new OPE('unexpected JWT "iss" (issuer) claim value');
+    if (expected === 'https://login.microsoftonline.com/common/v2.0'
+      && result.claims.tid !== undefined
+      && result.claims.iss === `https://login.microsoftonline.com/${result.claims.tid}/v2.0`) {
+        return result;
     }
-    return result;
+    if (result.claims.iss === expected) {
+      return result
+    }
+    throw new OPE('unexpected JWT "iss" (issuer) claim value')
 }
 const branded = new WeakSet();
 function brand(searchParams) {
