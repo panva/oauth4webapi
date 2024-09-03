@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.12.1](https://github.com/panva/oauth4webapi/compare/v2.12.0...v2.12.1) (2024-09-03)
+
+
+### Fixes
+
+* use correct "htm" in DPoP Proof via protectedResourceRequest ([3ce3be2](https://github.com/panva/oauth4webapi/commit/3ce3be2584f483feff49eebdf9225676af2c2182)), closes [#132](https://github.com/panva/oauth4webapi/issues/132)
+
 ## [2.12.0](https://github.com/panva/oauth4webapi/compare/v2.11.1...v2.12.0) (2024-08-19)
 
 
