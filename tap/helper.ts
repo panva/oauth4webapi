@@ -1,9 +1,6 @@
 import * as lib from '../src/index.js'
 import * as jose from 'jose'
 
-// @ts-ignore
-import packageJson from '../package.json' assert { type: 'json' }
-
 export function isDpopNonceError(input: lib.OAuth2Error | lib.WWWAuthenticateChallenge[]) {
   if ('error' in input) {
     return input.error === 'use_dpop_nonce'

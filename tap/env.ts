@@ -1,7 +1,4 @@
 // @ts-ignore
-import packageLock from '../package-lock.json' assert { type: 'json' }
-
-// @ts-ignore
 export const isBun = typeof Bun !== 'undefined'
 
 // @ts-ignore
