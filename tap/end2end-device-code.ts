@@ -96,9 +96,11 @@ export default (QUnit: QUnit) => {
         t.ok(access_token)
         t.equal(token_type, dpop ? 'dpop' : 'bearer')
 
+        const verb = ['GET', 'POST', 'PATCH'][Math.floor(Math.random() * 3)]
+
         await lib.protectedResourceRequest(
           access_token,
-          'GET',
+          verb,
           new URL('http://localhost:3001/resource'),
           undefined,
           undefined,

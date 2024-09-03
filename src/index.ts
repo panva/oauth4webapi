@@ -2133,7 +2133,7 @@ export async function protectedResourceRequest(
       headers,
       options.DPoP,
       url,
-      'GET',
+      method.toUpperCase(),
       getClockSkew({ [clockSkew]: options?.[clockSkew] }),
       accessToken,
     )
