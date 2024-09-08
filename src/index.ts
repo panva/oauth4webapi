@@ -3532,7 +3532,7 @@ function checkSupportedJwsAlg(alg: unknown) {
   if (!SUPPORTED_JWS_ALGS.includes(<any>alg)) {
     throw new UnsupportedOperationError('unsupported JWS "alg" identifier')
   }
-  return <JWSAlgorithm>alg
+  return alg
 }
 
 function checkRsaKeyAlgorithm(algorithm: RsaHashedKeyAlgorithm) {
