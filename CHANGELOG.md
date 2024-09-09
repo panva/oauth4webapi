@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.12.2](https://github.com/panva/oauth4webapi/compare/v2.12.1...v2.12.2) (2024-09-09)
+
+
+### Refactor
+
+* error msg when ID Token aud is an array and azp is missing ([68e0338](https://github.com/panva/oauth4webapi/commit/68e03389176c03bad9441767fc899e3d1ec98540))
+* remove redundant checks ([763b3d0](https://github.com/panva/oauth4webapi/commit/763b3d021deaf1641d29964f865b101097973c86))
+
+
+### Documentation
+
+* remove non-described parameter JSDoc tags ([b1507b9](https://github.com/panva/oauth4webapi/commit/b1507b97e6d7bb443f8ff291a6bde4c1b15f8aee))
+* update README.md ([9d1377b](https://github.com/panva/oauth4webapi/commit/9d1377b532008b502df8e9a9158c9315997ebf9a))
+
 ## [2.12.1](https://github.com/panva/oauth4webapi/compare/v2.12.0...v2.12.1) (2024-09-03)
 
 
