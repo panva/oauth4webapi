@@ -34,9 +34,9 @@ function's execution.
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
 | `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server to accept JWT Access Tokens from. |
-| `request` | [`Request`](https://developer.mozilla.org/docs/Web/API/Request) |  |
+| `request` | [`Request`](https://developer.mozilla.org/docs/Web/API/Request) | - |
 | `expectedAudience` | `string` | Audience identifier the resource server expects for itself. |
-| `options`? | [`ValidateJWTAccessTokenOptions`](../interfaces/ValidateJWTAccessTokenOptions.md) |  |
+| `options`? | [`ValidateJWTAccessTokenOptions`](../interfaces/ValidateJWTAccessTokenOptions.md) | - |
 
 ## Returns
 

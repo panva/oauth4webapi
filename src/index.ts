@@ -4567,9 +4567,7 @@ async function validateDPoP(
  * function's execution.
  *
  * @param as Authorization Server to accept JWT Access Tokens from.
- * @param request
  * @param expectedAudience Audience identifier the resource server expects for itself.
- * @param options
  *
  * @group JWT Access Tokens
  *
