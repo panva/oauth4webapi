@@ -24,12 +24,6 @@ test('validateJwtAuthResponse() error conditions', async (t) => {
   await t.throwsAsync(() => lib.validateJwtAuthResponse(issuer, client, new URLSearchParams()), {
     message: '"parameters" does not contain a JARM response',
   })
-  await t.throwsAsync(
-    () => lib.validateJwtAuthResponse(issuer, client, new URLSearchParams('response=foo')),
-    {
-      message: '"as.jwks_uri" must be a string',
-    },
-  )
 })
 
 test('validateJwtAuthResponse()', async (t) => {

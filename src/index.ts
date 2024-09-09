@@ -3727,10 +3727,6 @@ export async function validateJwtAuthResponse(
     throw new OPE('"parameters" does not contain a JARM response')
   }
 
-  if (typeof as.jwks_uri !== 'string') {
-    throw new TypeError('"as.jwks_uri" must be a string')
-  }
-
   const { claims } = await validateJwt(
     response,
     checkSigningAlgorithm.bind(
@@ -3880,10 +3876,6 @@ export async function validateDetachedSignatureResponse(
   const code = getURLSearchParameter(parameters, 'code')
   if (!code) {
     throw new OPE('"parameters" does not contain an Authorization Code')
-  }
-
-  if (typeof as.jwks_uri !== 'string') {
-    throw new TypeError('"as.jwks_uri" must be a string')
   }
 
   const requiredClaims: (keyof typeof jwtClaimNames)[] = [
