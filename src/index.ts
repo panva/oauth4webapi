@@ -2711,8 +2711,13 @@ async function processGenericAccessTokenResponse(
         .then(validateIssuer.bind(undefined, as.issuer))
         .then(validateAudience.bind(undefined, client.client_id))
 
-      if (Array.isArray(claims.aud) && claims.aud.length !== 1 && claims.azp !== client.client_id) {
-        throw new OPE('unexpected ID Token "azp" (authorized party) claim value')
+      if (Array.isArray(claims.aud) && claims.aud.length !== 1) {
+        if (claims.azp === undefined) {
+          throw new OPE('ID Token "aud" (audience) claim includes additional untrusted audiences')
+        }
+        if (claims.azp !== client.client_id) {
+          throw new OPE('unexpected ID Token "azp" (authorized party) claim value')
+        }
       }
 
       if (
@@ -3966,8 +3971,13 @@ export async function validateDetachedSignatureResponse(
     throw new OPE('unexpected ID Token "nonce" claim value')
   }
 
-  if (Array.isArray(claims.aud) && claims.aud.length !== 1 && claims.azp !== client.client_id) {
-    throw new OPE('unexpected ID Token "azp" (authorized party) claim value')
+  if (Array.isArray(claims.aud) && claims.aud.length !== 1) {
+    if (claims.azp === undefined) {
+      throw new OPE('ID Token "aud" (audience) claim includes additional untrusted audiences')
+    }
+    if (claims.azp !== client.client_id) {
+      throw new OPE('unexpected ID Token "azp" (authorized party) claim value')
+    }
   }
 
   return result

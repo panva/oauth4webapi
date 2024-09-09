@@ -4,7 +4,7 @@ for (const module of modules('invalid-secondary-aud')) {
   test.serial(
     rejects(flow()),
     module,
-    'unexpected ID Token "azp" (authorized party) claim value',
+    'ID Token "aud" (audience) claim includes additional untrusted audiences',
     'OperationProcessingError',
   )
 }

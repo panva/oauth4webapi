@@ -875,6 +875,28 @@ test('processAuthorizationCodeOpenIDResponse() azp checks', async (t) => {
         }),
       ),
     ),
+    { message: 'ID Token "aud" (audience) claim includes additional untrusted audiences' },
+  )
+
+  await t.throwsAsync(
+    lib.processAuthorizationCodeOpenIDResponse(
+      tIssuer,
+      client,
+      getResponse(
+        JSON.stringify({
+          access_token: 'token',
+          token_type: 'Bearer',
+          id_token: await new jose.SignJWT({ azp: 'not-my-client_id' })
+            .setProtectedHeader({ alg: 'RS256' })
+            .setIssuer(issuer.issuer)
+            .setSubject('urn:example:subject')
+            .setAudience([client.client_id, 'other-aud'])
+            .setExpirationTime('5m')
+            .setIssuedAt()
+            .sign(t.context.RS256.privateKey),
+        }),
+      ),
+    ),
     { message: 'unexpected ID Token "azp" (authorized party) claim value' },
   )
 
