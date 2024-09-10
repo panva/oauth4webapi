@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.13.0](https://github.com/panva/oauth4webapi/compare/v2.12.2...v2.13.0) (2024-09-10)
+
+
+### Features
+
+* **build:** add jsr.io distribution ([dc6157f](https://github.com/panva/oauth4webapi/commit/dc6157fb24595b191a7fb3d2113c0db146798aad))
+
 ## [2.12.2](https://github.com/panva/oauth4webapi/compare/v2.12.1...v2.12.2) (2024-09-09)
 
 
