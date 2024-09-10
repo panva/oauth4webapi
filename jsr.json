@@ -1,0 +1,13 @@
+{
+  "$schema": "https://jsr.io/schema/config-file.v1.json",
+  "name": "@panva/oauth4webapi",
+  "version": "2.12.2",
+  "exports": "./src/index.ts",
+  "publish": {
+    "include": [
+      "LICENSE.md",
+      "README.md",
+      "src/**/*.ts"
+    ]
+  }
+}

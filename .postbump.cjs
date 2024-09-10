@@ -5,7 +5,7 @@ const { version } = require('./package.json')
 const updates = [
   ['./src/index.ts', /const VERSION = 'v\d+\.\d+\.\d+'/gm, `const VERSION = 'v${version}'`],
   ['./build/index.js', /const VERSION = 'v\d+\.\d+\.\d+'/gm, `const VERSION = 'v${version}'`, false],
-  ['./README.md', /oauth4webapi@v\d+\.\d+\.\d+/gm, `oauth4webapi@v${version}`],
+  ['./jsr.json', /"version": "\d+\.\d+\.\d+"/gm, `"version": "${version}"`],
 ]
 
 for (const [path, regex, replace, gitAdd = true] of updates) {

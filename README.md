@@ -33,7 +33,7 @@ Support from the community to continue maintaining and improving this module is 
 
 ## [API Reference](docs/README.md)
 
-`oauth4webapi` is distributed via [npmjs.com](https://www.npmjs.com/package/oauth4webapi), [deno.land/x](https://deno.land/x/oauth4webapi), [cdnjs.com](https://cdnjs.com/libraries/oauth4webapi), [jsdelivr.com](https://www.jsdelivr.com/package/npm/oauth4webapi), and [github.com](https://github.com/panva/oauth4webapi).
+`oauth4webapi` is distributed via [npmjs.com](https://www.npmjs.com/package/oauth4webapi), [jsr.io](https://jsr.io/@panva/oauth4webapi), [deno.land/x](https://deno.land/x/oauth4webapi), [cdnjs.com](https://cdnjs.com/libraries/oauth4webapi), [jsdelivr.com](https://www.jsdelivr.com/package/npm/oauth4webapi), and [github.com](https://github.com/panva/oauth4webapi).
 
 ## [Examples](examples/README.md)
 
@@ -41,12 +41,6 @@ Support from the community to continue maintaining and improving this module is 
 
 ```js
 import * as oauth from 'oauth4webapi'
-```
-
-**`example`** Deno import
-
-```js
-import * as oauth from 'https://deno.land/x/oauth4webapi@v2.12.2/mod.ts'
 ```
 
 - Authorization Code Flow (OAuth 2.0) - [source](examples/oauth.ts)
