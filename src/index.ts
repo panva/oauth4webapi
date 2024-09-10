@@ -4724,7 +4724,8 @@ export type IntrospectionConfirmationClaims = ConfirmationClaims
  */
 export const experimental_validateDetachedSignatureResponse = (
   ...args: Parameters<typeof validateDetachedSignatureResponse>
-) => validateDetachedSignatureResponse(...args)
+): ReturnType<typeof validateDetachedSignatureResponse> =>
+  validateDetachedSignatureResponse(...args)
 /**
  * @ignore
  *
@@ -4732,7 +4733,7 @@ export const experimental_validateDetachedSignatureResponse = (
  */
 export const experimental_validateJwtAccessToken = (
   ...args: Parameters<typeof validateJwtAccessToken>
-) => validateJwtAccessToken(...args)
+): ReturnType<typeof validateJwtAccessToken> => validateJwtAccessToken(...args)
 /**
  * @ignore
  *
