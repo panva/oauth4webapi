@@ -139,6 +139,10 @@ export default (QUnit: QUnit) => {
 
           if (!assertNotOAuth2Error(result)) return
 
+          if (jwtIntrospection) {
+            await lib.validateJwtIntrospectionSignature(as, response)
+          }
+
           t.propContains(result, {
             active: true,
             scope: 'api:write',

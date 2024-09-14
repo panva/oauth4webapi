@@ -2448,8 +2448,9 @@ export async function processUserInfoResponse(
   let json: JsonValue
   if (getContentType(response) === 'application/jwt') {
     assertReadableResponse(response)
+    const jwt = await response.text()
     const { claims } = await validateJwt(
-      await response.text(),
+      jwt,
       checkSigningAlgorithm.bind(
         undefined,
         client.userinfo_signed_response_alg,
@@ -2462,6 +2463,7 @@ export async function processUserInfoResponse(
       .then(validateOptionalAudience.bind(undefined, client.client_id))
       .then(validateOptionalIssuer.bind(undefined, as.issuer))
 
+    jwtResponseBodies.set(response, jwt)
     json = <JsonValue>claims
   } else {
     if (client.userinfo_signed_response_alg) {
@@ -2583,6 +2585,7 @@ export async function refreshTokenGrantRequest(
 }
 
 const idTokenClaims = new WeakMap<TokenEndpointResponse, IDToken>()
+const jwtResponseBodies = new WeakMap<Response, string>()
 
 /**
  * Returns ID Token claims validated during {@link processAuthorizationCodeOpenIDResponse}.
@@ -2620,6 +2623,140 @@ export function getValidatedIdTokenClaims(
   }
 
   return claims
+}
+
+export interface ValidateSignatureOptions extends HttpRequestOptions, JWKSCacheOptions {}
+
+/**
+ * Validates the JWS Signature of an ID Token included in results previously resolved from
+ * {@link processAuthorizationCodeOpenIDResponse}, {@link processRefreshTokenResponse}, or
+ * {@link processDeviceCodeResponse} for non-repudiation purposes.
+ *
+ * Note: Validating signatures of ID Tokens received via direct communication between the Client and
+ * the Token Endpoint (which it is here) is not mandatory since the TLS server validation is used to
+ * validate the issuer instead of checking the token signature. You only need to use this method for
+ * non-repudiation purposes.
+ *
+ * Note: Supports only digital signatures.
+ *
+ * @param as Authorization Server Metadata.
+ * @param ref Value previously resolved from {@link processAuthorizationCodeOpenIDResponse},
+ *   {@link processRefreshTokenResponse}, or {@link processDeviceCodeResponse}.
+ *
+ * @returns Resolves if the signature validates, rejects otherwise.
+ *
+ * @group Authorization Code Grant w/ OpenID Connect (OIDC)
+ * @group FAPI 1.0 Advanced
+ *
+ * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#IDTokenValidation)
+ */
+export async function validateIdTokenSignature(
+  as: AuthorizationServer,
+  ref: OpenIDTokenEndpointResponse | TokenEndpointResponse,
+  options?: ValidateSignatureOptions,
+): Promise<void> {
+  assertAs(as)
+
+  if (!getValidatedIdTokenClaims(ref)) {
+    throw new OPE('"ref" does not contain an ID Token to verify the signature of')
+  }
+
+  const { 0: protectedHeader, 1: payload, 2: encodedSignature } = ref.id_token!.split('.')
+
+  const header: CompactJWSHeaderParameters = JSON.parse(buf(b64u(protectedHeader)))
+
+  if (header.alg.startsWith('HS')) {
+    throw new UnsupportedOperationError()
+  }
+
+  let key!: CryptoKey
+  key = await getPublicSigKeyFromIssuerJwksUri(as, options, header)
+  await validateJwsSignature(protectedHeader, payload, key, b64u(encodedSignature))
+}
+
+async function validateJwtResponseSignature(
+  as: AuthorizationServer,
+  ref: Response,
+  options?: ValidateSignatureOptions,
+): Promise<void> {
+  assertAs(as)
+
+  if (!jwtResponseBodies.has(ref)) {
+    throw new OPE('"ref" does not contain a processed JWT Response to verify the signature of')
+  }
+
+  const {
+    0: protectedHeader,
+    1: payload,
+    2: encodedSignature,
+  } = jwtResponseBodies.get(ref)!.split('.')
+
+  const header: CompactJWSHeaderParameters = JSON.parse(buf(b64u(protectedHeader)))
+
+  if (header.alg.startsWith('HS')) {
+    throw new UnsupportedOperationError()
+  }
+
+  let key!: CryptoKey
+  key = await getPublicSigKeyFromIssuerJwksUri(as, options, header)
+  await validateJwsSignature(protectedHeader, payload, key, b64u(encodedSignature))
+}
+
+/**
+ * Validates the JWS Signature of a JWT {@link !Response} body of response previously processed by
+ * {@link processUserInfoResponse} for non-repudiation purposes.
+ *
+ * Note: Validating signatures of JWTs received via direct communication between the Client and a
+ * TLS-secured Endpoint (which it is here) is not mandatory since the TLS server validation is used
+ * to validate the issuer instead of checking the token signature. You only need to use this method
+ * for non-repudiation purposes.
+ *
+ * Note: Supports only digital signatures.
+ *
+ * @param as Authorization Server Metadata.
+ * @param ref Response previously processed by {@link processUserInfoResponse}.
+ *
+ * @returns Resolves if the signature validates, rejects otherwise.
+ *
+ * @group Authorization Code Grant w/ OpenID Connect (OIDC)
+ * @group OpenID Connect (OIDC) UserInfo
+ *
+ * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#UserInfo)
+ */
+export function validateJwtUserinfoSignature(
+  as: AuthorizationServer,
+  ref: Response,
+  options?: ValidateSignatureOptions,
+): Promise<void> {
+  return validateJwtResponseSignature(as, ref, options)
+}
+
+/**
+ * Validates the JWS Signature of an JWT {@link !Response} body of responses previously processed by
+ * {@link processIntrospectionResponse} for non-repudiation purposes.
+ *
+ * Note: Validating signatures of JWTs received via direct communication between the Client and a
+ * TLS-secured Endpoint (which it is here) is not mandatory since the TLS server validation is used
+ * to validate the issuer instead of checking the token signature. You only need to use this method
+ * for non-repudiation purposes.
+ *
+ * Note: Supports only digital signatures.
+ *
+ * @param as Authorization Server Metadata.
+ * @param ref Response previously processed by {@link processIntrospectionResponse}.
+ *
+ * @returns Resolves if the signature validates, rejects otherwise.
+ *
+ * @group Token Introspection
+ *
+ * @see [draft-ietf-oauth-jwt-introspection-response-12 - JWT Response for OAuth Token Introspection](https://www.ietf.org/archive/id/draft-ietf-oauth-jwt-introspection-response-12.html#section-5)
+ */
+export function validateJwtIntrospectionSignature(
+  as: AuthorizationServer,
+  ref: Response,
+  options?: ValidateSignatureOptions,
+): Promise<void> {
+  return validateJwtResponseSignature(as, ref, options)
 }
 
 async function processGenericAccessTokenResponse(
@@ -3414,8 +3551,9 @@ export async function processIntrospectionResponse(
   let json: JsonValue
   if (getContentType(response) === 'application/token-introspection+jwt') {
     assertReadableResponse(response)
+    const jwt = await response.text()
     const { claims } = await validateJwt(
-      await response.text(),
+      jwt,
       checkSigningAlgorithm.bind(
         undefined,
         client.introspection_signed_response_alg,
@@ -3430,6 +3568,7 @@ export async function processIntrospectionResponse(
       .then(validateIssuer.bind(undefined, as.issuer))
       .then(validateAudience.bind(undefined, client.client_id))
 
+    jwtResponseBodies.set(response, jwt)
     json = <JsonValue>claims.token_introspection
     if (!isJsonObject(json)) {
       throw new OPE('JWT "token_introspection" claim must be a JSON object')
@@ -3594,6 +3733,19 @@ function keyToSubtle(key: CryptoKey): AlgorithmIdentifier | RsaPssParams | Ecdsa
 
 const noSignatureCheck = Symbol()
 
+async function validateJwsSignature(
+  protectedHeader: string,
+  payload: string,
+  key: CryptoKey,
+  signature: Uint8Array,
+) {
+  const input = `${protectedHeader}.${payload}`
+  const verified = await crypto.subtle.verify(keyToSubtle(key), key, signature, buf(input))
+  if (!verified) {
+    throw new OPE('JWT signature verification failed')
+  }
+}
+
 /**
  * Minimal JWT validation implementation.
  */
@@ -3632,11 +3784,7 @@ async function validateJwt(
   let key!: CryptoKey
   if (getKey !== noSignatureCheck) {
     key = await getKey(header)
-    const input = `${protectedHeader}.${payload}`
-    const verified = await crypto.subtle.verify(keyToSubtle(key), key, signature, buf(input))
-    if (!verified) {
-      throw new OPE('JWT signature verification failed')
-    }
+    await validateJwsSignature(protectedHeader, payload, key, signature)
   }
 
   let claims: JsonValue
@@ -3692,8 +3840,6 @@ async function validateJwt(
   return { header, claims, signature, key }
 }
 
-export interface ValidateJwtAuthResponseOptions extends HttpRequestOptions, JWKSCacheOptions {}
-
 /**
  * Same as {@link validateAuthResponse} but for signed JARM responses.
  *
@@ -3715,7 +3861,7 @@ export async function validateJwtAuthResponse(
   client: Client,
   parameters: URLSearchParams | URL,
   expectedState?: string | typeof expectNoState | typeof skipStateCheck,
-  options?: ValidateJwtAuthResponseOptions,
+  options?: ValidateSignatureOptions,
 ): Promise<URLSearchParams | OAuth2Error> {
   assertAs(as)
   assertClient(client)
@@ -3796,10 +3942,6 @@ async function idTokenHashMatches(data: string, actual: string, alg: JWSAlgorith
   return actual === expected
 }
 
-export interface ValidateDetachedSignatureResponseOptions
-  extends HttpRequestOptions,
-    JWKSCacheOptions {}
-
 /**
  * Same as {@link validateAuthResponse} but for FAPI 1.0 Advanced Detached Signature authorization
  * responses.
@@ -3829,7 +3971,7 @@ export async function validateDetachedSignatureResponse(
   expectedNonce: string,
   expectedState?: string | typeof expectNoState,
   maxAge?: number | typeof skipAuthTimeCheck,
-  options?: ValidateDetachedSignatureResponseOptions,
+  options?: ValidateSignatureOptions,
 ): Promise<URLSearchParams | OAuth2Error> {
   assertAs(as)
   assertClient(client)
@@ -4741,3 +4883,15 @@ export const experimental_validateJwtAccessToken = (
  * @deprecated Use {@link jwksCache}.
  */
 export const experimental_jwksCache = jwksCache
+/**
+ * @ignore
+ *
+ * @deprecated Use {@link ValidateSignatureOptions}.
+ */
+export interface ValidateJwtResponseSignatureOptions extends ValidateSignatureOptions {}
+/**
+ * @ignore
+ *
+ * @deprecated Use {@link ValidateSignatureOptions}.
+ */
+export interface ValidateDetachedSignatureResponseOptions extends ValidateSignatureOptions {}

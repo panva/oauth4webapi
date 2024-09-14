@@ -59,6 +59,9 @@ jobs:
 
           # FAPI 2.0 Message Signing ID1
           - plan: fapi2-message-signing-id1-client-test-plan
+          - plan: fapi2-message-signing-id1-client-test-plan
+            variant:
+              fapi_client_type: 'plain_oauth'
 
     steps:
       - name: Checkout

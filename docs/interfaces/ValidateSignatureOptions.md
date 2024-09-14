@@ -1,4 +1,4 @@
-# Interface: ValidateDetachedSignatureResponseOptions
+# Interface: ValidateSignatureOptions
 
 [💗 Help the project](https://github.com/sponsors/panva)
 

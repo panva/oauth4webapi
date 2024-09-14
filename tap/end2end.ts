@@ -245,6 +245,7 @@ export default (QUnit: QUnit) => {
           throw new Error()
         }
         const { sub } = lib.getValidatedIdTokenClaims(result)
+        await lib.validateIdTokenSignature(as, result)
 
         {
           const userInfoRequest = () => lib.userInfoRequest(as, client, access_token, { DPoP })
@@ -267,6 +268,10 @@ export default (QUnit: QUnit) => {
           }
 
           await lib.processUserInfoResponse(as, client, sub, response)
+
+          if (jwtUserinfo) {
+            await lib.validateJwtUserinfoSignature(as, response)
+          }
         }
 
         {

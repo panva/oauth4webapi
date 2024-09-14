@@ -90,6 +90,13 @@ function usesPar(plan: Plan) {
   return plan.name.startsWith('fapi2') || variant.fapi_auth_request_method === 'pushed'
 }
 
+export function nonRepudiation(plan: Plan, variant: Record<string, string>) {
+  return (
+    variant.fapi_client_type === 'oidc' &&
+    (plan.name.startsWith('fapi2-message-signing') || plan.name.startsWith('fapi1'))
+  )
+}
+
 function usesRequestObject(planName: string, variant: Record<string, string>) {
   if (planName.startsWith('fapi1')) {
     return true
@@ -478,6 +485,10 @@ export const flow = (options?: MacroOptions) => {
           } else {
             throw new Error() // Handle OAuth 2.0 response body error
           }
+        }
+
+        if (nonRepudiation(plan, variant)) {
+          await oauth.validateIdTokenSignature(as, result)
         }
 
         t.log('token endpoint response body', { ...result })

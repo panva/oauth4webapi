@@ -34,7 +34,9 @@ Support from the community to continue maintaining and improving this module is 
 - [processUserInfoResponse](functions/processUserInfoResponse.md)
 - [userInfoRequest](functions/userInfoRequest.md)
 - [validateAuthResponse](functions/validateAuthResponse.md)
+- [validateIdTokenSignature](functions/validateIdTokenSignature.md)
 - [validateJwtAuthResponse](functions/validateJwtAuthResponse.md)
+- [validateJwtUserinfoSignature](functions/validateJwtUserinfoSignature.md)
 
 ## Authorization Server Metadata
 
@@ -65,6 +67,7 @@ Support from the community to continue maintaining and improving this module is 
 ## FAPI 1.0 Advanced
 
 - [validateDetachedSignatureResponse](functions/validateDetachedSignatureResponse.md)
+- [validateIdTokenSignature](functions/validateIdTokenSignature.md)
 
 ## JWT Access Tokens
 
@@ -87,6 +90,7 @@ Support from the community to continue maintaining and improving this module is 
 
 - [processUserInfoResponse](functions/processUserInfoResponse.md)
 - [userInfoRequest](functions/userInfoRequest.md)
+- [validateJwtUserinfoSignature](functions/validateJwtUserinfoSignature.md)
 
 ## Proof Key for Code Exchange (PKCE)
 
@@ -113,6 +117,7 @@ Support from the community to continue maintaining and improving this module is 
 - [isOAuth2Error](functions/isOAuth2Error.md)
 - [parseWwwAuthenticateChallenges](functions/parseWwwAuthenticateChallenges.md)
 - [processIntrospectionResponse](functions/processIntrospectionResponse.md)
+- [validateJwtIntrospectionSignature](functions/validateJwtIntrospectionSignature.md)
 
 ## Token Revocation
 
@@ -169,9 +174,8 @@ Support from the community to continue maintaining and improving this module is 
 - [UserInfoAddress](interfaces/UserInfoAddress.md)
 - [UserInfoRequestOptions](interfaces/UserInfoRequestOptions.md)
 - [UserInfoResponse](interfaces/UserInfoResponse.md)
-- [ValidateDetachedSignatureResponseOptions](interfaces/ValidateDetachedSignatureResponseOptions.md)
 - [ValidateJWTAccessTokenOptions](interfaces/ValidateJWTAccessTokenOptions.md)
-- [ValidateJwtAuthResponseOptions](interfaces/ValidateJwtAuthResponseOptions.md)
+- [ValidateSignatureOptions](interfaces/ValidateSignatureOptions.md)
 - [WWWAuthenticateChallenge](interfaces/WWWAuthenticateChallenge.md)
 - [WWWAuthenticateChallengeParameters](interfaces/WWWAuthenticateChallengeParameters.md)
 

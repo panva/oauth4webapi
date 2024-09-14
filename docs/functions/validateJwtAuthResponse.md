@@ -18,7 +18,7 @@ Same as [validateAuthResponse](validateAuthResponse.md) but for signed JARM resp
 | `client` | [`Client`](../interfaces/Client.md) | Client Metadata. |
 | `parameters` | [`URLSearchParams`](https://developer.mozilla.org/docs/Web/API/URLSearchParams) \| [`URL`](https://developer.mozilla.org/docs/Web/API/URL) | JARM authorization response. |
 | `expectedState`? | `string` \| *typeof* [`expectNoState`](../variables/expectNoState.md) \| *typeof* [`skipStateCheck`](../variables/skipStateCheck.md) | Expected `state` parameter value. Default is [expectNoState](../variables/expectNoState.md). |
-| `options`? | [`ValidateJwtAuthResponseOptions`](../interfaces/ValidateJwtAuthResponseOptions.md) | - |
+| `options`? | [`ValidateSignatureOptions`](../interfaces/ValidateSignatureOptions.md) | - |
 
 ## Returns
 
