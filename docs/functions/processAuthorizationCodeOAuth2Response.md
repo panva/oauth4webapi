@@ -8,8 +8,9 @@ Support from the community to continue maintaining and improving this module is 
 
 ▸ **processAuthorizationCodeOAuth2Response**(`as`, `client`, `response`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`OAuth2TokenEndpointResponse`](../interfaces/OAuth2TokenEndpointResponse.md) \| [`OAuth2Error`](../interfaces/OAuth2Error.md)\>
 
-(OAuth 2.0 without OpenID Connect only) Validates Authorization Code Grant Response instance to
-be one coming from the [`as.token_endpoint`](../interfaces/AuthorizationServer.md#token_endpoint).
+(OAuth 2.0 without OpenID Connect only) Validates Authorization Code Grant [Response](https://developer.mozilla.org/docs/Web/API/Response)
+instance to be one coming from the
+[`as.token_endpoint`](../interfaces/AuthorizationServer.md#token_endpoint).
 
 ## Parameters
 

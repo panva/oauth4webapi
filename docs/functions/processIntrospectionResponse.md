@@ -8,7 +8,7 @@ Support from the community to continue maintaining and improving this module is 
 
 ▸ **processIntrospectionResponse**(`as`, `client`, `response`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`IntrospectionResponse`](../interfaces/IntrospectionResponse.md) \| [`OAuth2Error`](../interfaces/OAuth2Error.md)\>
 
-Validates Response instance to be one coming from the
+Validates [Response](https://developer.mozilla.org/docs/Web/API/Response) instance to be one coming from the
 [`as.introspection_endpoint`](../interfaces/AuthorizationServer.md#introspection_endpoint).
 
 ## Parameters

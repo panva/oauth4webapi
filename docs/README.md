@@ -139,11 +139,11 @@ Support from the community to continue maintaining and improving this module is 
 - [ClientCredentialsGrantRequestOptions](interfaces/ClientCredentialsGrantRequestOptions.md)
 - [ClientCredentialsGrantResponse](interfaces/ClientCredentialsGrantResponse.md)
 - [ConfirmationClaims](interfaces/ConfirmationClaims.md)
-- [DPoPOptions](interfaces/DPoPOptions.md)
-- [DPoPRequestOptions](interfaces/DPoPRequestOptions.md)
 - [DeviceAuthorizationRequestOptions](interfaces/DeviceAuthorizationRequestOptions.md)
 - [DeviceAuthorizationResponse](interfaces/DeviceAuthorizationResponse.md)
 - [DiscoveryRequestOptions](interfaces/DiscoveryRequestOptions.md)
+- [DPoPOptions](interfaces/DPoPOptions.md)
+- [DPoPRequestOptions](interfaces/DPoPRequestOptions.md)
 - [ExportedJWKSCache](interfaces/ExportedJWKSCache.md)
 - [GenerateKeyPairOptions](interfaces/GenerateKeyPairOptions.md)
 - [HttpRequestOptions](interfaces/HttpRequestOptions.md)
@@ -178,12 +178,12 @@ Support from the community to continue maintaining and improving this module is 
 ## Type Aliases
 
 - [ClientAuthenticationMethod](type-aliases/ClientAuthenticationMethod.md)
-- [JWKSCacheInput](type-aliases/JWKSCacheInput.md)
-- [JWSAlgorithm](type-aliases/JWSAlgorithm.md)
 - [JsonArray](type-aliases/JsonArray.md)
 - [JsonObject](type-aliases/JsonObject.md)
 - [JsonPrimitive](type-aliases/JsonPrimitive.md)
 - [JsonValue](type-aliases/JsonValue.md)
+- [JWKSCacheInput](type-aliases/JWKSCacheInput.md)
+- [JWSAlgorithm](type-aliases/JWSAlgorithm.md)
 
 ## Variables
 

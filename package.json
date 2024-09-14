@@ -74,7 +74,7 @@
     "chrome-launcher": "^1.1.2",
     "edge-runtime": "^3.0.3",
     "esbuild": "^0.23.1",
-    "jose": "^5.9.1",
+    "jose": "^5.9.2",
     "oidc-provider": "^8.5.1",
     "patch-package": "^8.0.0",
     "prettier": "^3.3.3",

@@ -248,25 +248,25 @@ export const clockTolerance: unique symbol = Symbol()
  * fetch replacement the arguments and expected return are the same as fetch.
  *
  * In theory any module that claims to be compatible with the Fetch API can be used but your mileage
- * may vary. No workarounds to allow use of non-conform {@link Response}s will be considered.
+ * may vary. No workarounds to allow use of non-conform {@link !Response}s will be considered.
  *
- * If you only need to update the {@link Request} properties you do not need to use a Fetch API
+ * If you only need to update the {@link !Request} properties you do not need to use a Fetch API
  * module, just change what you need and pass it to globalThis.fetch just like this module would
  * normally do.
  *
  * Its intended use cases are:
  *
- * - {@link Request}/{@link Response} tracing and logging
+ * - {@link !Request}/{@link !Response} tracing and logging
  * - Custom caching strategies for responses of Authorization Server Metadata and JSON Web Key Set
  *   (JWKS) endpoints
- * - Changing the {@link Request} properties like headers, body, credentials, mode before it is passed
+ * - Changing the {@link !Request} properties like headers, body, credentials, mode before it is passed
  *   to fetch
  *
  * Known caveats:
  *
  * - Expect Type-related issues when passing the inputs through to fetch-like modules, they hardly
  *   ever get their typings inline with actual fetch, you should `@ts-expect-error` them.
- * - Returning self-constructed {@link Response} instances prohibits AS/RS-signalled DPoP Nonce
+ * - Returning self-constructed {@link !Response} instances prohibits AS/RS-signalled DPoP Nonce
  *   caching.
  *
  * @example
@@ -1167,8 +1167,8 @@ function validateString(input: unknown): input is string {
 }
 
 /**
- * Validates Response instance to be one coming from the authorization server's well-known discovery
- * endpoint.
+ * Validates {@link !Response} instance to be one coming from the authorization server's well-known
+ * discovery endpoint.
  *
  * @param expectedIssuerIdentifier Expected Issuer Identifier value.
  * @param response Resolved value from {@link discoveryRequest}.
@@ -1965,7 +1965,7 @@ function wwwAuth(scheme: string, params: string): WWWAuthenticateChallenge {
 }
 
 /**
- * Parses the `WWW-Authenticate` HTTP Header from a Response instance.
+ * Parses the `WWW-Authenticate` HTTP Header from a {@link !Response} instance.
  *
  * @returns Array of {@link WWWAuthenticateChallenge} objects. Their order from the response is
  *   preserved. `undefined` when there wasn't a `WWW-Authenticate` HTTP Header returned.
@@ -2017,7 +2017,7 @@ export function parseWwwAuthenticateChallenges(
 }
 
 /**
- * Validates Response instance to be one coming from the
+ * Validates {@link !Response} instance to be one coming from the
  * {@link AuthorizationServer.pushed_authorization_request_endpoint `as.pushed_authorization_request_endpoint`}.
  *
  * @param as Authorization Server Metadata.
@@ -2409,7 +2409,7 @@ function getContentType(response: Response) {
 }
 
 /**
- * Validates Response instance to be one coming from the
+ * Validates {@link !Response} instance to be one coming from the
  * {@link AuthorizationServer.userinfo_endpoint `as.userinfo_endpoint`}.
  *
  * @param as Authorization Server Metadata.
@@ -2735,7 +2735,7 @@ async function processGenericAccessTokenResponse(
 }
 
 /**
- * Validates Refresh Token Grant Response instance to be one coming from the
+ * Validates Refresh Token Grant {@link !Response} instance to be one coming from the
  * {@link AuthorizationServer.token_endpoint `as.token_endpoint`}.
  *
  * @param as Authorization Server Metadata.
@@ -3010,8 +3010,8 @@ export const expectNoNonce: unique symbol = Symbol()
 export const skipAuthTimeCheck: unique symbol = Symbol()
 
 /**
- * (OpenID Connect only) Validates Authorization Code Grant Response instance to be one coming from
- * the {@link AuthorizationServer.token_endpoint `as.token_endpoint`}.
+ * (OpenID Connect only) Validates Authorization Code Grant {@link !Response} instance to be one
+ * coming from the {@link AuthorizationServer.token_endpoint `as.token_endpoint`}.
  *
  * @param as Authorization Server Metadata.
  * @param client Client Metadata.
@@ -3093,8 +3093,9 @@ export async function processAuthorizationCodeOpenIDResponse(
 }
 
 /**
- * (OAuth 2.0 without OpenID Connect only) Validates Authorization Code Grant Response instance to
- * be one coming from the {@link AuthorizationServer.token_endpoint `as.token_endpoint`}.
+ * (OAuth 2.0 without OpenID Connect only) Validates Authorization Code Grant {@link !Response}
+ * instance to be one coming from the
+ * {@link AuthorizationServer.token_endpoint `as.token_endpoint`}.
  *
  * @param as Authorization Server Metadata.
  * @param client Client Metadata.
@@ -3176,7 +3177,7 @@ export async function clientCredentialsGrantRequest(
 }
 
 /**
- * Validates Client Credentials Grant Response instance to be one coming from the
+ * Validates Client Credentials Grant {@link !Response} instance to be one coming from the
  * {@link AuthorizationServer.token_endpoint `as.token_endpoint`}.
  *
  * @param as Authorization Server Metadata.
@@ -3250,7 +3251,7 @@ export async function revocationRequest(
 }
 
 /**
- * Validates Response instance to be one coming from the
+ * Validates {@link !Response} instance to be one coming from the
  * {@link AuthorizationServer.revocation_endpoint `as.revocation_endpoint`}.
  *
  * @param response Resolved value from {@link revocationRequest}.
@@ -3374,7 +3375,7 @@ export interface IntrospectionResponse {
 }
 
 /**
- * Validates Response instance to be one coming from the
+ * Validates {@link !Response} instance to be one coming from the
  * {@link AuthorizationServer.introspection_endpoint `as.introspection_endpoint`}.
  *
  * @param as Authorization Server Metadata.
@@ -4219,7 +4220,7 @@ export interface DeviceAuthorizationResponse {
 }
 
 /**
- * Validates Response instance to be one coming from the
+ * Validates {@link !Response} instance to be one coming from the
  * {@link AuthorizationServer.device_authorization_endpoint `as.device_authorization_endpoint`}.
  *
  * @param as Authorization Server Metadata.
@@ -4334,7 +4335,7 @@ export async function deviceCodeGrantRequest(
 }
 
 /**
- * Validates Device Authorization Grant Response instance to be one coming from the
+ * Validates Device Authorization Grant {@link !Response} instance to be one coming from the
  * {@link AuthorizationServer.token_endpoint `as.token_endpoint`}.
  *
  * @param as Authorization Server Metadata.
@@ -4555,7 +4556,7 @@ async function validateDPoP(
 }
 
 /**
- * Validates use of JSON Web Token (JWT) OAuth 2.0 Access Tokens for a given {@link Request} as per
+ * Validates use of JSON Web Token (JWT) OAuth 2.0 Access Tokens for a given {@link !Request} as per
  * RFC 6750, RFC 9068, and RFC 9449.
  *
  * The only supported means of sending access tokens is via the Authorization Request Header Field

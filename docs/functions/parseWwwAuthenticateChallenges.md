@@ -8,7 +8,7 @@ Support from the community to continue maintaining and improving this module is 
 
 ▸ **parseWwwAuthenticateChallenges**(`response`): [`WWWAuthenticateChallenge`](../interfaces/WWWAuthenticateChallenge.md)[] \| `undefined`
 
-Parses the `WWW-Authenticate` HTTP Header from a Response instance.
+Parses the `WWW-Authenticate` HTTP Header from a [Response](https://developer.mozilla.org/docs/Web/API/Response) instance.
 
 ## Parameters
 

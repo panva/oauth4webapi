@@ -8,7 +8,7 @@ Support from the community to continue maintaining and improving this module is 
 
 ▸ **processUserInfoResponse**(`as`, `client`, `expectedSubject`, `response`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`UserInfoResponse`](../interfaces/UserInfoResponse.md)\>
 
-Validates Response instance to be one coming from the
+Validates [Response](https://developer.mozilla.org/docs/Web/API/Response) instance to be one coming from the
 [`as.userinfo_endpoint`](../interfaces/AuthorizationServer.md#userinfo_endpoint).
 
 ## Parameters

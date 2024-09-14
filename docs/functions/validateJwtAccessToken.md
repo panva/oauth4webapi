@@ -8,7 +8,7 @@ Support from the community to continue maintaining and improving this module is 
 
 ▸ **validateJwtAccessToken**(`as`, `request`, `expectedAudience`, `options`?): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`JWTAccessTokenClaims`](../interfaces/JWTAccessTokenClaims.md)\>
 
-Validates use of JSON Web Token (JWT) OAuth 2.0 Access Tokens for a given Request as per
+Validates use of JSON Web Token (JWT) OAuth 2.0 Access Tokens for a given [Request](https://developer.mozilla.org/docs/Web/API/Request) as per
 RFC 6750, RFC 9068, and RFC 9449.
 
 The only supported means of sending access tokens is via the Authorization Request Header Field

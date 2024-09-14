@@ -8,14 +8,6 @@ Support from the community to continue maintaining and improving this module is 
 
 ## Properties
 
-### DPoP?
-
-• `optional` **DPoP**: [`DPoPOptions`](DPoPOptions.md)
-
-DPoP-related options.
-
-***
-
 ### \[clockSkew\]?
 
 • `optional` **\[clockSkew\]**: `number`
@@ -40,6 +32,14 @@ See [customFetch](../variables/customFetch.md).
 #### Returns
 
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Response`](https://developer.mozilla.org/docs/Web/API/Response)\>
+
+***
+
+### DPoP?
+
+• `optional` **DPoP**: [`DPoPOptions`](DPoPOptions.md)
+
+DPoP-related options.
 
 ***
 

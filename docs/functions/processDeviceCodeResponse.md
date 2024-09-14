@@ -8,7 +8,7 @@ Support from the community to continue maintaining and improving this module is 
 
 ▸ **processDeviceCodeResponse**(`as`, `client`, `response`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`TokenEndpointResponse`](../interfaces/TokenEndpointResponse.md) \| [`OAuth2Error`](../interfaces/OAuth2Error.md)\>
 
-Validates Device Authorization Grant Response instance to be one coming from the
+Validates Device Authorization Grant [Response](https://developer.mozilla.org/docs/Web/API/Response) instance to be one coming from the
 [`as.token_endpoint`](../interfaces/AuthorizationServer.md#token_endpoint).
 
 ## Parameters

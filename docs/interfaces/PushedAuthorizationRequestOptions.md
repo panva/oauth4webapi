@@ -8,14 +8,6 @@ Support from the community to continue maintaining and improving this module is 
 
 ## Properties
 
-### DPoP?
-
-• `optional` **DPoP**: [`DPoPOptions`](DPoPOptions.md)
-
-DPoP-related options.
-
-***
-
 ### \[customFetch\]()?
 
 • `optional` **\[customFetch\]**: (`input`, `init`?) => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Response`](https://developer.mozilla.org/docs/Web/API/Response)\>
@@ -50,6 +42,14 @@ See [useMtlsAlias](../variables/useMtlsAlias.md).
 Private key to use for `private_key_jwt`
 [client authentication](../type-aliases/ClientAuthenticationMethod.md). Its algorithm must be compatible with
 a supported [JWS `alg` Algorithm](../type-aliases/JWSAlgorithm.md).
+
+***
+
+### DPoP?
+
+• `optional` **DPoP**: [`DPoPOptions`](DPoPOptions.md)
+
+DPoP-related options.
 
 ***
 

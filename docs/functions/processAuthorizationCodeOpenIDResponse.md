@@ -8,8 +8,8 @@ Support from the community to continue maintaining and improving this module is 
 
 ▸ **processAuthorizationCodeOpenIDResponse**(`as`, `client`, `response`, `expectedNonce`?, `maxAge`?): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`OpenIDTokenEndpointResponse`](../interfaces/OpenIDTokenEndpointResponse.md) \| [`OAuth2Error`](../interfaces/OAuth2Error.md)\>
 
-(OpenID Connect only) Validates Authorization Code Grant Response instance to be one coming from
-the [`as.token_endpoint`](../interfaces/AuthorizationServer.md#token_endpoint).
+(OpenID Connect only) Validates Authorization Code Grant [Response](https://developer.mozilla.org/docs/Web/API/Response) instance to be one
+coming from the [`as.token_endpoint`](../interfaces/AuthorizationServer.md#token_endpoint).
 
 ## Parameters
 
