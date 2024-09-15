@@ -12,7 +12,7 @@ Support from the community to continue maintaining and improving this module is 
 
 • `optional` **crv**: `"Ed25519"` \| `"Ed448"`
 
-(EdDSA algorithms only) The EdDSA sub-type. Default is `Ed25519`.
+(EdDSA algorithm only) The EdDSA sub-type. Default is `Ed25519`.
 
 ***
 

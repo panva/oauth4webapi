@@ -244,8 +244,8 @@ export const clockTolerance: unique symbol = Symbol()
 
 /**
  * When configured on an interface that extends {@link HttpRequestOptions}, this applies to `options`
- * parameter for functions that trigger HTTP requests, this replaces the use of global fetch. As a
- * fetch replacement the arguments and expected return are the same as fetch.
+ * parameter for functions that may trigger HTTP requests, this replaces the use of global fetch. As
+ * a fetch replacement the arguments and expected return are the same as fetch.
  *
  * In theory any module that claims to be compatible with the Fetch API can be used but your mileage
  * may vary. No workarounds to allow use of non-conform {@link !Response}s will be considered.
@@ -337,7 +337,7 @@ export const customFetch: unique symbol = Symbol()
  * is not desirable.
  *
  * When configured on an interface that extends {@link JWKSCacheOptions}, this applies to `options`
- * parameter for functions that trigger HTTP requests for the
+ * parameter for functions that may trigger HTTP requests to
  * {@link AuthorizationServer.jwks_uri `as.jwks_uri`}, this allows the passed in object to:
  *
  * - Serve as an initial value for the JSON Web Key Set that the module would otherwise need to
@@ -4370,7 +4370,7 @@ export interface GenerateKeyPairOptions {
   modulusLength?: number
 
   /**
-   * (EdDSA algorithms only) The EdDSA sub-type. Default is `Ed25519`.
+   * (EdDSA algorithm only) The EdDSA sub-type. Default is `Ed25519`.
    */
   crv?: 'Ed25519' | 'Ed448'
 }
