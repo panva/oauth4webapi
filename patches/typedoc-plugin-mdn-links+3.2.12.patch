@@ -1,0 +1,14 @@
+diff --git a/node_modules/typedoc-plugin-mdn-links/data/web-api.json b/node_modules/typedoc-plugin-mdn-links/data/web-api.json
+index 3e76956..5751271 100644
+--- a/node_modules/typedoc-plugin-mdn-links/data/web-api.json
++++ b/node_modules/typedoc-plugin-mdn-links/data/web-api.json
+@@ -1645,6 +1645,9 @@
+ 			"usages": "https://developer.mozilla.org/docs/Web/API/CryptoKey/usages"
+ 		}
+ 	},
++	"CryptoKeyPair": {
++		"url": "https://developer.mozilla.org/docs/Web/API/CryptoKeyPair"
++	},
+ 	"CustomElementRegistry": {
+ 		"url": "https://developer.mozilla.org/docs/Web/API/CustomElementRegistry",
+ 		"inst": {

@@ -90,7 +90,7 @@ export type ClientAuthenticationMethod =
  *
  * @example
  *
- * CryptoKey algorithm for the `PS256`, `PS384`, or `PS512` JWS Algorithm Identifiers
+ * {@link !CryptoKey.algorithm} for the `PS256`, `PS384`, or `PS512` JWS Algorithm Identifiers
  *
  * ```ts
  * interface PS256 extends RsaHashedKeyAlgorithm {
@@ -111,7 +111,7 @@ export type ClientAuthenticationMethod =
  *
  * @example
  *
- * CryptoKey algorithm for the `ES256`, `ES384`, or `ES512` JWS Algorithm Identifiers
+ * {@link !CryptoKey.algorithm} for the `ES256`, `ES384`, or `ES512` JWS Algorithm Identifiers
  *
  * ```ts
  * interface ES256 extends EcKeyAlgorithm {
@@ -132,7 +132,7 @@ export type ClientAuthenticationMethod =
  *
  * @example
  *
- * CryptoKey algorithm for the `RS256`, `RS384`, or `RS512` JWS Algorithm Identifiers
+ * {@link !CryptoKey.algorithm} for the `RS256`, `RS384`, or `RS512` JWS Algorithm Identifiers
  *
  * ```ts
  * interface RS256 extends RsaHashedKeyAlgorithm {
@@ -153,7 +153,7 @@ export type ClientAuthenticationMethod =
  *
  * @example
  *
- * CryptoKey algorithm for the `EdDSA` JWS Algorithm Identifier (Experimental)
+ * {@link !CryptoKey.algorithm} for the `EdDSA` JWS Algorithm Identifier (Experimental)
  *
  * Runtime support for this algorithm is limited, it depends on the [Secure Curves in the Web
  * Cryptography API](https://wicg.github.io/webcrypto-secure-curves/) proposal which is yet to be
@@ -4376,7 +4376,7 @@ export interface GenerateKeyPairOptions {
 }
 
 /**
- * Generates a CryptoKeyPair for a given JWS `alg` Algorithm identifier.
+ * Generates a {@link !CryptoKeyPair} for a given JWS `alg` Algorithm identifier.
  *
  * @param alg Supported JWS `alg` Algorithm identifier.
  *
