@@ -59,7 +59,7 @@ let request: string
   params.set('code_challenge_method', code_challenge_method)
   params.set('redirect_uri', redirect_uri)
   params.set('response_type', 'code')
-  params.set('scope', 'api:read')
+  params.set('scope', 'openid api:read')
   params.set('response_mode', 'jwt')
 
   request = await oauth.issueRequestObject(as, client, params, jarPrivateKey)
@@ -140,16 +140,16 @@ let access_token: string
     throw new Error() // Handle WWW-Authenticate Challenges as needed
   }
 
-  const processAuthorizationCodeOAuth2Response = () =>
-    oauth.processAuthorizationCodeOAuth2Response(as, client, response)
+  const processAuthorizationCodeOpenIDResponse = () =>
+    oauth.processAuthorizationCodeOpenIDResponse(as, client, response)
 
-  let result = await processAuthorizationCodeOAuth2Response()
+  let result = await processAuthorizationCodeOpenIDResponse()
   if (oauth.isOAuth2Error(result)) {
     console.error('Error Response', result)
     if (result.error === 'use_dpop_nonce') {
       // the AS-signalled nonce is now cached, retrying
       response = await authorizationCodeGrantRequest()
-      result = await processAuthorizationCodeOAuth2Response()
+      result = await processAuthorizationCodeOpenIDResponse()
       if (oauth.isOAuth2Error(result)) {
         throw new Error() // Handle OAuth 2.0 response body error
       }
