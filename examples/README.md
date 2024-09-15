@@ -23,5 +23,6 @@ A collection of examples for the most common use cases.
   - Device Authorization Grant - [source](device_authorization_grant.ts)
   - Refresh Token Grant - [source](refresh_token.ts) | [diff](refresh_token.diff)
 - FAPI
-  - FAPI 1.0 Advanced (Private Key JWT, MTLS, JAR) - [source](fapi1-advanced.ts) | [diff](fapi1-advanced.diff)
-  - FAPI 2.0 Security Profile (Private Key JWT, PAR, DPoP) - [source](fapi2.ts) | [diff](fapi2.diff)
+  - FAPI 1.0 Advanced - [source](fapi1-advanced.ts) | [diff](fapi1-advanced.diff)
+  - FAPI 2.0 Security Profile - [source](fapi2.ts) | [diff](fapi2.diff)
+  - FAPI 2.0 Message Signing - [source](fapi2-message-signing.ts) | [diff](fapi2-message-signing.diff)

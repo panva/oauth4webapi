@@ -60,8 +60,9 @@ import * as oauth from 'oauth4webapi'
   - Device Authorization Grant - [source](examples/device_authorization_grant.ts)
   - Refresh Token Grant - [source](examples/refresh_token.ts) | [diff](examples/refresh_token.diff)
 - FAPI
-  - FAPI 1.0 Advanced (Private Key JWT, MTLS, JAR) - [source](examples/fapi1-advanced.ts) | [diff](examples/fapi1-advanced.diff)
-  - FAPI 2.0 Security Profile (Private Key JWT, PAR, DPoP) - [source](examples/fapi2.ts) | [diff](examples/fapi2.diff)
+  - FAPI 1.0 Advanced - [source](examples/fapi1-advanced.ts) | [diff](examples/fapi1-advanced.diff)
+  - FAPI 2.0 Security Profile - [source](examples/fapi2.ts) | [diff](examples/fapi2.diff)
+  - FAPI 2.0 Message Signing - [source](examples/fapi2-message-signing.ts) | [diff](examples/fapi2-message-signing.diff)
 
 
 ## Supported Runtimes

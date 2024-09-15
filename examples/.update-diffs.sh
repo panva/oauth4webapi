@@ -7,5 +7,6 @@ git diff HEAD:examples/oauth.ts examples/client_secret_post.ts > examples/client
 git diff HEAD:examples/oauth.ts examples/private_key_jwt.ts > examples/private_key_jwt.diff
 git diff HEAD:examples/oauth.ts examples/public.ts > examples/public.diff
 git diff HEAD:examples/oauth.ts examples/fapi2.ts > examples/fapi2.diff
+git diff HEAD:examples/fapi2.ts examples/fapi2-message-signing.ts > examples/fapi2-message-signing.diff
 git diff HEAD:examples/oauth.ts examples/fapi1-advanced.ts > examples/fapi1-advanced.diff
 git diff HEAD:examples/oauth.ts examples/refresh_token.ts > examples/refresh_token.diff
