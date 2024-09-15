@@ -270,7 +270,7 @@ export default (QUnit: QUnit) => {
           await lib.processUserInfoResponse(as, client, sub, response)
 
           if (jwtUserinfo) {
-            await lib.validateJwtUserinfoSignature(as, response)
+            await lib.validateJwtUserInfoSignature(as, response)
           }
         }
 

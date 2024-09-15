@@ -36,7 +36,7 @@ Support from the community to continue maintaining and improving this module is 
 - [validateAuthResponse](functions/validateAuthResponse.md)
 - [validateIdTokenSignature](functions/validateIdTokenSignature.md)
 - [validateJwtAuthResponse](functions/validateJwtAuthResponse.md)
-- [validateJwtUserinfoSignature](functions/validateJwtUserinfoSignature.md)
+- [validateJwtUserInfoSignature](functions/validateJwtUserInfoSignature.md)
 
 ## Authorization Server Metadata
 
@@ -90,7 +90,7 @@ Support from the community to continue maintaining and improving this module is 
 
 - [processUserInfoResponse](functions/processUserInfoResponse.md)
 - [userInfoRequest](functions/userInfoRequest.md)
-- [validateJwtUserinfoSignature](functions/validateJwtUserinfoSignature.md)
+- [validateJwtUserInfoSignature](functions/validateJwtUserInfoSignature.md)
 
 ## Proof Key for Code Exchange (PKCE)
 

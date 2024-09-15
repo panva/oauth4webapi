@@ -2723,7 +2723,7 @@ async function validateJwtResponseSignature(
  *
  * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#UserInfo)
  */
-export function validateJwtUserinfoSignature(
+export function validateJwtUserInfoSignature(
   as: AuthorizationServer,
   ref: Response,
   options?: ValidateSignatureOptions,
@@ -4877,6 +4877,14 @@ export const experimental_validateDetachedSignatureResponse = (
 export const experimental_validateJwtAccessToken = (
   ...args: Parameters<typeof validateJwtAccessToken>
 ): ReturnType<typeof validateJwtAccessToken> => validateJwtAccessToken(...args)
+/**
+ * @ignore
+ *
+ * @deprecated Use {@link validateJwtUserinfoSignature}.
+ */
+export const validateJwtUserinfoSignature = (
+  ...args: Parameters<typeof validateJwtUserInfoSignature>
+): ReturnType<typeof validateJwtUserInfoSignature> => validateJwtUserInfoSignature(...args)
 /**
  * @ignore
  *

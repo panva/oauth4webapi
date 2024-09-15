@@ -1,4 +1,4 @@
-# Function: validateJwtUserinfoSignature()
+# Function: validateJwtUserInfoSignature()
 
 [💗 Help the project](https://github.com/sponsors/panva)
 
@@ -6,7 +6,7 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
-▸ **validateJwtUserinfoSignature**(`as`, `ref`, `options`?): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
+▸ **validateJwtUserInfoSignature**(`as`, `ref`, `options`?): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 Validates the JWS Signature of a JWT [Response](https://developer.mozilla.org/docs/Web/API/Response) body of response previously processed by
 [processUserInfoResponse](processUserInfoResponse.md) for non-repudiation purposes.
