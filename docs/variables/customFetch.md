@@ -9,8 +9,8 @@ Support from the community to continue maintaining and improving this module is 
 • `const` **customFetch**: unique `symbol`
 
 When configured on an interface that extends [HttpRequestOptions](../interfaces/HttpRequestOptions.md), this applies to `options`
-parameter for functions that trigger HTTP requests, this replaces the use of global fetch. As a
-fetch replacement the arguments and expected return are the same as fetch.
+parameter for functions that may trigger HTTP requests, this replaces the use of global fetch. As
+a fetch replacement the arguments and expected return are the same as fetch.
 
 In theory any module that claims to be compatible with the Fetch API can be used but your mileage
 may vary. No workarounds to allow use of non-conform [Response](https://developer.mozilla.org/docs/Web/API/Response)s will be considered.

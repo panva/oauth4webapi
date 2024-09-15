@@ -17,7 +17,7 @@ their code's invocations. Use in runtimes where an in memory cache between reque
 is not desirable.
 
 When configured on an interface that extends [JWKSCacheOptions](../interfaces/JWKSCacheOptions.md), this applies to `options`
-parameter for functions that trigger HTTP requests for the
+parameter for functions that may trigger HTTP requests to
 [`as.jwks_uri`](../interfaces/AuthorizationServer.md#jwks_uri), this allows the passed in object to:
 
 - Serve as an initial value for the JSON Web Key Set that the module would otherwise need to
