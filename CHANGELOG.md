@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.14.0](https://github.com/panva/oauth4webapi/compare/v2.13.0...v2.14.0) (2024-09-15)
+
+
+### Features
+
+* add non-repudiation signature validation methods ([0916de2](https://github.com/panva/oauth4webapi/commit/0916de23c6daf93434592b1c181b27b4ed13a277))
+
+
+### Documentation
+
+* update JSDoc to use more link syntax ([d78f090](https://github.com/panva/oauth4webapi/commit/d78f090d430e7f351e33d55ac05db8e2c103d130))
+* update various comments and documentation ([9c3f1ed](https://github.com/panva/oauth4webapi/commit/9c3f1ed50df50d10d098b0168fb1a481a0f713a0))
+
 ## [2.13.0](https://github.com/panva/oauth4webapi/compare/v2.12.2...v2.13.0) (2024-09-10)
 
 
