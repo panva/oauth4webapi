@@ -11,6 +11,8 @@ import {
 import * as lib from '../src/index.js'
 import { keys } from './keys.js'
 
+const coinflip = () => !Math.floor(Math.random() * 2)
+
 export default (QUnit: QUnit) => {
   const { module, test } = QUnit
   module('end2end-client-credentials.ts')
@@ -98,11 +100,23 @@ export default (QUnit: QUnit) => {
       params.set('scope', 'api:write')
 
       {
-        const clientCredentialsGrantRequest = () =>
-          lib.clientCredentialsGrantRequest(as, client, params, {
-            DPoP,
-            ...authenticated,
-          })
+        let clientCredentialsGrantRequest: () => ReturnType<
+          typeof lib.clientCredentialsGrantRequest
+        >
+
+        if (coinflip()) {
+          clientCredentialsGrantRequest = () =>
+            lib.clientCredentialsGrantRequest(as, client, params, {
+              DPoP,
+              ...authenticated,
+            })
+        } else {
+          clientCredentialsGrantRequest = () =>
+            lib.genericTokenEndpointRequest(as, client, 'client_credentials', params, {
+              DPoP,
+              ...authenticated,
+            })
+        }
         let response = await clientCredentialsGrantRequest()
 
         assertNoWwwAuthenticateChallenges(response)

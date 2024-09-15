@@ -73,6 +73,12 @@ Support from the community to continue maintaining and improving this module is 
 
 - [validateJwtAccessToken](functions/validateJwtAccessToken.md)
 
+## JWT Bearer Token Grant Type
+
+- [genericTokenEndpointRequest](functions/genericTokenEndpointRequest.md)
+- [isOAuth2Error](functions/isOAuth2Error.md)
+- [parseWwwAuthenticateChallenges](functions/parseWwwAuthenticateChallenges.md)
+
 ## JWT Secured Authorization Response Mode for OAuth 2.0 (JARM)
 
 - [validateJwtAuthResponse](functions/validateJwtAuthResponse.md)
@@ -110,6 +116,18 @@ Support from the community to continue maintaining and improving this module is 
 - [parseWwwAuthenticateChallenges](functions/parseWwwAuthenticateChallenges.md)
 - [processRefreshTokenResponse](functions/processRefreshTokenResponse.md)
 - [refreshTokenGrantRequest](functions/refreshTokenGrantRequest.md)
+
+## SAML 2.0 Bearer Assertion Grant Type
+
+- [genericTokenEndpointRequest](functions/genericTokenEndpointRequest.md)
+- [isOAuth2Error](functions/isOAuth2Error.md)
+- [parseWwwAuthenticateChallenges](functions/parseWwwAuthenticateChallenges.md)
+
+## Token Exchange Grant Type
+
+- [genericTokenEndpointRequest](functions/genericTokenEndpointRequest.md)
+- [isOAuth2Error](functions/isOAuth2Error.md)
+- [parseWwwAuthenticateChallenges](functions/parseWwwAuthenticateChallenges.md)
 
 ## Token Introspection
 

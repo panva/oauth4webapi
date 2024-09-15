@@ -1883,6 +1883,9 @@ export interface OAuth2Error {
  * @group Token Revocation
  * @group Refreshing an Access Token
  * @group Pushed Authorization Requests (PAR)
+ * @group JWT Bearer Token Grant Type
+ * @group SAML 2.0 Bearer Assertion Grant Type
+ * @group Token Exchange Grant Type
  */
 export function isOAuth2Error(
   input?:
@@ -1980,6 +1983,9 @@ function wwwAuth(scheme: string, params: string): WWWAuthenticateChallenge {
  * @group Token Revocation
  * @group Refreshing an Access Token
  * @group Pushed Authorization Requests (PAR)
+ * @group JWT Bearer Token Grant Type
+ * @group SAML 2.0 Bearer Assertion Grant Type
+ * @group Token Exchange Grant Type
  */
 export function parseWwwAuthenticateChallenges(
   response: Response,
@@ -3311,6 +3317,40 @@ export async function clientCredentialsGrantRequest(
     new URLSearchParams(parameters),
     options,
   )
+}
+
+/**
+ * Performs any Grant request at the {@link AuthorizationServer.token_endpoint `as.token_endpoint`}.
+ * The purpose is to be able to execute grant requests such as Token Exchange Grant Type, JWT Bearer
+ * Token Grant Type, or SAML 2.0 Bearer Assertion Grant Type.
+ *
+ * @param as Authorization Server Metadata.
+ * @param client Client Metadata.
+ * @param grantType Grant Type.
+ *
+ * @group JWT Bearer Token Grant Type
+ * @group SAML 2.0 Bearer Assertion Grant Type
+ * @group Token Exchange Grant Type
+ *
+ * @see {@link https://www.rfc-editor.org/rfc/rfc8693.html Token Exchange Grant Type}
+ * @see {@link https://www.rfc-editor.org/rfc/rfc7523.html#section-2.1 JWT Bearer Token Grant Type}
+ * @see {@link https://www.rfc-editor.org/rfc/rfc7522.html#section-2.1 SAML 2.0 Bearer Assertion Grant Type}
+ */
+export async function genericTokenEndpointRequest(
+  as: AuthorizationServer,
+  client: Client,
+  grantType: string,
+  parameters: URLSearchParams | Record<string, string> | string[][],
+  options?: Omit<TokenEndpointRequestOptions, 'additionalParameters'>,
+): Promise<Response> {
+  assertAs(as)
+  assertClient(client)
+
+  if (!validateString(grantType)) {
+    throw new TypeError('"grantType" must be a non-empty string')
+  }
+
+  return tokenEndpointRequest(as, client, grantType, new URLSearchParams(parameters), options)
 }
 
 /**
