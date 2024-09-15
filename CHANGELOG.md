@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.15.0](https://github.com/panva/oauth4webapi/compare/v2.14.0...v2.15.0) (2024-09-15)
+
+
+### Features
+
+* support generic token endpoint grant requests ([2f454b5](https://github.com/panva/oauth4webapi/commit/2f454b5b304039d341e06c9cdd9d6cf63663648f))
+
 ## [2.14.0](https://github.com/panva/oauth4webapi/compare/v2.13.0...v2.14.0) (2024-09-15)
 
 
