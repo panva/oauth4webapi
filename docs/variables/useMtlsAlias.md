@@ -22,46 +22,43 @@ prioritize an endpoint URL present in
 (Node.js) Using [nodejs/undici](https://github.com/nodejs/undici) for Mutual-TLS Client
 Authentication and Certificate-Bound Access Tokens support.
 
-```js
+```ts
 import * as undici from 'undici'
 import * as oauth from 'oauth4webapi'
 
+// Prerequisites
+let as!: oauth.AuthorizationServer
+let client!: oauth.Client
+let params!: URLSearchParams
+let key!: string // PEM-encoded key
+let cert!: string // PEM-encoded certificate
+
+const agent = new undici.Agent({ connect: { key, cert } })
+
 const response = await oauth.pushedAuthorizationRequest(as, client, params, {
   [oauth.useMtlsAlias]: true,
-  [oauth.customFetch]: (...args) => {
-    return undici.fetch(args[0], {
-      ...args[1],
-      dispatcher: new undici.Agent({
-        connect: {
-          key: clientKey,
-          cert: clientCertificate,
-        },
-      }),
-    })
-  },
+  [oauth.customFetch]: (...args) => undici.fetch(args[0], { ...args[1], dispatcher: agent }),
 })
 ```
 
 (Deno) Using Deno.createHttpClient API for Mutual-TLS Client Authentication and Certificate-Bound
-Access Tokens support. This is currently (Jan 2023) locked behind the --unstable command line
-flag.
+Access Tokens support.
 
-```js
+```ts
 import * as oauth from 'oauth4webapi'
 
-const agent = Deno.createHttpClient({
-  certChain: clientCertificate,
-  privateKey: clientKey,
-})
+// Prerequisites
+let as!: oauth.AuthorizationServer
+let client!: oauth.Client
+let params!: URLSearchParams
+let key!: string // PEM-encoded key
+let cert!: string // PEM-encoded certificate
+
+const agent = Deno.createHttpClient({ key, cert })
 
 const response = await oauth.pushedAuthorizationRequest(as, client, params, {
   [oauth.useMtlsAlias]: true,
-  [oauth.customFetch]: (...args) => {
-    return fetch(args[0], {
-      ...args[1],
-      client: agent,
-    })
-  },
+  [oauth.customFetch]: (...args) => fetch(args[0], { ...args[1], client: agent }),
 })
 ```
 
