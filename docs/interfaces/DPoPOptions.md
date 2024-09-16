@@ -26,6 +26,18 @@ The public key corresponding to [DPoPOptions.privateKey](DPoPOptions.md#privatek
 
 ***
 
+### \[modifyAssertion\]?
+
+• `optional` **\[modifyAssertion\]**: [`ModifyAssertionFunction`](ModifyAssertionFunction.md)
+
+Use to modify the DPoP Proof JWT right before it is signed.
+
+#### See
+
+[modifyAssertion](../variables/modifyAssertion.md)
+
+***
+
 ### nonce?
 
 • `optional` **nonce**: `string`

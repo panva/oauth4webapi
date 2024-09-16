@@ -21,6 +21,18 @@ Its algorithm must be compatible with a supported [JWS `alg` Algorithm](../type-
 
 ***
 
+### \[modifyAssertion\]?
+
+• `optional` **\[modifyAssertion\]**: [`ModifyAssertionFunction`](ModifyAssertionFunction.md)
+
+Use to modify the JWT signed by this key right before it is signed.
+
+#### See
+
+[modifyAssertion](../variables/modifyAssertion.md)
+
+***
+
 ### kid?
 
 • `optional` **kid**: `string`

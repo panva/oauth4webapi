@@ -58,6 +58,30 @@ export default (QUnit: QUnit) => {
     t.propEqual(resource, ['urn:example:resource', 'urn:example:resource-2'])
   })
 
+  test('issueRequestObject() with customization', async (t) => {
+    const kp = await keys.ES256
+
+    const jwt = await lib.issueRequestObject(
+      issuer,
+      client,
+      {
+        foo: 'bar',
+      },
+      {
+        key: kp.privateKey,
+        [lib.modifyAssertion](h, p) {
+          t.equal(h.alg, 'ES256')
+          delete h.typ
+          p.foo = 'baz'
+        },
+      },
+    )
+
+    const { protectedHeader, payload } = await jose.jwtVerify(jwt, kp.publicKey)
+    t.propEqual(protectedHeader, { alg: 'ES256' })
+    t.propContains(payload, { foo: 'baz' })
+  })
+
   test('issueRequestObject() claims parameter', async (t) => {
     const kp = await keys.ES256
 

@@ -40,6 +40,19 @@ function looseInstanceOf<T extends {}>(input: unknown, expected: Constructor<T>)
   }
 }
 
+export interface ModifyAssertionFunction {
+  (
+    /**
+     * JWS Header to modify right before it is signed.
+     */
+    header: Record<string, JsonValue | undefined>,
+    /**
+     * JWT Claims Set to modify right before it is signed.
+     */
+    payload: Record<string, JsonValue | undefined>,
+  ): void
+}
+
 /**
  * Interface to pass an asymmetric private key and, optionally, its associated JWK Key ID to be
  * added as a `kid` JOSE Header Parameter.
@@ -57,6 +70,13 @@ export interface PrivateKey {
    * ID) will be added to the JOSE Header.
    */
   kid?: string
+
+  /**
+   * Use to modify the JWT signed by this key right before it is signed.
+   *
+   * @see {@link modifyAssertion}
+   */
+  [modifyAssertion]?: ModifyAssertionFunction
 }
 
 /**
@@ -326,6 +346,57 @@ export const clockTolerance: unique symbol = Symbol()
  * ```
  */
 export const customFetch: unique symbol = Symbol()
+
+/**
+ * Use to mutate JWT header and payload before they are signed. Its intended use is working around
+ * non-conform server behaviours, such as modifying JWT "aud" (audience) claims, or otherwise
+ * changing fixed claims used by this library.
+ *
+ * @example
+ *
+ * Changing Private Key JWT client assertion audience issued from an array to a string
+ *
+ * ```ts
+ * import * as oauth from 'oauth4webapi'
+ *
+ * // Prerequisites
+ * let as!: oauth.AuthorizationServer
+ * let client!: oauth.Client
+ * let parameters!: URLSearchParams
+ * let clientPrivateKey!: CryptoKey
+ *
+ * const response = await oauth.pushedAuthorizationRequest(as, client, parameters, {
+ *   clientPrivateKey: {
+ *     key: clientPrivateKey,
+ *     [oauth.modifyAssertion](header, payload) {
+ *       payload.aud = as.issuer
+ *     },
+ *   },
+ * })
+ * ```
+ *
+ * @example
+ *
+ * Changing Request Object issued by {@link issueRequestObject} to have an expiration of 5 minutes
+ *
+ * ```ts
+ * import * as oauth from 'oauth4webapi'
+ *
+ * // Prerequisites
+ * let as!: oauth.AuthorizationServer
+ * let client!: oauth.Client
+ * let parameters!: URLSearchParams
+ * let jarPrivateKey!: CryptoKey
+ *
+ * const request = await oauth.issueRequestObject(as, client, parameters, {
+ *   key: jarPrivateKey,
+ *   [oauth.modifyAssertion](header, payload) {
+ *     payload.exp = <number>payload.iat + 300
+ *   },
+ * })
+ * ```
+ */
+export const modifyAssertion: unique symbol = Symbol()
 
 /**
  * DANGER ZONE - This option has security implications that must be understood, assessed for
@@ -1283,6 +1354,7 @@ export async function calculatePKCECodeChallenge(codeVerifier: string): Promise<
 interface NormalizedKeyInput {
   key?: CryptoKey
   kid?: string
+  modifyAssertion?: ModifyAssertionFunction
 }
 
 function getKeyAndKid(input: CryptoKey | PrivateKey | undefined): NormalizedKeyInput {
@@ -1298,7 +1370,11 @@ function getKeyAndKid(input: CryptoKey | PrivateKey | undefined): NormalizedKeyI
     throw new TypeError('"kid" must be a non-empty string')
   }
 
-  return { key: input.key, kid: input.kid }
+  return {
+    key: input.key,
+    kid: input.kid,
+    modifyAssertion: input[modifyAssertion],
+  }
 }
 
 export interface DPoPOptions extends CryptoKeyPair {
@@ -1320,6 +1396,13 @@ export interface DPoPOptions extends CryptoKeyPair {
    * will be used automatically.
    */
   nonce?: string
+
+  /**
+   * Use to modify the DPoP Proof JWT right before it is signed.
+   *
+   * @see {@link modifyAssertion}
+   */
+  [modifyAssertion]?: ModifyAssertionFunction
 }
 
 export interface DPoPRequestOptions {
@@ -1464,7 +1547,7 @@ function clientAssertion(as: AuthorizationServer, client: Client) {
   const now = epochTime() + getClockSkew(client)
   return {
     jti: randomBytes(),
-    aud: [as.issuer, as.token_endpoint],
+    aud: [as.issuer, as.token_endpoint!],
     exp: now + 60,
     iat: now,
     nbf: now,
@@ -1481,15 +1564,14 @@ async function privateKeyJwt(
   client: Client,
   key: CryptoKey,
   kid?: string,
+  modifyAssertion?: ModifyAssertionFunction,
 ) {
-  return jwt(
-    {
-      alg: keyToJws(key),
-      kid,
-    },
-    clientAssertion(as, client),
-    key,
-  )
+  const header = { alg: keyToJws(key), kid }
+  const payload = clientAssertion(as, client)
+
+  modifyAssertion?.(header, payload)
+
+  return jwt(header, payload, key)
 }
 
 function assertAs(as: AuthorizationServer): as is AuthorizationServer {
@@ -1574,13 +1656,13 @@ async function clientAuthentication(
           '"options.clientPrivateKey" must be provided when "client.token_endpoint_auth_method" is "private_key_jwt"',
         )
       }
-      const { key, kid } = getKeyAndKid(clientPrivateKey)
+      const { key, kid, modifyAssertion } = getKeyAndKid(clientPrivateKey)
       if (!isPrivateKey(key)) {
         throw new TypeError('"options.clientPrivateKey.key" must be a private CryptoKey')
       }
       body.set('client_id', client.client_id)
       body.set('client_assertion_type', 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer')
-      body.set('client_assertion', await privateKeyJwt(as, client, key, kid))
+      body.set('client_assertion', await privateKeyJwt(as, client, key, kid, modifyAssertion))
       break
     }
     // @ts-expect-error
@@ -1603,7 +1685,7 @@ async function clientAuthentication(
  */
 async function jwt(
   header: CompactJWSHeaderParameters,
-  claimsSet: Record<string, unknown>,
+  payload: Record<string, unknown>,
   key: CryptoKey,
 ) {
   if (!key.usages.includes('sign')) {
@@ -1611,7 +1693,7 @@ async function jwt(
       'CryptoKey instances used for signing assertions must include "sign" in their "usages"',
     )
   }
-  const input = `${b64u(buf(JSON.stringify(header)))}.${b64u(buf(JSON.stringify(claimsSet)))}`
+  const input = `${b64u(buf(JSON.stringify(header)))}.${b64u(buf(JSON.stringify(payload)))}`
   const signature = b64u(await crypto.subtle.sign(keyToSubtle(key), key, buf(input)))
   return `${input}.${signature}`
 }
@@ -1640,7 +1722,7 @@ export async function issueRequestObject(
 
   parameters = new URLSearchParams(parameters)
 
-  const { key, kid } = getKeyAndKid(privateKey)
+  const { key, kid, modifyAssertion } = getKeyAndKid(privateKey)
   if (!isPrivateKey(key)) {
     throw new TypeError('"privateKey.key" must be a private CryptoKey')
   }
@@ -1648,7 +1730,7 @@ export async function issueRequestObject(
   parameters.set('client_id', client.client_id)
 
   const now = epochTime() + getClockSkew(client)
-  const claims: Record<string, unknown> = {
+  const claims: Record<string, JsonValue> = {
     ...Object.fromEntries(parameters.entries()),
     jti: randomBytes(),
     aud: as.issuer,
@@ -1708,15 +1790,15 @@ export async function issueRequestObject(
     }
   }
 
-  return jwt(
-    {
-      alg: keyToJws(key),
-      typ: 'oauth-authz-req+jwt',
-      kid,
-    },
-    claims,
-    key,
-  )
+  const header = {
+    alg: keyToJws(key),
+    typ: 'oauth-authz-req+jwt',
+    kid,
+  }
+
+  modifyAssertion?.(header, claims)
+
+  return jwt(header, claims, key)
 }
 
 /**
@@ -1749,24 +1831,23 @@ async function dpopProofJwt(
   }
 
   const now = epochTime() + clockSkew
-  const proof = await jwt(
-    {
-      alg: keyToJws(privateKey),
-      typ: 'dpop+jwt',
-      jwk: await publicJwk(publicKey),
-    },
-    {
-      iat: now,
-      jti: randomBytes(),
-      htm,
-      nonce,
-      htu: `${url.origin}${url.pathname}`,
-      ath: accessToken ? b64u(await crypto.subtle.digest('SHA-256', buf(accessToken))) : undefined,
-    },
-    privateKey,
-  )
+  const header = {
+    alg: keyToJws(privateKey),
+    typ: 'dpop+jwt',
+    jwk: await publicJwk(publicKey),
+  }
+  const payload = {
+    iat: now,
+    jti: randomBytes(),
+    htm,
+    nonce,
+    htu: `${url.origin}${url.pathname}`,
+    ath: accessToken ? b64u(await crypto.subtle.digest('SHA-256', buf(accessToken))) : undefined,
+  }
 
-  headers.set('dpop', proof)
+  options[modifyAssertion]?.(header, payload)
+
+  headers.set('dpop', await jwt(header, payload, privateKey))
 }
 
 let jwkCache: WeakMap<CryptoKey, JWK>

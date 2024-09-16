@@ -105,7 +105,15 @@ export default (QUnit: QUnit) => {
           undefined,
           undefined,
           {
-            DPoP,
+            DPoP: DPoP
+              ? {
+                  ...DPoP,
+                  [lib.modifyAssertion](h, p) {
+                    t.equal(h.alg, 'ES256')
+                    p.foo = 'bar'
+                  },
+                }
+              : undefined,
             async [lib.customFetch](...params: Parameters<typeof fetch>) {
               const url = new URL(<string>params[0])
               const { headers, method } = params[1]!
@@ -124,6 +132,8 @@ export default (QUnit: QUnit) => {
                   jwtAccessToken.cnf!.jkt,
                   await jose.calculateJwkThumbprint(await jose.exportJWK(DPoP.publicKey)),
                 )
+
+                t.propContains(await jose.decodeJwt(request.headers.get('dpop')!), { foo: 'bar' })
               } else {
                 t.equal(jwtAccessToken.cnf, undefined)
               }

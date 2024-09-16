@@ -138,7 +138,29 @@ export default (QUnit: QUnit) => {
         t.equal(token_type, dpop ? 'dpop' : 'bearer')
 
         {
-          let response = await lib.introspectionRequest(as, client, access_token, authenticated)
+          let response = await lib.introspectionRequest(as, client, access_token, {
+            clientPrivateKey: authenticated.clientPrivateKey
+              ? {
+                  ...clientPrivateKey,
+                  [lib.modifyAssertion](h, p) {
+                    t.equal(h.alg, 'ES256')
+                    p.foo = 'bar'
+                  },
+                }
+              : undefined,
+            async [lib.customFetch](...params: Parameters<typeof fetch>) {
+              if (authMethod === 'private_key_jwt') {
+                if (params[1]?.body instanceof URLSearchParams) {
+                  t.propContains(await jose.decodeJwt(params[1].body.get('client_assertion')!), {
+                    foo: 'bar',
+                  })
+                } else {
+                  throw new Error()
+                }
+              }
+              return fetch(...params)
+            },
+          })
 
           const clone = await response.clone().text()
           if (jwtIntrospection) {
