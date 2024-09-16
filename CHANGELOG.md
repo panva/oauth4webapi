@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.16.0](https://github.com/panva/oauth4webapi/compare/v2.15.0...v2.16.0) (2024-09-16)
+
+
+### Features
+
+* add a hook for decrypting JWE assertions ([62795a6](https://github.com/panva/oauth4webapi/commit/62795a6c1905cfbcbb19b4bd86e1eef2d773baa5))
+* allow to modify issued JWT headers and payloads before signing ([30931ba](https://github.com/panva/oauth4webapi/commit/30931ba3cec58c6eaa6139734f1a399b34885a7c))
+
+
+### Documentation
+
+* update docs on useMtlsAlias ([006db55](https://github.com/panva/oauth4webapi/commit/006db55b3ddf6c4414edc21a5a9fbf358301192d))
+
 ## [2.15.0](https://github.com/panva/oauth4webapi/compare/v2.14.0...v2.15.0) (2024-09-15)
 
 
