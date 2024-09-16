@@ -20,49 +20,36 @@ export default (QUnit: QUnit) => {
   const alg = 'ES256'
 
   const authMethodOptions: lib.ClientAuthenticationMethod[] = [
-    'none',
-    'private_key_jwt',
     'client_secret_basic',
     'client_secret_post',
+    'private_key_jwt',
+    'none',
   ]
-  const dpopOptions = [false, true]
-  const jwtIntrospectionOptions = [false, true]
 
-  const cartesianMatrix = []
-
-  for (const authMethod of authMethodOptions) {
-    for (const dpop of dpopOptions) {
-      for (const jwtIntrospection of jwtIntrospectionOptions) {
-        cartesianMatrix.push({
-          authMethod,
-          dpop,
-          jwtIntrospection,
-        })
-      }
+  const options = (
+    authMethod: lib.ClientAuthenticationMethod,
+    ...flags: Array<'dpop' | 'jwtIntrospection' | 'encryption'>
+  ) => {
+    const conf = { authMethod, dpop: false, jwtIntrospection: false, encryption: false }
+    for (const flag of flags) {
+      conf[flag] = true
     }
+    return conf
   }
 
-  function trueCount(a: (boolean | string)[]) {
-    return a.reduce((c, x) => (x === true ? ++c : c), 0)
-  }
+  // - every auth method with all options off
+  // - dpop alone
+  // - jwtIntrospection alone
+  // - jwtIntrospection & encryption
+  const testCases = [
+    ...authMethodOptions.map((authMethod) => options(authMethod)),
+    options(authMethodOptions[0], 'dpop'),
+    options(authMethodOptions[0], 'jwtIntrospection'),
+    options(authMethodOptions[0], 'jwtIntrospection', 'encryption'),
+  ]
 
-  for (const config of cartesianMatrix) {
-    const { authMethod, dpop, jwtIntrospection } = config
-    const options = [authMethod, dpop, jwtIntrospection]
-
-    // Test
-    // - every auth method with all options off
-    // - individual options
-    switch (trueCount(options)) {
-      case 0:
-        break
-      case 1:
-        if (authMethod === 'client_secret_basic') {
-          break
-        }
-      default:
-        continue
-    }
+  for (const config of testCases) {
+    const { authMethod, dpop, jwtIntrospection, encryption } = config
 
     function label(config: Record<string, string | boolean>) {
       const keys = Object.keys(
@@ -83,6 +70,7 @@ export default (QUnit: QUnit) => {
         false,
         jwtIntrospection,
         ['client_credentials'],
+        encryption,
       )
       const DPoP = dpop ? await lib.generateKeyPair(<lib.JWSAlgorithm>alg) : undefined
 
@@ -161,13 +149,6 @@ export default (QUnit: QUnit) => {
               return fetch(...params)
             },
           })
-
-          const clone = await response.clone().text()
-          if (jwtIntrospection) {
-            t.ok(jose.decodeJwt(clone))
-          } else {
-            t.ok(JSON.parse(clone))
-          }
 
           assertNoWwwAuthenticateChallenges(response)
 

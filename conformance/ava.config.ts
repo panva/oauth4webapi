@@ -63,10 +63,10 @@ const DEFAULTS: Record<typeof PLAN_NAME, Record<string, string>> = {
   },
   'fapi1-advanced-final-client-test-plan': {
     client_auth_type: 'private_key_jwt', // private_key_jwt, mtls
-    fapi_auth_request_method: 'pushed',
+    fapi_auth_request_method: 'pushed', // pushed, by_value
     fapi_client_type: 'oidc', // oidc, plain_oauth
     fapi_profile: 'plain_fapi',
-    fapi_response_mode: 'jarm',
+    fapi_response_mode: 'jarm', // jarm, plain_response
   },
   'fapi2-security-profile-id2-client-test-plan': {
     client_auth_type: 'private_key_jwt', // private_key_jwt, mtls

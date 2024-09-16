@@ -42,6 +42,14 @@ See [clockTolerance](../variables/clockTolerance.md).
 
 ***
 
+### \[jweDecrypt\]?
+
+• `optional` **\[jweDecrypt\]**: [`JweDecryptFunction`](JweDecryptFunction.md)
+
+See [jweDecrypt](../variables/jweDecrypt.md).
+
+***
+
 ### authorization\_signed\_response\_alg?
 
 • `optional` **authorization\_signed\_response\_alg**: [`JWSAlgorithm`](../type-aliases/JWSAlgorithm.md)

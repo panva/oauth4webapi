@@ -26,6 +26,7 @@ const provider = new Provider('http://localhost:3000', {
       requireNonce: () => true,
     },
     introspection: { enabled: true },
+    encryption: { enabled: true },
     revocation: { enabled: true },
     clientCredentials: { enabled: true },
     registration: { enabled: true },

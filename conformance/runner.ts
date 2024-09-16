@@ -1,13 +1,6 @@
 import anyTest from 'ava'
 import type { Macro, TestFn } from 'ava'
-import {
-  importJWK,
-  type JWK,
-  calculateJwkThumbprint,
-  exportJWK,
-  decodeProtectedHeader,
-  compactDecrypt,
-} from 'jose'
+import { importJWK, type JWK, calculateJwkThumbprint, exportJWK, compactDecrypt } from 'jose'
 import * as undici from 'undici'
 
 export const test = anyTest as TestFn<{ instance: Test }>
@@ -129,22 +122,6 @@ function responseType(planName: string, variant: Record<string, string>) {
   return variant.fapi_response_mode === 'jarm' ? 'code' : 'code id_token'
 }
 
-async function decryptIdToken(jwe: string) {
-  return new TextDecoder().decode(
-    (
-      await compactDecrypt(
-        jwe,
-        await importPrivateKey('RSA-OAEP', configuration.client.jwks.keys[0]),
-        {
-          keyManagementAlgorithms: ['RSA-OAEP'],
-        },
-      ).catch((cause) => {
-        throw new oauth.OperationProcessingError('failed to decrypt ID Token', { cause })
-      })
-    ).plaintext,
-  )
-}
-
 interface MacroOptions {
   useNonce?: boolean
   useState?: boolean
@@ -181,9 +158,20 @@ export const flow = (options?: MacroOptions) => {
 
       t.log('AS Metadata discovered for', as.issuer)
 
+      const decoder = new TextDecoder()
       const client: oauth.Client = {
         client_id: configuration.client.client_id,
         client_secret: configuration.client.client_secret,
+        async [oauth.jweDecrypt](jwe) {
+          const { plaintext } = await compactDecrypt(
+            jwe,
+            await importPrivateKey('RSA-OAEP', configuration.client.jwks.keys[0]),
+            { keyManagementAlgorithms: ['RSA-OAEP'] },
+          ).catch((cause) => {
+            throw new oauth.OperationProcessingError('failed to decrypt', { cause })
+          })
+          return decoder.decode(plaintext)
+        },
       }
 
       switch (variant.client_auth_type) {
@@ -387,17 +375,10 @@ export const flow = (options?: MacroOptions) => {
         if (usesJarm(variant)) {
           params = await oauth.validateJwtAuthResponse(as, client, currentUrl, state)
         } else if (response_type === 'code id_token') {
-          const fragmentParams = new URLSearchParams(currentUrl.hash.slice(1))
-          const idToken = fragmentParams.get('id_token')!
-          let decrypted
-          if (decodeProtectedHeader(idToken).enc) {
-            fragmentParams.set('id_token', await decryptIdToken(idToken))
-            decrypted = true
-          }
           params = await oauth.validateDetachedSignatureResponse(
             as,
             client,
-            decrypted ? fragmentParams : currentUrl,
+            currentUrl,
             <string>nonce,
             state,
           )
@@ -433,23 +414,6 @@ export const flow = (options?: MacroOptions) => {
             t.log('challenge', challenge)
           }
           throw new Error()
-        }
-
-        if (response_type === 'code id_token') {
-          try {
-            const body = await response.clone().json()
-            const { id_token } = body
-            if (decodeProtectedHeader(id_token).enc) {
-              const newResponse = new Response(
-                JSON.stringify({
-                  ...body,
-                  id_token: await decryptIdToken(id_token),
-                }),
-                response,
-              )
-              response = newResponse
-            }
-          } catch {}
         }
 
         let result:

@@ -1,5 +1,4 @@
 import type QUnit from 'qunit'
-import * as jose from 'jose'
 
 import {
   assertNoWwwAuthenticateChallenges,
@@ -18,67 +17,42 @@ export default (QUnit: QUnit) => {
 
   const alg = 'ES256'
 
-  const cartesianMatrix = []
-
-  for (const jarm of [false, true]) {
-    for (const par of [false, true]) {
-      for (const jar of [false, true]) {
-        for (const dpop of [false, true]) {
-          for (const jwtUserinfo of [false, true]) {
-            for (const hybrid of [false, true]) {
-              cartesianMatrix.push({
-                hybrid,
-                jarm,
-                par,
-                jar,
-                dpop,
-                jwtUserinfo,
-              })
-            }
-          }
-        }
-      }
+  const options = (
+    ...flags: Array<'jarm' | 'par' | 'jar' | 'dpop' | 'jwtUserinfo' | 'hybrid' | 'encryption'>
+  ) => {
+    const conf = {
+      jarm: false,
+      par: false,
+      jar: false,
+      dpop: false,
+      jwtUserinfo: false,
+      hybrid: false,
+      encryption: false,
     }
+    for (const flag of flags) {
+      conf[flag] = true
+    }
+    return conf
   }
 
-  function trueCount(a: boolean[]) {
-    return a.reduce((c, x) => (x ? ++c : c), 0)
-  }
+  const testCases = [
+    options(),
+    options('par'),
+    options('jar'),
+    options('dpop'),
+    options('par', 'jar'),
+    options('par', 'dpop'),
+    options('encryption'),
+    options('jarm'),
+    options('jarm', 'encryption'),
+    options('jwtUserinfo'),
+    options('jwtUserinfo', 'encryption'),
+    options('hybrid'),
+    options('hybrid', 'encryption'),
+  ]
 
-  for (const config of cartesianMatrix) {
-    const { jarm, par, jar, dpop, jwtUserinfo, hybrid } = config
-
-    const options = [jarm, par, jar, dpop, jwtUserinfo, hybrid]
-
-    // Test
-    // - individual options
-    // - no options
-    // - all options
-    // - par + jar
-    // - par + jar + dpop
-    // - par + dpop
-
-    switch (trueCount(options)) {
-      case 0:
-      case 1:
-        break
-      case options.length - 1:
-        if (hybrid) {
-          continue
-        } else {
-          break
-        }
-      case 2:
-        if ((par && jar) || (par && dpop)) {
-          break
-        }
-      case 3:
-        if (par && jar && dpop) {
-          break
-        }
-      default:
-        continue
-    }
+  for (const config of testCases) {
+    const { jarm, par, jar, dpop, jwtUserinfo, hybrid, encryption } = config
 
     function label(config: Record<string, boolean>) {
       const keys = Object.keys(
@@ -100,6 +74,7 @@ export default (QUnit: QUnit) => {
         hybrid
           ? ['implicit', 'authorization_code', 'refresh_token']
           : ['authorization_code', 'refresh_token'],
+        encryption,
       )
       const DPoP = dpop ? await lib.generateKeyPair(<lib.JWSAlgorithm>alg) : undefined
 
@@ -258,13 +233,6 @@ export default (QUnit: QUnit) => {
             } else {
               throw unexpectedAuthorizationServerError(challenges)
             }
-          }
-
-          const clone = await response.clone().text()
-          if (jwtUserinfo) {
-            t.ok(jose.decodeJwt(clone))
-          } else {
-            t.ok(JSON.parse(clone))
           }
 
           await lib.processUserInfoResponse(as, client, sub, response)

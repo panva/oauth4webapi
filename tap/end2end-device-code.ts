@@ -17,16 +17,6 @@ export default (QUnit: QUnit) => {
 
   const alg = 'ES256'
 
-  const dpopOptions = [false, true]
-
-  const cartesianMatrix = []
-
-  for (const dpop of dpopOptions) {
-    cartesianMatrix.push({
-      dpop,
-    })
-  }
-
   for (const dpop of [true, false]) {
     test(`end-to-end device flow ${dpop ? 'w/ dpop' : ''}`, async (t) => {
       const kp = await keys[alg]
@@ -38,6 +28,7 @@ export default (QUnit: QUnit) => {
         false,
         false,
         ['refresh_token', 'urn:ietf:params:oauth:grant-type:device_code'],
+        false,
       )
       const DPoP = dpop ? await lib.generateKeyPair(<lib.JWSAlgorithm>alg) : undefined
 

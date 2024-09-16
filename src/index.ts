@@ -399,6 +399,51 @@ export const customFetch: unique symbol = Symbol()
 export const modifyAssertion: unique symbol = Symbol()
 
 /**
+ * Use to add support for decrypting JWEs the client encounters, namely
+ *
+ * - Encrypted ID Tokens returned by the Token Endpoint
+ * - Encrypted ID Tokens returned as part of FAPI 1.0 Advanced Detached Signature authorization
+ *   responses
+ * - Encrypted JWT UserInfo responses
+ * - Encrypted JWT Introspection responses
+ * - Encrypted JARM Responses
+ *
+ * @example
+ *
+ * Decrypting JARM responses
+ *
+ * ```ts
+ * import * as oauth from 'oauth4webapi'
+ * import * as jose from 'jose'
+ *
+ * // Prerequisites
+ * let as!: oauth.AuthorizationServer
+ * let key!: CryptoKey
+ * let alg!: string
+ * let enc!: string
+ *
+ * const decoder = new TextDecoder()
+ *
+ * const client: oauth.Client = {
+ *   client_id: 'urn:example:client_id',
+ *   async [oauth.jweDecrypt](jwe) {
+ *     const { plaintext } = await compactDecrypt(jwe, key, {
+ *       keyManagementAlgorithms: [alg],
+ *       contentEncryptionAlgorithms: [enc],
+ *     }).catch((cause) => {
+ *       throw new oauth.OperationProcessingError('decryption failed', { cause })
+ *     })
+ *
+ *     return decoder.decode(plaintext)
+ *   },
+ * }
+ *
+ * const params = await oauth.validateJwtAuthResponse(as, client, currentUrl)
+ * ```
+ */
+export const jweDecrypt: unique symbol = Symbol()
+
+/**
  * DANGER ZONE - This option has security implications that must be understood, assessed for
  * applicability, and accepted before use. It is critical that the JSON Web Key Set cache only be
  * writable by your own code.
@@ -916,6 +961,11 @@ export interface Client {
    * See {@link clockTolerance}.
    */
   [clockTolerance]?: number
+
+  /**
+   * See {@link jweDecrypt}.
+   */
+  [jweDecrypt]?: JweDecryptFunction
 
   [metadata: string]: JsonValue | undefined
 }
@@ -2532,9 +2582,8 @@ export async function processUserInfoResponse(
   let json: JsonValue
   if (getContentType(response) === 'application/jwt') {
     assertReadableResponse(response)
-    const jwt = await response.text()
-    const { claims } = await validateJwt(
-      jwt,
+    const { claims, jwt } = await validateJwt(
+      await response.text(),
       checkSigningAlgorithm.bind(
         undefined,
         client.userinfo_signed_response_alg,
@@ -2543,6 +2592,7 @@ export async function processUserInfoResponse(
       noSignatureCheck,
       getClockSkew(client),
       getClockTolerance(client),
+      client[jweDecrypt],
     )
       .then(validateOptionalAudience.bind(undefined, client.client_id))
       .then(validateOptionalIssuer.bind(undefined, as.issuer))
@@ -2668,7 +2718,7 @@ export async function refreshTokenGrantRequest(
   return tokenEndpointRequest(as, client, 'refresh_token', parameters, options)
 }
 
-const idTokenClaims = new WeakMap<TokenEndpointResponse, IDToken>()
+const idTokenClaims = new WeakMap<TokenEndpointResponse, [IDToken, string]>()
 const jwtResponseBodies = new WeakMap<Response, string>()
 
 /**
@@ -2706,7 +2756,7 @@ export function getValidatedIdTokenClaims(
     )
   }
 
-  return claims
+  return claims[0]
 }
 
 export interface ValidateSignatureOptions extends HttpRequestOptions, JWKSCacheOptions {}
@@ -2741,11 +2791,15 @@ export async function validateIdTokenSignature(
 ): Promise<void> {
   assertAs(as)
 
-  if (!getValidatedIdTokenClaims(ref)) {
+  if (!idTokenClaims.has(ref)) {
     throw new OPE('"ref" does not contain an ID Token to verify the signature of')
   }
 
-  const { 0: protectedHeader, 1: payload, 2: encodedSignature } = ref.id_token!.split('.')
+  const {
+    0: protectedHeader,
+    1: payload,
+    2: encodedSignature,
+  } = idTokenClaims.get(ref)![1].split('.')
 
   const header: CompactJWSHeaderParameters = JSON.parse(buf(b64u(protectedHeader)))
 
@@ -2917,7 +2971,7 @@ async function processGenericAccessTokenResponse(
     }
 
     if (json.id_token) {
-      const { claims } = await validateJwt(
+      const { claims, jwt } = await validateJwt(
         json.id_token,
         checkSigningAlgorithm.bind(
           undefined,
@@ -2927,6 +2981,7 @@ async function processGenericAccessTokenResponse(
         noSignatureCheck,
         getClockSkew(client),
         getClockTolerance(client),
+        client[jweDecrypt],
       )
         .then(validatePresence.bind(undefined, ['aud', 'exp', 'iat', 'iss', 'sub']))
         .then(validateIssuer.bind(undefined, as.issuer))
@@ -2948,7 +3003,7 @@ async function processGenericAccessTokenResponse(
         throw new OPE('ID Token "auth_time" (authentication time) must be a positive number')
       }
 
-      idTokenClaims.set(json, <IDToken>claims)
+      idTokenClaims.set(json, [<IDToken>claims, jwt])
     }
   }
 
@@ -3117,6 +3172,7 @@ interface ParsedJWT {
   header: CompactJWSHeaderParameters
   claims: JWTPayload
   signature: Uint8Array
+  jwt: string
 }
 
 const jwtClaimNames = {
@@ -3669,9 +3725,8 @@ export async function processIntrospectionResponse(
   let json: JsonValue
   if (getContentType(response) === 'application/token-introspection+jwt') {
     assertReadableResponse(response)
-    const jwt = await response.text()
-    const { claims } = await validateJwt(
-      jwt,
+    const { claims, jwt } = await validateJwt(
+      await response.text(),
       checkSigningAlgorithm.bind(
         undefined,
         client.introspection_signed_response_alg,
@@ -3680,6 +3735,7 @@ export async function processIntrospectionResponse(
       noSignatureCheck,
       getClockSkew(client),
       getClockTolerance(client),
+      client[jweDecrypt],
     )
       .then(checkJwtType.bind(undefined, 'token-introspection+jwt'))
       .then(validatePresence.bind(undefined, ['aud', 'iat', 'iss']))
@@ -3864,6 +3920,10 @@ async function validateJwsSignature(
   }
 }
 
+export interface JweDecryptFunction {
+  (jwe: string): Promise<string>
+}
+
 /**
  * Minimal JWT validation implementation.
  */
@@ -3873,11 +3933,19 @@ async function validateJwt(
   getKey: ((h: CompactJWSHeaderParameters) => Promise<CryptoKey>) | typeof noSignatureCheck,
   clockSkew: number,
   clockTolerance: number,
+  decryptJwt: JweDecryptFunction | undefined,
 ): Promise<ParsedJWT & { key?: CryptoKey }> {
-  const { 0: protectedHeader, 1: payload, 2: encodedSignature, length } = jws.split('.')
+  let { 0: protectedHeader, 1: payload, 2: encodedSignature, length } = jws.split('.')
+
   if (length === 5) {
-    throw new UnsupportedOperationError('JWE structure JWTs are not supported')
+    if (decryptJwt !== undefined) {
+      jws = await decryptJwt(jws)
+      ;({ 0: protectedHeader, 1: payload, 2: encodedSignature, length } = jws.split('.'))
+    } else {
+      throw new UnsupportedOperationError('JWE structure JWTs are not supported')
+    }
   }
+
   if (length !== 3) {
     throw new OPE('Invalid JWT')
   }
@@ -3955,7 +4023,7 @@ async function validateJwt(
     }
   }
 
-  return { header, claims, signature, key }
+  return { header, claims, signature, key, jwt: jws }
 }
 
 /**
@@ -4007,6 +4075,7 @@ export async function validateJwtAuthResponse(
     getPublicSigKeyFromIssuerJwksUri.bind(undefined, as, options),
     getClockSkew(client),
     getClockTolerance(client),
+    client[jweDecrypt],
   )
     .then(validatePresence.bind(undefined, ['aud', 'exp', 'iss']))
     .then(validateIssuer.bind(undefined, as.issuer))
@@ -4168,6 +4237,7 @@ export async function validateDetachedSignatureResponse(
     getPublicSigKeyFromIssuerJwksUri.bind(undefined, as, options),
     getClockSkew(client),
     getClockTolerance(client),
+    client[jweDecrypt],
   )
     .then(validatePresence.bind(undefined, requiredClaims))
     .then(validateIssuer.bind(undefined, as.issuer))
@@ -4748,6 +4818,7 @@ async function validateDPoP(
     },
     clockSkew,
     getClockTolerance(options),
+    undefined,
   )
     .then(checkJwtType.bind(undefined, 'dpop+jwt'))
     .then(validatePresence.bind(undefined, ['iat', 'jti', 'ath', 'htm', 'htu']))
@@ -4900,6 +4971,7 @@ export async function validateJwtAccessToken(
     getPublicSigKeyFromIssuerJwksUri.bind(undefined, as, options),
     getClockSkew(options),
     getClockTolerance(options),
+    undefined,
   )
     .then(checkJwtType.bind(undefined, 'at+jwt'))
     .then(validatePresence.bind(undefined, requiredClaims))
