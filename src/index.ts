@@ -1099,9 +1099,14 @@ export class UnsupportedOperationError extends Error {
  * @group Errors
  */
 export class OperationProcessingError extends Error {
-  constructor(message: string, options?: { cause?: unknown }) {
+  code?: string
+
+  constructor(message: string, options?: { cause?: unknown; code?: string }) {
     super(message, options)
     this.name = this.constructor.name
+    if (options?.code) {
+      this.code = options?.code
+    }
     // @ts-ignore
     Error.captureStackTrace?.(this, this.constructor)
   }
@@ -3343,7 +3348,10 @@ export async function processAuthorizationCodeOpenIDResponse(
   }
 
   if (!validateString(result.id_token)) {
-    throw new OPE('"response" body "id_token" property must be a non-empty string')
+    throw new OPE('"response" body "id_token" property must be a non-empty string', {
+      cause: result,
+      code: USE_OAUTH_CALLBACK,
+    })
   }
 
   maxAge ??= client.default_max_age ?? skipAuthTimeCheck
@@ -3421,6 +3429,7 @@ export async function processAuthorizationCodeOAuth2Response(
     if (typeof result.id_token === 'string' && result.id_token.length) {
       throw new OPE(
         'Unexpected ID Token returned, use processAuthorizationCodeOpenIDResponse() for OpenID Connect callback processing',
+        { cause: result, code: USE_OPENID_CALLBACK },
       )
     }
     // @ts-expect-error
@@ -3429,6 +3438,15 @@ export async function processAuthorizationCodeOAuth2Response(
 
   return result as OAuth2TokenEndpointResponse
 }
+
+/**
+ * @ignore
+ */
+export const USE_OPENID_CALLBACK = 'ERR_OAUTH_USE_OPENID_CALLBACK'
+/**
+ * @ignore
+ */
+export const USE_OAUTH_CALLBACK = 'ERR_OAUTH_USE_OAUTH_CALLBACK'
 
 function checkJwtType(expected: string, result: Awaited<ReturnType<typeof validateJwt>>) {
   if (typeof result.header.typ !== 'string' || normalizeTyp(result.header.typ) !== expected) {
