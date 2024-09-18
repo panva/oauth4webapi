@@ -3398,11 +3398,6 @@ export async function processAuthorizationCodeOAuth2Response(
   }
 
   if (result.id_token !== undefined) {
-    if (typeof result.id_token === 'string' && result.id_token.length) {
-      throw new OPE(
-        'Unexpected ID Token returned, use processAuthorizationCodeOpenIDResponse() for OpenID Connect callback processing',
-      )
-    }
     // @ts-expect-error
     delete result.id_token
   }
