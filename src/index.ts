@@ -1116,7 +1116,7 @@ export class UnsupportedOperationError extends Error {
 export class OperationProcessingError extends Error {
   code?: string
 
-  constructor(message: string, options?: { cause?: unknown; code?: string }) {
+  constructor(message?: string, options?: { cause?: unknown; code?: string }) {
     super(message, options)
     this.name = this.constructor.name
     if (options?.code) {
@@ -2501,7 +2501,7 @@ async function getPublicSigKeyFromIssuerJwksUri(
       kty = 'OKP'
       break
     default:
-      throw new UnsupportedOperationError()
+      throw new UnsupportedOperationError('unsupported JWS algorithm')
   }
 
   const candidates = jwks.keys.filter((jwk) => {
@@ -2844,7 +2844,7 @@ export async function validateIdTokenSignature(
   const header: CompactJWSHeaderParameters = JSON.parse(buf(b64u(protectedHeader)))
 
   if (header.alg.startsWith('HS')) {
-    throw new UnsupportedOperationError()
+    throw new UnsupportedOperationError('unsupported JWS algorithm')
   }
 
   let key!: CryptoKeyType
@@ -2872,7 +2872,7 @@ async function validateJwtResponseSignature(
   const header: CompactJWSHeaderParameters = JSON.parse(buf(b64u(protectedHeader)))
 
   if (header.alg.startsWith('HS')) {
-    throw new UnsupportedOperationError()
+    throw new UnsupportedOperationError('unsupported JWS algorithm')
   }
 
   let key!: CryptoKeyType
@@ -3457,11 +3457,11 @@ export async function processAuthorizationCodeOAuth2Response(
 /**
  * @ignore
  */
-export const USE_OPENID_CALLBACK = 'ERR_OAUTH_USE_OPENID_CALLBACK'
+export const USE_OPENID_CALLBACK = 'OAUTH_USE_OPENID_CALLBACK_ERR'
 /**
  * @ignore
  */
-export const USE_OAUTH_CALLBACK = 'ERR_OAUTH_USE_OAUTH_CALLBACK'
+export const USE_OAUTH_CALLBACK = 'OAUTH_USE_OAUTH_CALLBACK_ERR'
 
 function checkJwtType(expected: string, result: Awaited<ReturnType<typeof validateJwt>>) {
   if (typeof result.header.typ !== 'string' || normalizeTyp(result.header.typ) !== expected) {
@@ -3922,7 +3922,7 @@ function ecdsaHashName(namedCurve: string) {
     case 'P-521':
       return 'SHA-512'
     default:
-      throw new UnsupportedOperationError()
+      throw new UnsupportedOperationError('unsupported ECDSA namedCurve')
   }
 }
 
@@ -3945,7 +3945,7 @@ function keyToSubtle(key: CryptoKeyType): AlgorithmIdentifier | RsaPssParams | E
               parseInt((key.algorithm as RsaHashedKeyAlgorithm).hash.name.slice(-3), 10) >> 3,
           } as RsaPssParams
         default:
-          throw new UnsupportedOperationError()
+          throw new UnsupportedOperationError('unsupported RSA-PSS hash name')
       }
     }
     case 'RSASSA-PKCS1-v1_5':
@@ -3955,7 +3955,7 @@ function keyToSubtle(key: CryptoKeyType): AlgorithmIdentifier | RsaPssParams | E
     case 'Ed25519':
       return key.algorithm.name
   }
-  throw new UnsupportedOperationError()
+  throw new UnsupportedOperationError('unsupported CryptoKey algorithm name')
 }
 
 const noSignatureCheck = Symbol()
@@ -4168,9 +4168,9 @@ async function idTokenHash(alg: JWSAlgorithm, data: string, key: CryptoKeyType) 
         algorithm = 'SHA-512'
         break
       }
-      throw new UnsupportedOperationError()
+      throw new UnsupportedOperationError('unsupported EdDSA curve for *_hash calculation')
     default:
-      throw new UnsupportedOperationError()
+      throw new UnsupportedOperationError('unsupported JWS algorithm for *_hash calculation')
   }
 
   const digest = await crypto.subtle.digest(algorithm, buf(data))
@@ -4547,11 +4547,11 @@ function algToSubtle(
         case 'Ed448':
           return crv
         default:
-          throw new UnsupportedOperationError()
+          throw new UnsupportedOperationError('unsupported EdDSA curve')
       }
     }
     default:
-      throw new UnsupportedOperationError()
+      throw new UnsupportedOperationError('unsupported JWS algorithm')
   }
 }
 
@@ -4933,7 +4933,7 @@ async function validateDPoP(
         }
         break
       default:
-        throw new UnsupportedOperationError()
+        throw new UnsupportedOperationError('unsupported JWK key type')
     }
     const expected = b64u(
       await crypto.subtle.digest('SHA-256', encoder.encode(JSON.stringify(components))),
