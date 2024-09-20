@@ -499,69 +499,11 @@ export const jweDecrypt: unique symbol = Symbol()
 export const jwksCache: unique symbol = Symbol()
 
 /**
- * When combined with {@link customFetch} (to use a Fetch API implementation that supports client
- * certificates) this can be used to target FAPI 2.0 profiles that utilize Mutual-TLS for either
- * client authentication or sender constraining. FAPI 1.0 Advanced profiles that use PAR and JARM
- * can also be targetted.
+ * @ignore
  *
- * When configured on an interface that extends {@link UseMTLSAliasOptions} this makes the client
- * prioritize an endpoint URL present in
- * {@link AuthorizationServer.mtls_endpoint_aliases `as.mtls_endpoint_aliases`}.
- *
- * This doesn't need not be used when
- * {@link Client.use_mtls_endpoint_aliases `client.use_mtls_endpoint_aliases`} is `true`.
- *
- * @example
- *
- * (Node.js) Using [nodejs/undici](https://github.com/nodejs/undici) for Mutual-TLS Client
- * Authentication and Certificate-Bound Access Tokens support.
- *
- * ```ts
- * import * as undici from 'undici'
- * import * as oauth from 'oauth4webapi'
- *
- * // Prerequisites
- * let as!: oauth.AuthorizationServer
- * let client!: oauth.Client
- * let params!: URLSearchParams
- * let key!: string // PEM-encoded key
- * let cert!: string // PEM-encoded certificate
- *
- * const agent = new undici.Agent({ connect: { key, cert } })
- *
- * const response = await oauth.pushedAuthorizationRequest(as, client, params, {
- *   [oauth.useMtlsAlias]: true,
- *   [oauth.customFetch]: (...args) => undici.fetch(args[0], { ...args[1], dispatcher: agent }),
- * })
- * ```
- *
- * @example
- *
- * (Deno) Using Deno.createHttpClient API for Mutual-TLS Client Authentication and Certificate-Bound
- * Access Tokens support.
- *
- * ```ts
- * import * as oauth from 'oauth4webapi'
- *
- * // Prerequisites
- * let as!: oauth.AuthorizationServer
- * let client!: oauth.Client
- * let params!: URLSearchParams
- * let key!: string // PEM-encoded key
- * let cert!: string // PEM-encoded certificate
- *
- * const agent = Deno.createHttpClient({ key, cert })
- *
- * const response = await oauth.pushedAuthorizationRequest(as, client, params, {
- *   [oauth.useMtlsAlias]: true,
- *   [oauth.customFetch]: (...args) => fetch(args[0], { ...args[1], client: agent }),
- * })
- * ```
- *
- * @see [RFC 8705 - OAuth 2.0 Mutual-TLS Client Authentication and Certificate-Bound Access Tokens](https://www.rfc-editor.org/rfc/rfc8705.html)
+ * @deprecated Use {@link Client.use_mtls_endpoint_aliases `client.use_mtls_endpoint_aliases`}.
  */
 export const useMtlsAlias: unique symbol = Symbol()
-// TODO: deprecate useMtlsAlias in favour of `client.use_mtls_endpoint_aliases`.
 
 /**
  * Authorization Server Metadata
@@ -959,6 +901,59 @@ export interface Client {
   /**
    * Indicates the requirement for a client to use mutual TLS endpoint aliases defined by the AS
    * where present. Default is `false`.
+   *
+   * When combined with {@link customFetch} (to use a Fetch API implementation that supports client
+   * certificates) this can be used to target FAPI 2.0 profiles that utilize Mutual-TLS for either
+   * client authentication or sender constraining. FAPI 1.0 Advanced profiles that use PAR and JARM
+   * can also be targetted.
+   *
+   * @example
+   *
+   * (Node.js) Using [nodejs/undici](https://github.com/nodejs/undici) for Mutual-TLS Client
+   * Authentication and Certificate-Bound Access Tokens support.
+   *
+   * ```ts
+   * import * as undici from 'undici'
+   * import * as oauth from 'oauth4webapi'
+   *
+   * // Prerequisites
+   * let as!: oauth.AuthorizationServer
+   * let client!: oauth.Client & { use_mtls_endpoint_aliases: true }
+   * let params!: URLSearchParams
+   * let key!: string // PEM-encoded key
+   * let cert!: string // PEM-encoded certificate
+   *
+   * const agent = new undici.Agent({ connect: { key, cert } })
+   *
+   * const response = await oauth.pushedAuthorizationRequest(as, client, params, {
+   *   [oauth.customFetch]: (...args) =>
+   *     undici.fetch(args[0], { ...args[1], dispatcher: agent }),
+   * })
+   * ```
+   *
+   * @example
+   *
+   * (Deno) Using Deno.createHttpClient API for Mutual-TLS Client Authentication and
+   * Certificate-Bound Access Tokens support.
+   *
+   * ```ts
+   * import * as oauth from 'oauth4webapi'
+   *
+   * // Prerequisites
+   * let as!: oauth.AuthorizationServer
+   * let client!: oauth.Client & { use_mtls_endpoint_aliases: true }
+   * let params!: URLSearchParams
+   * let key!: string // PEM-encoded key
+   * let cert!: string // PEM-encoded certificate
+   *
+   * const agent = Deno.createHttpClient({ key, cert })
+   *
+   * const response = await oauth.pushedAuthorizationRequest(as, client, params, {
+   *   [oauth.customFetch]: (...args) => fetch(args[0], { ...args[1], client: agent }),
+   * })
+   * ```
+   *
+   * @see [RFC 8705 - OAuth 2.0 Mutual-TLS Client Authentication and Certificate-Bound Access Tokens](https://www.rfc-editor.org/rfc/rfc8705.html)
    */
   use_mtls_endpoint_aliases?: boolean
 
@@ -1472,9 +1467,16 @@ export interface DPoPRequestOptions {
   DPoP?: DPoPOptions
 }
 
+/**
+ * @ignore
+ *
+ * @deprecated Use {@link Client.use_mtls_endpoint_aliases `client.use_mtls_endpoint_aliases`}.
+ */
 export interface UseMTLSAliasOptions {
   /**
-   * See {@link useMtlsAlias}.
+   * @ignore
+   *
+   * @deprecated Use {@link Client.use_mtls_endpoint_aliases `client.use_mtls_endpoint_aliases`}.
    */
   [useMtlsAlias]?: boolean
 }
@@ -1930,10 +1932,10 @@ async function publicJwk(key: CryptoKey) {
 function validateEndpoint(
   value: unknown,
   endpoint: keyof AuthorizationServer,
-  options?: UseMTLSAliasOptions,
+  useMtlsAlias: boolean,
 ) {
   if (typeof value !== 'string') {
-    if (options?.[useMtlsAlias]) {
+    if (useMtlsAlias) {
       throw new TypeError(`"as.mtls_endpoint_aliases.${endpoint}" must be a string`)
     }
 
@@ -1946,21 +1948,21 @@ function validateEndpoint(
 function resolveEndpoint(
   as: AuthorizationServer,
   endpoint: keyof AuthorizationServer,
-  options?: UseMTLSAliasOptions,
+  useMtlsAlias = false,
 ) {
-  if (options?.[useMtlsAlias] && as.mtls_endpoint_aliases && endpoint in as.mtls_endpoint_aliases) {
-    return validateEndpoint(as.mtls_endpoint_aliases[endpoint], endpoint, options)
+  if (useMtlsAlias && as.mtls_endpoint_aliases && endpoint in as.mtls_endpoint_aliases) {
+    return validateEndpoint(as.mtls_endpoint_aliases[endpoint], endpoint, useMtlsAlias)
   }
 
-  return validateEndpoint(as[endpoint], endpoint)
+  return validateEndpoint(as[endpoint], endpoint, useMtlsAlias)
 }
 
-function alias(client: Client, options?: UseMTLSAliasOptions): UseMTLSAliasOptions {
+function alias(client: Client, options?: UseMTLSAliasOptions): boolean {
   if (client.use_mtls_endpoint_aliases || options?.[useMtlsAlias]) {
-    return { [useMtlsAlias]: true }
+    return true
   }
 
-  return { [useMtlsAlias]: false }
+  return false
 }
 
 /**
@@ -5047,19 +5049,19 @@ export const experimental_customFetch = customFetch
 /**
  * @ignore
  *
- * @deprecated Use {@link useMtlsAlias}.
+ * @deprecated Use {@link Client.use_mtls_endpoint_aliases `client.use_mtls_endpoint_aliases`}.
  */
 export const experimentalUseMtlsAlias = useMtlsAlias
 /**
  * @ignore
  *
- * @deprecated Use {@link useMtlsAlias}.
+ * @deprecated Use {@link Client.use_mtls_endpoint_aliases `client.use_mtls_endpoint_aliases`}.
  */
 export const experimental_useMtlsAlias = useMtlsAlias
 /**
  * @ignore
  *
- * @deprecated Use {@link UseMTLSAliasOptions}.
+ * @deprecated Use {@link Client.use_mtls_endpoint_aliases `client.use_mtls_endpoint_aliases`}.
  */
 export type ExperimentalUseMTLSAliasOptions = UseMTLSAliasOptions
 /**

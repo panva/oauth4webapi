@@ -27,14 +27,6 @@ See [customFetch](../variables/customFetch.md).
 
 ***
 
-### \[useMtlsAlias\]?
-
-• `optional` **\[useMtlsAlias\]**: `boolean`
-
-See [useMtlsAlias](../variables/useMtlsAlias.md).
-
-***
-
 ### DPoP?
 
 • `optional` **DPoP**: [`DPoPOptions`](DPoPOptions.md)

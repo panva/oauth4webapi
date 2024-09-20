@@ -190,7 +190,6 @@ Support from the community to continue maintaining and improving this module is 
 - [RevocationRequestOptions](interfaces/RevocationRequestOptions.md)
 - [TokenEndpointRequestOptions](interfaces/TokenEndpointRequestOptions.md)
 - [TokenEndpointResponse](interfaces/TokenEndpointResponse.md)
-- [UseMTLSAliasOptions](interfaces/UseMTLSAliasOptions.md)
 - [UserInfoAddress](interfaces/UserInfoAddress.md)
 - [UserInfoRequestOptions](interfaces/UserInfoRequestOptions.md)
 - [UserInfoResponse](interfaces/UserInfoResponse.md)
@@ -222,4 +221,3 @@ Support from the community to continue maintaining and improving this module is 
 - [skipAuthTimeCheck](variables/skipAuthTimeCheck.md)
 - [skipStateCheck](variables/skipStateCheck.md)
 - [skipSubjectCheck](variables/skipSubjectCheck.md)
-- [useMtlsAlias](variables/useMtlsAlias.md)

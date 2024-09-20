@@ -8,14 +8,6 @@ Support from the community to continue maintaining and improving this module is 
 
 ## Properties
 
-### \[useMtlsAlias\]?
-
-• `optional` **\[useMtlsAlias\]**: `boolean`
-
-See [useMtlsAlias](../variables/useMtlsAlias.md).
-
-***
-
 ### clientPrivateKey?
 
 • `optional` **clientPrivateKey**: [`CryptoKey`](https://developer.mozilla.org/docs/Web/API/CryptoKey) \| [`PrivateKey`](PrivateKey.md)

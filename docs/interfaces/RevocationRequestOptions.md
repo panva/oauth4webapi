@@ -27,14 +27,6 @@ See [customFetch](../variables/customFetch.md).
 
 ***
 
-### \[useMtlsAlias\]?
-
-• `optional` **\[useMtlsAlias\]**: `boolean`
-
-See [useMtlsAlias](../variables/useMtlsAlias.md).
-
-***
-
 ### additionalParameters?
 
 • `optional` **additionalParameters**: [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `string`\> \| [`URLSearchParams`](https://developer.mozilla.org/docs/Web/API/URLSearchParams) \| `string`[][]
