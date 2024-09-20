@@ -42,6 +42,8 @@ export async function setupContextKeys(t: ExecutionContext<ContextWithAlgs>) {
   )
 }
 
+const coinflip = () => !Math.floor(Math.random() * 2)
+
 export async function setupJwks(t: ExecutionContext<ContextWithAlgs>) {
   await setupContextKeys(t)
 
@@ -50,13 +52,19 @@ export async function setupJwks(t: ExecutionContext<ContextWithAlgs>) {
       path: '/jwks',
       method: 'GET',
     })
-    .reply(200, {
-      keys: await Promise.all(
-        ALGS.map((alg) =>
-          jose.exportJWK(t.context[alg].publicKey).then((jwk) => ({ ...jwk, alg })),
+    .reply(
+      200,
+      {
+        keys: await Promise.all(
+          ALGS.map((alg) =>
+            jose.exportJWK(t.context[alg].publicKey).then((jwk) => ({ ...jwk, alg })),
+          ),
         ),
-      ),
-    })
+      },
+      {
+        headers: { 'content-type': coinflip() ? 'application/json' : 'application/jwk-set+json' },
+      },
+    )
     .persist()
 }
 
@@ -82,7 +90,10 @@ export const client = {
   client_id: 'urn:example:client_id',
 } as Client
 
-export function getResponse(body: string, { status = 200, headers = new Headers() } = {}) {
+export function getResponse(
+  body: string,
+  { status = 200, headers = new Headers({ 'content-type': 'application/json' }) } = {},
+) {
   return new Response(Buffer.from(body), { status, headers })
 }
 

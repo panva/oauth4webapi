@@ -1337,10 +1337,14 @@ export async function processDiscoveryResponse(
   }
 
   if (response.status !== 200) {
-    throw new OPE('"response" is not a conform Authorization Server Metadata response')
+    throw new OPE('"response" is not a conform Authorization Server Metadata response', {
+      cause: response,
+      code: RESPONSE_IS_NOT_CONFORM,
+    })
   }
 
   assertReadableResponse(response)
+  assertApplicationJson(response)
   let json: JsonValue
   try {
     json = await response.json()
@@ -1361,6 +1365,35 @@ export async function processDiscoveryResponse(
   }
 
   return json
+}
+
+function assertApplicationJson(response: Response): void {
+  assertContentType(response, 'application/json')
+}
+
+function notJson(response: Response, ...types: string[]) {
+  let msg = '"response" content-type must be '
+  if (types.length > 2) {
+    const last = types.pop()
+    msg += `${types.join(', ')}, or ${last}`
+  } else if (types.length === 2) {
+    msg += `${types[0]} or ${types[1]}`
+  } else {
+    msg += types[0]
+  }
+  return new OPE(msg, { cause: response, code: RESPONSE_IS_NOT_JSON })
+}
+
+function assertContentTypes(response: Response, ...types: string[]): void {
+  if (!types.includes(getContentType(response)!)) {
+    throw notJson(response, ...types)
+  }
+}
+
+function assertContentType(response: Response, contentType: string): void {
+  if (getContentType(response) !== contentType) {
+    throw notJson(response, contentType)
+  }
 }
 
 /**
@@ -2223,10 +2256,14 @@ export async function processPushedAuthorizationResponse(
     if ((err = await handleOAuthBodyError(response))) {
       return err
     }
-    throw new OPE('"response" is not a conform Pushed Authorization Request Endpoint response')
+    throw new OPE('"response" is not a conform Pushed Authorization Request Endpoint response', {
+      cause: response,
+      code: RESPONSE_IS_NOT_CONFORM,
+    })
   }
 
   assertReadableResponse(response)
+  assertApplicationJson(response)
   let json: JsonValue
   try {
     json = await response.json()
@@ -2616,12 +2653,16 @@ export async function processUserInfoResponse(
   }
 
   if (response.status !== 200) {
-    throw new OPE('"response" is not a conform UserInfo Endpoint response')
+    throw new OPE('"response" is not a conform UserInfo Endpoint response', {
+      cause: response,
+      code: RESPONSE_IS_NOT_CONFORM,
+    })
   }
+
+  assertReadableResponse(response)
 
   let json: JsonValue
   if (getContentType(response) === 'application/jwt') {
-    assertReadableResponse(response)
     const { claims, jwt } = await validateJwt(
       await response.text(),
       checkSigningAlgorithm.bind(
@@ -2641,10 +2682,13 @@ export async function processUserInfoResponse(
     json = claims as JsonValue
   } else {
     if (client.userinfo_signed_response_alg) {
-      throw new OPE('JWT UserInfo Response expected')
+      throw new OPE('JWT UserInfo Response expected', {
+        cause: response,
+        code: 'OAUTH_JWT_USERINFO_EXPECTED',
+      })
     }
 
-    assertReadableResponse(response)
+    assertApplicationJson(response)
     try {
       json = await response.json()
     } catch (cause) {
@@ -2956,10 +3000,14 @@ async function processGenericAccessTokenResponse(
     if ((err = await handleOAuthBodyError(response))) {
       return err
     }
-    throw new OPE('"response" is not a conform Token Endpoint response')
+    throw new OPE('"response" is not a conform Token Endpoint response', {
+      cause: response,
+      code: RESPONSE_IS_NOT_CONFORM,
+    })
   }
 
   assertReadableResponse(response)
+  assertApplicationJson(response)
   let json: JsonValue
   try {
     json = await response.json()
@@ -3454,14 +3502,24 @@ export async function processAuthorizationCodeOAuth2Response(
   return result as OAuth2TokenEndpointResponse
 }
 
+// TODO: remove these exports
+// TODO: revisit all code values
 /**
  * @ignore
  */
-export const USE_OPENID_CALLBACK = 'OAUTH_USE_OPENID_CALLBACK_ERR'
+export const USE_OPENID_CALLBACK = 'OAUTH_USE_OPENID_CALLBACK'
 /**
  * @ignore
  */
-export const USE_OAUTH_CALLBACK = 'OAUTH_USE_OAUTH_CALLBACK_ERR'
+export const USE_OAUTH_CALLBACK = 'OAUTH_USE_OAUTH_CALLBACK'
+/**
+ * @ignore
+ */
+export const RESPONSE_IS_NOT_JSON = 'OAUTH_RESPONSE_IS_NOT_JSON'
+/**
+ * @ignore
+ */
+export const RESPONSE_IS_NOT_CONFORM = 'OAUTH_RESPONSE_IS_NOT_CONFORM'
 
 function checkJwtType(expected: string, result: Awaited<ReturnType<typeof validateJwt>>) {
   if (typeof result.header.typ !== 'string' || normalizeTyp(result.header.typ) !== expected) {
@@ -3639,7 +3697,10 @@ export async function processRevocationResponse(
     if ((err = await handleOAuthBodyError(response))) {
       return err
     }
-    throw new OPE('"response" is not a conform Revocation Endpoint response')
+    throw new OPE('"response" is not a conform Revocation Endpoint response', {
+      cause: response,
+      code: RESPONSE_IS_NOT_CONFORM,
+    })
   }
 
   return undefined
@@ -3772,7 +3833,10 @@ export async function processIntrospectionResponse(
     if ((err = await handleOAuthBodyError(response))) {
       return err
     }
-    throw new OPE('"response" is not a conform Introspection Endpoint response')
+    throw new OPE('"response" is not a conform Introspection Endpoint response', {
+      cause: response,
+      code: RESPONSE_IS_NOT_CONFORM,
+    })
   }
 
   let json: JsonValue
@@ -3802,6 +3866,7 @@ export async function processIntrospectionResponse(
     }
   } else {
     assertReadableResponse(response)
+    assertApplicationJson(response)
     try {
       json = await response.json()
     } catch (cause) {
@@ -3849,10 +3914,14 @@ async function processJwksResponse(response: Response): Promise<JWKS> {
   }
 
   if (response.status !== 200) {
-    throw new OPE('"response" is not a conform JSON Web Key Set response')
+    throw new OPE('"response" is not a conform JSON Web Key Set response', {
+      cause: response,
+      code: RESPONSE_IS_NOT_CONFORM,
+    })
   }
 
   assertReadableResponse(response)
+  assertContentTypes(response, 'application/json', 'application/jwk-set+json')
   let json: JsonValue
   try {
     json = await response.json()
@@ -3878,9 +3947,11 @@ async function processJwksResponse(response: Response): Promise<JWKS> {
 async function handleOAuthBodyError(response: Response): Promise<OAuth2Error | undefined> {
   if (response.status > 399 && response.status < 500) {
     assertReadableResponse(response)
+    assertApplicationJson(response)
     try {
-      const json: JsonValue = await response.json()
+      const json: JsonValue = await response.clone().json()
       if (isJsonObject(json) && typeof json.error === 'string' && json.error.length) {
+        // TODO: these removals are questionable, wouldn't it be better to give back as much as possible despite it not being the explicit type?
         if (json.error_description !== undefined && typeof json.error_description !== 'string') {
           delete json.error_description
         }
@@ -4640,10 +4711,14 @@ export async function processDeviceAuthorizationResponse(
     if ((err = await handleOAuthBodyError(response))) {
       return err
     }
-    throw new OPE('"response" is not a conform Device Authorization Endpoint response')
+    throw new OPE('"response" is not a conform Device Authorization Endpoint response', {
+      cause: response,
+      code: RESPONSE_IS_NOT_CONFORM,
+    })
   }
 
   assertReadableResponse(response)
+  assertApplicationJson(response)
   let json: JsonValue
   try {
     json = await response.json()

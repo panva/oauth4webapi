@@ -22,9 +22,13 @@ test.serial('cache is empty at first and set after', async (t) => {
       path: '/jwks-force-refetch-with-cache',
       method: 'GET',
     })
-    .reply(200, {
-      keys: [await jose.exportJWK(key.publicKey)],
-    })
+    .reply(
+      200,
+      {
+        keys: [await jose.exportJWK(key.publicKey)],
+      },
+      { headers: { 'content-type': 'application/json' } },
+    )
 
   const as: lib.AuthorizationServer = {
     ...issuer,
@@ -91,9 +95,13 @@ test.serial('cache is set and updated', async (t) => {
       path: '/jwks-force-refetch-with-cache',
       method: 'GET',
     })
-    .reply(200, {
-      keys: [await jose.exportJWK(key.publicKey)],
-    })
+    .reply(
+      200,
+      {
+        keys: [await jose.exportJWK(key.publicKey)],
+      },
+      { headers: { 'content-type': 'application/json' } },
+    )
 
   const as: lib.AuthorizationServer = {
     ...issuer,

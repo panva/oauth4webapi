@@ -20,9 +20,13 @@ test.serial('jwks_uri force refetch', async (t) => {
       path: '/jwks-force-refetch',
       method: 'GET',
     })
-    .reply(200, {
-      keys: [await jose.exportJWK(key.publicKey)],
-    })
+    .reply(
+      200,
+      {
+        keys: [await jose.exportJWK(key.publicKey)],
+      },
+      { headers: { 'content-type': 'application/json' } },
+    )
 
   const as: lib.AuthorizationServer = {
     ...issuer,
@@ -64,14 +68,18 @@ test.serial('jwks_uri refetch if off cooldown and needed', async (t) => {
       path: '/jwks-refetch-off-cooldown',
       method: 'GET',
     })
-    .reply(200, {
-      keys: [
-        {
-          ...(await jose.exportJWK(key.publicKey)),
-          kid: 'foo',
-        },
-      ],
-    })
+    .reply(
+      200,
+      {
+        keys: [
+          {
+            ...(await jose.exportJWK(key.publicKey)),
+            kid: 'foo',
+          },
+        ],
+      },
+      { headers: { 'content-type': 'application/json' } },
+    )
 
   const as: lib.AuthorizationServer = {
     ...issuer,
@@ -107,14 +115,18 @@ test.serial('jwks_uri refetch if off cooldown and needed', async (t) => {
       path: '/jwks-refetch-off-cooldown',
       method: 'GET',
     })
-    .reply(200, {
-      keys: [
-        {
-          ...(await jose.exportJWK(key.publicKey)),
-          kid: 'foo2',
-        },
-      ],
-    })
+    .reply(
+      200,
+      {
+        keys: [
+          {
+            ...(await jose.exportJWK(key.publicKey)),
+            kid: 'foo2',
+          },
+        ],
+      },
+      { headers: { 'content-type': 'application/json' } },
+    )
 
   // re-fetch not allowed yet
   await t.throwsAsync(() => lib.validateJwtAuthResponse(as, c, params), {
