@@ -17,6 +17,9 @@ When configured on an interface that extends [UseMTLSAliasOptions](../interfaces
 prioritize an endpoint URL present in
 [`as.mtls_endpoint_aliases`](../interfaces/AuthorizationServer.md#mtls_endpoint_aliases).
 
+This doesn't need not be used when
+[`client.use_mtls_endpoint_aliases`](../interfaces/Client.md#use_mtls_endpoint_aliases) is `true`.
+
 ## Examples
 
 (Node.js) Using [nodejs/undici](https://github.com/nodejs/undici) for Mutual-TLS Client

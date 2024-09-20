@@ -117,6 +117,15 @@ requests. Default is `client_secret_basic`.
 
 ***
 
+### use\_mtls\_endpoint\_aliases?
+
+• `optional` **use\_mtls\_endpoint\_aliases**: `boolean`
+
+Indicates the requirement for a client to use mutual TLS endpoint aliases defined by the AS
+where present. Default is `false`.
+
+***
+
 ### userinfo\_signed\_response\_alg?
 
 • `optional` **userinfo\_signed\_response\_alg**: `string`

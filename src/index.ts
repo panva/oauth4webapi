@@ -508,6 +508,9 @@ export const jwksCache: unique symbol = Symbol()
  * prioritize an endpoint URL present in
  * {@link AuthorizationServer.mtls_endpoint_aliases `as.mtls_endpoint_aliases`}.
  *
+ * This doesn't need not be used when
+ * {@link Client.use_mtls_endpoint_aliases `client.use_mtls_endpoint_aliases`} is `true`.
+ *
  * @example
  *
  * (Node.js) Using [nodejs/undici](https://github.com/nodejs/undici) for Mutual-TLS Client
@@ -558,6 +561,7 @@ export const jwksCache: unique symbol = Symbol()
  * @see [RFC 8705 - OAuth 2.0 Mutual-TLS Client Authentication and Certificate-Bound Access Tokens](https://www.rfc-editor.org/rfc/rfc8705.html)
  */
 export const useMtlsAlias: unique symbol = Symbol()
+// TODO: deprecate useMtlsAlias in favour of `client.use_mtls_endpoint_aliases`.
 
 /**
  * Authorization Server Metadata
@@ -951,6 +955,12 @@ export interface Client {
    * Default Maximum Authentication Age.
    */
   default_max_age?: number
+
+  /**
+   * Indicates the requirement for a client to use mutual TLS endpoint aliases defined by the AS
+   * where present. Default is `false`.
+   */
+  use_mtls_endpoint_aliases?: boolean
 
   /**
    * See {@link clockSkew}.
@@ -1945,6 +1955,14 @@ function resolveEndpoint(
   return validateEndpoint(as[endpoint], endpoint)
 }
 
+function alias(client: Client, options?: UseMTLSAliasOptions): UseMTLSAliasOptions {
+  if (client.use_mtls_endpoint_aliases || options?.[useMtlsAlias]) {
+    return { [useMtlsAlias]: true }
+  }
+
+  return { [useMtlsAlias]: false }
+}
+
 /**
  * Performs a Pushed Authorization Request at the
  * {@link AuthorizationServer.pushed_authorization_request_endpoint `as.pushed_authorization_request_endpoint`}.
@@ -1967,7 +1985,7 @@ export async function pushedAuthorizationRequest(
   assertAs(as)
   assertClient(client)
 
-  const url = resolveEndpoint(as, 'pushed_authorization_request_endpoint', options)
+  const url = resolveEndpoint(as, 'pushed_authorization_request_endpoint', alias(client, options))
 
   const body = new URLSearchParams(parameters)
   body.set('client_id', client.client_id)
@@ -2313,7 +2331,7 @@ export async function userInfoRequest(
   assertAs(as)
   assertClient(client)
 
-  const url = resolveEndpoint(as, 'userinfo_endpoint', options)
+  const url = resolveEndpoint(as, 'userinfo_endpoint', alias(client, options))
 
   const headers = prepareHeaders(options?.headers)
   if (client.userinfo_signed_response_alg) {
@@ -2673,7 +2691,7 @@ async function tokenEndpointRequest(
   parameters: URLSearchParams,
   options?: Omit<TokenEndpointRequestOptions, 'additionalParameters'>,
 ): Promise<Response> {
-  const url = resolveEndpoint(as, 'token_endpoint', options)
+  const url = resolveEndpoint(as, 'token_endpoint', alias(client, options))
 
   parameters.set('grant_type', grantType)
   const headers = prepareHeaders(options?.headers)
@@ -3550,7 +3568,7 @@ export async function revocationRequest(
     throw new TypeError('"token" must be a non-empty string')
   }
 
-  const url = resolveEndpoint(as, 'revocation_endpoint', options)
+  const url = resolveEndpoint(as, 'revocation_endpoint', alias(client, options))
 
   const body = new URLSearchParams(options?.additionalParameters)
   body.set('token', token)
@@ -3644,7 +3662,7 @@ export async function introspectionRequest(
     throw new TypeError('"token" must be a non-empty string')
   }
 
-  const url = resolveEndpoint(as, 'introspection_endpoint', options)
+  const url = resolveEndpoint(as, 'introspection_endpoint', alias(client, options))
 
   const body = new URLSearchParams(options?.additionalParameters)
   body.set('token', token)
@@ -4527,7 +4545,7 @@ export async function deviceAuthorizationRequest(
   assertAs(as)
   assertClient(client)
 
-  const url = resolveEndpoint(as, 'device_authorization_endpoint', options)
+  const url = resolveEndpoint(as, 'device_authorization_endpoint', alias(client, options))
 
   const body = new URLSearchParams(parameters)
   body.set('client_id', client.client_id)
