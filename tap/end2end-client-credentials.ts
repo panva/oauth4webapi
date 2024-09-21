@@ -71,7 +71,7 @@ export default (QUnit: QUnit) => {
       }
 
       const as = await lib
-        .discoveryRequest(issuerIdentifier)
+        .discoveryRequest(issuerIdentifier, { [lib.allowInsecureRequests]: true })
         .then((response) => lib.processDiscoveryResponse(issuerIdentifier, response))
 
       const params = new URLSearchParams()
@@ -88,12 +88,14 @@ export default (QUnit: QUnit) => {
           clientCredentialsGrantRequest = () =>
             lib.clientCredentialsGrantRequest(as, client, params, {
               DPoP,
+              [lib.allowInsecureRequests]: true,
               ...authenticated,
             })
         } else {
           clientCredentialsGrantRequest = () =>
             lib.genericTokenEndpointRequest(as, client, 'client_credentials', params, {
               DPoP,
+              [lib.allowInsecureRequests]: true,
               ...authenticated,
             })
         }
@@ -124,6 +126,7 @@ export default (QUnit: QUnit) => {
                   },
                 }
               : undefined,
+            [lib.allowInsecureRequests]: true,
             async [lib.customFetch](...params: Parameters<typeof fetch>) {
               if (authMethod === 'private_key_jwt') {
                 if (params[1]?.body instanceof URLSearchParams) {
@@ -141,7 +144,9 @@ export default (QUnit: QUnit) => {
           const result = await lib.processIntrospectionResponse(as, client, response)
 
           if (jwtIntrospection) {
-            await lib.validateJwtIntrospectionSignature(as, response)
+            await lib.validateJwtIntrospectionSignature(as, response, {
+              [lib.allowInsecureRequests]: true,
+            })
           }
 
           t.propContains(result, {
@@ -153,7 +158,10 @@ export default (QUnit: QUnit) => {
         }
 
         {
-          let response = await lib.revocationRequest(as, client, access_token, authenticated)
+          let response = await lib.revocationRequest(as, client, access_token, {
+            [lib.allowInsecureRequests]: true,
+            ...authenticated,
+          })
           await lib.processRevocationResponse(response)
         }
       }

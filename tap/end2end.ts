@@ -165,14 +165,18 @@ export default (QUnit: QUnit) => {
           nonce!,
           lib.expectNoState,
           maxAge,
+          { [lib.allowInsecureRequests]: true },
         )
-      } else {
-        callbackParams = await (jarm ? lib.validateJwtAuthResponse : lib.validateAuthResponse)(
+      } else if (jarm) {
+        callbackParams = await lib.validateJwtAuthResponse(
           as,
           client,
           currentUrl,
           lib.expectNoState,
+          { [lib.allowInsecureRequests]: true },
         )
+      } else {
+        callbackParams = lib.validateAuthResponse(as, client, currentUrl, lib.expectNoState)
       }
 
       {
@@ -183,7 +187,7 @@ export default (QUnit: QUnit) => {
             callbackParams,
             'http://localhost:3000/cb',
             code_verifier,
-            { DPoP },
+            { DPoP, [lib.allowInsecureRequests]: true },
           )
         let response = await authorizationCodeGrantRequest()
 
@@ -205,10 +209,14 @@ export default (QUnit: QUnit) => {
           throw new Error()
         }
         const { sub } = lib.getValidatedIdTokenClaims(result)
-        await lib.validateIdTokenSignature(as, result)
+        await lib.validateIdTokenSignature(as, result, { [lib.allowInsecureRequests]: true })
 
         {
-          const userInfoRequest = () => lib.userInfoRequest(as, client, access_token, { DPoP })
+          const userInfoRequest = () =>
+            lib.userInfoRequest(as, client, access_token, {
+              DPoP,
+              [lib.allowInsecureRequests]: true,
+            })
           let response = await userInfoRequest().catch(async (err) => {
             if (isDpopNonceError(t, err)) {
               return userInfoRequest()
@@ -220,13 +228,18 @@ export default (QUnit: QUnit) => {
           await lib.processUserInfoResponse(as, client, sub, response)
 
           if (jwtUserinfo) {
-            await lib.validateJwtUserInfoSignature(as, response)
+            await lib.validateJwtUserInfoSignature(as, response, {
+              [lib.allowInsecureRequests]: true,
+            })
           }
         }
 
         {
           const refreshTokenGrantRequest = () =>
-            lib.refreshTokenGrantRequest(as, client, refresh_token, { DPoP })
+            lib.refreshTokenGrantRequest(as, client, refresh_token, {
+              DPoP,
+              [lib.allowInsecureRequests]: true,
+            })
           let response = await refreshTokenGrantRequest().catch((err) => {
             if (isDpopNonceError(t, err)) {
               // the AS-signalled nonce is now cached, retrying

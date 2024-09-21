@@ -230,6 +230,15 @@ export interface JWK {
 }
 
 /**
+ * By default the module only allows interactions with HTTPS endpoints. Setting this option to
+ * `true` removes that restriction.
+ *
+ * @deprecated To make it stand out as something you shouldn't use, possibly only for local
+ *   development and testing against non-TLS secured environments.
+ */
+export const allowInsecureRequests: unique symbol = Symbol()
+
+/**
  * Use to adjust the assumed current time. Positive and negative finite values representing seconds
  * are allowed. Default is `0` (Date.now() + 0 seconds is used).
  *
@@ -1187,6 +1196,13 @@ export interface HttpRequestOptions {
    * See {@link customFetch}.
    */
   [customFetch]?: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>
+
+  /**
+   * See {@link allowInsecureRequests}.
+   *
+   * @deprecated
+   */
+  [allowInsecureRequests]?: boolean
 }
 
 export interface DiscoveryRequestOptions extends HttpRequestOptions {
@@ -1985,7 +2001,8 @@ async function publicJwk(key: CryptoKeyType) {
 function validateEndpoint(
   value: unknown,
   endpoint: keyof AuthorizationServer,
-  useMtlsAlias: boolean,
+  useMtlsAlias: boolean | undefined,
+  enforceHttps: boolean | undefined,
 ) {
   if (typeof value !== 'string') {
     if (useMtlsAlias) {
@@ -1995,19 +2012,33 @@ function validateEndpoint(
     throw new TypeError(`"as.${endpoint}" must be a string`)
   }
 
-  return new URL(value)
+  const url = new URL(value)
+
+  if (enforceHttps && url.protocol !== 'https:') {
+    throw new OperationProcessingError('only requests to HTTPS are allowed', {
+      code: HTTP_REQUEST_FORBIDDEN,
+    })
+  }
+
+  return url
 }
 
 function resolveEndpoint(
   as: AuthorizationServer,
   endpoint: keyof AuthorizationServer,
-  useMtlsAlias = false,
+  useMtlsAlias: boolean | undefined,
+  enforceHttps: boolean | undefined,
 ) {
   if (useMtlsAlias && as.mtls_endpoint_aliases && endpoint in as.mtls_endpoint_aliases) {
-    return validateEndpoint(as.mtls_endpoint_aliases[endpoint], endpoint, useMtlsAlias)
+    return validateEndpoint(
+      as.mtls_endpoint_aliases[endpoint],
+      endpoint,
+      useMtlsAlias,
+      enforceHttps,
+    )
   }
 
-  return validateEndpoint(as[endpoint], endpoint, useMtlsAlias)
+  return validateEndpoint(as[endpoint], endpoint, useMtlsAlias, enforceHttps)
 }
 
 function alias(client: Client, options?: UseMTLSAliasOptions): boolean {
@@ -2040,7 +2071,12 @@ export async function pushedAuthorizationRequest(
   assertAs(as)
   assertClient(client)
 
-  const url = resolveEndpoint(as, 'pushed_authorization_request_endpoint', alias(client, options))
+  const url = resolveEndpoint(
+    as,
+    'pushed_authorization_request_endpoint',
+    alias(client, options),
+    options?.[allowInsecureRequests],
+  )
 
   const body = new URLSearchParams(parameters)
   body.set('client_id', client.client_id)
@@ -2445,6 +2481,12 @@ export async function protectedResourceRequest(
     throw new TypeError('"url" must be an instance of URL')
   }
 
+  if (options?.[allowInsecureRequests] !== true && url.protocol !== 'https:') {
+    throw new OperationProcessingError('only requests to HTTPS are allowed', {
+      code: HTTP_REQUEST_FORBIDDEN,
+    })
+  }
+
   headers = prepareHeaders(headers)
 
   if (options?.DPoP === undefined) {
@@ -2511,7 +2553,12 @@ export async function userInfoRequest(
   assertAs(as)
   assertClient(client)
 
-  const url = resolveEndpoint(as, 'userinfo_endpoint', alias(client, options))
+  const url = resolveEndpoint(
+    as,
+    'userinfo_endpoint',
+    alias(client, options),
+    options?.[allowInsecureRequests] !== true,
+  )
 
   const headers = prepareHeaders(options?.headers)
   if (client.userinfo_signed_response_alg) {
@@ -2885,7 +2932,12 @@ async function tokenEndpointRequest(
   parameters: URLSearchParams,
   options?: Omit<TokenEndpointRequestOptions, 'additionalParameters'>,
 ): Promise<Response> {
-  const url = resolveEndpoint(as, 'token_endpoint', alias(client, options))
+  const url = resolveEndpoint(
+    as,
+    'token_endpoint',
+    alias(client, options),
+    options?.[allowInsecureRequests] !== true,
+  )
 
   parameters.set('grant_type', grantType)
   const headers = prepareHeaders(options?.headers)
@@ -3652,6 +3704,10 @@ export const RESPONSE_IS_NOT_JSON = 'OAUTH_RESPONSE_IS_NOT_JSON'
  * @ignore
  */
 export const RESPONSE_IS_NOT_CONFORM = 'OAUTH_RESPONSE_IS_NOT_CONFORM'
+/**
+ * @ignore
+ */
+export const HTTP_REQUEST_FORBIDDEN = 'OAUTH_HTTP_REQUEST_FORBIDDEN'
 
 function checkJwtType(expected: string, result: Awaited<ReturnType<typeof validateJwt>>) {
   if (typeof result.header.typ !== 'string' || normalizeTyp(result.header.typ) !== expected) {
@@ -3789,7 +3845,12 @@ export async function revocationRequest(
     throw new TypeError('"token" must be a non-empty string')
   }
 
-  const url = resolveEndpoint(as, 'revocation_endpoint', alias(client, options))
+  const url = resolveEndpoint(
+    as,
+    'revocation_endpoint',
+    alias(client, options),
+    options?.[allowInsecureRequests] !== true,
+  )
 
   const body = new URLSearchParams(options?.additionalParameters)
   body.set('token', token)
@@ -3895,7 +3956,12 @@ export async function introspectionRequest(
     throw new TypeError('"token" must be a non-empty string')
   }
 
-  const url = resolveEndpoint(as, 'introspection_endpoint', alias(client, options))
+  const url = resolveEndpoint(
+    as,
+    'introspection_endpoint',
+    alias(client, options),
+    options?.[allowInsecureRequests] !== true,
+  )
 
   const body = new URLSearchParams(options?.additionalParameters)
   body.set('token', token)
@@ -4038,7 +4104,7 @@ async function jwksRequest(
 ): Promise<Response> {
   assertAs(as)
 
-  const url = resolveEndpoint(as, 'jwks_uri')
+  const url = resolveEndpoint(as, 'jwks_uri', false, options?.[allowInsecureRequests] !== true)
 
   const headers = prepareHeaders(options?.headers)
   headers.set('accept', 'application/json')
@@ -4788,7 +4854,12 @@ export async function deviceAuthorizationRequest(
   assertAs(as)
   assertClient(client)
 
-  const url = resolveEndpoint(as, 'device_authorization_endpoint', alias(client, options))
+  const url = resolveEndpoint(
+    as,
+    'device_authorization_endpoint',
+    alias(client, options),
+    options?.[allowInsecureRequests] !== true,
+  )
 
   const body = new URLSearchParams(parameters)
   body.set('client_id', client.client_id)

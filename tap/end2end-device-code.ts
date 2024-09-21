@@ -27,7 +27,7 @@ export default (QUnit: QUnit) => {
       const DPoP = dpop ? await lib.generateKeyPair(alg as lib.JWSAlgorithm) : undefined
 
       const as = await lib
-        .discoveryRequest(issuerIdentifier)
+        .discoveryRequest(issuerIdentifier, { [lib.allowInsecureRequests]: true })
         .then((response) => lib.processDiscoveryResponse(issuerIdentifier, response))
 
       const resource = 'urn:example:resource:jwt'
@@ -35,7 +35,9 @@ export default (QUnit: QUnit) => {
       params.set('resource', resource)
       params.set('scope', 'api:write')
 
-      let response = await lib.deviceAuthorizationRequest(as, client, params)
+      let response = await lib.deviceAuthorizationRequest(as, client, params, {
+        [lib.allowInsecureRequests]: true,
+      })
 
       let result = await lib.processDeviceAuthorizationResponse(as, client, response)
       const { verification_uri_complete, device_code } = result
@@ -49,7 +51,10 @@ export default (QUnit: QUnit) => {
 
       {
         const deviceCodeGrantRequest = () =>
-          lib.deviceCodeGrantRequest(as, client, device_code, { DPoP })
+          lib.deviceCodeGrantRequest(as, client, device_code, {
+            DPoP,
+            [lib.allowInsecureRequests]: true,
+          })
         let response = await deviceCodeGrantRequest()
 
         const processDeviceCodeResponse = () => lib.processDeviceCodeResponse(as, client, response)
@@ -85,12 +90,15 @@ export default (QUnit: QUnit) => {
                   },
                 }
               : undefined,
+            [lib.allowInsecureRequests]: true,
             async [lib.customFetch](...params: Parameters<typeof fetch>) {
               const url = new URL(params[0] as string)
               const { headers, method } = params[1]!
               const request = new Request(url, { headers, method })
 
-              const jwtAccessToken = await lib.validateJwtAccessToken(as, request, resource)
+              const jwtAccessToken = await lib.validateJwtAccessToken(as, request, resource, {
+                [lib.allowInsecureRequests]: true,
+              })
 
               t.propContains(jwtAccessToken, {
                 client_id: client.client_id,
