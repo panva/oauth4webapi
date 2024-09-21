@@ -154,6 +154,7 @@ export default async () => {
       keys: [await key(JWS_ALGORITHM)],
     },
     id_token_signed_response_alg: JWS_ALGORITHM,
+    use_mtls_endpoint_aliases: false,
     certificate: '',
   }
 
@@ -167,6 +168,7 @@ export default async () => {
       cert: selfsigned.cert,
       key: selfsigned.private,
     }
+    clientConfig.use_mtls_endpoint_aliases = true
   }
 
   const configuration = {

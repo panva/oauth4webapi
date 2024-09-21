@@ -26,6 +26,7 @@ const configuration: {
     client_id: string
     client_secret?: string
     redirect_uri: string
+    use_mtls_endpoint_aliases: boolean
     jwks: {
       keys: Array<JWK & { kid: string }>
     }
@@ -173,6 +174,7 @@ export const flow = (options?: MacroOptions) => {
           })
           return decoder.decode(plaintext)
         },
+        use_mtls_endpoint_aliases: configuration.client.use_mtls_endpoint_aliases,
       }
 
       switch (variant.client_auth_type) {
@@ -233,19 +235,16 @@ export const flow = (options?: MacroOptions) => {
         switch (endpoint) {
           case 'token':
             return {
-              [oauth.useMtlsAlias]: mtlsAuth || mtlsConstrain ? true : false,
               [oauth.customFetch]: mtlsAuth || mtlsConstrain ? mtlsFetch : undefined,
-            } as oauth.TokenEndpointRequestOptions
+            } as oauth.TokenEndpointRequestOptions as oauth.TokenEndpointRequestOptions
           case 'par':
             return {
-              [oauth.useMtlsAlias]: mtlsAuth ? true : false,
               [oauth.customFetch]: mtlsAuth ? mtlsFetch : undefined,
-            } as oauth.PushedAuthorizationRequestOptions
+            } as oauth.PushedAuthorizationRequestOptions as oauth.PushedAuthorizationRequestOptions
           case 'userinfo':
             return {
-              [oauth.useMtlsAlias]: mtlsConstrain ? true : false,
               [oauth.customFetch]: mtlsConstrain ? mtlsFetch : undefined,
-            } as oauth.UserInfoRequestOptions
+            } as oauth.UserInfoRequestOptions as oauth.UserInfoRequestOptions
           case 'resource':
             return {
               [oauth.customFetch]: mtlsConstrain ? mtlsFetch : undefined,

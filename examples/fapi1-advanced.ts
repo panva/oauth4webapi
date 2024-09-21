@@ -100,7 +100,6 @@ let access_token: string
     code_verifier,
     {
       clientPrivateKey,
-      [oauth.useMtlsAlias]: true,
       // @ts-expect-error
       [oauth.customFetch]: (...args) => {
         // @ts-expect-error

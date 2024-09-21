@@ -523,13 +523,6 @@ export const jweDecrypt: unique symbol = Symbol()
 export const jwksCache: unique symbol = Symbol()
 
 /**
- * @ignore
- *
- * @deprecated Use {@link Client.use_mtls_endpoint_aliases `client.use_mtls_endpoint_aliases`}.
- */
-export const useMtlsAlias: unique symbol = Symbol()
-
-/**
  * Authorization Server Metadata
  *
  * @see [IANA OAuth Authorization Server Metadata registry](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#authorization-server-metadata)
@@ -1536,21 +1529,7 @@ export interface DPoPRequestOptions {
   DPoP?: DPoPOptions
 }
 
-/**
- * @ignore
- *
- * @deprecated Use {@link Client.use_mtls_endpoint_aliases `client.use_mtls_endpoint_aliases`}.
- */
-export interface UseMTLSAliasOptions {
-  /**
-   * @ignore
-   *
-   * @deprecated Use {@link Client.use_mtls_endpoint_aliases `client.use_mtls_endpoint_aliases`}.
-   */
-  [useMtlsAlias]?: boolean
-}
-
-export interface AuthenticatedRequestOptions extends UseMTLSAliasOptions {
+export interface AuthenticatedRequestOptions {
   /**
    * Private key to use for `private_key_jwt`
    * {@link ClientAuthenticationMethod client authentication}. Its algorithm must be compatible with
@@ -2041,14 +2020,6 @@ function resolveEndpoint(
   return validateEndpoint(as[endpoint], endpoint, useMtlsAlias, enforceHttps)
 }
 
-function alias(client: Client, options?: UseMTLSAliasOptions): boolean {
-  if (client.use_mtls_endpoint_aliases || options?.[useMtlsAlias]) {
-    return true
-  }
-
-  return false
-}
-
 /**
  * Performs a Pushed Authorization Request at the
  * {@link AuthorizationServer.pushed_authorization_request_endpoint `as.pushed_authorization_request_endpoint`}.
@@ -2074,7 +2045,7 @@ export async function pushedAuthorizationRequest(
   const url = resolveEndpoint(
     as,
     'pushed_authorization_request_endpoint',
-    alias(client, options),
+    client.use_mtls_endpoint_aliases,
     options?.[allowInsecureRequests],
   )
 
@@ -2523,10 +2494,7 @@ export async function protectedResourceRequest(
     })
 }
 
-export interface UserInfoRequestOptions
-  extends HttpRequestOptions,
-    DPoPRequestOptions,
-    UseMTLSAliasOptions {}
+export interface UserInfoRequestOptions extends HttpRequestOptions, DPoPRequestOptions {}
 
 /**
  * Performs a UserInfo Request at the
@@ -2556,7 +2524,7 @@ export async function userInfoRequest(
   const url = resolveEndpoint(
     as,
     'userinfo_endpoint',
-    alias(client, options),
+    client.use_mtls_endpoint_aliases,
     options?.[allowInsecureRequests] !== true,
   )
 
@@ -2935,7 +2903,7 @@ async function tokenEndpointRequest(
   const url = resolveEndpoint(
     as,
     'token_endpoint',
-    alias(client, options),
+    client.use_mtls_endpoint_aliases,
     options?.[allowInsecureRequests] !== true,
   )
 
@@ -3848,7 +3816,7 @@ export async function revocationRequest(
   const url = resolveEndpoint(
     as,
     'revocation_endpoint',
-    alias(client, options),
+    client.use_mtls_endpoint_aliases,
     options?.[allowInsecureRequests] !== true,
   )
 
@@ -3959,7 +3927,7 @@ export async function introspectionRequest(
   const url = resolveEndpoint(
     as,
     'introspection_endpoint',
-    alias(client, options),
+    client.use_mtls_endpoint_aliases,
     options?.[allowInsecureRequests] !== true,
   )
 
@@ -4857,7 +4825,7 @@ export async function deviceAuthorizationRequest(
   const url = resolveEndpoint(
     as,
     'device_authorization_endpoint',
-    alias(client, options),
+    client.use_mtls_endpoint_aliases,
     options?.[allowInsecureRequests] !== true,
   )
 
@@ -5374,24 +5342,6 @@ export const experimentalCustomFetch = customFetch
  * @deprecated Use {@link customFetch}.
  */
 export const experimental_customFetch = customFetch
-/**
- * @ignore
- *
- * @deprecated Use {@link Client.use_mtls_endpoint_aliases `client.use_mtls_endpoint_aliases`}.
- */
-export const experimentalUseMtlsAlias = useMtlsAlias
-/**
- * @ignore
- *
- * @deprecated Use {@link Client.use_mtls_endpoint_aliases `client.use_mtls_endpoint_aliases`}.
- */
-export const experimental_useMtlsAlias = useMtlsAlias
-/**
- * @ignore
- *
- * @deprecated Use {@link Client.use_mtls_endpoint_aliases `client.use_mtls_endpoint_aliases`}.
- */
-export type ExperimentalUseMTLSAliasOptions = UseMTLSAliasOptions
 /**
  * @ignore
  *
