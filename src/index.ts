@@ -3950,21 +3950,8 @@ async function handleOAuthBodyError(response: Response): Promise<OAuth2Error | u
     assertApplicationJson(response)
     try {
       const json: JsonValue = await response.clone().json()
-      if (isJsonObject(json) && typeof json.error === 'string' && json.error.length) {
-        // TODO: these removals are questionable, wouldn't it be better to give back as much as possible despite it not being the explicit type?
-        if (json.error_description !== undefined && typeof json.error_description !== 'string') {
-          delete json.error_description
-        }
-        if (json.error_uri !== undefined && typeof json.error_uri !== 'string') {
-          delete json.error_uri
-        }
-        if (json.algs !== undefined && typeof json.algs !== 'string') {
-          delete json.algs
-        }
-        if (json.scope !== undefined && typeof json.scope !== 'string') {
-          delete json.scope
-        }
-        return json as OAuth2Error
+      if (isJsonObject<OAuth2Error>(json) && typeof json.error === 'string' && json.error.length) {
+        return json
       }
     } catch {}
   }
