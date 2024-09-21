@@ -211,25 +211,23 @@ test('processPushedAuthorizationResponse()', async (t) => {
     { request_uri: 'urn:example:uri', expires_in: 60 },
   )
 
-  t.true(
-    lib.isOAuth2Error(
-      await lib.processPushedAuthorizationResponse(
-        issuer,
-        client,
-        getResponse(JSON.stringify({ error: 'invalid_client' }), { status: 401 }),
-      ),
+  const err = await t.throwsAsync(
+    lib.processPushedAuthorizationResponse(
+      issuer,
+      client,
+      getResponse(JSON.stringify({ error: 'invalid_client' }), { status: 401 }),
     ),
   )
 
-  t.false(
-    lib.isOAuth2Error(
-      await lib.processPushedAuthorizationResponse(
-        issuer,
-        client,
-        getResponse(JSON.stringify({ request_uri: 'urn:example:uri', expires_in: 60 }), {
-          status: 201,
-        }),
-      ),
-    ),
+  t.true(
+    err instanceof lib.ResponseBodyError && err.error === 'invalid_client' && err.status === 401,
+  )
+
+  await lib.processPushedAuthorizationResponse(
+    issuer,
+    client,
+    getResponse(JSON.stringify({ request_uri: 'urn:example:uri', expires_in: 60 }), {
+      status: 201,
+    }),
   )
 })

@@ -1,5 +1,5 @@
 diff --git a/examples/oauth.ts b/examples/private_key_jwt.ts
-index cc6d632..7bf6b06 100644
+index a3321ad..a83dd5e 100644
 --- a/examples/oauth.ts
 +++ b/examples/private_key_jwt.ts
 @@ -8,12 +8,16 @@ let algorithm!:
@@ -30,11 +30,11 @@ index cc6d632..7bf6b06 100644
  }
  
  const code_challenge_method = 'S256'
-@@ -77,6 +80,7 @@ let access_token: string
+@@ -73,6 +76,7 @@ let access_token: string
      params,
      redirect_uri,
      code_verifier,
 +    { clientPrivateKey },
    )
  
-   let challenges: oauth.WWWAuthenticateChallenge[] | undefined
+   const result = await oauth.processAuthorizationCodeOAuth2Response(as, client, response)

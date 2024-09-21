@@ -1,17 +1,9 @@
 import type QUnit from 'qunit'
 import * as jose from 'jose'
 
-import {
-  assertNoWwwAuthenticateChallenges,
-  isDpopNonceError,
-  assertNotOAuth2Error,
-  setup,
-  unexpectedAuthorizationServerError,
-} from './helper.js'
+import { isDpopNonceError, setup, random } from './helper.js'
 import * as lib from '../src/index.js'
 import { keys } from './keys.js'
-
-const coinflip = () => !Math.floor(Math.random() * 2)
 
 export default (QUnit: QUnit) => {
   const { module, test } = QUnit
@@ -92,7 +84,7 @@ export default (QUnit: QUnit) => {
           typeof lib.clientCredentialsGrantRequest
         >
 
-        if (coinflip()) {
+        if (random()) {
           clientCredentialsGrantRequest = () =>
             lib.clientCredentialsGrantRequest(as, client, params, {
               DPoP,
@@ -107,20 +99,16 @@ export default (QUnit: QUnit) => {
         }
         let response = await clientCredentialsGrantRequest()
 
-        assertNoWwwAuthenticateChallenges(response)
-
         const processClientCredentialsResponse = () =>
           lib.processClientCredentialsResponse(as, client, response)
-        let result = await processClientCredentialsResponse()
-        if (lib.isOAuth2Error(result)) {
-          if (isDpopNonceError(result)) {
+        let result = await processClientCredentialsResponse().catch(async (err) => {
+          if (isDpopNonceError(t, err)) {
             response = await clientCredentialsGrantRequest()
-            result = await processClientCredentialsResponse()
-            if (!assertNotOAuth2Error(result)) return
-          } else {
-            throw unexpectedAuthorizationServerError(result)
+            return processClientCredentialsResponse()
           }
-        }
+
+          throw err
+        })
 
         const { access_token, token_type } = result
         t.equal(token_type, dpop ? 'dpop' : 'bearer')
@@ -150,11 +138,7 @@ export default (QUnit: QUnit) => {
             },
           })
 
-          assertNoWwwAuthenticateChallenges(response)
-
           const result = await lib.processIntrospectionResponse(as, client, response)
-
-          if (!assertNotOAuth2Error(result)) return
 
           if (jwtIntrospection) {
             await lib.validateJwtIntrospectionSignature(as, response)
@@ -170,11 +154,7 @@ export default (QUnit: QUnit) => {
 
         {
           let response = await lib.revocationRequest(as, client, access_token, authenticated)
-
-          assertNoWwwAuthenticateChallenges(response)
-
-          const result = await lib.processRevocationResponse(response)
-          if (!assertNotOAuth2Error(result)) return
+          await lib.processRevocationResponse(response)
         }
       }
 

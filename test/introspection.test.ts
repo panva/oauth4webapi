@@ -246,24 +246,22 @@ test('processIntrospectionResponse()', async (t) => {
     },
   )
 
-  t.true(
-    lib.isOAuth2Error(
-      await lib.processIntrospectionResponse(
-        issuer,
-        client,
-        getResponse(JSON.stringify({ error: 'invalid_client' }), { status: 401 }),
-      ),
+  const err = await t.throwsAsync(
+    lib.processIntrospectionResponse(
+      issuer,
+      client,
+      getResponse(JSON.stringify({ error: 'invalid_client' }), { status: 401 }),
     ),
   )
 
-  t.false(
-    lib.isOAuth2Error(
-      await lib.processIntrospectionResponse(
-        issuer,
-        client,
-        getResponse(JSON.stringify({ active: false })),
-      ),
-    ),
+  t.true(
+    err instanceof lib.ResponseBodyError && err.error === 'invalid_client' && err.status === 401,
+  )
+
+  await lib.processIntrospectionResponse(
+    issuer,
+    client,
+    getResponse(JSON.stringify({ active: false })),
   )
 })
 

@@ -1,5 +1,5 @@
 diff --git a/examples/oauth.ts b/examples/refresh_token.ts
-index cc6d632..4bf648d 100644
+index a3321ad..22a8a56 100644
 --- a/examples/oauth.ts
 +++ b/examples/refresh_token.ts
 @@ -43,7 +43,7 @@ let state: string | undefined
@@ -19,8 +19,8 @@ index cc6d632..4bf648d 100644
  {
    // @ts-expect-error
    const currentUrl: URL = getCurrentUrl()
-@@ -94,7 +95,7 @@ let access_token: string
-   }
+@@ -78,7 +79,7 @@ let access_token: string
+   const result = await oauth.processAuthorizationCodeOAuth2Response(as, client, response)
  
    console.log('Access Token Response', result)
 -  ;({ access_token } = result)
@@ -28,7 +28,7 @@ index cc6d632..4bf648d 100644
  }
  
  // Protected Resource Request
-@@ -115,3 +116,25 @@ let access_token: string
+@@ -91,3 +92,13 @@ let access_token: string
  
    console.log('Protected Resource Response', await response.json())
  }
@@ -37,19 +37,7 @@ index cc6d632..4bf648d 100644
 +if (refresh_token) {
 +  const response = await oauth.refreshTokenGrantRequest(as, client, refresh_token)
 +
-+  let challenges: oauth.WWWAuthenticateChallenge[] | undefined
-+  if ((challenges = oauth.parseWwwAuthenticateChallenges(response))) {
-+    for (const challenge of challenges) {
-+      console.error('WWW-Authenticate Challenge', challenge)
-+    }
-+    throw new Error() // Handle WWW-Authenticate Challenges as needed
-+  }
-+
 +  const result = await oauth.processRefreshTokenResponse(as, client, response)
-+  if (oauth.isOAuth2Error(result)) {
-+    console.error('Error Response', result)
-+    throw new Error() // Handle OAuth 2.0 response body error
-+  }
 +
 +  console.log('Access Token Response', result)
 +  ;({ access_token, refresh_token } = result)

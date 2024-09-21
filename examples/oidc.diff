@@ -1,5 +1,5 @@
 diff --git a/examples/oauth.ts b/examples/oidc.ts
-index cc6d632..cac6c75 100644
+index a3321ad..e476141 100644
 --- a/examples/oauth.ts
 +++ b/examples/oidc.ts
 @@ -35,7 +35,7 @@ const code_challenge_method = 'S256'
@@ -44,19 +44,15 @@ index cc6d632..cac6c75 100644
    const currentUrl: URL = getCurrentUrl()
 -  const params = oauth.validateAuthResponse(as, client, currentUrl, state)
 +  const params = oauth.validateAuthResponse(as, client, currentUrl)
-   if (oauth.isOAuth2Error(params)) {
-     console.error('Error Response', params)
-     throw new Error() // Handle OAuth 2.0 redirect error
-@@ -87,7 +88,7 @@ let access_token: string
-     throw new Error() // Handle WWW-Authenticate Challenges as needed
-   }
+ 
+   const response = await oauth.authorizationCodeGrantRequest(
+     as,
+@@ -75,19 +76,19 @@ let access_token: string
+     code_verifier,
+   )
  
 -  const result = await oauth.processAuthorizationCodeOAuth2Response(as, client, response)
 +  const result = await oauth.processAuthorizationCodeOpenIDResponse(as, client, response, nonce)
-   if (oauth.isOAuth2Error(result)) {
-     console.error('Error Response', result)
-     throw new Error() // Handle OAuth 2.0 response body error
-@@ -95,15 +96,14 @@ let access_token: string
  
    console.log('Access Token Response', result)
    ;({ access_token } = result)
@@ -74,12 +70,6 @@ index cc6d632..cac6c75 100644
 -    new URL('https://rs.example.com/api'),
 -  )
 +  const response = await oauth.userInfoRequest(as, client, access_token)
- 
-   let challenges: oauth.WWWAuthenticateChallenge[] | undefined
-   if ((challenges = oauth.parseWwwAuthenticateChallenges(response))) {
-@@ -113,5 +113,6 @@ let access_token: string
-     throw new Error() // Handle WWW-Authenticate Challenges as needed
-   }
  
 -  console.log('Protected Resource Response', await response.json())
 +  const result = await oauth.processUserInfoResponse(as, client, sub, response)

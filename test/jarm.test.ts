@@ -45,12 +45,6 @@ test('validateJwtAuthResponse()', async (t) => {
   await t.notThrowsAsync(async () => {
     const result = await lib.validateJwtAuthResponse(tIssuer, client, params, lib.expectNoState)
     t.true(result instanceof URLSearchParams)
-    const isError = lib.isOAuth2Error(result)
-    if (isError) {
-      t.fail()
-      throw new Error()
-    }
-    t.true(result instanceof URLSearchParams)
     t.deepEqual([...result.keys()], ['iss', 'code'])
   })
 })
@@ -73,12 +67,6 @@ test('validateJwtAuthResponse() as URL', async (t) => {
   const params = new URL(`https://rp.example.com/cb?response=${response}`)
   await t.notThrowsAsync(async () => {
     const result = await lib.validateJwtAuthResponse(tIssuer, client, params, lib.expectNoState)
-    t.true(result instanceof URLSearchParams)
-    const isError = lib.isOAuth2Error(result)
-    if (isError) {
-      t.fail()
-      throw new Error()
-    }
     t.true(result instanceof URLSearchParams)
     t.deepEqual([...result.keys()], ['iss', 'code'])
   })

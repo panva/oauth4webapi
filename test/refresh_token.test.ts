@@ -253,10 +253,6 @@ test('processRefreshTokenResponse() without ID Tokens', async (t) => {
     ),
   )
 
-  if (lib.isOAuth2Error(response)) {
-    throw new Error()
-  }
-
   t.deepEqual(response, {
     access_token: 'token',
     token_type: 'bearer',
@@ -267,24 +263,22 @@ test('processRefreshTokenResponse() without ID Tokens', async (t) => {
 
   t.is(lib.getValidatedIdTokenClaims(response), undefined)
 
-  t.true(
-    lib.isOAuth2Error(
-      await lib.processRefreshTokenResponse(
-        issuer,
-        client,
-        getResponse(JSON.stringify({ error: 'invalid_grant' }), { status: 400 }),
-      ),
+  const err = await t.throwsAsync(
+    lib.processRefreshTokenResponse(
+      issuer,
+      client,
+      getResponse(JSON.stringify({ error: 'invalid_grant' }), { status: 400 }),
     ),
   )
 
-  t.false(
-    lib.isOAuth2Error(
-      await lib.processRefreshTokenResponse(
-        issuer,
-        client,
-        getResponse(JSON.stringify({ access_token: 'token', token_type: 'Bearer' })),
-      ),
-    ),
+  t.true(
+    err instanceof lib.ResponseBodyError && err.error === 'invalid_grant' && err.status === 400,
+  )
+
+  await lib.processRefreshTokenResponse(
+    issuer,
+    client,
+    getResponse(JSON.stringify({ access_token: 'token', token_type: 'Bearer' })),
   )
 })
 
@@ -312,11 +306,7 @@ test('processRefreshTokenResponse() - ignores signatures', async (t) => {
         ),
       )
       .then(async (result) => {
-        if (lib.isOAuth2Error(result)) {
-          t.fail()
-        } else {
-          t.assert(lib.getValidatedIdTokenClaims(result))
-        }
+        t.assert(lib.getValidatedIdTokenClaims(result))
       }),
   )
 })
@@ -345,16 +335,11 @@ test('processRefreshTokenResponse() with an ID Token (alg signalled)', async (t)
         ),
       )
       .then(async (result) => {
-        if (lib.isOAuth2Error(result)) {
-          t.fail()
-        } else {
-          t.assert(lib.getValidatedIdTokenClaims(result))
-          t.throws(() => lib.getValidatedIdTokenClaims({ ...result }), {
-            name: 'TypeError',
-            message:
-              '"ref" was already garbage collected or did not resolve from the proper sources',
-          })
-        }
+        t.assert(lib.getValidatedIdTokenClaims(result))
+        t.throws(() => lib.getValidatedIdTokenClaims({ ...result }), {
+          name: 'TypeError',
+          message: '"ref" was already garbage collected or did not resolve from the proper sources',
+        })
       }),
   )
 })

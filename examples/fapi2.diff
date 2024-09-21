@@ -1,5 +1,5 @@
 diff --git a/examples/oauth.ts b/examples/fapi2.ts
-index cc6d632..80ec0f4 100644
+index a3321ad..732a72d 100644
 --- a/examples/oauth.ts
 +++ b/examples/fapi2.ts
 @@ -8,12 +8,22 @@ let algorithm!:
@@ -26,7 +26,7 @@ index cc6d632..80ec0f4 100644
  
  // End of prerequisites
  
-@@ -23,38 +33,68 @@ const as = await oauth
+@@ -23,38 +33,57 @@ const as = await oauth
  
  const client: oauth.Client = {
    client_id,
@@ -64,30 +64,19 @@ index cc6d632..80ec0f4 100644
 +      clientPrivateKey,
 +    })
 +  let response = await pushedAuthorizationRequest()
-+  let challenges: oauth.WWWAuthenticateChallenge[] | undefined
-+  if ((challenges = oauth.parseWwwAuthenticateChallenges(response))) {
-+    for (const challenge of challenges) {
-+      console.error('WWW-Authenticate Challenge', challenge)
-+    }
-+    throw new Error() // Handle WWW-Authenticate Challenges as needed
-+  }
 +
 +  const processPushedAuthorizationResponse = () =>
 +    oauth.processPushedAuthorizationResponse(as, client, response)
-+  let result = await processPushedAuthorizationResponse()
-+  if (oauth.isOAuth2Error(result)) {
-+    console.error('Error Response', result)
-+    if (result.error === 'use_dpop_nonce') {
-+      // the AS-signalled nonce is now cached, retrying
-+      response = await pushedAuthorizationRequest()
-+      result = await processPushedAuthorizationResponse()
-+      if (oauth.isOAuth2Error(result)) {
-+        throw new Error() // Handle OAuth 2.0 response body error
++  let result = await processPushedAuthorizationResponse().catch(async (err) => {
++    if (err instanceof oauth.ResponseBodyError) {
++      if (result.error === 'use_dpop_nonce') {
++        // the AS-signalled nonce is now cached, retrying
++        response = await pushedAuthorizationRequest()
++        return processPushedAuthorizationResponse()
 +      }
-+    } else {
-+      throw new Error() // Handle OAuth 2.0 response body error
 +    }
-+  }
++    throw err
++  })
 +
 +  ;({ request_uri } = result)
 +}
@@ -114,16 +103,17 @@ index cc6d632..80ec0f4 100644
  
    // now redirect the user to authorizationUrl.href
  }
-@@ -65,19 +105,16 @@ let access_token: string
+@@ -65,17 +94,26 @@ let access_token: string
  {
    // @ts-expect-error
    const currentUrl: URL = getCurrentUrl()
 -  const params = oauth.validateAuthResponse(as, client, currentUrl, state)
 +  const params = oauth.validateAuthResponse(as, client, currentUrl)
-   if (oauth.isOAuth2Error(params)) {
-     console.error('Error Response', params)
-     throw new Error() // Handle OAuth 2.0 redirect error
-   }
++
++  const authorizationCodeGrantRequest = () =>
++    oauth.authorizationCodeGrantRequest(as, client, params, redirect_uri, code_verifier, { DPoP })
++
++  let response = await authorizationCodeGrantRequest()
  
 -  const response = await oauth.authorizationCodeGrantRequest(
 -    as,
@@ -132,39 +122,24 @@ index cc6d632..80ec0f4 100644
 -    redirect_uri,
 -    code_verifier,
 -  )
-+  const authorizationCodeGrantRequest = () =>
-+    oauth.authorizationCodeGrantRequest(as, client, params, redirect_uri, code_verifier, { DPoP })
-+
-+  let response = await authorizationCodeGrantRequest()
- 
-   let challenges: oauth.WWWAuthenticateChallenge[] | undefined
-   if ((challenges = oauth.parseWwwAuthenticateChallenges(response))) {
-@@ -87,10 +124,22 @@ let access_token: string
-     throw new Error() // Handle WWW-Authenticate Challenges as needed
-   }
- 
--  const result = await oauth.processAuthorizationCodeOAuth2Response(as, client, response)
 +  const processAuthorizationCodeOAuth2Response = () =>
 +    oauth.processAuthorizationCodeOAuth2Response(as, client, response)
-+
-+  let result = await processAuthorizationCodeOAuth2Response()
-   if (oauth.isOAuth2Error(result)) {
-     console.error('Error Response', result)
--    throw new Error() // Handle OAuth 2.0 response body error
-+    if (result.error === 'use_dpop_nonce') {
-+      // the AS-signalled nonce is now cached, retrying
-+      response = await authorizationCodeGrantRequest()
-+      result = await processAuthorizationCodeOAuth2Response()
-+      if (oauth.isOAuth2Error(result)) {
-+        throw new Error() // Handle OAuth 2.0 response body error
+ 
+-  const result = await oauth.processAuthorizationCodeOAuth2Response(as, client, response)
++  let result = await processAuthorizationCodeOAuth2Response().catch(async (err) => {
++    if (err instanceof oauth.ResponseBodyError) {
++      if (result.error === 'use_dpop_nonce') {
++        // the AS-signalled nonce is now cached, retrying
++        response = await authorizationCodeGrantRequest()
++        return processAuthorizationCodeOAuth2Response()
 +      }
-+    } else {
-+      throw new Error() // Handle OAuth 2.0 response body error
 +    }
-   }
++    throw err
++  })
  
    console.log('Access Token Response', result)
-@@ -99,18 +148,33 @@ let access_token: string
+   ;({ access_token } = result)
+@@ -83,11 +121,29 @@ let access_token: string
  
  // Protected Resource Request
  {
@@ -182,27 +157,20 @@ index cc6d632..80ec0f4 100644
 +      undefined,
 +      { DPoP },
 +    )
-+  let response = await protectedResourceRequest()
- 
-   let challenges: oauth.WWWAuthenticateChallenge[] | undefined
-   if ((challenges = oauth.parseWwwAuthenticateChallenges(response))) {
--    for (const challenge of challenges) {
--      console.error('WWW-Authenticate Challenge', challenge)
-+    const { 0: challenge, length } = challenges
-+    if (
-+      length === 1 &&
-+      challenge.scheme === 'dpop' &&
-+      challenge.parameters.error === 'use_dpop_nonce'
-+    ) {
-+      // the AS-signalled nonce is now cached, retrying
-+      response = await protectedResourceRequest()
-+    } else {
-+      for (const challenge of challenges) {
-+        console.error('WWW-Authenticate Challenge', challenge)
++  let response = await protectedResourceRequest().catch((err) => {
++    if (err instanceof oauth.WWWAuthenticateChallengeError) {
++      const { 0: challenge, length } = err.cause
++      if (
++        length === 1 &&
++        challenge.scheme === 'dpop' &&
++        challenge.parameters.error === 'use_dpop_nonce'
++      ) {
++        // the AS-signalled nonce is now cached, retrying
++        return protectedResourceRequest()
 +      }
-+      throw new Error() // Handle WWW-Authenticate Challenges as needed
-     }
--    throw new Error() // Handle WWW-Authenticate Challenges as needed
-   }
++    }
++    throw err
++  })
  
    console.log('Protected Resource Response', await response.json())
+ }

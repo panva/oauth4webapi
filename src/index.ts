@@ -2073,41 +2073,157 @@ export interface OAuth2Error {
 }
 
 /**
- * A helper function used to determine if a response processing function returned an OAuth2Error.
+ * Throw when a server responds with an "OAuth-style" error JSON body
  *
- * @group Utilities
- * @group Client Credentials Grant
- * @group Device Authorization Grant
- * @group Authorization Code Grant
- * @group Authorization Code Grant w/ OpenID Connect (OIDC)
- * @group Token Introspection
- * @group Token Revocation
- * @group Refreshing an Access Token
- * @group Pushed Authorization Requests (PAR)
- * @group JWT Bearer Token Grant Type
- * @group SAML 2.0 Bearer Assertion Grant Type
- * @group Token Exchange Grant Type
+ * @example
+ *
+ * ```http
+ * HTTP/1.1 400 Bad Request
+ * Content-Type: application/json;charset=UTF-8
+ * Cache-Control: no-store
+ * Pragma: no-cache
+ *
+ * {
+ *   "error":"invalid_request"
+ * }
+ * ```
+ *
+ * @group Errors
  */
-export function isOAuth2Error(
-  input?:
-    | TokenEndpointResponse
-    | OAuth2TokenEndpointResponse
-    | OpenIDTokenEndpointResponse
-    | ClientCredentialsGrantResponse
-    | DeviceAuthorizationResponse
-    | IntrospectionResponse
-    | OAuth2Error
-    | PushedAuthorizationResponse
-    | URLSearchParams
-    | UserInfoResponse,
-): input is OAuth2Error {
-  const value = input as unknown
-  if (typeof value !== 'object' || Array.isArray(value) || value === null) {
-    return false
-  }
+export class ResponseBodyError extends Error {
+  /**
+   * The parsed JSON response body
+   */
+  override cause!: Record<string, JsonValue | undefined>
 
-  // @ts-expect-error
-  return value.error !== undefined
+  /**
+   * Error code given in the JSON response
+   */
+  error: string
+
+  /**
+   * HTTP Status Code of the response
+   */
+  status: number
+
+  /**
+   * Human-readable text providing additional information, used to assist the developer in
+   * understanding the error that occurred, given in the JSON response
+   */
+  error_description?: string
+
+  /**
+   * The "OAuth-style" error {@link !Response}, its {@link !Response.bodyUsed} is `false` and the JSON
+   * body is available in {@link ResponseBodyError.cause}
+   */
+  response!: Response
+
+  constructor(
+    message: string,
+    options: {
+      cause: OAuth2Error
+      response: Response
+    },
+  ) {
+    super(message, options)
+    this.name = this.constructor.name
+    this.error = options.cause.error
+    this.status = options.response.status
+    this.error_description = options.cause.error_description
+    Object.defineProperty(this, 'response', { enumerable: false, value: options.response })
+
+    // @ts-ignore
+    Error.captureStackTrace?.(this, this.constructor)
+  }
+}
+
+/**
+ * Thrown when OAuth 2.0 Authorization Error Response is encountered.
+ *
+ * @example
+ *
+ * ```http
+ * HTTP/1.1 302 Found
+ * Location: https://client.example.com/cb?error=access_denied&state=xyz
+ * ```
+ *
+ * @group Errors
+ */
+export class AuthorizationResponseError extends Error {
+  /**
+   * Authorization Response parameters as {@link !URLSearchParams}
+   */
+  override cause!: URLSearchParams
+
+  /**
+   * Error code given in the Authorization Response
+   */
+  error: string
+
+  /**
+   * Human-readable text providing additional information, used to assist the developer in
+   * understanding the error that occurred, given in the Authorization Response
+   */
+  error_description?: string
+
+  constructor(
+    message: string,
+    options: {
+      cause: URLSearchParams
+    },
+  ) {
+    super(message, options)
+    this.name = this.constructor.name
+    this.error = options.cause.get('error')!
+    this.error_description = options.cause.get('error_description') ?? undefined
+
+    // @ts-ignore
+    Error.captureStackTrace?.(this, this.constructor)
+  }
+}
+
+/**
+ * Thrown when a server responds with WWW-Authenticate challenges, typically because of expired
+ * tokens, or bad client authentication
+ *
+ * @example
+ *
+ * ```http
+ * HTTP/1.1 401 Unauthorized
+ * WWW-Authenticate: Bearer realm="example",
+ *                          error="invalid_token",
+ *                          error_description="The access token expired"
+ * ```
+ *
+ * @group Errors
+ */
+export class WWWAuthenticateChallengeError extends Error {
+  /**
+   * The parsed WWW-Authenticate HTTP Header challenges
+   */
+  override cause!: WWWAuthenticateChallenge[]
+
+  /**
+   * The {@link !Response} that included a WWW-Authenticate HTTP Header challenges, its
+   * {@link !Response.bodyUsed} is `true`
+   */
+  response: Response
+
+  /**
+   * HTTP Status Code of the response
+   */
+  status: number
+
+  constructor(message: string, options: { cause: WWWAuthenticateChallenge[]; response: Response }) {
+    super(message, options)
+    this.name = this.constructor.name
+    this.status = options.response.status
+    this.response = options.response
+    Object.defineProperty(this, 'response', { enumerable: false })
+
+    // @ts-ignore
+    Error.captureStackTrace?.(this, this.constructor)
+  }
 }
 
 export interface WWWAuthenticateChallengeParameters {
@@ -2169,24 +2285,7 @@ function wwwAuth(scheme: string, params: string): WWWAuthenticateChallenge {
 }
 
 /**
- * Parses the `WWW-Authenticate` HTTP Header from a {@link !Response} instance.
- *
- * @returns Array of {@link WWWAuthenticateChallenge} objects. Their order from the response is
- *   preserved. `undefined` when there wasn't a `WWW-Authenticate` HTTP Header returned.
- *
- * @group Accessing Protected Resources
- * @group Utilities
- * @group Client Credentials Grant
- * @group Device Authorization Grant
- * @group Authorization Code Grant
- * @group Authorization Code Grant w/ OpenID Connect (OIDC)
- * @group Token Introspection
- * @group Token Revocation
- * @group Refreshing an Access Token
- * @group Pushed Authorization Requests (PAR)
- * @group JWT Bearer Token Grant Type
- * @group SAML 2.0 Bearer Assertion Grant Type
- * @group Token Exchange Grant Type
+ * @internal
  */
 export function parseWwwAuthenticateChallenges(
   response: Response,
@@ -2231,9 +2330,9 @@ export function parseWwwAuthenticateChallenges(
  * @param client Client Metadata.
  * @param response Resolved value from {@link pushedAuthorizationRequest}.
  *
- * @returns Resolves with an object representing the parsed successful response, or an object
- *   representing an OAuth 2.0 protocol style error. Use {@link isOAuth2Error} to determine if an
- *   OAuth 2.0 error was returned.
+ * @returns Resolves with an object representing the parsed successful response. OAuth 2.0 protocol
+ *   style errors are rejected using {@link ResponseBodyError}. WWW-Authenticate HTTP Header
+ *   challenges are rejected with {@link WWWAuthenticateChallengeError}.
  *
  * @group Pushed Authorization Requests (PAR)
  *
@@ -2243,7 +2342,7 @@ export async function processPushedAuthorizationResponse(
   as: AuthorizationServer,
   client: Client,
   response: Response,
-): Promise<PushedAuthorizationResponse | OAuth2Error> {
+): Promise<PushedAuthorizationResponse> {
   assertAs(as)
   assertClient(client)
 
@@ -2251,10 +2350,21 @@ export async function processPushedAuthorizationResponse(
     throw new TypeError('"response" must be an instance of Response')
   }
 
+  let challenges: WWWAuthenticateChallenge[] | undefined
+  if ((challenges = parseWwwAuthenticateChallenges(response))) {
+    throw new WWWAuthenticateChallengeError(
+      'server responded with a challenge in the WWW-Authenticate HTTP Header',
+      { cause: challenges, response },
+    )
+  }
+
   if (response.status !== 201) {
     let err: OAuth2Error | undefined
     if ((err = await handleOAuthBodyError(response))) {
-      return err
+      throw new ResponseBodyError('server responded with an error in the response body', {
+        cause: err,
+        response,
+      })
     }
     throw new OPE('"response" is not a conform Pushed Authorization Request Endpoint response', {
       cause: response,
@@ -2357,7 +2467,18 @@ export async function protectedResourceRequest(
     method,
     redirect: 'manual',
     signal: options?.signal ? signal(options.signal) : null,
-  }).then(processDpopNonce)
+  })
+    .then(processDpopNonce)
+    .then((response) => {
+      let challenges: WWWAuthenticateChallenge[] | undefined
+      if ((challenges = parseWwwAuthenticateChallenges(response))) {
+        throw new WWWAuthenticateChallengeError(
+          'server responded with a challenge in the WWW-Authenticate HTTP Header',
+          { cause: challenges, response },
+        )
+      }
+      return response
+    })
 }
 
 export interface UserInfoRequestOptions
@@ -2630,9 +2751,8 @@ function getContentType(response: Response) {
  *   {@link getValidatedIdTokenClaims}.
  * @param response Resolved value from {@link userInfoRequest}.
  *
- * @returns Resolves with an object representing the parsed successful response, or an object
- *   representing an OAuth 2.0 protocol style error. Use {@link isOAuth2Error} to determine if an
- *   OAuth 2.0 error was returned.
+ * @returns Resolves with an object representing the parsed successful response. WWW-Authenticate
+ *   HTTP Header challenges are rejected with {@link WWWAuthenticateChallengeError}.
  *
  * @group Authorization Code Grant w/ OpenID Connect (OIDC)
  * @group OpenID Connect (OIDC) UserInfo
@@ -2650,6 +2770,14 @@ export async function processUserInfoResponse(
 
   if (!looseInstanceOf(response, Response)) {
     throw new TypeError('"response" must be an instance of Response')
+  }
+
+  let challenges: WWWAuthenticateChallenge[] | undefined
+  if ((challenges = parseWwwAuthenticateChallenges(response))) {
+    throw new WWWAuthenticateChallengeError(
+      'server responded with a challenge in the WWW-Authenticate HTTP Header',
+      { cause: challenges, response },
+    )
   }
 
   if (response.status !== 200) {
@@ -2987,7 +3115,7 @@ async function processGenericAccessTokenResponse(
   response: Response,
   ignoreIdToken = false,
   ignoreRefreshToken = false,
-): Promise<TokenEndpointResponse | OAuth2Error> {
+): Promise<TokenEndpointResponse> {
   assertAs(as)
   assertClient(client)
 
@@ -2995,10 +3123,22 @@ async function processGenericAccessTokenResponse(
     throw new TypeError('"response" must be an instance of Response')
   }
 
+  let challenges: WWWAuthenticateChallenge[] | undefined
+  if ((challenges = parseWwwAuthenticateChallenges(response))) {
+    throw new WWWAuthenticateChallengeError(
+      'server responded with a challenge in the WWW-Authenticate HTTP Header',
+      { cause: challenges, response },
+    )
+  }
+
   if (response.status !== 200) {
     let err: OAuth2Error | undefined
     if ((err = await handleOAuthBodyError(response))) {
-      return err
+      await response.body!.cancel()
+      throw new ResponseBodyError('server responded with an error in the response body', {
+        cause: err,
+        response,
+      })
     }
     throw new OPE('"response" is not a conform Token Endpoint response', {
       cause: response,
@@ -3106,9 +3246,9 @@ async function processGenericAccessTokenResponse(
  * @param client Client Metadata.
  * @param response Resolved value from {@link refreshTokenGrantRequest}.
  *
- * @returns Resolves with an object representing the parsed successful response, or an object
- *   representing an OAuth 2.0 protocol style error. Use {@link isOAuth2Error} to determine if an
- *   OAuth 2.0 error was returned.
+ * @returns Resolves with an object representing the parsed successful response. OAuth 2.0 protocol
+ *   style errors are rejected using {@link ResponseBodyError}. WWW-Authenticate HTTP Header
+ *   challenges are rejected with {@link WWWAuthenticateChallengeError}.
  *
  * @group Refreshing an Access Token
  *
@@ -3119,7 +3259,7 @@ export async function processRefreshTokenResponse(
   as: AuthorizationServer,
   client: Client,
   response: Response,
-): Promise<TokenEndpointResponse | OAuth2Error> {
+): Promise<TokenEndpointResponse> {
   return processGenericAccessTokenResponse(as, client, response)
 }
 
@@ -3388,9 +3528,9 @@ export const skipAuthTimeCheck: unique symbol = Symbol()
  *   {@link Client.default_max_age `client.default_max_age`} and falls back to
  *   {@link skipAuthTimeCheck}.
  *
- * @returns Resolves with an object representing the parsed successful response, or an object
- *   representing an OAuth 2.0 protocol style error. Use {@link isOAuth2Error} to determine if an
- *   OAuth 2.0 error was returned.
+ * @returns Resolves with an object representing the parsed successful response. OAuth 2.0 protocol
+ *   style errors are rejected using {@link ResponseBodyError}. WWW-Authenticate HTTP Header
+ *   challenges are rejected with {@link WWWAuthenticateChallengeError}.
  *
  * @group Authorization Code Grant w/ OpenID Connect (OIDC)
  *
@@ -3403,12 +3543,8 @@ export async function processAuthorizationCodeOpenIDResponse(
   response: Response,
   expectedNonce?: string | typeof expectNoNonce,
   maxAge?: number | typeof skipAuthTimeCheck,
-): Promise<OpenIDTokenEndpointResponse | OAuth2Error> {
+): Promise<OpenIDTokenEndpointResponse> {
   const result = await processGenericAccessTokenResponse(as, client, response)
-
-  if (isOAuth2Error(result)) {
-    return result
-  }
 
   if (!validateString(result.id_token)) {
     throw new OPE('"response" body "id_token" property must be a non-empty string', {
@@ -3469,9 +3605,9 @@ export async function processAuthorizationCodeOpenIDResponse(
  * @param client Client Metadata.
  * @param response Resolved value from {@link authorizationCodeGrantRequest}.
  *
- * @returns Resolves with an object representing the parsed successful response, or an object
- *   representing an OAuth 2.0 protocol style error. Use {@link isOAuth2Error} to determine if an
- *   OAuth 2.0 error was returned.
+ * @returns Resolves with an object representing the parsed successful response. OAuth 2.0 protocol
+ *   style errors are rejected using {@link ResponseBodyError}. WWW-Authenticate HTTP Header
+ *   challenges are rejected with {@link WWWAuthenticateChallengeError}.
  *
  * @group Authorization Code Grant
  *
@@ -3481,12 +3617,8 @@ export async function processAuthorizationCodeOAuth2Response(
   as: AuthorizationServer,
   client: Client,
   response: Response,
-): Promise<OAuth2TokenEndpointResponse | OAuth2Error> {
+): Promise<OAuth2TokenEndpointResponse> {
   const result = await processGenericAccessTokenResponse(as, client, response, true)
-
-  if (isOAuth2Error(result)) {
-    return result
-  }
 
   if (result.id_token !== undefined) {
     if (typeof result.id_token === 'string' && result.id_token.length) {
@@ -3606,9 +3738,9 @@ export async function genericTokenEndpointRequest(
  * @param client Client Metadata.
  * @param response Resolved value from {@link clientCredentialsGrantRequest}.
  *
- * @returns Resolves with an object representing the parsed successful response, or an object
- *   representing an OAuth 2.0 protocol style error. Use {@link isOAuth2Error} to determine if an
- *   OAuth 2.0 error was returned.
+ * @returns Resolves with an object representing the parsed successful response. OAuth 2.0 protocol
+ *   style errors are rejected using {@link ResponseBodyError}. WWW-Authenticate HTTP Header
+ *   challenges are rejected with {@link WWWAuthenticateChallengeError}.
  *
  * @group Client Credentials Grant
  *
@@ -3618,12 +3750,8 @@ export async function processClientCredentialsResponse(
   as: AuthorizationServer,
   client: Client,
   response: Response,
-): Promise<ClientCredentialsGrantResponse | OAuth2Error> {
+): Promise<ClientCredentialsGrantResponse> {
   const result = await processGenericAccessTokenResponse(as, client, response, true, true)
-
-  if (isOAuth2Error(result)) {
-    return result
-  }
 
   return result as ClientCredentialsGrantResponse
 }
@@ -3685,17 +3813,26 @@ export async function revocationRequest(
  *
  * @see [RFC 7009 - OAuth 2.0 Token Revocation](https://www.rfc-editor.org/rfc/rfc7009.html#section-2)
  */
-export async function processRevocationResponse(
-  response: Response,
-): Promise<undefined | OAuth2Error> {
+export async function processRevocationResponse(response: Response): Promise<undefined> {
   if (!looseInstanceOf(response, Response)) {
     throw new TypeError('"response" must be an instance of Response')
+  }
+
+  let challenges: WWWAuthenticateChallenge[] | undefined
+  if ((challenges = parseWwwAuthenticateChallenges(response))) {
+    throw new WWWAuthenticateChallengeError(
+      'server responded with a challenge in the WWW-Authenticate HTTP Header',
+      { cause: challenges, response },
+    )
   }
 
   if (response.status !== 200) {
     let err: OAuth2Error | undefined
     if ((err = await handleOAuthBodyError(response))) {
-      return err
+      throw new ResponseBodyError('server responded with an error in the response body', {
+        cause: err,
+        response,
+      })
     }
     throw new OPE('"response" is not a conform Revocation Endpoint response', {
       cause: response,
@@ -3807,9 +3944,9 @@ export interface IntrospectionResponse {
  * @param client Client Metadata.
  * @param response Resolved value from {@link introspectionRequest}.
  *
- * @returns Resolves with an object representing the parsed successful response, or an object
- *   representing an OAuth 2.0 protocol style error. Use {@link isOAuth2Error} to determine if an
- *   OAuth 2.0 error was returned.
+ * @returns Resolves with an object representing the parsed successful response. OAuth 2.0 protocol
+ *   style errors are rejected using {@link ResponseBodyError}. WWW-Authenticate HTTP Header
+ *   challenges are rejected with {@link WWWAuthenticateChallengeError}.
  *
  * @group Token Introspection
  *
@@ -3820,7 +3957,7 @@ export async function processIntrospectionResponse(
   as: AuthorizationServer,
   client: Client,
   response: Response,
-): Promise<IntrospectionResponse | OAuth2Error> {
+): Promise<IntrospectionResponse> {
   assertAs(as)
   assertClient(client)
 
@@ -3828,10 +3965,21 @@ export async function processIntrospectionResponse(
     throw new TypeError('"response" must be an instance of Response')
   }
 
+  let challenges: WWWAuthenticateChallenge[] | undefined
+  if ((challenges = parseWwwAuthenticateChallenges(response))) {
+    throw new WWWAuthenticateChallengeError(
+      'server responded with a challenge in the WWW-Authenticate HTTP Header',
+      { cause: challenges, response },
+    )
+  }
+
   if (response.status !== 200) {
     let err: OAuth2Error | undefined
     if ((err = await handleOAuthBodyError(response))) {
-      return err
+      throw new ResponseBodyError('server responded with an error in the response body', {
+        cause: err,
+        response,
+      })
     }
     throw new OPE('"response" is not a conform Introspection Endpoint response', {
       cause: response,
@@ -4145,7 +4293,8 @@ async function validateJwt(
  * @param parameters JARM authorization response.
  * @param expectedState Expected `state` parameter value. Default is {@link expectNoState}.
  *
- * @returns Validated Authorization Response parameters or Authorization Error Response.
+ * @returns Validated Authorization Response parameters. Authorization Error Responses are rejected
+ *   using {@link AuthorizationResponseError}.
  *
  * @group Authorization Code Grant
  * @group Authorization Code Grant w/ OpenID Connect (OIDC)
@@ -4159,7 +4308,7 @@ export async function validateJwtAuthResponse(
   parameters: URLSearchParams | URL,
   expectedState?: string | typeof expectNoState | typeof skipStateCheck,
   options?: ValidateSignatureOptions,
-): Promise<URLSearchParams | OAuth2Error> {
+): Promise<URLSearchParams> {
   assertAs(as)
   assertClient(client)
 
@@ -4261,7 +4410,8 @@ async function idTokenHashMatches(
  *   {@link Client.default_max_age `client.default_max_age`} and falls back to
  *   {@link skipAuthTimeCheck}.
  *
- * @returns Validated Authorization Response parameters or Authorization Error Response.
+ * @returns Validated Authorization Response parameters. Authorization Error Responses are rejected
+ *   using {@link AuthorizationResponseError}.
  *
  * @group FAPI 1.0 Advanced
  *
@@ -4275,7 +4425,7 @@ export async function validateDetachedSignatureResponse(
   expectedState?: string | typeof expectNoState,
   maxAge?: number | typeof skipAuthTimeCheck,
   options?: ValidateSignatureOptions,
-): Promise<URLSearchParams | OAuth2Error> {
+): Promise<URLSearchParams> {
   assertAs(as)
   assertClient(client)
 
@@ -4316,10 +4466,6 @@ export async function validateDetachedSignatureResponse(
     parameters,
     expectedState,
   )
-
-  if (isOAuth2Error(result)) {
-    return result
-  }
 
   if (!id_token) {
     throw new OPE('"parameters" does not contain an ID Token')
@@ -4499,7 +4645,8 @@ export const expectNoState: unique symbol = Symbol()
  * @param parameters Authorization response.
  * @param expectedState Expected `state` parameter value. Default is {@link expectNoState}.
  *
- * @returns Validated Authorization Response parameters or Authorization Error Response.
+ * @returns Validated Authorization Response parameters. Authorization Error Responses throw
+ *   {@link AuthorizationResponseError}.
  *
  * @group Authorization Code Grant
  * @group Authorization Code Grant w/ OpenID Connect (OIDC)
@@ -4513,7 +4660,7 @@ export function validateAuthResponse(
   client: Client,
   parameters: URLSearchParams | URL,
   expectedState?: string | typeof expectNoState | typeof skipStateCheck,
-): URLSearchParams | OAuth2Error {
+): URLSearchParams {
   assertAs(as)
   assertClient(client)
 
@@ -4565,11 +4712,9 @@ export function validateAuthResponse(
 
   const error = getURLSearchParameter(parameters, 'error')
   if (error) {
-    return {
-      error,
-      error_description: getURLSearchParameter(parameters, 'error_description'),
-      error_uri: getURLSearchParameter(parameters, 'error_uri'),
-    }
+    throw new AuthorizationResponseError('authorization response from the server is an error', {
+      cause: parameters,
+    })
   }
 
   const id_token = getURLSearchParameter(parameters, 'id_token')
@@ -4673,9 +4818,9 @@ export interface DeviceAuthorizationResponse {
  * @param client Client Metadata.
  * @param response Resolved value from {@link deviceAuthorizationRequest}.
  *
- * @returns Resolves with an object representing the parsed successful response, or an object
- *   representing an OAuth 2.0 protocol style error. Use {@link isOAuth2Error} to determine if an
- *   OAuth 2.0 error was returned.
+ * @returns Resolves with an object representing the parsed successful response. OAuth 2.0 protocol
+ *   style errors are rejected using {@link ResponseBodyError}. WWW-Authenticate HTTP Header
+ *   challenges are rejected with {@link WWWAuthenticateChallengeError}.
  *
  * @group Device Authorization Grant
  *
@@ -4685,7 +4830,7 @@ export async function processDeviceAuthorizationResponse(
   as: AuthorizationServer,
   client: Client,
   response: Response,
-): Promise<DeviceAuthorizationResponse | OAuth2Error> {
+): Promise<DeviceAuthorizationResponse> {
   assertAs(as)
   assertClient(client)
 
@@ -4693,10 +4838,21 @@ export async function processDeviceAuthorizationResponse(
     throw new TypeError('"response" must be an instance of Response')
   }
 
+  let challenges: WWWAuthenticateChallenge[] | undefined
+  if ((challenges = parseWwwAuthenticateChallenges(response))) {
+    throw new WWWAuthenticateChallengeError(
+      'server responded with a challenge in the WWW-Authenticate HTTP Header',
+      { cause: challenges, response },
+    )
+  }
+
   if (response.status !== 200) {
     let err: OAuth2Error | undefined
     if ((err = await handleOAuthBodyError(response))) {
-      return err
+      throw new ResponseBodyError('server responded with an error in the response body', {
+        cause: err,
+        response,
+      })
     }
     throw new OPE('"response" is not a conform Device Authorization Endpoint response', {
       cause: response,
@@ -4792,9 +4948,9 @@ export async function deviceCodeGrantRequest(
  * @param client Client Metadata.
  * @param response Resolved value from {@link deviceCodeGrantRequest}.
  *
- * @returns Resolves with an object representing the parsed successful response, or an object
- *   representing an OAuth 2.0 protocol style error. Use {@link isOAuth2Error} to determine if an
- *   OAuth 2.0 error was returned.
+ * @returns Resolves with an object representing the parsed successful response. OAuth 2.0 protocol
+ *   style errors are rejected using {@link ResponseBodyError}. WWW-Authenticate HTTP Header
+ *   challenges are rejected with {@link WWWAuthenticateChallengeError}.
  *
  * @group Device Authorization Grant
  *
@@ -4804,7 +4960,7 @@ export async function processDeviceCodeResponse(
   as: AuthorizationServer,
   client: Client,
   response: Response,
-): Promise<TokenEndpointResponse | OAuth2Error> {
+): Promise<TokenEndpointResponse> {
   return processGenericAccessTokenResponse(as, client, response)
 }
 

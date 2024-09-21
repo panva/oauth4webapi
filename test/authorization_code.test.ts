@@ -30,7 +30,6 @@ function cb(params: string) {
     new URLSearchParams(),
     lib.expectNoState,
   )
-  if (lib.isOAuth2Error(callbackParameters)) throw new Error()
   for (const param of callbackParameters.keys()) {
     callbackParameters.delete(param)
   }
@@ -406,25 +405,19 @@ test('processAuthorizationCodeOAuth2Response()', async (t) => {
     },
   )
 
-  t.true(
-    lib.isOAuth2Error(
-      await lib.processAuthorizationCodeOAuth2Response(
-        issuer,
-        client,
-        getResponse(JSON.stringify({ error: 'invalid_grant' }), { status: 400 }),
-      ),
+  let err = await t.throwsAsync(
+    lib.processAuthorizationCodeOAuth2Response(
+      issuer,
+      client,
+      getResponse(JSON.stringify({ error: 'invalid_grant' }), { status: 400 }),
     ),
   )
 
-  t.false(
-    lib.isOAuth2Error(
-      await lib.processAuthorizationCodeOAuth2Response(
-        issuer,
-        client,
-        getResponse(JSON.stringify({ access_token: 'token', token_type: 'Bearer' })),
-      ),
-    ),
-  )
+  if (err instanceof lib.ResponseBodyError) {
+    t.is(err.error, 'invalid_grant')
+  } else {
+    t.fail()
+  }
 })
 
 test('processAuthorizationCodeOpenIDResponse() - ignores signatures', async (t) => {
@@ -451,11 +444,7 @@ test('processAuthorizationCodeOpenIDResponse() - ignores signatures', async (t) 
         ),
       )
       .then(async (result) => {
-        if (lib.isOAuth2Error(result)) {
-          t.fail()
-        } else {
-          t.assert(lib.getValidatedIdTokenClaims(result))
-        }
+        t.assert(lib.getValidatedIdTokenClaims(result))
       }),
   )
 })
@@ -483,16 +472,11 @@ test('processAuthorizationCodeOpenIDResponse() with an ID Token (alg signalled)'
         ),
       )
       .then(async (result) => {
-        if (lib.isOAuth2Error(result)) {
-          t.fail()
-        } else {
-          t.assert(lib.getValidatedIdTokenClaims(result))
-          t.throws(() => lib.getValidatedIdTokenClaims({ ...result }), {
-            name: 'TypeError',
-            message:
-              '"ref" was already garbage collected or did not resolve from the proper sources',
-          })
-        }
+        t.assert(lib.getValidatedIdTokenClaims(result))
+        t.throws(() => lib.getValidatedIdTokenClaims({ ...result }), {
+          name: 'TypeError',
+          message: '"ref" was already garbage collected or did not resolve from the proper sources',
+        })
       }),
   )
 })

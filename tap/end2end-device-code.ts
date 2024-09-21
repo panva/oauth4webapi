@@ -1,12 +1,6 @@
 import type QUnit from 'qunit'
 
-import {
-  assertNotOAuth2Error,
-  assertNoWwwAuthenticateChallenges,
-  isDpopNonceError,
-  setup,
-  unexpectedAuthorizationServerError,
-} from './helper.js'
+import { setup } from './helper.js'
 import * as lib from '../src/index.js'
 import { keys } from './keys.js'
 import * as jose from 'jose'
@@ -42,10 +36,8 @@ export default (QUnit: QUnit) => {
       params.set('scope', 'api:write')
 
       let response = await lib.deviceAuthorizationRequest(as, client, params)
-      assertNoWwwAuthenticateChallenges(response)
 
       let result = await lib.processDeviceAuthorizationResponse(as, client, response)
-      if (!assertNotOAuth2Error(result)) return
       const { verification_uri_complete, device_code } = result
 
       await fetch('http://localhost:3000/drive', {
@@ -60,26 +52,14 @@ export default (QUnit: QUnit) => {
           lib.deviceCodeGrantRequest(as, client, device_code, { DPoP })
         let response = await deviceCodeGrantRequest()
 
-        assertNoWwwAuthenticateChallenges(response)
-
         const processDeviceCodeResponse = () => lib.processDeviceCodeResponse(as, client, response)
-        let result = await processDeviceCodeResponse()
-        let i = 0
-        while (lib.isOAuth2Error(result) && result.error === 'authorization_pending') {
-          await new Promise((resolve) => setTimeout(resolve, 100))
-          response = await deviceCodeGrantRequest()
-          result = await processDeviceCodeResponse()
-          i++
-          if (i === 5) break
-        }
-
-        if (lib.isOAuth2Error(result)) {
-          if (isDpopNonceError(result)) {
-            response = await deviceCodeGrantRequest()
+        let result: lib.TokenEndpointResponse | undefined
+        while (!result) {
+          try {
             result = await processDeviceCodeResponse()
-            if (!assertNotOAuth2Error(result)) return
-          } else {
-            throw unexpectedAuthorizationServerError(result)
+          } catch {
+            await new Promise((resolve) => setTimeout(resolve, 100))
+            response = await deviceCodeGrantRequest()
           }
         }
 

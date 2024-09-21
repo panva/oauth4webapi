@@ -35,26 +35,21 @@ export default (QUnit: QUnit) => {
       lib.skipStateCheck,
     )
 
-    t.true(
-      lib.isOAuth2Error(
+    t.throws(
+      () =>
         lib.validateAuthResponse(
           issuer,
           client,
           new URLSearchParams('error=access_denied'),
           lib.expectNoState,
         ),
-      ),
-    )
-
-    t.false(
-      lib.isOAuth2Error(
-        lib.validateAuthResponse(
-          issuer,
-          client,
-          new URLSearchParams('code=foo'),
-          lib.expectNoState,
-        ),
-      ),
+      (err: Error) => {
+        t.propContains(err, {
+          name: lib.AuthorizationResponseError.name,
+          error: 'access_denied',
+        })
+        return true
+      },
     )
   })
 

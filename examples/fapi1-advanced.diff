@@ -1,5 +1,5 @@
 diff --git a/examples/oauth.ts b/examples/fapi1-advanced.ts
-index cc6d632..fbc52ff 100644
+index a3321ad..eebcb27 100644
 --- a/examples/oauth.ts
 +++ b/examples/fapi1-advanced.ts
 @@ -1,3 +1,4 @@
@@ -110,10 +110,10 @@ index cc6d632..fbc52ff 100644
 +    authorizationResponse,
 +    nonce,
 +  )
-   if (oauth.isOAuth2Error(params)) {
-     console.error('Error Response', params)
-     throw new Error() // Handle OAuth 2.0 redirect error
-@@ -77,6 +102,23 @@ let access_token: string
+ 
+   const response = await oauth.authorizationCodeGrantRequest(
+     as,
+@@ -73,9 +98,29 @@ let access_token: string
      params,
      redirect_uri,
      code_verifier,
@@ -136,25 +136,15 @@ index cc6d632..fbc52ff 100644
 +    },
    )
  
-   let challenges: oauth.WWWAuthenticateChallenge[] | undefined
-@@ -87,12 +129,15 @@ let access_token: string
-     throw new Error() // Handle WWW-Authenticate Challenges as needed
-   }
- 
 -  const result = await oauth.processAuthorizationCodeOAuth2Response(as, client, response)
 +  const result = await oauth.processAuthorizationCodeOpenIDResponse(as, client, response)
-   if (oauth.isOAuth2Error(result)) {
-     console.error('Error Response', result)
-     throw new Error() // Handle OAuth 2.0 response body error
-   }
- 
++
 +  // Check ID Token signature for non-repudiation purposes
 +  await oauth.validateIdTokenSignature(as, result)
-+
+ 
    console.log('Access Token Response', result)
    ;({ access_token } = result)
- }
-@@ -103,6 +148,23 @@ let access_token: string
+@@ -87,6 +132,23 @@ let access_token: string
      access_token,
      'GET',
      new URL('https://rs.example.com/api'),
@@ -177,4 +167,4 @@ index cc6d632..fbc52ff 100644
 +    },
    )
  
-   let challenges: oauth.WWWAuthenticateChallenge[] | undefined
+   console.log('Protected Resource Response', await response.json())

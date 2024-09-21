@@ -1,5 +1,5 @@
 diff --git a/examples/oauth.ts b/examples/par.ts
-index cc6d632..110d820 100644
+index a3321ad..33dd060 100644
 --- a/examples/oauth.ts
 +++ b/examples/par.ts
 @@ -37,15 +37,16 @@ const code_verifier = oauth.generateRandomCodeVerifier()
@@ -27,28 +27,17 @@ index cc6d632..110d820 100644
  
    /**
     * We cannot be sure the AS supports PKCE so we're going to use state too. Use of PKCE is
-@@ -53,9 +54,33 @@ let state: string | undefined
+@@ -53,9 +54,22 @@ let state: string | undefined
     */
    if (as.code_challenge_methods_supported?.includes('S256') !== true) {
      state = oauth.generateRandomState()
 -    authorizationUrl.searchParams.set('state', state)
 +    params.set('state', state)
-+  }
-+
-+  const response = await oauth.pushedAuthorizationRequest(as, client, params)
-+  let challenges: oauth.WWWAuthenticateChallenge[] | undefined
-+  if ((challenges = oauth.parseWwwAuthenticateChallenges(response))) {
-+    for (const challenge of challenges) {
-+      console.error('WWW-Authenticate Challenge', challenge)
-+    }
-+    throw new Error() // Handle WWW-Authenticate Challenges as needed
    }
  
++  const response = await oauth.pushedAuthorizationRequest(as, client, params)
++
 +  const result = await oauth.processPushedAuthorizationResponse(as, client, response)
-+  if (oauth.isOAuth2Error(result)) {
-+    console.error('Error Response', result)
-+    throw new Error() // Handle OAuth 2.0 response body error
-+  }
 +
 +  ;({ request_uri } = result)
 +}

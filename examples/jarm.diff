@@ -1,5 +1,5 @@
 diff --git a/examples/oauth.ts b/examples/jarm.ts
-index cc6d632..6ea90cc 100644
+index a3321ad..a7360bd 100644
 --- a/examples/oauth.ts
 +++ b/examples/jarm.ts
 @@ -46,6 +46,7 @@ let state: string | undefined
@@ -16,6 +16,6 @@ index cc6d632..6ea90cc 100644
    const currentUrl: URL = getCurrentUrl()
 -  const params = oauth.validateAuthResponse(as, client, currentUrl, state)
 +  const params = await oauth.validateJwtAuthResponse(as, client, currentUrl)
-   if (oauth.isOAuth2Error(params)) {
-     console.error('Error Response', params)
-     throw new Error() // Handle OAuth 2.0 redirect error
+ 
+   const response = await oauth.authorizationCodeGrantRequest(
+     as,

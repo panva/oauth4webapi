@@ -213,23 +213,21 @@ test('processClientCredentialsResponse()', async (t) => {
     },
   )
 
-  t.true(
-    lib.isOAuth2Error(
-      await lib.processClientCredentialsResponse(
-        issuer,
-        client,
-        getResponse(JSON.stringify({ error: 'invalid_grant' }), { status: 400 }),
-      ),
+  const err = await t.throwsAsync(
+    lib.processClientCredentialsResponse(
+      issuer,
+      client,
+      getResponse(JSON.stringify({ error: 'invalid_grant' }), { status: 400 }),
     ),
   )
 
-  t.false(
-    lib.isOAuth2Error(
-      await lib.processClientCredentialsResponse(
-        issuer,
-        client,
-        getResponse(JSON.stringify({ access_token: 'token', token_type: 'Bearer' })),
-      ),
-    ),
+  t.true(
+    err instanceof lib.ResponseBodyError && err.error === 'invalid_grant' && err.status === 400,
+  )
+
+  await lib.processClientCredentialsResponse(
+    issuer,
+    client,
+    getResponse(JSON.stringify({ access_token: 'token', token_type: 'Bearer' })),
   )
 })

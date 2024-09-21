@@ -91,10 +91,6 @@ let access_token: string
     authorizationResponse,
     nonce,
   )
-  if (oauth.isOAuth2Error(params)) {
-    console.error('Error Response', params)
-    throw new Error() // Handle OAuth 2.0 redirect error
-  }
 
   const response = await oauth.authorizationCodeGrantRequest(
     as,
@@ -121,19 +117,7 @@ let access_token: string
     },
   )
 
-  let challenges: oauth.WWWAuthenticateChallenge[] | undefined
-  if ((challenges = oauth.parseWwwAuthenticateChallenges(response))) {
-    for (const challenge of challenges) {
-      console.error('WWW-Authenticate Challenge', challenge)
-    }
-    throw new Error() // Handle WWW-Authenticate Challenges as needed
-  }
-
   const result = await oauth.processAuthorizationCodeOpenIDResponse(as, client, response)
-  if (oauth.isOAuth2Error(result)) {
-    console.error('Error Response', result)
-    throw new Error() // Handle OAuth 2.0 response body error
-  }
 
   // Check ID Token signature for non-repudiation purposes
   await oauth.validateIdTokenSignature(as, result)
@@ -166,14 +150,6 @@ let access_token: string
       },
     },
   )
-
-  let challenges: oauth.WWWAuthenticateChallenge[] | undefined
-  if ((challenges = oauth.parseWwwAuthenticateChallenges(response))) {
-    for (const challenge of challenges) {
-      console.error('WWW-Authenticate Challenge', challenge)
-    }
-    throw new Error() // Handle WWW-Authenticate Challenges as needed
-  }
 
   console.log('Protected Resource Response', await response.json())
 }

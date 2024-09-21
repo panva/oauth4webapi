@@ -30,19 +30,7 @@ let access_token: string
 
   const response = await oauth.clientCredentialsGrantRequest(as, client, parameters)
 
-  let challenges: oauth.WWWAuthenticateChallenge[] | undefined
-  if ((challenges = oauth.parseWwwAuthenticateChallenges(response))) {
-    for (const challenge of challenges) {
-      console.error('WWW-Authenticate Challenge', challenge)
-    }
-    throw new Error() // Handle WWW-Authenticate Challenges as needed
-  }
-
   const result = await oauth.processClientCredentialsResponse(as, client, response)
-  if (oauth.isOAuth2Error(result)) {
-    console.error('Error Response', result)
-    throw new Error() // Handle OAuth 2.0 response body error
-  }
 
   console.log('Access Token Response', result)
   ;({ access_token } = result)
@@ -55,14 +43,6 @@ let access_token: string
     'GET',
     new URL('https://rs.example.com/api'),
   )
-
-  let challenges: oauth.WWWAuthenticateChallenge[] | undefined
-  if ((challenges = oauth.parseWwwAuthenticateChallenges(response))) {
-    for (const challenge of challenges) {
-      console.error('WWW-Authenticate Challenge', challenge)
-    }
-    throw new Error() // Handle WWW-Authenticate Challenges as needed
-  }
 
   console.log('Protected Resource Response', await response.json())
 }

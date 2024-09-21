@@ -1,48 +1,25 @@
 import * as lib from '../src/index.js'
 import * as jose from 'jose'
 
-export function isDpopNonceError(input: lib.OAuth2Error | lib.WWWAuthenticateChallenge[]) {
-  if ('error' in input) {
-    return input.error === 'use_dpop_nonce'
-  } else {
+export function isDpopNonceError(t: Assert, err: unknown) {
+  if (err instanceof lib.ResponseBodyError) {
+    t.true(err.response.bodyUsed)
+    return err.error === 'use_dpop_nonce'
+  }
+
+  if (err instanceof lib.WWWAuthenticateChallengeError) {
+    t.false(err.response.bodyUsed)
+    const { 0: challenge, length } = err.cause
     return (
-      input.length === 1 &&
-      input[0].scheme === 'dpop' &&
-      input[0].parameters.error === 'use_dpop_nonce'
+      length === 1 && challenge.scheme === 'dpop' && challenge.parameters.error === 'use_dpop_nonce'
     )
   }
+
+  return false
 }
 
 export function random() {
   return Math.random() < 0.5
-}
-
-export function unexpectedAuthorizationServerError(
-  input: lib.WWWAuthenticateChallenge[] | lib.OAuth2Error,
-) {
-  let msg: string
-  if ('error' in input) {
-    msg = `${input.error}: ${input.error_description}`
-  } else {
-    msg = `${input[0].parameters.error}: ${input[0].parameters.error_description}`
-  }
-  return new Error(msg, { cause: input })
-}
-
-export function assertNotOAuth2Error(
-  input: Parameters<typeof lib.isOAuth2Error>[0],
-): input is Exclude<Parameters<typeof lib.isOAuth2Error>[0], lib.OAuth2Error> {
-  if (lib.isOAuth2Error(input)) {
-    throw unexpectedAuthorizationServerError(input)
-  }
-  return true
-}
-
-export function assertNoWwwAuthenticateChallenges(response: Response) {
-  let challenges: lib.WWWAuthenticateChallenge[] | undefined
-  if ((challenges = lib.parseWwwAuthenticateChallenges(response))) {
-    throw unexpectedAuthorizationServerError(challenges)
-  }
 }
 
 export async function setup(

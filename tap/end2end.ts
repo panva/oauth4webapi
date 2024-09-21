@@ -1,13 +1,6 @@
 import type QUnit from 'qunit'
 
-import {
-  assertNoWwwAuthenticateChallenges,
-  isDpopNonceError,
-  assertNotOAuth2Error,
-  setup,
-  unexpectedAuthorizationServerError,
-  random,
-} from './helper.js'
+import { isDpopNonceError, setup, random } from './helper.js'
 import * as lib from '../src/index.js'
 import { keys } from './keys.js'
 
@@ -126,21 +119,18 @@ export default (QUnit: QUnit) => {
         const pushedAuthorizationRequest = () =>
           lib.pushedAuthorizationRequest(as, client, params, { DPoP })
         let response = await pushedAuthorizationRequest()
-        assertNoWwwAuthenticateChallenges(response)
 
         const processPushedAuthorizationResponse = () =>
           lib.processPushedAuthorizationResponse(as, client, response)
-        let result = await processPushedAuthorizationResponse()
-        if (lib.isOAuth2Error(result)) {
-          if (isDpopNonceError(result)) {
+        let result = await processPushedAuthorizationResponse().catch(async (err) => {
+          if (isDpopNonceError(t, err)) {
+            // the AS-signalled nonce is now cached, retrying
             response = await pushedAuthorizationRequest()
-            assertNoWwwAuthenticateChallenges(response)
-            result = await processPushedAuthorizationResponse()
-            if (!assertNotOAuth2Error(result)) return
-          } else {
-            throw unexpectedAuthorizationServerError(result)
+            return processPushedAuthorizationResponse()
           }
-        }
+          throw err
+        })
+
         for (const param of [...params.keys()]) {
           if (param !== 'client_id') {
             params.delete(param)
@@ -166,7 +156,7 @@ export default (QUnit: QUnit) => {
         )
       }
 
-      let callbackParams: URLSearchParams | lib.OAuth2Error
+      let callbackParams: URLSearchParams
       if (hybrid) {
         callbackParams = await lib.validateDetachedSignatureResponse(
           as,
@@ -184,7 +174,6 @@ export default (QUnit: QUnit) => {
           lib.expectNoState,
         )
       }
-      if (!assertNotOAuth2Error(callbackParams)) return
 
       {
         const authorizationCodeGrantRequest = () =>
@@ -198,20 +187,16 @@ export default (QUnit: QUnit) => {
           )
         let response = await authorizationCodeGrantRequest()
 
-        assertNoWwwAuthenticateChallenges(response)
-
         const processAuthorizationCodeOpenIDResponse = () =>
           lib.processAuthorizationCodeOpenIDResponse(as, client, response, nonce, maxAge)
-        let result = await processAuthorizationCodeOpenIDResponse()
-        if (lib.isOAuth2Error(result)) {
-          if (isDpopNonceError(result)) {
+        let result = await processAuthorizationCodeOpenIDResponse().catch(async (err) => {
+          if (isDpopNonceError(t, err)) {
             response = await authorizationCodeGrantRequest()
-            result = await processAuthorizationCodeOpenIDResponse()
-            if (!assertNotOAuth2Error(result)) return
-          } else {
-            throw unexpectedAuthorizationServerError(result)
+            return processAuthorizationCodeOpenIDResponse()
           }
-        }
+
+          throw err
+        })
 
         const { access_token, refresh_token, token_type } = result
         t.equal(token_type, dpop ? 'dpop' : 'bearer')
@@ -224,16 +209,13 @@ export default (QUnit: QUnit) => {
 
         {
           const userInfoRequest = () => lib.userInfoRequest(as, client, access_token, { DPoP })
-          let response = await userInfoRequest()
-
-          let challenges: lib.WWWAuthenticateChallenge[] | undefined
-          if ((challenges = lib.parseWwwAuthenticateChallenges(response))) {
-            if (isDpopNonceError(challenges)) {
-              response = await userInfoRequest()
-            } else {
-              throw unexpectedAuthorizationServerError(challenges)
+          let response = await userInfoRequest().catch(async (err) => {
+            if (isDpopNonceError(t, err)) {
+              return userInfoRequest()
             }
-          }
+
+            throw err
+          })
 
           await lib.processUserInfoResponse(as, client, sub, response)
 
@@ -245,19 +227,15 @@ export default (QUnit: QUnit) => {
         {
           const refreshTokenGrantRequest = () =>
             lib.refreshTokenGrantRequest(as, client, refresh_token, { DPoP })
-          let response = await refreshTokenGrantRequest()
-
-          let challenges: lib.WWWAuthenticateChallenge[] | undefined
-          if ((challenges = lib.parseWwwAuthenticateChallenges(response))) {
-            if (isDpopNonceError(challenges)) {
-              response = await refreshTokenGrantRequest()
-            } else {
-              throw unexpectedAuthorizationServerError(challenges)
+          let response = await refreshTokenGrantRequest().catch((err) => {
+            if (isDpopNonceError(t, err)) {
+              // the AS-signalled nonce is now cached, retrying
+              return refreshTokenGrantRequest()
             }
-          }
+            throw err
+          })
 
-          const result = await lib.processRefreshTokenResponse(as, client, response)
-          if (!assertNotOAuth2Error(result)) return
+          await lib.processRefreshTokenResponse(as, client, response)
         }
       }
 

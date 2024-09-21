@@ -12,6 +12,7 @@
   "excludeExternals": true,
   "excludePrivate": true,
   "excludeProtected": true,
+  "excludeInternal": true,
   "gitRevision": "main",
   "hideGenerator": true,
   "out": "docs",

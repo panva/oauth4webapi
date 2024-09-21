@@ -130,11 +130,13 @@ test('processRevocationResponse()', async (t) => {
 
   t.is(await lib.processRevocationResponse(getResponse('')), undefined)
 
-  t.true(
-    lib.isOAuth2Error(
-      await lib.processRevocationResponse(
-        getResponse(JSON.stringify({ error: 'invalid_client' }), { status: 401 }),
-      ),
+  const err = await t.throwsAsync(
+    lib.processRevocationResponse(
+      getResponse(JSON.stringify({ error: 'invalid_client' }), { status: 401 }),
     ),
+  )
+
+  t.true(
+    err instanceof lib.ResponseBodyError && err.error === 'invalid_client' && err.status === 401,
   )
 })
