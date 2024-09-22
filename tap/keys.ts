@@ -1,7 +1,7 @@
 import * as lib from '../src/index.js'
 import * as env from './env.js'
 
-export const algs = <lib.JWSAlgorithm[]>[
+export const algs = [
   'PS256',
   'PS384',
   'PS512',
@@ -10,8 +10,8 @@ export const algs = <lib.JWSAlgorithm[]>[
   'RS512',
   'ES256',
   'ES384',
-]
-export const fails = <lib.JWSAlgorithm[]>[]
+] as lib.JWSAlgorithm[]
+export const fails = [] as lib.JWSAlgorithm[]
 // TODO: remove when P-521 integration in Deno is finished
 if (!env.isDeno) {
   algs.push('ES512')
@@ -23,5 +23,5 @@ export const keys = algs.reduce(
     acc[alg] = lib.generateKeyPair(alg)
     return acc
   },
-  <Record<lib.JWSAlgorithm, Promise<CryptoKeyPair>>>{},
+  {} as Record<lib.JWSAlgorithm, Promise<CryptoKeyPair>>,
 )

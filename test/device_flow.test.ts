@@ -101,7 +101,7 @@ test('deviceAuthorizationRequest() w/ Custom Headers', async (t) => {
 })
 
 test('processDeviceAuthorizationResponse()', async (t) => {
-  await t.throwsAsync(lib.processDeviceAuthorizationResponse(issuer, client, <any>null), {
+  await t.throwsAsync(lib.processDeviceAuthorizationResponse(issuer, client, null as any), {
     message: '"response" must be an instance of Response',
   })
   await t.throwsAsync(
@@ -241,7 +241,7 @@ test('deviceCodeGrantRequest()', async (t) => {
     message: '"as.token_endpoint" must be a string',
   })
 
-  await t.throwsAsync(lib.deviceCodeGrantRequest(issuer, tClient, <any>null), {
+  await t.throwsAsync(lib.deviceCodeGrantRequest(issuer, tClient, null as any), {
     message: '"deviceCode" must be a non-empty string',
   })
 
@@ -363,7 +363,7 @@ test('deviceCodeGrantRequest() w/ DPoP', async (t) => {
 })
 
 test('processDeviceCodeResponse() without ID Tokens', async (t) => {
-  await t.throwsAsync(lib.processDeviceCodeResponse(issuer, client, <any>null), {
+  await t.throwsAsync(lib.processDeviceCodeResponse(issuer, client, null as any), {
     message: '"response" must be an instance of Response',
   })
   await t.throwsAsync(

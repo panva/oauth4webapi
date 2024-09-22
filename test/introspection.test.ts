@@ -26,7 +26,7 @@ test('introspectionRequest()', async (t) => {
     message: '"as.introspection_endpoint" must be a string',
   })
 
-  await t.throwsAsync(lib.introspectionRequest(issuer, tClient, <any>null), {
+  await t.throwsAsync(lib.introspectionRequest(issuer, tClient, null as any), {
     message: '"token" must be a non-empty string',
   })
 
@@ -205,7 +205,7 @@ test('introspectionRequest() forced json', async (t) => {
 })
 
 test('processIntrospectionResponse()', async (t) => {
-  await t.throwsAsync(lib.processIntrospectionResponse(issuer, client, <any>null), {
+  await t.throwsAsync(lib.processIntrospectionResponse(issuer, client, null as any), {
     message: '"response" must be an instance of Response',
   })
   await t.throwsAsync(

@@ -72,7 +72,7 @@ export default (QUnit: QUnit) => {
         ['client_credentials'],
         encryption,
       )
-      const DPoP = dpop ? await lib.generateKeyPair(<lib.JWSAlgorithm>alg) : undefined
+      const DPoP = dpop ? await lib.generateKeyPair(alg as lib.JWSAlgorithm) : undefined
 
       const authenticated: lib.AuthenticatedRequestOptions = {
         clientPrivateKey: authMethod === 'private_key_jwt' ? clientPrivateKey : undefined,

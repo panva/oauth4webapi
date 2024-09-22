@@ -76,7 +76,7 @@ export default (QUnit: QUnit) => {
           : ['authorization_code', 'refresh_token'],
         encryption,
       )
-      const DPoP = dpop ? await lib.generateKeyPair(<lib.JWSAlgorithm>alg) : undefined
+      const DPoP = dpop ? await lib.generateKeyPair(alg as lib.JWSAlgorithm) : undefined
 
       const as = await lib
         .discoveryRequest(issuerIdentifier)

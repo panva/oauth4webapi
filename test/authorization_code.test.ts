@@ -61,7 +61,7 @@ test('authorizationCodeGrantRequest()', async (t) => {
   )
 
   await t.throwsAsync(
-    lib.authorizationCodeGrantRequest(issuer, tClient, <any>null, 'redirect_uri', 'verifier'),
+    lib.authorizationCodeGrantRequest(issuer, tClient, null as any, 'redirect_uri', 'verifier'),
     {
       message:
         '"callbackParameters" must be an instance of URLSearchParams obtained from "validateAuthResponse()", or "validateJwtAuthResponse()',
@@ -73,7 +73,7 @@ test('authorizationCodeGrantRequest()', async (t) => {
       issuer,
       tClient,
       cb('code=authorization_code'),
-      <any>null,
+      null as any,
       'verifier',
     ),
     {
@@ -87,7 +87,7 @@ test('authorizationCodeGrantRequest()', async (t) => {
       tClient,
       cb('code=authorization_code'),
       'redirect_uri',
-      <any>null,
+      null as any,
     ),
     {
       message: '"codeVerifier" must be a non-empty string',
@@ -268,7 +268,7 @@ test('authorizationCodeGrantRequest() w/ DPoP', async (t) => {
 })
 
 test('processAuthorizationCodeOAuth2Response()', async (t) => {
-  await t.throwsAsync(lib.processAuthorizationCodeOAuth2Response(issuer, client, <any>null), {
+  await t.throwsAsync(lib.processAuthorizationCodeOAuth2Response(issuer, client, null as any), {
     message: '"response" must be an instance of Response',
   })
   await t.throwsAsync(
@@ -796,7 +796,7 @@ test('processAuthorizationCodeOpenIDResponse() nonce checks', async (t) => {
               .sign(t.context.RS256.privateKey),
           }),
         ),
-        <any>nonce,
+        nonce as any,
       ),
       { message: '"expectedNonce" must be a non-empty string', name: 'TypeError' },
     )

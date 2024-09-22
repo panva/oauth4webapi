@@ -30,7 +30,7 @@ export default (QUnit: QUnit) => {
         ['refresh_token', 'urn:ietf:params:oauth:grant-type:device_code'],
         false,
       )
-      const DPoP = dpop ? await lib.generateKeyPair(<lib.JWSAlgorithm>alg) : undefined
+      const DPoP = dpop ? await lib.generateKeyPair(alg as lib.JWSAlgorithm) : undefined
 
       const as = await lib
         .discoveryRequest(issuerIdentifier)
@@ -106,7 +106,7 @@ export default (QUnit: QUnit) => {
                 }
               : undefined,
             async [lib.customFetch](...params: Parameters<typeof fetch>) {
-              const url = new URL(<string>params[0])
+              const url = new URL(params[0] as string)
               const { headers, method } = params[1]!
               const request = new Request(url, { headers, method })
 

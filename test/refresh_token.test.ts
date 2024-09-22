@@ -26,7 +26,7 @@ test('refreshTokenGrantRequest()', async (t) => {
     message: '"as.token_endpoint" must be a string',
   })
 
-  await t.throwsAsync(lib.refreshTokenGrantRequest(issuer, tClient, <any>null), {
+  await t.throwsAsync(lib.refreshTokenGrantRequest(issuer, tClient, null as any), {
     message: '"refreshToken" must be a non-empty string',
   })
 
@@ -152,7 +152,7 @@ test('refreshTokenGrantRequest() w/ DPoP', async (t) => {
 })
 
 test('processRefreshTokenResponse() without ID Tokens', async (t) => {
-  await t.throwsAsync(lib.processRefreshTokenResponse(issuer, client, <any>null), {
+  await t.throwsAsync(lib.processRefreshTokenResponse(issuer, client, null as any), {
     message: '"response" must be an instance of Response',
   })
   await t.throwsAsync(

@@ -58,7 +58,7 @@ export async function createTestPlan(
     throw new Error(await response.text())
   }
 
-  return <Plan>await response.json()
+  return (await response.json()) as Plan
 }
 
 export async function getTestPlanInfo(plan: Plan) {
@@ -70,7 +70,7 @@ export async function getTestPlanInfo(plan: Plan) {
     throw new Error(await response.text())
   }
 
-  return <PlanInfo>await response.json()
+  return (await response.json()) as PlanInfo
 }
 
 export async function getTestExposed(test: Test): Promise<Record<string, string>> {
@@ -120,7 +120,7 @@ async function getModuleInfo(module: Test) {
     throw new Error(await response.text())
   }
 
-  return <ModuleInfo>await response.json()
+  return (await response.json()) as ModuleInfo
 }
 
 export async function downloadArtifact(plan: Plan) {

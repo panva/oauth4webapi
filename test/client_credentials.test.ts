@@ -145,7 +145,7 @@ test('clientCredentialsGrantRequest() w/ DPoP', async (t) => {
 })
 
 test('processClientCredentialsResponse()', async (t) => {
-  await t.throwsAsync(lib.processClientCredentialsResponse(issuer, client, <any>null), {
+  await t.throwsAsync(lib.processClientCredentialsResponse(issuer, client, null as any), {
     message: '"response" must be an instance of Response',
   })
   await t.throwsAsync(

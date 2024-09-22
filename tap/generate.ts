@@ -19,12 +19,12 @@ export default (QUnit: QUnit) => {
   module('generate.ts')
   test('"alg" value validation', async (t) => {
     for (const value of [null, 1, 0, Infinity, Boolean, undefined, false, true, '']) {
-      await t.rejects(lib.generateKeyPair(<any>value), /"alg" must be a non-empty string/)
+      await t.rejects(lib.generateKeyPair(value as any), /"alg" must be a non-empty string/)
     }
   })
 
   test('unknown algorithm', async (t) => {
-    await t.rejects(lib.generateKeyPair(<any>'foo'), lib.UnsupportedOperationError)
+    await t.rejects(lib.generateKeyPair('foo' as any), lib.UnsupportedOperationError)
   })
 
   for (const alg of fails) {
@@ -70,7 +70,7 @@ export default (QUnit: QUnit) => {
         }
 
         if (isRSA(alg)) {
-          const algorithm = <RsaHashedKeyAlgorithm>key.algorithm
+          const algorithm = key.algorithm as RsaHashedKeyAlgorithm
           t.equal(algorithm.modulusLength, 2048)
           t.deepEqual(new Uint8Array(algorithm.publicExponent), new Uint8Array([0x01, 0x00, 0x01]))
         }

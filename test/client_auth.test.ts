@@ -166,7 +166,7 @@ test('private_key_jwt ({ key: CryptoKey })', async (t) => {
       },
       'token',
       {
-        clientPrivateKey: { key: <any>null },
+        clientPrivateKey: { key: null as any },
       },
     ),
     { message: '"options.clientPrivateKey.key" must be a private CryptoKey' },
@@ -248,7 +248,7 @@ test('private_key_jwt ({ key: CryptoKey, kid: string })', async (t) => {
       },
       'token',
       {
-        clientPrivateKey: { key: t.context.ES256.publicKey, kid: <any>123 },
+        clientPrivateKey: { key: t.context.ES256.publicKey, kid: 123 as any },
       },
     ),
     { message: '"kid" must be a non-empty string' },

@@ -1,13 +1,13 @@
 import type QUnit from 'qunit'
 import * as lib from '../src/index.js'
 
-const client = <lib.Client>{
+const client = {
   client_id: 'urn:example:client_id',
-}
+} as lib.Client
 const identifier = 'https://op.example.com'
-const issuer = <lib.AuthorizationServer>{
+const issuer = {
   issuer: identifier,
-}
+} as lib.AuthorizationServer
 
 export default async (QUnit: QUnit) => {
   const { module, test } = QUnit

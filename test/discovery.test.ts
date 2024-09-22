@@ -99,10 +99,10 @@ test('discoveryRequest() - oauth2 with a pathname', async (t) => {
 test('processDiscoveryResponse()', async (t) => {
   const expected = new URL('https://op.example.com')
 
-  await t.throwsAsync(lib.processDiscoveryResponse(expected, <any>null), {
+  await t.throwsAsync(lib.processDiscoveryResponse(expected, null as any), {
     message: '"response" must be an instance of Response',
   })
-  await t.throwsAsync(lib.processDiscoveryResponse(<any>null, new Response()), {
+  await t.throwsAsync(lib.processDiscoveryResponse(null as any, new Response()), {
     message: '"expectedIssuer" must be an instance of URL',
   })
   await t.throwsAsync(lib.processDiscoveryResponse(expected, getResponse('', { status: 404 })), {

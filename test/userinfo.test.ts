@@ -100,7 +100,7 @@ test('userInfoRequest() requires userinfo_endpoint', async (t) => {
 
 test('processUserInfoResponse() - json', async (t) => {
   const tIssuer: lib.AuthorizationServer = { ...issuer, userinfo_endpoint: endpoint('userinfo') }
-  await t.throwsAsync(lib.processUserInfoResponse(tIssuer, client, 'sub', <any>null), {
+  await t.throwsAsync(lib.processUserInfoResponse(tIssuer, client, 'sub', null as any), {
     message: '"response" must be an instance of Response',
   })
   await t.throwsAsync(lib.processUserInfoResponse(tIssuer, client, 'sub', getResponse('{"')), {
@@ -145,7 +145,7 @@ test('processUserInfoResponse() - json', async (t) => {
   await t.throwsAsync(
     async () => {
       const response = getResponse(JSON.stringify({ sub: 'urn:example:subject' }))
-      await lib.processUserInfoResponse(tIssuer, client, <any>null, response)
+      await lib.processUserInfoResponse(tIssuer, client, null as any, response)
     },
     { message: '"expectedSubject" must be a non-empty string' },
   )

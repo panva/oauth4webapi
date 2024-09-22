@@ -148,7 +148,7 @@ test('pushedAuthorizationRequest() w/ Request Object', async (t) => {
 })
 
 test('processPushedAuthorizationResponse()', async (t) => {
-  await t.throwsAsync(lib.processPushedAuthorizationResponse(issuer, client, <any>null), {
+  await t.throwsAsync(lib.processPushedAuthorizationResponse(issuer, client, null as any), {
     message: '"response" must be an instance of Response',
   })
   await t.throwsAsync(

@@ -74,13 +74,13 @@ export function endpoint(pathname: string, base = identifier) {
   return new URL(pathname, base).href
 }
 
-export const issuer = <AuthorizationServer>{
+export const issuer = {
   issuer: identifier,
-}
+} as AuthorizationServer
 
-export const client = <Client>{
+export const client = {
   client_id: 'urn:example:client_id',
-}
+} as Client
 
 export function getResponse(body: string, { status = 200, headers = new Headers() } = {}) {
   return new Response(Buffer.from(body), { status, headers })

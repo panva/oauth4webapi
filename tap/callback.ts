@@ -1,13 +1,13 @@
 import type QUnit from 'qunit'
 import * as lib from '../src/index.js'
 
-const client = <lib.Client>{
+const client = {
   client_id: 'urn:example:client_id',
-}
+} as lib.Client
 const identifier = 'https://op.example.com'
-const issuer = <lib.AuthorizationServer>{
+const issuer = {
   issuer: identifier,
-}
+} as lib.AuthorizationServer
 
 export default (QUnit: QUnit) => {
   const { module, test } = QUnit
@@ -60,7 +60,7 @@ export default (QUnit: QUnit) => {
 
   test('validateAuthResponse() error conditions', (t) => {
     t.throws(
-      () => lib.validateAuthResponse(issuer, client, <any>null, lib.expectNoState),
+      () => lib.validateAuthResponse(issuer, client, null as any, lib.expectNoState),
       (err: Error) => {
         t.propContains(err, {
           message: '"parameters" must be an instance of URLSearchParams, or URL',
@@ -142,7 +142,7 @@ export default (QUnit: QUnit) => {
           issuer,
           client,
           new URLSearchParams('code=foo&state=foo'),
-          <any>null,
+          null as any,
         ),
       (err: Error) => {
         t.propContains(err, { message: '"expectedState" must be a non-empty string' })

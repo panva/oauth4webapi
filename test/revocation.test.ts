@@ -22,7 +22,7 @@ test('revocationRequest()', async (t) => {
     message: '"as.revocation_endpoint" must be a string',
   })
 
-  await t.throwsAsync(lib.revocationRequest(issuer, tClient, <any>null), {
+  await t.throwsAsync(lib.revocationRequest(issuer, tClient, null as any), {
     message: '"token" must be a non-empty string',
   })
 
@@ -121,7 +121,7 @@ test('revocationRequest() w/ Custom Headers', async (t) => {
 })
 
 test('processRevocationResponse()', async (t) => {
-  await t.throwsAsync(lib.processRevocationResponse(<any>null), {
+  await t.throwsAsync(lib.processRevocationResponse(null as any), {
     message: '"response" must be an instance of Response',
   })
   await t.throwsAsync(lib.processRevocationResponse(getResponse('', { status: 404 })), {

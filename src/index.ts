@@ -1521,7 +1521,7 @@ function clientSecretBasic(clientId: string, clientSecret: string) {
  * Determines an RSASSA-PSS algorithm identifier from CryptoKey instance properties.
  */
 function psAlg(key: CryptoKey): JWSAlgorithm {
-  switch ((<RsaHashedKeyAlgorithm>key.algorithm).hash.name) {
+  switch ((key.algorithm as RsaHashedKeyAlgorithm).hash.name) {
     case 'SHA-256':
       return 'PS256'
     case 'SHA-384':
@@ -1537,7 +1537,7 @@ function psAlg(key: CryptoKey): JWSAlgorithm {
  * Determines an RSASSA-PKCS1-v1_5 algorithm identifier from CryptoKey instance properties.
  */
 function rsAlg(key: CryptoKey): JWSAlgorithm {
-  switch ((<RsaHashedKeyAlgorithm>key.algorithm).hash.name) {
+  switch ((key.algorithm as RsaHashedKeyAlgorithm).hash.name) {
     case 'SHA-256':
       return 'RS256'
     case 'SHA-384':
@@ -1553,7 +1553,7 @@ function rsAlg(key: CryptoKey): JWSAlgorithm {
  * Determines an ECDSA algorithm identifier from CryptoKey instance properties.
  */
 function esAlg(key: CryptoKey): JWSAlgorithm {
-  switch ((<EcKeyAlgorithm>key.algorithm).namedCurve) {
+  switch ((key.algorithm as EcKeyAlgorithm).namedCurve) {
     case 'P-256':
       return 'ES256'
     case 'P-384':
@@ -2048,7 +2048,7 @@ export function isOAuth2Error(
     | URLSearchParams
     | UserInfoResponse,
 ): input is OAuth2Error {
-  const value = <unknown>input
+  const value = input as unknown
   if (typeof value !== 'object' || Array.isArray(value) || value === null) {
     return false
   }
@@ -2093,7 +2093,7 @@ const SCHEMES_REGEXP = /(?:^|, ?)([0-9a-zA-Z!#$%&'*+\-.^_`|~]+)(?=$|[ ,])/g
 function wwwAuth(scheme: string, params: string): WWWAuthenticateChallenge {
   const arr = params.split(SPLIT_REGEXP).slice(1)
   if (!arr.length) {
-    return { scheme: <Lowercase<string>>scheme.toLowerCase(), parameters: {} }
+    return { scheme: scheme.toLowerCase() as Lowercase<string>, parameters: {} }
   }
   arr[arr.length - 1] = arr[arr.length - 1].replace(/,$/, '')
   const parameters: WWWAuthenticateChallenge['parameters'] = {}
@@ -2104,13 +2104,13 @@ function wwwAuth(scheme: string, params: string): WWWAuthenticateChallenge {
         arr[idx] += arr[i]
       }
     }
-    const key = <Lowercase<string>>arr[idx - 1].replace(/^(?:, ?)|=$/g, '').toLowerCase()
+    const key = arr[idx - 1].replace(/^(?:, ?)|=$/g, '').toLowerCase() as Lowercase<string>
     // @ts-expect-error
     parameters[key] = unquote(arr[idx])
   }
 
   return {
-    scheme: <Lowercase<string>>scheme.toLowerCase(),
+    scheme: scheme.toLowerCase() as Lowercase<string>,
     parameters,
   }
 }
@@ -2618,7 +2618,7 @@ export async function processUserInfoResponse(
       .then(validateOptionalIssuer.bind(undefined, as.issuer))
 
     jwtResponseBodies.set(response, jwt)
-    json = <JsonValue>claims
+    json = claims as JsonValue
   } else {
     if (client.userinfo_signed_response_alg) {
       throw new OPE('JWT UserInfo Response expected')
@@ -3018,12 +3018,12 @@ async function processGenericAccessTokenResponse(
 
       if (
         claims.auth_time !== undefined &&
-        (!Number.isFinite(claims.auth_time) || Math.sign(<number>claims.auth_time) !== 1)
+        (!Number.isFinite(claims.auth_time) || Math.sign(claims.auth_time as number) !== 1)
       ) {
         throw new OPE('ID Token "auth_time" (authentication time) must be a positive number')
       }
 
-      idTokenClaims.set(json, [<IDToken>claims, jwt])
+      idTokenClaims.set(json, [claims as IDToken, jwt])
     }
   }
 
@@ -3386,7 +3386,7 @@ export async function processAuthorizationCodeOpenIDResponse(
       }
   }
 
-  return <OpenIDTokenEndpointResponse>result
+  return result as OpenIDTokenEndpointResponse
 }
 
 /**
@@ -3427,7 +3427,7 @@ export async function processAuthorizationCodeOAuth2Response(
     delete result.id_token
   }
 
-  return <OAuth2TokenEndpointResponse>result
+  return result as OAuth2TokenEndpointResponse
 }
 
 function checkJwtType(expected: string, result: Awaited<ReturnType<typeof validateJwt>>) {
@@ -3534,7 +3534,7 @@ export async function processClientCredentialsResponse(
     return result
   }
 
-  return <ClientCredentialsGrantResponse>result
+  return result as ClientCredentialsGrantResponse
 }
 
 export interface RevocationRequestOptions extends HttpRequestOptions, AuthenticatedRequestOptions {
@@ -3763,7 +3763,7 @@ export async function processIntrospectionResponse(
       .then(validateAudience.bind(undefined, client.client_id))
 
     jwtResponseBodies.set(response, jwt)
-    json = <JsonValue>claims.token_introspection
+    json = claims.token_introspection as JsonValue
     if (!isJsonObject(json)) {
       throw new OPE('JWT "token_introspection" claim must be a JSON object')
     }
@@ -3783,7 +3783,7 @@ export async function processIntrospectionResponse(
     throw new OPE('"response" body "active" property must be a boolean')
   }
 
-  return <IntrospectionResponse>json
+  return json as IntrospectionResponse
 }
 
 async function jwksRequest(
@@ -3860,7 +3860,7 @@ async function handleOAuthBodyError(response: Response): Promise<OAuth2Error | u
         if (json.scope !== undefined && typeof json.scope !== 'string') {
           delete json.scope
         }
-        return <OAuth2Error>json
+        return json as OAuth2Error
       }
     } catch {}
   }
@@ -3868,7 +3868,7 @@ async function handleOAuthBodyError(response: Response): Promise<OAuth2Error | u
 }
 
 function checkSupportedJwsAlg(alg: unknown) {
-  if (!SUPPORTED_JWS_ALGS.includes(<any>alg)) {
+  if (!SUPPORTED_JWS_ALGS.includes(alg as any)) {
     throw new UnsupportedOperationError('unsupported JWS "alg" identifier')
   }
   return alg
@@ -3896,27 +3896,27 @@ function ecdsaHashName(namedCurve: string) {
 function keyToSubtle(key: CryptoKey): AlgorithmIdentifier | RsaPssParams | EcdsaParams {
   switch (key.algorithm.name) {
     case 'ECDSA':
-      return <EcdsaParams>{
+      return {
         name: key.algorithm.name,
-        hash: ecdsaHashName((<EcKeyAlgorithm>key.algorithm).namedCurve),
-      }
+        hash: ecdsaHashName((key.algorithm as EcKeyAlgorithm).namedCurve),
+      } as EcdsaParams
     case 'RSA-PSS': {
-      checkRsaKeyAlgorithm(<RsaHashedKeyAlgorithm>key.algorithm)
-      switch ((<RsaHashedKeyAlgorithm>key.algorithm).hash.name) {
+      checkRsaKeyAlgorithm(key.algorithm as RsaHashedKeyAlgorithm)
+      switch ((key.algorithm as RsaHashedKeyAlgorithm).hash.name) {
         case 'SHA-256': // Fall through
         case 'SHA-384': // Fall through
         case 'SHA-512':
-          return <RsaPssParams>{
+          return {
             name: key.algorithm.name,
             saltLength:
-              parseInt((<RsaHashedKeyAlgorithm>key.algorithm).hash.name.slice(-3), 10) >> 3,
-          }
+              parseInt((key.algorithm as RsaHashedKeyAlgorithm).hash.name.slice(-3), 10) >> 3,
+          } as RsaPssParams
         default:
           throw new UnsupportedOperationError()
       }
     }
     case 'RSASSA-PKCS1-v1_5':
-      checkRsaKeyAlgorithm(<RsaHashedKeyAlgorithm>key.algorithm)
+      checkRsaKeyAlgorithm(key.algorithm as RsaHashedKeyAlgorithm)
       return key.algorithm.name
     case 'Ed448': // Fall through
     case 'Ed25519':
@@ -4290,7 +4290,7 @@ export async function validateDetachedSignatureResponse(
 
   if (
     claims.auth_time !== undefined &&
-    (!Number.isFinite(claims.auth_time) || Math.sign(<number>claims.auth_time) !== 1)
+    (!Number.isFinite(claims.auth_time) || Math.sign(claims.auth_time as number) !== 1)
   ) {
     throw new OPE('ID Token "auth_time" (authentication time) must be a positive number')
   }
@@ -4310,7 +4310,7 @@ export async function validateDetachedSignatureResponse(
 
     const now = epochTime() + getClockSkew(client)
     const tolerance = getClockTolerance(client)
-    if ((<IDToken>claims).auth_time! + maxAge < now - tolerance) {
+    if ((claims as IDToken).auth_time! + maxAge < now - tolerance) {
       throw new OPE('too much time has elapsed since the last End-User authentication')
     }
   }
@@ -4751,9 +4751,10 @@ export async function generateKeyPair(
     })
   }
 
-  return <Promise<CryptoKeyPair>>(
-    crypto.subtle.generateKey(algorithm, options?.extractable ?? false, ['sign', 'verify'])
-  )
+  return crypto.subtle.generateKey(algorithm, options?.extractable ?? false, [
+    'sign',
+    'verify',
+  ]) as Promise<CryptoKeyPair>
 }
 
 export interface JWTAccessTokenClaims extends JWTPayload {
@@ -5031,7 +5032,7 @@ export async function validateJwtAccessToken(
     await validateDPoP(as, request, accessToken, claims, options)
   }
 
-  return <JWTAccessTokenClaims>claims
+  return claims as JWTAccessTokenClaims
 }
 
 /**
