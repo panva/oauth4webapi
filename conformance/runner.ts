@@ -179,7 +179,7 @@ export const flow = (options?: MacroOptions) => {
 
       switch (variant.client_auth_type) {
         case 'mtls':
-          client.token_endpoint_auth_method = 'none'
+          client.token_endpoint_auth_method = 'self_signed_tls_client_auth'
           break
         case 'none':
         case 'private_key_jwt':

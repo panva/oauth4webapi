@@ -109,16 +109,26 @@ export interface PrivateKey {
  *   {@link AuthenticatedRequestOptions.clientPrivateKey options parameter}.
  * - **`none`** (public client) uses the HTTP request body to send only
  *   {@link Client.client_id `client_id`} as `application/x-www-form-urlencoded` body parameter.
+ * - **`tls_client_auth`** uses the HTTP request body to send only {@link Client.client_id `client_id`}
+ *   as `application/x-www-form-urlencoded` body parameter and the mTLS key and certificate is
+ *   configured through {@link customFetch}.
+ * - **`self_signed_tls_client_auth`** uses the HTTP request body to send only
+ *   {@link Client.client_id `client_id`} as `application/x-www-form-urlencoded` body parameter and
+ *   the mTLS key and certificate is configured through {@link customFetch}.
  *
  * @see [RFC 6749 - The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html#section-2.3)
  * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication)
  * @see [OAuth Token Endpoint Authentication Methods](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#token-endpoint-auth-method)
+ * @see [RFC 8705 - OAuth 2.0 Mutual-TLS Client Authentication (PKI Mutual-TLS Method)](https://www.rfc-editor.org/rfc/rfc8705.html#name-pki-mutual-tls-method)
+ * @see [RFC 8705 - OAuth 2.0 Mutual-TLS Client Authentication (Self-Signed Certificate Mutual-TLS Method)](https://www.rfc-editor.org/rfc/rfc8705.html#name-self-signed-certificate-mut)
  */
 export type ClientAuthenticationMethod =
   | 'client_secret_basic'
   | 'client_secret_post'
   | 'private_key_jwt'
   | 'none'
+  | 'tls_client_auth'
+  | 'self_signed_tls_client_auth'
 
 /**
  * Supported JWS `alg` Algorithm identifiers.
@@ -1775,9 +1785,7 @@ async function clientAuthentication(
       body.set('client_assertion', await privateKeyJwt(as, client, key, kid, modifyAssertion))
       break
     }
-    // @ts-expect-error
     case 'tls_client_auth':
-    // @ts-expect-error
     case 'self_signed_tls_client_auth':
     case 'none': {
       assertNoClientSecret(client.token_endpoint_auth_method, client.client_secret)
