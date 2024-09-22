@@ -170,6 +170,9 @@ provider.use(async (ctx, next) => {
     if (typeof ctx.body === 'string' && ctx.body.includes('Continue')) {
       ctx.body = ctx.body.replace('<title>Sign-in</title>', '<title>Consent</title>')
     }
+    if (ctx.body?.verification_uri_complete) {
+      ctx.body.interval = 0.1
+    }
   }
 })
 

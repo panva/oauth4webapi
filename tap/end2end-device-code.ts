@@ -40,7 +40,7 @@ export default (QUnit: QUnit) => {
       })
 
       let result = await lib.processDeviceAuthorizationResponse(as, client, response)
-      const { verification_uri_complete, device_code } = result
+      const { verification_uri_complete, device_code, interval = 5 } = result
 
       await fetch('http://localhost:3000/drive', {
         method: 'POST',
@@ -63,7 +63,7 @@ export default (QUnit: QUnit) => {
           try {
             result = await processDeviceCodeResponse()
           } catch {
-            await new Promise((resolve) => setTimeout(resolve, 100))
+            await new Promise((resolve) => setTimeout(resolve, interval * 1000))
             response = await deviceCodeGrantRequest()
           }
         }
