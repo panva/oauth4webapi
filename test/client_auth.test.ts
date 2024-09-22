@@ -34,7 +34,7 @@ test('client_secret_basic', async (t) => {
 
   await lib.revocationRequest(
     { ...issuer, revocation_endpoint: endpoint('test-basic') },
-    { ...client, client_secret: 'foo' },
+    { ...client, client_secret: 'foo', token_endpoint_auth_method: 'client_secret_basic' },
     'token',
   )
   t.pass()
@@ -63,7 +63,35 @@ test('client_secret_basic (appendix b)', async (t) => {
 
   await lib.revocationRequest(
     { ...issuer, revocation_endpoint: endpoint('test-basic-encoding') },
-    { ...client, client_id: ' %&+£€', client_secret: ' %&+£€' },
+    {
+      ...client,
+      client_id: ' %&+£€',
+      client_secret: ' %&+£€',
+      token_endpoint_auth_method: 'client_secret_basic',
+    },
+    'token',
+  )
+  t.pass()
+})
+
+test('client_secret_post (default)', async (t) => {
+  t.context
+    .intercept({
+      path: '/test-post',
+      method: 'POST',
+      headers(headers) {
+        return !('authorization' in headers)
+      },
+      body(body) {
+        const params = new URLSearchParams(body)
+        return params.get('client_id') === client.client_id && params.get('client_secret') === 'foo'
+      },
+    })
+    .reply(200, '')
+
+  await lib.revocationRequest(
+    { ...issuer, revocation_endpoint: endpoint('test-post') },
+    { ...client, client_secret: 'foo' },
     'token',
   )
   t.pass()

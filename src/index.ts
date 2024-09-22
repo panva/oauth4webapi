@@ -97,12 +97,12 @@ export interface PrivateKey {
 /**
  * Supported Client Authentication Methods.
  *
- * - **`client_secret_basic`** (default) uses the HTTP `Basic` authentication scheme to send
+ * - **`client_secret_post`** (default) uses the HTTP request body to send
+ *   {@link Client.client_id `client_id`} and {@link Client.client_secret `client_secret`} as
+ *   `application/x-www-form-urlencoded` body parameters.
+ * - **`client_secret_basic`** uses the HTTP `Basic` authentication scheme to send
  *   {@link Client.client_id `client_id`} and {@link Client.client_secret `client_secret`} in an
  *   `Authorization` HTTP Header.
- * - **`client_secret_post`** uses the HTTP request body to send {@link Client.client_id `client_id`}
- *   and {@link Client.client_secret `client_secret`} as `application/x-www-form-urlencoded` body
- *   parameters.
  * - **`private_key_jwt`** uses the HTTP request body to send {@link Client.client_id `client_id`},
  *   `client_assertion_type`, and `client_assertion` as `application/x-www-form-urlencoded` body
  *   parameters. The `client_assertion` is signed using a private key supplied as an
@@ -123,8 +123,8 @@ export interface PrivateKey {
  * @see [RFC 8705 - OAuth 2.0 Mutual-TLS Client Authentication (Self-Signed Certificate Mutual-TLS Method)](https://www.rfc-editor.org/rfc/rfc8705.html#name-self-signed-certificate-mut)
  */
 export type ClientAuthenticationMethod =
-  | 'client_secret_basic'
   | 'client_secret_post'
+  | 'client_secret_basic'
   | 'private_key_jwt'
   | 'none'
   | 'tls_client_auth'
@@ -881,10 +881,9 @@ export interface Client {
    * Client secret.
    */
   client_secret?: string
-  // TODO: Make client_secret_post the default in v3.x
   /**
    * Client {@link ClientAuthenticationMethod authentication method} for the client's authenticated
-   * requests. Default is `client_secret_basic`.
+   * requests. Default is `client_secret_post`.
    */
   token_endpoint_auth_method?: ClientAuthenticationMethod
   /**
@@ -1755,18 +1754,18 @@ async function clientAuthentication(
   body.delete('client_assertion')
   switch (client.token_endpoint_auth_method) {
     case undefined: // Fall through
+    case 'client_secret_post': {
+      assertNoClientPrivateKey('client_secret_post', clientPrivateKey)
+      body.set('client_id', client.client_id)
+      body.set('client_secret', assertClientSecret(client.client_secret))
+      break
+    }
     case 'client_secret_basic': {
       assertNoClientPrivateKey('client_secret_basic', clientPrivateKey)
       headers.set(
         'authorization',
         clientSecretBasic(client.client_id, assertClientSecret(client.client_secret)),
       )
-      break
-    }
-    case 'client_secret_post': {
-      assertNoClientPrivateKey('client_secret_post', clientPrivateKey)
-      body.set('client_id', client.client_id)
-      body.set('client_secret', assertClientSecret(client.client_secret))
       break
     }
     case 'private_key_jwt': {
