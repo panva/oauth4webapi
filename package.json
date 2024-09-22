@@ -60,7 +60,7 @@
     "_format": "find src test tap examples conformance -type f -name '*.ts' -o -name '*.mjs' -o -name '*.cjs' | xargs prettier",
     "build": "rm -rf build && tsc --sourceMap && tsc --declaration true --emitDeclarationOnly true --removeComments false && tsc -p test && tsc -p examples && tsc -p conformance && tsc -p tap && npx --yes jsr publish --dry-run --allow-dirty",
     "conformance": "bash -c 'source .node_flags.sh && ava --config conformance/ava.config.ts'",
-    "docs": "patch-package && typedoc",
+    "docs": "patch-package > /dev/null && typedoc",
     "format": "npm run _format -- --write",
     "format-check": "npm run _format -- --check",
     "tap:browsers": "./tap/.browsers.sh",
