@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.17.0](https://github.com/panva/oauth4webapi/compare/v2.16.0...v2.17.0) (2024-09-22)
+
+
+### Features
+
+* support client use_mtls_endpoint_aliases metadata ([60c9df4](https://github.com/panva/oauth4webapi/commit/60c9df480bf0bac4d064f9ae8867e65a30ae8e8a))
+
+
+### Documentation
+
+* fix calculatePKCECodeChallenge description ([ac014f2](https://github.com/panva/oauth4webapi/commit/ac014f2882a82e1ef688c8542b09a0cab76dcffd))
+
+
+### Refactor
+
+* deprecate the useMtlsAlias symbol and options ([d2b7cb0](https://github.com/panva/oauth4webapi/commit/d2b7cb04481c6abaca9f22befa55b8a4ac355a41))
+* use as Type for type assertions instead of <Type> ([a0ccf56](https://github.com/panva/oauth4webapi/commit/a0ccf568e6fcc11bc005a97b86e3b429ac3e86b4))
+
 ## [2.16.0](https://github.com/panva/oauth4webapi/compare/v2.15.0...v2.16.0) (2024-09-16)
 
 
