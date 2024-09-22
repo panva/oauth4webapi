@@ -1387,7 +1387,7 @@ export function generateRandomNonce(): string {
 }
 
 /**
- * Calculates the PKCE `code_verifier` value to send with an authorization request using the S256
+ * Calculates the PKCE `code_challenge` value to send with an authorization request using the S256
  * PKCE Code Challenge Method transformation.
  *
  * @param codeVerifier `code_verifier` value generated e.g. from {@link generateRandomCodeVerifier}.
