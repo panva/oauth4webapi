@@ -1,23 +1,23 @@
 diff --git a/examples/fapi2.ts b/examples/fapi2-message-signing.ts
-index ca2ed9b..968eac8 100644
+index 8de0d2e..fe2dc9a 100644
 --- a/examples/fapi2.ts
 +++ b/examples/fapi2-message-signing.ts
-@@ -24,6 +24,11 @@ let DPoP!: oauth.CryptoKeyPairType
+@@ -25,6 +25,11 @@ let DPoP!: oauth.CryptoKeyPair
   * client authentication method.
   */
- let clientPrivateKey!: oauth.CryptoKeyType
+ let clientPrivateKey!: oauth.CryptoKey
 +/**
 + * A key that is pre-registered at the Authorization Server that the client is supposed to sign its
 + * Request Objects with.
 + */
-+let jarPrivateKey!: oauth.CryptoKeyType
-
++let jarPrivateKey!: oauth.CryptoKey
+ 
  // End of prerequisites
-
-@@ -45,8 +50,8 @@ const code_challenge_method = 'S256'
+ 
+@@ -46,8 +51,8 @@ const code_challenge_method = 'S256'
  const code_verifier = oauth.generateRandomCodeVerifier()
  const code_challenge = await oauth.calculatePKCECodeChallenge(code_verifier)
-
+ 
 -// Pushed Authorization Request & Response (PAR)
 -let request_uri: string
 +// Signed Request Object (JAR)
@@ -25,7 +25,7 @@ index ca2ed9b..968eac8 100644
  {
    const params = new URLSearchParams()
    params.set('client_id', client.client_id)
-@@ -54,7 +59,18 @@ let request_uri: string
+@@ -55,7 +60,18 @@ let request_uri: string
    params.set('code_challenge_method', code_challenge_method)
    params.set('redirect_uri', redirect_uri)
    params.set('response_type', 'code')
@@ -42,26 +42,26 @@ index ca2ed9b..968eac8 100644
 +  const params = new URLSearchParams()
 +  params.set('client_id', client.client_id)
 +  params.set('request', request)
-
+ 
    const pushedAuthorizationRequest = () =>
      oauth.pushedAuthorizationRequest(as, client, params, {
-@@ -94,27 +110,30 @@ let access_token: string
+@@ -94,27 +110,30 @@ let request_uri: string
+ let access_token: string
  {
-
    const currentUrl: URL = getCurrentUrl()
 -  const params = oauth.validateAuthResponse(as, client, currentUrl)
 +  const params = await oauth.validateJwtAuthResponse(as, client, currentUrl)
-
+ 
    const authorizationCodeGrantRequest = () =>
      oauth.authorizationCodeGrantRequest(as, client, params, redirect_uri, code_verifier, { DPoP })
-
+ 
    let response = await authorizationCodeGrantRequest()
-
+ 
 -  const processAuthorizationCodeOAuth2Response = () =>
 -    oauth.processAuthorizationCodeOAuth2Response(as, client, response)
 +  const processAuthorizationCodeOpenIDResponse = () =>
 +    oauth.processAuthorizationCodeOpenIDResponse(as, client, response)
-
+ 
 -  let result = await processAuthorizationCodeOAuth2Response().catch(async (err) => {
 +  let result = await processAuthorizationCodeOpenIDResponse().catch(async (err) => {
      if (err instanceof oauth.ResponseBodyError) {
@@ -74,7 +74,7 @@ index ca2ed9b..968eac8 100644
      }
      throw err
    })
-
+ 
 +  // Check ID Token signature for non-repudiation purposes
 +  await oauth.validateIdTokenSignature(as, result)
 +

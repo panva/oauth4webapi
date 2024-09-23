@@ -308,7 +308,7 @@ export const flow = (options?: MacroOptions) => {
         authorizationUrl.searchParams.set('response_type', response_type)
       }
 
-      let DPoP!: oauth.CryptoKeyPairType
+      let DPoP!: oauth.CryptoKeyPair
       if (usesDpop(variant)) {
         DPoP = await oauth.generateKeyPair(JWS_ALGORITHM as oauth.JWSAlgorithm)
         authorizationUrl.searchParams.set(

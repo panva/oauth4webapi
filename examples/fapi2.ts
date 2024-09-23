@@ -19,12 +19,12 @@ let redirect_uri!: string
  * session. In the browser environment you shall use IndexedDB to persist the generated
  * CryptoKeyPair.
  */
-let DPoP!: oauth.CryptoKeyPairType
+let DPoP!: oauth.CryptoKeyPair
 /**
  * A key that the client has pre-registered at the Authorization Server for use with Private Key JWT
  * client authentication method.
  */
-let clientPrivateKey!: oauth.CryptoKeyType
+let clientPrivateKey!: oauth.CryptoKey
 
 // End of prerequisites
 

@@ -1,8 +1,8 @@
 diff --git a/examples/oauth.ts b/examples/jar.ts
-index a3b923c..d6e1142 100644
+index 6f4b65e..3bb4223 100644
 --- a/examples/oauth.ts
 +++ b/examples/jar.ts
-@@ -14,6 +14,11 @@ let client_secret!: string
+@@ -15,6 +15,11 @@ let client_secret!: string
   * Server.
   */
  let redirect_uri!: string
@@ -10,11 +10,11 @@ index a3b923c..d6e1142 100644
 + * A key that is pre-registered at the Authorization Server that the client is supposed to sign its
 + * Request Objects with.
 + */
-+let jarPrivateKey!: oauth.CryptoKeyType
++let jarPrivateKey!: oauth.CryptoKey
  
  // End of prerequisites
  
-@@ -37,15 +42,16 @@ const code_verifier = oauth.generateRandomCodeVerifier()
+@@ -38,15 +43,16 @@ const code_verifier = oauth.generateRandomCodeVerifier()
  const code_challenge = await oauth.calculatePKCECodeChallenge(code_verifier)
  let state: string | undefined
  
@@ -39,7 +39,7 @@ index a3b923c..d6e1142 100644
  
    /**
     * We cannot be sure the AS supports PKCE so we're going to use state too. Use of PKCE is
-@@ -53,9 +59,18 @@ let state: string | undefined
+@@ -54,9 +60,18 @@ let state: string | undefined
     */
    if (as.code_challenge_methods_supported?.includes('S256') !== true) {
      state = oauth.generateRandomState()

@@ -28,12 +28,12 @@ let mtlsClientCertificate!: string
  * A key that is pre-registered at the Authorization Server that the client is supposed to sign its
  * Request Objects with.
  */
-let jarPrivateKey!: oauth.CryptoKeyType
+let jarPrivateKey!: oauth.CryptoKey
 /**
  * A key that the client has pre-registered at the Authorization Server for use with Private Key JWT
  * client authentication method.
  */
-let clientPrivateKey!: oauth.CryptoKeyType
+let clientPrivateKey!: oauth.CryptoKey
 
 // End of prerequisites
 

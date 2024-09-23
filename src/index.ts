@@ -7,19 +7,19 @@ if (typeof navigator === 'undefined' || !navigator.userAgent?.startsWith?.('Mozi
 }
 
 /**
- * Alias for {@link !CryptoKey}
+ * @ignore
  */
-export type CryptoKeyType = Extract<
+export type CryptoKey = Extract<
   Awaited<ReturnType<typeof crypto.subtle.generateKey>>,
   { type: string }
 >
 /**
- * Alias for {@link !CryptoKeyPair}
+ * @ignore
  */
-export type CryptoKeyPairType = Extract<
-  Awaited<ReturnType<typeof crypto.subtle.generateKey>>,
-  { privateKey: any }
->
+export type CryptoKeyPair = {
+  privateKey: CryptoKey
+  publicKey: CryptoKey
+}
 
 /**
  * JSON Object
@@ -78,7 +78,7 @@ export interface PrivateKey {
    *
    * Its algorithm must be compatible with a supported {@link JWSAlgorithm JWS `alg` Algorithm}.
    */
-  key: CryptoKeyType
+  key: CryptoKey
 
   /**
    * JWK Key ID to add to JOSE headers when this key is used. When not provided no `kid` (JWK Key
@@ -397,7 +397,7 @@ export const customFetch: unique symbol = Symbol()
  * let as!: oauth.AuthorizationServer
  * let client!: oauth.Client
  * let parameters!: URLSearchParams
- * let clientPrivateKey!: oauth.CryptoKeyType
+ * let clientPrivateKey!: oauth.CryptoKey
  *
  * const response = await oauth.pushedAuthorizationRequest(as, client, parameters, {
  *   clientPrivateKey: {
@@ -420,7 +420,7 @@ export const customFetch: unique symbol = Symbol()
  * let as!: oauth.AuthorizationServer
  * let client!: oauth.Client
  * let parameters!: URLSearchParams
- * let jarPrivateKey!: oauth.CryptoKeyType
+ * let jarPrivateKey!: oauth.CryptoKey
  *
  * const request = await oauth.issueRequestObject(as, client, parameters, {
  *   key: jarPrivateKey,
@@ -452,7 +452,7 @@ export const modifyAssertion: unique symbol = Symbol()
  *
  * // Prerequisites
  * let as!: oauth.AuthorizationServer
- * let key!: oauth.CryptoKeyType
+ * let key!: oauth.CryptoKey
  * let alg!: string
  * let enc!: string
  *
@@ -1142,15 +1142,15 @@ const OPE = OperationProcessingError
 
 const dpopNonces: LRU<string, string> = new LRU(100)
 
-function isCryptoKey(key: unknown): key is CryptoKeyType {
+function isCryptoKey(key: unknown): key is CryptoKey {
   return key instanceof CryptoKey
 }
 
-function isPrivateKey(key: unknown): key is CryptoKeyType {
+function isPrivateKey(key: unknown): key is CryptoKey {
   return isCryptoKey(key) && key.type === 'private'
 }
 
-function isPublicKey(key: unknown): key is CryptoKeyType {
+function isPublicKey(key: unknown): key is CryptoKey {
   return isCryptoKey(key) && key.type === 'public'
 }
 
@@ -1510,12 +1510,12 @@ export async function calculatePKCECodeChallenge(codeVerifier: string): Promise<
 }
 
 interface NormalizedKeyInput {
-  key?: CryptoKeyType
+  key?: CryptoKey
   kid?: string
   modifyAssertion?: ModifyAssertionFunction
 }
 
-function getKeyAndKid(input: CryptoKeyType | PrivateKey | undefined): NormalizedKeyInput {
+function getKeyAndKid(input: CryptoKey | PrivateKey | undefined): NormalizedKeyInput {
   if (input instanceof CryptoKey) {
     return { key: input }
   }
@@ -1535,18 +1535,18 @@ function getKeyAndKid(input: CryptoKeyType | PrivateKey | undefined): Normalized
   }
 }
 
-export interface DPoPOptions extends CryptoKeyPairType {
+export interface DPoPOptions extends CryptoKeyPair {
   /**
    * Private CryptoKey instance to sign the DPoP Proof JWT with.
    *
    * Its algorithm must be compatible with a supported {@link JWSAlgorithm JWS `alg` Algorithm}.
    */
-  privateKey: CryptoKeyType
+  privateKey: CryptoKey
 
   /**
    * The public key corresponding to {@link DPoPOptions.privateKey}.
    */
-  publicKey: CryptoKeyType
+  publicKey: CryptoKey
 
   /**
    * Server-Provided Nonce to use in the request. This option serves as an override in case the
@@ -1576,7 +1576,7 @@ export interface AuthenticatedRequestOptions {
    * {@link ClientAuthenticationMethod client authentication}. Its algorithm must be compatible with
    * a supported {@link JWSAlgorithm JWS `alg` Algorithm}.
    */
-  clientPrivateKey?: CryptoKeyType | PrivateKey
+  clientPrivateKey?: CryptoKey | PrivateKey
 }
 
 export interface PushedAuthorizationRequestOptions
@@ -1672,7 +1672,7 @@ function esAlg(key: CryptoKey): JWSAlgorithm {
 /**
  * Determines a supported JWS `alg` identifier from CryptoKey instance properties.
  */
-function keyToJws(key: CryptoKeyType) {
+function keyToJws(key: CryptoKey) {
   switch (key.algorithm.name) {
     case 'RSA-PSS':
       return psAlg(key)
@@ -1728,7 +1728,7 @@ function clientAssertion(as: AuthorizationServer, client: Client) {
 async function privateKeyJwt(
   as: AuthorizationServer,
   client: Client,
-  key: CryptoKeyType,
+  key: CryptoKey,
   kid?: string,
   modifyAssertion?: ModifyAssertionFunction,
 ) {
@@ -1794,7 +1794,7 @@ async function clientAuthentication(
   client: Client,
   body: URLSearchParams,
   headers: Headers,
-  clientPrivateKey?: CryptoKeyType | PrivateKey,
+  clientPrivateKey?: CryptoKey | PrivateKey,
 ) {
   body.delete('client_secret')
   body.delete('client_assertion_type')
@@ -1850,7 +1850,7 @@ async function clientAuthentication(
 async function jwt(
   header: CompactJWSHeaderParameters,
   payload: Record<string, unknown>,
-  key: CryptoKeyType,
+  key: CryptoKey,
 ) {
   if (!key.usages.includes('sign')) {
     throw new TypeError(
@@ -1879,7 +1879,7 @@ export async function issueRequestObject(
   as: AuthorizationServer,
   client: Client,
   parameters: URLSearchParams | Record<string, string> | string[][],
-  privateKey: CryptoKeyType | PrivateKey,
+  privateKey: CryptoKey | PrivateKey,
 ): Promise<string> {
   assertAs(as)
   assertClient(client)
@@ -2014,9 +2014,9 @@ async function dpopProofJwt(
   headers.set('dpop', await jwt(header, payload, privateKey))
 }
 
-let jwkCache: WeakMap<CryptoKeyType, JWK>
+let jwkCache: WeakMap<CryptoKey, JWK>
 
-async function getSetPublicJwkCache(key: CryptoKeyType) {
+async function getSetPublicJwkCache(key: CryptoKey) {
   const { kty, e, n, x, y, crv } = await crypto.subtle.exportKey('jwk', key)
   const jwk = { kty, e, n, x, y, crv }
   jwkCache.set(key, jwk)
@@ -2026,7 +2026,7 @@ async function getSetPublicJwkCache(key: CryptoKeyType) {
 /**
  * Exports an asymmetric crypto key as bare JWK
  */
-async function publicJwk(key: CryptoKeyType) {
+async function publicJwk(key: CryptoKey) {
   jwkCache ||= new WeakMap()
   return jwkCache.get(key) || getSetPublicJwkCache(key)
 }
@@ -2692,7 +2692,7 @@ async function getPublicSigKeyFromIssuerJwksUri(
   as: AuthorizationServer,
   options: (HttpRequestOptions<'GET'> & JWKSCacheOptions) | undefined,
   header: CompactJWSHeaderParameters,
-): Promise<CryptoKeyType> {
+): Promise<CryptoKey> {
   const { alg, kid } = header
   checkSupportedJwsAlg(alg)
 
@@ -3094,7 +3094,7 @@ export async function validateIdTokenSignature(
     throw new UnsupportedOperationError('unsupported JWS algorithm')
   }
 
-  let key!: CryptoKeyType
+  let key!: CryptoKey
   key = await getPublicSigKeyFromIssuerJwksUri(as, options, header)
   await validateJwsSignature(protectedHeader, payload, key, b64u(encodedSignature))
 }
@@ -3122,7 +3122,7 @@ async function validateJwtResponseSignature(
     throw new UnsupportedOperationError('unsupported JWS algorithm')
   }
 
-  let key!: CryptoKeyType
+  let key!: CryptoKey
   key = await getPublicSigKeyFromIssuerJwksUri(as, options, header)
   await validateJwsSignature(protectedHeader, payload, key, b64u(encodedSignature))
 }
@@ -4224,7 +4224,7 @@ function ecdsaHashName(namedCurve: string) {
   }
 }
 
-function keyToSubtle(key: CryptoKeyType): AlgorithmIdentifier | RsaPssParams | EcdsaParams {
+function keyToSubtle(key: CryptoKey): AlgorithmIdentifier | RsaPssParams | EcdsaParams {
   switch (key.algorithm.name) {
     case 'ECDSA':
       return {
@@ -4261,7 +4261,7 @@ const noSignatureCheck = Symbol()
 async function validateJwsSignature(
   protectedHeader: string,
   payload: string,
-  key: CryptoKeyType,
+  key: CryptoKey,
   signature: Uint8Array,
 ) {
   const input = `${protectedHeader}.${payload}`
@@ -4281,11 +4281,11 @@ export interface JweDecryptFunction {
 async function validateJwt(
   jws: string,
   checkAlg: (h: CompactJWSHeaderParameters) => void,
-  getKey: ((h: CompactJWSHeaderParameters) => Promise<CryptoKeyType>) | typeof noSignatureCheck,
+  getKey: ((h: CompactJWSHeaderParameters) => Promise<CryptoKey>) | typeof noSignatureCheck,
   clockSkew: number,
   clockTolerance: number,
   decryptJwt: JweDecryptFunction | undefined,
-): Promise<ParsedJWT & { key?: CryptoKeyType }> {
+): Promise<ParsedJWT & { key?: CryptoKey }> {
   let { 0: protectedHeader, 1: payload, 2: encodedSignature, length } = jws.split('.')
 
   if (length === 5) {
@@ -4318,7 +4318,7 @@ async function validateJwt(
   }
 
   const signature = b64u(encodedSignature)
-  let key!: CryptoKeyType
+  let key!: CryptoKey
   if (getKey !== noSignatureCheck) {
     key = await getKey(header)
     await validateJwsSignature(protectedHeader, payload, key, signature)
@@ -4444,7 +4444,7 @@ export async function validateJwtAuthResponse(
   return validateAuthResponse(as, client, result, expectedState)
 }
 
-async function idTokenHash(alg: JWSAlgorithm, data: string, key: CryptoKeyType) {
+async function idTokenHash(alg: JWSAlgorithm, data: string, key: CryptoKey) {
   let algorithm: string
   switch (alg) {
     case 'RS256': // Fall through
@@ -4476,12 +4476,7 @@ async function idTokenHash(alg: JWSAlgorithm, data: string, key: CryptoKeyType) 
   return b64u(digest.slice(0, digest.byteLength / 2))
 }
 
-async function idTokenHashMatches(
-  data: string,
-  actual: string,
-  alg: JWSAlgorithm,
-  key: CryptoKeyType,
-) {
+async function idTokenHashMatches(data: string, actual: string, alg: JWSAlgorithm, key: CryptoKey) {
   const expected = await idTokenHash(alg, data, key)
   return actual === expected
 }
@@ -5088,7 +5083,7 @@ export interface GenerateKeyPairOptions {
 export async function generateKeyPair(
   alg: JWSAlgorithm,
   options?: GenerateKeyPairOptions,
-): Promise<CryptoKeyPairType> {
+): Promise<CryptoKeyPair> {
   if (!validateString(alg)) {
     throw new TypeError('"alg" must be a non-empty string')
   }

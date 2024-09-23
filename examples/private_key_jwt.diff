@@ -1,8 +1,8 @@
 diff --git a/examples/oauth.ts b/examples/private_key_jwt.ts
-index a3b923c..aed0fd0 100644
+index 6f4b65e..d13c813 100644
 --- a/examples/oauth.ts
 +++ b/examples/private_key_jwt.ts
-@@ -8,12 +8,16 @@ let algorithm!:
+@@ -9,12 +9,16 @@ let algorithm!:
    | 'oidc' /* For .well-known/openid-configuration discovery */
    | undefined /* Defaults to 'oidc' */
  let client_id!: string
@@ -16,11 +16,11 @@ index a3b923c..aed0fd0 100644
 + * A key that the client has pre-registered at the Authorization Server for use with Private Key JWT
 + * client authentication method.
 + */
-+let clientPrivateKey!: oauth.CryptoKeyType
++let clientPrivateKey!: oauth.CryptoKey
  
  // End of prerequisites
  
-@@ -23,8 +27,7 @@ const as = await oauth
+@@ -24,8 +28,7 @@ const as = await oauth
  
  const client: oauth.Client = {
    client_id,

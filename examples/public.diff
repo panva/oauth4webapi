@@ -1,8 +1,8 @@
 diff --git a/examples/oauth.ts b/examples/public.ts
-index a3b923c..610c62e 100644
+index 6f4b65e..189e5be 100644
 --- a/examples/oauth.ts
 +++ b/examples/public.ts
-@@ -8,7 +8,6 @@ let algorithm!:
+@@ -9,7 +9,6 @@ let algorithm!:
    | 'oidc' /* For .well-known/openid-configuration discovery */
    | undefined /* Defaults to 'oidc' */
  let client_id!: string
@@ -10,7 +10,7 @@ index a3b923c..610c62e 100644
  /**
   * Value used in the authorization request as redirect_uri pre-registered at the Authorization
   * Server.
-@@ -23,8 +22,7 @@ const as = await oauth
+@@ -24,8 +23,7 @@ const as = await oauth
  
  const client: oauth.Client = {
    client_id,

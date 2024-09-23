@@ -1,8 +1,8 @@
 diff --git a/examples/oauth.ts b/examples/fapi2.ts
-index a3b923c..ca2ed9b 100644
+index 6f4b65e..8de0d2e 100644
 --- a/examples/oauth.ts
 +++ b/examples/fapi2.ts
-@@ -8,12 +8,22 @@ let algorithm!:
+@@ -9,12 +9,22 @@ let algorithm!:
    | 'oidc' /* For .well-known/openid-configuration discovery */
    | undefined /* Defaults to 'oidc' */
  let client_id!: string
@@ -17,24 +17,24 @@ index a3b923c..ca2ed9b 100644
 + * session. In the browser environment you shall use IndexedDB to persist the generated
 + * CryptoKeyPair.
 + */
-+let DPoP!: oauth.CryptoKeyPairType
++let DPoP!: oauth.CryptoKeyPair
 +/**
 + * A key that the client has pre-registered at the Authorization Server for use with Private Key JWT
 + * client authentication method.
 + */
-+let clientPrivateKey!: oauth.CryptoKeyType
-
++let clientPrivateKey!: oauth.CryptoKey
+ 
  // End of prerequisites
-
-@@ -23,38 +33,57 @@ const as = await oauth
-
+ 
+@@ -24,38 +34,57 @@ const as = await oauth
+ 
  const client: oauth.Client = {
    client_id,
 -  client_secret,
 -  token_endpoint_auth_method: 'client_secret_basic',
 +  token_endpoint_auth_method: 'private_key_jwt',
  }
-
+ 
  const code_challenge_method = 'S256'
  /**
   * The following MUST be generated for every redirect to the authorization_endpoint. You must store
@@ -80,7 +80,7 @@ index a3b923c..ca2ed9b 100644
 +
 +  ;({ request_uri } = result)
 +}
-
+ 
  {
    // redirect user to as.authorization_endpoint
    const authorizationUrl = new URL(as.authorization_endpoint!)
@@ -100,12 +100,12 @@ index a3b923c..ca2ed9b 100644
 -    authorizationUrl.searchParams.set('state', state)
 -  }
 +  authorizationUrl.searchParams.set('request_uri', request_uri)
-
+ 
    // now redirect the user to authorizationUrl.href
  }
-@@ -65,17 +94,26 @@ let access_token: string
+@@ -65,17 +94,26 @@ let state: string | undefined
+ let access_token: string
  {
-
    const currentUrl: URL = getCurrentUrl()
 -  const params = oauth.validateAuthResponse(as, client, currentUrl, state)
 +  const params = oauth.validateAuthResponse(as, client, currentUrl)
@@ -114,7 +114,7 @@ index a3b923c..ca2ed9b 100644
 +    oauth.authorizationCodeGrantRequest(as, client, params, redirect_uri, code_verifier, { DPoP })
 +
 +  let response = await authorizationCodeGrantRequest()
-
+ 
 -  const response = await oauth.authorizationCodeGrantRequest(
 -    as,
 -    client,
@@ -124,7 +124,7 @@ index a3b923c..ca2ed9b 100644
 -  )
 +  const processAuthorizationCodeOAuth2Response = () =>
 +    oauth.processAuthorizationCodeOAuth2Response(as, client, response)
-
+ 
 -  const result = await oauth.processAuthorizationCodeOAuth2Response(as, client, response)
 +  let result = await processAuthorizationCodeOAuth2Response().catch(async (err) => {
 +    if (err instanceof oauth.ResponseBodyError) {
@@ -136,11 +136,11 @@ index a3b923c..ca2ed9b 100644
 +    }
 +    throw err
 +  })
-
+ 
    console.log('Access Token Response', result)
    ;({ access_token } = result)
 @@ -83,11 +121,29 @@ let access_token: string
-
+ 
  // Protected Resource Request
  {
 -  const response = await oauth.protectedResourceRequest(
@@ -171,6 +171,6 @@ index a3b923c..ca2ed9b 100644
 +    }
 +    throw err
 +  })
-
+ 
    console.log('Protected Resource Response', await response.json())
  }

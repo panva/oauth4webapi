@@ -1,8 +1,8 @@
 diff --git a/examples/oauth.ts b/examples/refresh_token.ts
-index a3b923c..124e4e9 100644
+index 6f4b65e..d3f0185 100644
 --- a/examples/oauth.ts
 +++ b/examples/refresh_token.ts
-@@ -43,7 +43,7 @@ let state: string | undefined
+@@ -44,7 +44,7 @@ let state: string | undefined
    authorizationUrl.searchParams.set('client_id', client.client_id)
    authorizationUrl.searchParams.set('redirect_uri', redirect_uri)
    authorizationUrl.searchParams.set('response_type', 'code')
@@ -10,26 +10,26 @@ index a3b923c..124e4e9 100644
 +  authorizationUrl.searchParams.set('scope', 'api:read offline_access')
    authorizationUrl.searchParams.set('code_challenge', code_challenge)
    authorizationUrl.searchParams.set('code_challenge_method', code_challenge_method)
-
-@@ -62,6 +62,7 @@ let state: string | undefined
+ 
+@@ -63,6 +63,7 @@ let state: string | undefined
  // one eternity later, the user lands back on the redirect_uri
  // Authorization Code Grant Request & Response
  let access_token: string
 +let refresh_token: string | undefined
  {
-
    const currentUrl: URL = getCurrentUrl()
+   const params = oauth.validateAuthResponse(as, client, currentUrl, state)
 @@ -78,7 +79,7 @@ let access_token: string
    const result = await oauth.processAuthorizationCodeOAuth2Response(as, client, response)
-
+ 
    console.log('Access Token Response', result)
 -  ;({ access_token } = result)
 +  ;({ access_token, refresh_token } = result)
  }
-
+ 
  // Protected Resource Request
 @@ -91,3 +92,13 @@ let access_token: string
-
+ 
    console.log('Protected Resource Response', await response.json())
  }
 +

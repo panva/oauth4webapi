@@ -20,7 +20,7 @@ let redirect_uri!: string
  * session. In the browser environment you shall use IndexedDB to persist the generated
  * CryptoKeyPair.
  */
-let DPoP!: oauth.CryptoKeyPairType
+let DPoP!: oauth.CryptoKeyPair
 
 // End of prerequisites
 

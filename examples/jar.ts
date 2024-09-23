@@ -19,7 +19,7 @@ let redirect_uri!: string
  * A key that is pre-registered at the Authorization Server that the client is supposed to sign its
  * Request Objects with.
  */
-let jarPrivateKey!: oauth.CryptoKeyType
+let jarPrivateKey!: oauth.CryptoKey
 
 // End of prerequisites
 

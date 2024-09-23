@@ -1,13 +1,18 @@
 diff --git a/examples/oauth.ts b/examples/fapi1-advanced.ts
-index a3b923c..32526fa 100644
+index 6f4b65e..6c35755 100644
 --- a/examples/oauth.ts
 +++ b/examples/fapi1-advanced.ts
-@@ -1,3 +1,4 @@
+@@ -1,20 +1,39 @@
 +import * as undici from 'undici'
  import * as oauth from 'oauth4webapi'
-
+ 
  // Prerequisites
-@@ -8,12 +9,30 @@ let algorithm!:
+ 
+-let getCurrentUrl!: (...args: any) => URL
++let getAuthorizationResponseOrURLWithFragment!: (...args: any) => URL
+ let issuer!: URL // Authorization server's Issuer Identifier URL
+ let algorithm!:
+   | 'oauth2' /* For .well-known/oauth-authorization-server discovery */
    | 'oidc' /* For .well-known/openid-configuration discovery */
    | undefined /* Defaults to 'oidc' */
  let client_id!: string
@@ -30,26 +35,26 @@ index a3b923c..32526fa 100644
 + * A key that is pre-registered at the Authorization Server that the client is supposed to sign its
 + * Request Objects with.
 + */
-+let jarPrivateKey!: oauth.CryptoKeyType
++let jarPrivateKey!: oauth.CryptoKey
 +/**
 + * A key that the client has pre-registered at the Authorization Server for use with Private Key JWT
 + * client authentication method.
 + */
-+let clientPrivateKey!: oauth.CryptoKeyType
-
++let clientPrivateKey!: oauth.CryptoKey
+ 
  // End of prerequisites
-
-@@ -23,8 +42,7 @@ const as = await oauth
-
+ 
+@@ -24,8 +43,7 @@ const as = await oauth
+ 
  const client: oauth.Client = {
    client_id,
 -  client_secret,
 -  token_endpoint_auth_method: 'client_secret_basic',
 +  token_endpoint_auth_method: 'private_key_jwt',
  }
-
+ 
  const code_challenge_method = 'S256'
-@@ -33,39 +51,46 @@ const code_challenge_method = 'S256'
+@@ -34,38 +52,45 @@ const code_challenge_method = 'S256'
   * the code_verifier and nonce in the end-user session such that it can be recovered as the user
   * gets redirected from the authorization server back to your application.
   */
@@ -71,7 +76,7 @@ index a3b923c..32526fa 100644
 +
 +  request = await oauth.issueRequestObject(as, client, params, jarPrivateKey)
 +}
-
+ 
  {
    // redirect user to as.authorization_endpoint
    const authorizationUrl = new URL(as.authorization_endpoint!)
@@ -91,16 +96,15 @@ index a3b923c..32526fa 100644
 -    authorizationUrl.searchParams.set('state', state)
 -  }
 +  authorizationUrl.searchParams.set('request', request)
-
+ 
    // now redirect the user to authorizationUrl.href
  }
-
+ 
  // one eternity later, the user lands back on the redirect_uri
 +// Detached Signature ID Token Validation
  // Authorization Code Grant Request & Response
  let access_token: string
  {
-
 -  const currentUrl: URL = getCurrentUrl()
 -  const params = oauth.validateAuthResponse(as, client, currentUrl, state)
 +  const authorizationResponse: URLSearchParams | URL = getAuthorizationResponseOrURLWithFragment()
@@ -110,7 +114,7 @@ index a3b923c..32526fa 100644
 +    authorizationResponse,
 +    nonce,
 +  )
-
+ 
    const response = await oauth.authorizationCodeGrantRequest(
      as,
 @@ -73,9 +98,26 @@ let access_token: string
@@ -132,13 +136,13 @@ index a3b923c..32526fa 100644
 +      },
 +    },
    )
-
+ 
 -  const result = await oauth.processAuthorizationCodeOAuth2Response(as, client, response)
 +  const result = await oauth.processAuthorizationCodeOpenIDResponse(as, client, response)
 +
 +  // Check ID Token signature for non-repudiation purposes
 +  await oauth.validateIdTokenSignature(as, result)
-
+ 
    console.log('Access Token Response', result)
    ;({ access_token } = result)
 @@ -87,6 +129,21 @@ let access_token: string
@@ -161,5 +165,5 @@ index a3b923c..32526fa 100644
 +      },
 +    },
    )
-
+ 
    console.log('Protected Resource Response', await response.json())
