@@ -1,7 +1,8 @@
-import * as oauth from '../src/index.js' // replace with an import of oauth4webapi
+import * as oauth from 'oauth4webapi'
 
 // Prerequisites
 
+let getCurrentUrl!: (...args: any) => URL
 let issuer!: URL // Authorization server's Issuer Identifier URL
 let algorithm!:
   | 'oauth2' /* For .well-known/oauth-authorization-server discovery */
@@ -64,7 +65,6 @@ let state: string | undefined
 let access_token: string
 let refresh_token: string | undefined
 {
-  // @ts-expect-error
   const currentUrl: URL = getCurrentUrl()
   const params = oauth.validateAuthResponse(as, client, currentUrl, state)
 

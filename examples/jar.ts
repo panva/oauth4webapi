@@ -1,7 +1,8 @@
-import * as oauth from '../src/index.js' // replace with an import of oauth4webapi
+import * as oauth from 'oauth4webapi'
 
 // Prerequisites
 
+let getCurrentUrl!: (...args: any) => URL
 let issuer!: URL // Authorization server's Issuer Identifier URL
 let algorithm!:
   | 'oauth2' /* For .well-known/oauth-authorization-server discovery */
@@ -18,7 +19,7 @@ let redirect_uri!: string
  * A key that is pre-registered at the Authorization Server that the client is supposed to sign its
  * Request Objects with.
  */
-let jarPrivateKey!: CryptoKey
+let jarPrivateKey!: oauth.CryptoKeyType
 
 // End of prerequisites
 
@@ -78,7 +79,6 @@ let request: string
 // Authorization Code Grant Request & Response
 let access_token: string
 {
-  // @ts-expect-error
   const currentUrl: URL = getCurrentUrl()
   const params = oauth.validateAuthResponse(as, client, currentUrl, state)
 

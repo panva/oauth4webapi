@@ -58,11 +58,12 @@
   ],
   "scripts": {
     "_format": "find src test tap examples conformance -type f -name '*.ts' -o -name '*.mjs' -o -name '*.cjs' | xargs prettier",
-    "build": "rm -rf build && tsc --sourceMap && tsc --declaration true --emitDeclarationOnly true --removeComments false && tsc -p test && tsc -p examples && tsc -p conformance && tsc -p tap && npx --yes jsr publish --dry-run --allow-dirty",
+    "build": "npm run generate-build && tsc -p test && tsc -p examples && tsc -p conformance && tsc -p tap && npx --yes jsr publish --dry-run --allow-dirty",
     "conformance": "bash -c 'source .node_flags.sh && ava --config conformance/ava.config.ts'",
     "docs": "patch-package > /dev/null && typedoc",
-    "format": "npm run _format -- --write",
+    "format": "npm run _format -- --check --write",
     "format-check": "npm run _format -- --check",
+    "generate-build": "rm -rf build && tsc --sourceMap && tsc --declaration true --emitDeclarationOnly true --removeComments false",
     "tap:browsers": "./tap/.browsers.sh",
     "tap:bun": "./tap/.bun.sh",
     "tap:deno": "./tap/.deno.sh",
@@ -96,7 +97,7 @@
     "typedoc": "^0.26.7",
     "typedoc-plugin-markdown": "^4.2.7",
     "typedoc-plugin-mdn-links": "^3.3.1",
-    "typescript": "~5.5.4",
+    "typescript": "~5.6.2",
     "undici": "^6.19.8"
   }
 }

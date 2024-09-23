@@ -1,4 +1,4 @@
-import * as oauth from '../src/index.js' // replace with an import of oauth4webapi
+import * as oauth from 'oauth4webapi'
 
 // Prerequisites
 

@@ -397,7 +397,7 @@ export const customFetch: unique symbol = Symbol()
  * let as!: oauth.AuthorizationServer
  * let client!: oauth.Client
  * let parameters!: URLSearchParams
- * let clientPrivateKey!: CryptoKey
+ * let clientPrivateKey!: oauth.CryptoKeyType
  *
  * const response = await oauth.pushedAuthorizationRequest(as, client, parameters, {
  *   clientPrivateKey: {
@@ -420,7 +420,7 @@ export const customFetch: unique symbol = Symbol()
  * let as!: oauth.AuthorizationServer
  * let client!: oauth.Client
  * let parameters!: URLSearchParams
- * let jarPrivateKey!: CryptoKey
+ * let jarPrivateKey!: oauth.CryptoKeyType
  *
  * const request = await oauth.issueRequestObject(as, client, parameters, {
  *   key: jarPrivateKey,
@@ -452,7 +452,7 @@ export const modifyAssertion: unique symbol = Symbol()
  *
  * // Prerequisites
  * let as!: oauth.AuthorizationServer
- * let key!: CryptoKey
+ * let key!: oauth.CryptoKeyType
  * let alg!: string
  * let enc!: string
  *
@@ -1174,7 +1174,7 @@ export interface JWKSCacheOptions {
   [jwksCache]?: JWKSCacheInput
 }
 
-export interface HttpRequestOptions {
+export interface HttpRequestOptions<Method, BodyType = undefined> {
   /**
    * An AbortSignal instance, or a factory returning one, to abort the HTTP request(s) triggered by
    * this function's invocation.
@@ -1197,7 +1197,38 @@ export interface HttpRequestOptions {
   /**
    * See {@link customFetch}.
    */
-  [customFetch]?: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>
+  [customFetch]?: (
+    /**
+     * URL the request is being made sent to {@link !fetch} as the `resource` argument
+     */
+    url: string,
+    /**
+     * Options otherwise sent to {@link !fetch} as the `options` argument
+     */
+    options: {
+      /**
+       * The request body content to send to the server
+       */
+      body: BodyType
+      /**
+       * HTTP Headers
+       */
+      headers: Record<string, string>
+      /**
+       * The {@link https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods request method}
+       */
+      method: Method
+      /**
+       * See {@link !Request.redirect}
+       */
+      redirect: 'manual'
+      /**
+       * Depending on whether {@link HttpRequestOptions.signal} was used, if so, it is the value
+       * passed, otherwise undefined
+       */
+      signal?: RequestInit['signal']
+    },
+  ) => Promise<Response>
 
   /**
    * See {@link allowInsecureRequests}.
@@ -1207,7 +1238,7 @@ export interface HttpRequestOptions {
   [allowInsecureRequests]?: boolean
 }
 
-export interface DiscoveryRequestOptions extends HttpRequestOptions {
+export interface DiscoveryRequestOptions extends HttpRequestOptions<'GET'> {
   /**
    * The issuer transformation algorithm to use.
    */
@@ -1254,7 +1285,7 @@ function prepareHeaders(input?: [string, string][] | Record<string, string> | He
   return headers
 }
 
-function signal(value: Exclude<HttpRequestOptions['signal'], undefined>): AbortSignal {
+function signal(value: Exclude<HttpRequestOptions<any>['signal'], undefined>): AbortSignal {
   if (typeof value === 'function') {
     value = value()
   }
@@ -1316,6 +1347,7 @@ export async function discoveryRequest(
   headers.set('accept', 'application/json')
 
   return (options?.[customFetch] || fetch)(url.href, {
+    body: undefined,
     headers: Object.fromEntries(headers.entries()),
     method: 'GET',
     redirect: 'manual',
@@ -1548,7 +1580,7 @@ export interface AuthenticatedRequestOptions {
 }
 
 export interface PushedAuthorizationRequestOptions
-  extends HttpRequestOptions,
+  extends HttpRequestOptions<'POST', URLSearchParams>,
     AuthenticatedRequestOptions,
     DPoPRequestOptions {}
 
@@ -2081,7 +2113,7 @@ export async function pushedAuthorizationRequest(
     await dpopProofJwt(headers, options.DPoP, url, 'POST', getClockSkew(client))
   }
 
-  return authenticatedRequest(as, client, 'POST', url, body, headers, options)
+  return authenticatedRequest(as, client, url, body, headers, options)
 }
 
 export interface PushedAuthorizationResponse {
@@ -2425,8 +2457,17 @@ export async function processPushedAuthorizationResponse(
   return json
 }
 
+export type ProtectedResourceRequestBody =
+  | ArrayBuffer
+  | null
+  | ReadableStream
+  | string
+  | Uint8Array
+  | undefined
+  | URLSearchParams
+
 export interface ProtectedResourceRequestOptions
-  extends Omit<HttpRequestOptions, 'headers'>,
+  extends Omit<HttpRequestOptions<string, ProtectedResourceRequestBody>, 'headers'>,
     DPoPRequestOptions {
   /**
    * See {@link clockSkew}.
@@ -2455,15 +2496,7 @@ export async function protectedResourceRequest(
   method: string,
   url: URL,
   headers?: Headers,
-  body?:
-    | ReadableStream
-    | Blob
-    | ArrayBufferView
-    | ArrayBuffer
-    | FormData
-    | URLSearchParams
-    | string
-    | null,
+  body?: ProtectedResourceRequestBody,
   options?: ProtectedResourceRequestOptions,
 ): Promise<Response> {
   if (!validateString(accessToken)) {
@@ -2516,7 +2549,7 @@ export async function protectedResourceRequest(
     })
 }
 
-export interface UserInfoRequestOptions extends HttpRequestOptions, DPoPRequestOptions {}
+export interface UserInfoRequestOptions extends HttpRequestOptions<'GET'>, DPoPRequestOptions {}
 
 /**
  * Performs a UserInfo Request at the
@@ -2561,7 +2594,7 @@ export async function userInfoRequest(
   return protectedResourceRequest(accessToken, 'GET', url, headers, null, {
     ...options,
     [clockSkew]: getClockSkew(client),
-  })
+  } as ProtectedResourceRequestOptions)
 }
 
 export interface UserInfoAddress {
@@ -2657,7 +2690,7 @@ function clearJwksCache(as: AuthorizationServer, cache?: Partial<JWKSCacheInput>
 
 async function getPublicSigKeyFromIssuerJwksUri(
   as: AuthorizationServer,
-  options: (HttpRequestOptions & JWKSCacheOptions) | undefined,
+  options: (HttpRequestOptions<'GET'> & JWKSCacheOptions) | undefined,
   header: CompactJWSHeaderParameters,
 ): Promise<CryptoKeyType> {
   const { alg, kid } = header
@@ -2887,11 +2920,11 @@ export async function processUserInfoResponse(
 async function authenticatedRequest(
   as: AuthorizationServer,
   client: Client,
-  method: string,
   url: URL,
   body: URLSearchParams,
   headers: Headers,
-  options?: Omit<HttpRequestOptions, 'headers'> & AuthenticatedRequestOptions,
+  options?: Omit<HttpRequestOptions<'POST', URLSearchParams>, 'headers'> &
+    AuthenticatedRequestOptions,
 ) {
   await clientAuthentication(as, client, body, headers, options?.clientPrivateKey)
   headers.set('content-type', 'application/x-www-form-urlencoded;charset=UTF-8')
@@ -2899,14 +2932,14 @@ async function authenticatedRequest(
   return (options?.[customFetch] || fetch)(url.href, {
     body,
     headers: Object.fromEntries(headers.entries()),
-    method,
+    method: 'POST',
     redirect: 'manual',
     signal: options?.signal ? signal(options.signal) : null,
   }).then(processDpopNonce)
 }
 
 export interface TokenEndpointRequestOptions
-  extends HttpRequestOptions,
+  extends HttpRequestOptions<'POST', URLSearchParams>,
     AuthenticatedRequestOptions,
     DPoPRequestOptions {
   /**
@@ -2937,7 +2970,7 @@ async function tokenEndpointRequest(
     await dpopProofJwt(headers, options.DPoP, url, 'POST', getClockSkew(client))
   }
 
-  return authenticatedRequest(as, client, 'POST', url, parameters, headers, options)
+  return authenticatedRequest(as, client, url, parameters, headers, options)
 }
 
 /**
@@ -3013,7 +3046,7 @@ export function getValidatedIdTokenClaims(
   return claims[0]
 }
 
-export interface ValidateSignatureOptions extends HttpRequestOptions, JWKSCacheOptions {}
+export interface ValidateSignatureOptions extends HttpRequestOptions<'GET'>, JWKSCacheOptions {}
 
 /**
  * Validates the JWS Signature of an ID Token included in results previously resolved from
@@ -3708,7 +3741,7 @@ function checkJwtType(expected: string, result: Awaited<ReturnType<typeof valida
 }
 
 export interface ClientCredentialsGrantRequestOptions
-  extends HttpRequestOptions,
+  extends HttpRequestOptions<'POST', URLSearchParams>,
     AuthenticatedRequestOptions,
     DPoPRequestOptions {}
 
@@ -3802,7 +3835,9 @@ export async function processClientCredentialsResponse(
   return result as ClientCredentialsGrantResponse
 }
 
-export interface RevocationRequestOptions extends HttpRequestOptions, AuthenticatedRequestOptions {
+export interface RevocationRequestOptions
+  extends HttpRequestOptions<'POST', URLSearchParams>,
+    AuthenticatedRequestOptions {
   /**
    * Any additional parameters to send. This cannot override existing parameter values.
    */
@@ -3848,7 +3883,7 @@ export async function revocationRequest(
   const headers = prepareHeaders(options?.headers)
   headers.delete('accept')
 
-  return authenticatedRequest(as, client, 'POST', url, body, headers, options)
+  return authenticatedRequest(as, client, url, body, headers, options)
 }
 
 /**
@@ -3895,7 +3930,7 @@ export async function processRevocationResponse(response: Response): Promise<und
 }
 
 export interface IntrospectionRequestOptions
-  extends HttpRequestOptions,
+  extends HttpRequestOptions<'POST', URLSearchParams>,
     AuthenticatedRequestOptions {
   /**
    * Any additional parameters to send. This cannot override existing parameter values.
@@ -3962,7 +3997,7 @@ export async function introspectionRequest(
     headers.set('accept', 'application/json')
   }
 
-  return authenticatedRequest(as, client, 'POST', url, body, headers, options)
+  return authenticatedRequest(as, client, url, body, headers, options)
 }
 
 export interface ConfirmationClaims {
@@ -4090,7 +4125,7 @@ export async function processIntrospectionResponse(
 
 async function jwksRequest(
   as: AuthorizationServer,
-  options?: HttpRequestOptions,
+  options?: HttpRequestOptions<'GET'>,
 ): Promise<Response> {
   assertAs(as)
 
@@ -4101,6 +4136,7 @@ async function jwksRequest(
   headers.append('accept', 'application/jwk-set+json')
 
   return (options?.[customFetch] || fetch)(url.href, {
+    body: undefined,
     headers: Object.fromEntries(headers.entries()),
     method: 'GET',
     redirect: 'manual',
@@ -4820,7 +4856,7 @@ async function importJwk(alg: JWSAlgorithm, jwk: JWK) {
 }
 
 export interface DeviceAuthorizationRequestOptions
-  extends HttpRequestOptions,
+  extends HttpRequestOptions<'POST', URLSearchParams>,
     AuthenticatedRequestOptions {}
 
 /**
@@ -4857,7 +4893,7 @@ export async function deviceAuthorizationRequest(
   const headers = prepareHeaders(options?.headers)
   headers.set('accept', 'application/json')
 
-  return authenticatedRequest(as, client, 'POST', url, body, headers, options)
+  return authenticatedRequest(as, client, url, body, headers, options)
 }
 
 export interface DeviceAuthorizationResponse {
@@ -5088,7 +5124,7 @@ export interface JWTAccessTokenClaims extends JWTPayload {
   readonly [claim: string]: JsonValue | undefined
 }
 
-export interface ValidateJWTAccessTokenOptions extends HttpRequestOptions, JWKSCacheOptions {
+export interface ValidateJWTAccessTokenOptions extends HttpRequestOptions<'GET'>, JWKSCacheOptions {
   /**
    * Indicates whether DPoP use is required.
    */

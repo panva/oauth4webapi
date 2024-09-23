@@ -1,5 +1,5 @@
 diff --git a/examples/oauth.ts b/examples/par.ts
-index a3321ad..33dd060 100644
+index a3b923c..8c68e7a 100644
 --- a/examples/oauth.ts
 +++ b/examples/par.ts
 @@ -37,15 +37,16 @@ const code_verifier = oauth.generateRandomCodeVerifier()
