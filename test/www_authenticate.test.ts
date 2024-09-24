@@ -1,5 +1,6 @@
 import test from 'ava'
-import { getResponse } from './_setup.js'
+import type { ExecutionContext } from 'ava'
+import { getResponse, issuer, client, endpoint } from './_setup.js'
 import * as lib from '../src/index.js'
 
 function response(headers: Headers) {
@@ -8,22 +9,36 @@ function response(headers: Headers) {
 
 const name = 'www-authenticate'
 
-test('parseWwwAuthenticateChallenges()', (t) => {
-  {
-    const headers = new Headers()
-    t.deepEqual(lib.parseWwwAuthenticateChallenges(response(headers)), undefined)
-  }
+async function getWWWAuthenticateChallengeError(t: ExecutionContext, response: Response) {
+  return lib
+    .processUserInfoResponse(
+      {
+        userinfo_endpoint: endpoint('userinfo'),
+        ...issuer,
+      },
+      client,
+      lib.skipSubjectCheck,
+      response,
+    )
+    .then(
+      () => {
+        t.fail('rejection expected')
+      },
+      (err) => {
+        if (!(err instanceof lib.WWWAuthenticateChallengeError)) {
+          t.fail(err)
+        }
 
-  {
-    const headers = new Headers()
-    headers.append(name, 'invalid=true')
-    t.deepEqual(lib.parseWwwAuthenticateChallenges(response(headers)), undefined)
-  }
+        return err.cause
+      },
+    )
+}
 
+test('parseWwwAuthenticateChallenges()', async (t) => {
   {
     const headers = new Headers()
     headers.append(name, 'Basic realm="Access to the staging site", charset="UTF-8"')
-    t.deepEqual(lib.parseWwwAuthenticateChallenges(response(headers)), [
+    t.deepEqual(await getWWWAuthenticateChallengeError(t, response(headers)), [
       { scheme: 'basic', parameters: { charset: 'UTF-8', realm: 'Access to the staging site' } },
     ])
   }
@@ -31,7 +46,7 @@ test('parseWwwAuthenticateChallenges()', (t) => {
   {
     const headers = new Headers()
     headers.append(name, 'Basic')
-    t.deepEqual(lib.parseWwwAuthenticateChallenges(response(headers)), [
+    t.deepEqual(await getWWWAuthenticateChallengeError(t, response(headers)), [
       { scheme: 'basic', parameters: {} },
     ])
   }
@@ -39,7 +54,7 @@ test('parseWwwAuthenticateChallenges()', (t) => {
   {
     const headers = new Headers()
     headers.append(name, 'Basic realm=realm')
-    t.deepEqual(lib.parseWwwAuthenticateChallenges(response(headers)), [
+    t.deepEqual(await getWWWAuthenticateChallengeError(t, response(headers)), [
       { scheme: 'basic', parameters: { realm: 'realm' } },
     ])
   }
@@ -47,7 +62,7 @@ test('parseWwwAuthenticateChallenges()', (t) => {
   {
     const headers = new Headers()
     headers.append(name, 'BASIC REALM=realM')
-    t.deepEqual(lib.parseWwwAuthenticateChallenges(response(headers)), [
+    t.deepEqual(await getWWWAuthenticateChallengeError(t, response(headers)), [
       { scheme: 'basic', parameters: { realm: 'realM' } },
     ])
   }
@@ -55,7 +70,7 @@ test('parseWwwAuthenticateChallenges()', (t) => {
   {
     const headers = new Headers()
     headers.append(name, 'Basic realm="realm"')
-    t.deepEqual(lib.parseWwwAuthenticateChallenges(response(headers)), [
+    t.deepEqual(await getWWWAuthenticateChallengeError(t, response(headers)), [
       { scheme: 'basic', parameters: { realm: 'realm' } },
     ])
   }
@@ -63,7 +78,7 @@ test('parseWwwAuthenticateChallenges()', (t) => {
   {
     const headers = new Headers()
     headers.append(name, 'Basic auth-param1="value"')
-    t.deepEqual(lib.parseWwwAuthenticateChallenges(response(headers)), [
+    t.deepEqual(await getWWWAuthenticateChallengeError(t, response(headers)), [
       { scheme: 'basic', parameters: { 'auth-param1': 'value' } },
     ])
   }
@@ -79,7 +94,7 @@ test('parseWwwAuthenticateChallenges()', (t) => {
       'Digest realm="http-auth@example.org", qop="auth, auth-int", algorithm=MD5, nonce="7ypf/xlj9XXwfDPEoM4URrv/xwf94BcCAzFZH4GiTo0v", opaque="FQhe/qaU925kfnzjCev0ciny7QMkPqMAFRtzCUYo5tdS"',
     )
 
-    t.deepEqual(lib.parseWwwAuthenticateChallenges(response(headers)), [
+    t.deepEqual(await getWWWAuthenticateChallengeError(t, response(headers)), [
       {
         scheme: 'digest',
         parameters: {
@@ -109,7 +124,7 @@ test('parseWwwAuthenticateChallenges()', (t) => {
       name,
       'Newauth realm="apps", type=1, title="Login to "apps"", Basic realm="simple"',
     )
-    t.deepEqual(lib.parseWwwAuthenticateChallenges(response(headers)), [
+    t.deepEqual(await getWWWAuthenticateChallengeError(t, response(headers)), [
       {
         scheme: 'newauth',
         parameters: {
@@ -131,7 +146,7 @@ test('parseWwwAuthenticateChallenges()', (t) => {
     const headers = new Headers()
     headers.append(name, 'Basic')
     headers.append(name, 'DPoP')
-    t.deepEqual(lib.parseWwwAuthenticateChallenges(response(headers)), [
+    t.deepEqual(await getWWWAuthenticateChallengeError(t, response(headers)), [
       { scheme: 'basic', parameters: {} },
       { scheme: 'dpop', parameters: {} },
     ])
@@ -141,7 +156,7 @@ test('parseWwwAuthenticateChallenges()', (t) => {
     const headers = new Headers()
     headers.append(name, 'Newauth realm="apps", type=1, title="Login to "apps","')
     headers.append(name, 'Newauth realm="apps", type=1, title="Login to "apps"')
-    t.deepEqual(lib.parseWwwAuthenticateChallenges(response(headers)), [
+    t.deepEqual(await getWWWAuthenticateChallengeError(t, response(headers)), [
       { scheme: 'newauth', parameters: { realm: 'apps', type: '1', title: 'Login to "apps",' } },
       { scheme: 'newauth', parameters: { realm: 'apps', type: '1', title: 'Login to "apps' } },
     ])
@@ -150,7 +165,7 @@ test('parseWwwAuthenticateChallenges()', (t) => {
   {
     const headers = new Headers()
     headers.append(name, 'Newauth realm="apps", type=1, title="Login to "apps",",')
-    t.deepEqual(lib.parseWwwAuthenticateChallenges(response(headers)), [
+    t.deepEqual(await getWWWAuthenticateChallengeError(t, response(headers)), [
       { scheme: 'newauth', parameters: { realm: 'apps', type: '1', title: 'Login to "apps",' } },
     ])
   }
@@ -158,7 +173,7 @@ test('parseWwwAuthenticateChallenges()', (t) => {
   {
     const headers = new Headers()
     headers.append(name, 'Newauth realm="apps", type=1, title="Login to "apps",')
-    t.deepEqual(lib.parseWwwAuthenticateChallenges(response(headers)), [
+    t.deepEqual(await getWWWAuthenticateChallengeError(t, response(headers)), [
       { scheme: 'newauth', parameters: { realm: 'apps', type: '1', title: 'Login to "apps' } },
     ])
   }
@@ -166,7 +181,7 @@ test('parseWwwAuthenticateChallenges()', (t) => {
   {
     const headers = new Headers()
     headers.append(name, 'Newauth realm="apps", type=1, title="Login to "apps","')
-    t.deepEqual(lib.parseWwwAuthenticateChallenges(response(headers)), [
+    t.deepEqual(await getWWWAuthenticateChallengeError(t, response(headers)), [
       { scheme: 'newauth', parameters: { realm: 'apps', type: '1', title: 'Login to "apps",' } },
     ])
   }
@@ -174,7 +189,7 @@ test('parseWwwAuthenticateChallenges()', (t) => {
   {
     const headers = new Headers()
     headers.append(name, 'Newauth realm="apps", type=1, title="Login to apps=asd"')
-    t.deepEqual(lib.parseWwwAuthenticateChallenges(response(headers)), [
+    t.deepEqual(await getWWWAuthenticateChallengeError(t, response(headers)), [
       { scheme: 'newauth', parameters: { realm: 'apps', type: '1', title: 'Login to apps=asd' } },
     ])
   }
@@ -182,7 +197,7 @@ test('parseWwwAuthenticateChallenges()', (t) => {
   {
     const headers = new Headers()
     headers.append(name, 'Newauth realm="apps", title="Login to, apps=asd", type=1')
-    t.deepEqual(lib.parseWwwAuthenticateChallenges(response(headers)), [
+    t.deepEqual(await getWWWAuthenticateChallengeError(t, response(headers)), [
       { scheme: 'newauth', parameters: { realm: 'apps', type: '1', title: 'Login to, apps=asd' } },
     ])
   }

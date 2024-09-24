@@ -2345,10 +2345,7 @@ function wwwAuth(scheme: string, params: string): WWWAuthenticateChallenge {
   }
 }
 
-/**
- * @internal
- */
-export function parseWwwAuthenticateChallenges(
+function parseWwwAuthenticateChallenges(
   response: Response,
 ): WWWAuthenticateChallenge[] | undefined {
   if (!looseInstanceOf(response, Response)) {
