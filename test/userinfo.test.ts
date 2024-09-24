@@ -240,15 +240,20 @@ test('processUserInfoResponse() - jwt (alg default)', async (t) => {
   }
   const kp = t.context.RS256
 
-  await t.notThrowsAsync(async () => {
-    const response = getResponse(
-      await new jose.SignJWT({ sub: 'urn:example:subject' })
-        .setProtectedHeader({ alg: 'RS256' })
-        .sign(kp.privateKey),
-      { headers: new Headers({ 'content-type': 'application/jwt' }) },
-    )
-    await lib.processUserInfoResponse(tIssuer, client, 'urn:example:subject', response)
-  })
+  await t.throwsAsync(
+    async () => {
+      const response = getResponse(
+        await new jose.SignJWT({ sub: 'urn:example:subject' })
+          .setProtectedHeader({ alg: 'RS256' })
+          .sign(kp.privateKey),
+        { headers: new Headers({ 'content-type': 'application/jwt' }) },
+      )
+      await lib.processUserInfoResponse(tIssuer, client, 'urn:example:subject', response)
+    },
+    {
+      message: 'missing client or server configuration to verify used JWT "alg" header parameter',
+    },
+  )
 })
 
 test('processUserInfoResponse() - alg mismatches', async (t) => {
@@ -265,7 +270,12 @@ test('processUserInfoResponse() - alg mismatches', async (t) => {
           .sign(t.context.ES256.privateKey),
         { headers: new Headers({ 'content-type': 'application/jwt' }) },
       )
-      await lib.processUserInfoResponse(tIssuer, client, 'urn:example:subject', response)
+      await lib.processUserInfoResponse(
+        tIssuer,
+        { ...client, userinfo_signed_response_alg: 'PS256' },
+        'urn:example:subject',
+        response,
+      )
     },
     { message: 'unexpected JWT "alg" header parameter' },
   )

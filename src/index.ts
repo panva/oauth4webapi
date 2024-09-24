@@ -2974,6 +2974,7 @@ export async function processUserInfoResponse(
         undefined,
         client.userinfo_signed_response_alg,
         as.userinfo_signing_alg_values_supported,
+        undefined,
       ),
       noSignatureCheck,
       getClockSkew(client),
@@ -3394,6 +3395,7 @@ async function processGenericAccessTokenResponse(
           undefined,
           client.id_token_signed_response_alg,
           as.id_token_signing_alg_values_supported,
+          'RS256',
         ),
         noSignatureCheck,
         getClockSkew(client),
@@ -4262,6 +4264,7 @@ export async function processIntrospectionResponse(
         undefined,
         client.introspection_signed_response_alg,
         as.introspection_signing_alg_values_supported,
+        'RS256',
       ),
       noSignatureCheck,
       getClockSkew(client),
@@ -4631,6 +4634,7 @@ export async function validateJwtAuthResponse(
       undefined,
       client.authorization_signed_response_alg,
       as.authorization_signing_alg_values_supported,
+      'RS256',
     ),
     getPublicSigKeyFromIssuerJwksUri.bind(undefined, as, options),
     getClockSkew(client),
@@ -4820,6 +4824,7 @@ export async function validateDetachedSignatureResponse(
       undefined,
       client.id_token_signed_response_alg,
       as.id_token_signing_alg_values_supported,
+      'RS256',
     ),
     getPublicSigKeyFromIssuerJwksUri.bind(undefined, as, options),
     getClockSkew(client),
@@ -4917,18 +4922,19 @@ export async function validateDetachedSignatureResponse(
   return result
 }
 
-// TODO: only do default for ID Tokens or specs that actually define RS256 as the default
 /**
- * If configured must be the configured one (client) if not configured must be signalled by the
- * issuer to be supported (issuer) if not signalled must be fallback
+ * If configured must be the configured one (client), if not configured must be signalled by the
+ * issuer to be supported (issuer), if not signalled may be a default fallback, otherwise its a
+ * failure
  */
 function checkSigningAlgorithm(
-  client: string | undefined,
+  client: string | string[] | undefined,
   issuer: string[] | undefined,
+  fallback: string | string[] | undefined,
   header: CompactJWSHeaderParameters,
 ) {
   if (client !== undefined) {
-    if (header.alg !== client) {
+    if (typeof client === 'string' ? header.alg !== client : !client.includes(header.alg)) {
       throw OPE('unexpected JWT "alg" header parameter', INVALID_RESPONSE, {
         header,
         expected: client,
@@ -4949,13 +4955,22 @@ function checkSigningAlgorithm(
     return
   }
 
-  if (header.alg !== 'RS256') {
-    throw OPE('unexpected JWT "alg" header parameter', INVALID_RESPONSE, {
-      header,
-      expected: 'RS256',
-      reason: 'default value',
-    })
+  if (fallback !== undefined) {
+    if (typeof fallback === 'string' ? header.alg !== fallback : !fallback.includes(header.alg)) {
+      throw OPE('unexpected JWT "alg" header parameter', INVALID_RESPONSE, {
+        header,
+        expected: fallback,
+        reason: 'default value',
+      })
+    }
+    return
   }
+
+  throw OPE(
+    'missing client or server configuration to verify used JWT "alg" header parameter',
+    undefined,
+    { client, issuer, fallback },
+  )
 }
 
 /**
@@ -5421,6 +5436,12 @@ export interface ValidateJWTAccessTokenOptions extends HttpRequestOptions<'GET'>
    * See {@link clockTolerance}.
    */
   [clockTolerance]?: number
+
+  /**
+   * Supported (or expected) JWT "alg" header parameter values for the JWT Access Token (and DPoP
+   * Proof JWTs). Default is {@link JWSAlgorithm}
+   */
+  signingAlgorithms?: string[]
 }
 
 function normalizeHtu(htu: string) {
@@ -5431,11 +5452,13 @@ function normalizeHtu(htu: string) {
 }
 
 async function validateDPoP(
-  as: AuthorizationServer,
   request: Request,
   accessToken: string,
   accessTokenClaims: JWTPayload,
-  options?: Pick<ValidateJWTAccessTokenOptions, typeof clockSkew | typeof clockTolerance>,
+  options?: Pick<
+    ValidateJWTAccessTokenOptions,
+    typeof clockSkew | typeof clockTolerance | 'signingAlgorithms'
+  >,
 ) {
   const headerValue = request.headers.get('dpop')
   if (headerValue === null) {
@@ -5467,8 +5490,9 @@ async function validateDPoP(
     headerValue,
     checkSigningAlgorithm.bind(
       undefined,
+      options?.signingAlgorithms,
       undefined,
-      as?.dpop_signing_alg_values_supported || SUPPORTED_JWS_ALGS,
+      SUPPORTED_JWS_ALGS,
     ),
     async (header) => {
       const { jwk, alg } = header
@@ -5650,7 +5674,12 @@ export async function validateJwtAccessToken(
 
   const { claims } = await validateJwt(
     accessToken,
-    checkSigningAlgorithm.bind(undefined, undefined, SUPPORTED_JWS_ALGS),
+    checkSigningAlgorithm.bind(
+      undefined,
+      options?.signingAlgorithms,
+      undefined,
+      SUPPORTED_JWS_ALGS,
+    ),
     getPublicSigKeyFromIssuerJwksUri.bind(undefined, as, options),
     getClockSkew(options),
     getClockTolerance(options),
@@ -5695,7 +5724,7 @@ export async function validateJwtAccessToken(
     claims.cnf?.jkt !== undefined ||
     request.headers.has('dpop')
   ) {
-    await validateDPoP(as, request, accessToken, claims, options)
+    await validateDPoP(request, accessToken, claims, options)
   }
 
   return claims as JWTAccessTokenClaims
