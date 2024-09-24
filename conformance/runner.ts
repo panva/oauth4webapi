@@ -331,8 +331,8 @@ export const flow = (options?: MacroOptions) => {
         try {
           result = await oauth.processPushedAuthorizationResponse(as, client, par)
         } catch (err) {
-          t.log('error', inspect(err, { depth: Infinity }))
           if (DPoP && err instanceof oauth.ResponseBodyError && err.error === 'use_dpop_nonce') {
+            t.log('error', inspect(err, { depth: Infinity }))
             t.log('retrying with a newly obtained dpop nonce')
             par = await request()
             result = await oauth.processPushedAuthorizationResponse(as, client, par)
@@ -403,8 +403,8 @@ export const flow = (options?: MacroOptions) => {
             result = await oauth.processAuthorizationCodeOAuth2Response(as, client, response)
           }
         } catch (err) {
-          t.log('error', inspect(err, { depth: Infinity }))
           if (DPoP && err instanceof oauth.ResponseBodyError && err.error === 'use_dpop_nonce') {
+            t.log('error', inspect(err, { depth: Infinity }))
             t.log('retrying with a newly obtained dpop nonce')
             response = await request()
             if (scope.includes('openid')) {

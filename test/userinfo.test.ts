@@ -131,7 +131,7 @@ test('processUserInfoResponse() - json', async (t) => {
       getResponse(JSON.stringify({ sub: 2321678 })),
     ),
     {
-      message: '"response" body "sub" property must be a non-empty string',
+      message: '"response" body "sub" property must be a string',
     },
   )
   await t.notThrowsAsync(async () => {
@@ -147,14 +147,14 @@ test('processUserInfoResponse() - json', async (t) => {
       const response = getResponse(JSON.stringify({ sub: 'urn:example:subject' }))
       await lib.processUserInfoResponse(tIssuer, client, null as any, response)
     },
-    { message: '"expectedSubject" must be a non-empty string' },
+    { message: '"expectedSubject" must be a string' },
   )
   await t.throwsAsync(
     async () => {
       const response = getResponse(JSON.stringify({ sub: 'urn:example:different-subject' }))
       await lib.processUserInfoResponse(tIssuer, client, 'urn:example:subject', response)
     },
-    { message: 'unexpected "response" body "sub" value' },
+    { message: 'unexpected "response" body "sub" property value' },
   )
   await t.throwsAsync(
     async () => {

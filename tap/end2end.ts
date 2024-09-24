@@ -80,7 +80,7 @@ export default (QUnit: QUnit) => {
       const code_challenge_method = 'S256'
 
       let params = new URLSearchParams()
-      const maxAge = random() ? (random() ? 30 : 0) : undefined
+      const maxAge = random() ? 30 : undefined
 
       let nonce: string | undefined
       if (hybrid) {

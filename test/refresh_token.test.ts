@@ -27,7 +27,7 @@ test('refreshTokenGrantRequest()', async (t) => {
   })
 
   await t.throwsAsync(lib.refreshTokenGrantRequest(issuer, tClient, null as any), {
-    message: '"refreshToken" must be a non-empty string',
+    message: '"refreshToken" must be a string',
   })
 
   const tIssuer: lib.AuthorizationServer = {
@@ -177,7 +177,7 @@ test('processRefreshTokenResponse() without ID Tokens', async (t) => {
       getResponse(JSON.stringify({ token_type: 'Bearer' })),
     ),
     {
-      message: '"response" body "access_token" property must be a non-empty string',
+      message: '"response" body "access_token" property must be a string',
     },
   )
   await t.throwsAsync(
@@ -187,7 +187,7 @@ test('processRefreshTokenResponse() without ID Tokens', async (t) => {
       getResponse(JSON.stringify({ access_token: 'token' })),
     ),
     {
-      message: '"response" body "token_type" property must be a non-empty string',
+      message: '"response" body "token_type" property must be a string',
     },
   )
   await t.throwsAsync(
@@ -203,7 +203,7 @@ test('processRefreshTokenResponse() without ID Tokens', async (t) => {
       ),
     ),
     {
-      message: '"response" body "expires_in" property must be a positive number',
+      message: '"response" body "expires_in" property must be a number',
     },
   )
   await t.throwsAsync(
@@ -225,7 +225,7 @@ test('processRefreshTokenResponse() without ID Tokens', async (t) => {
       ),
     ),
     {
-      message: '"response" body "refresh_token" property must be a non-empty string',
+      message: '"response" body "refresh_token" property must be a string',
     },
   )
   await t.throwsAsync(
@@ -235,7 +235,7 @@ test('processRefreshTokenResponse() without ID Tokens', async (t) => {
       getResponse(JSON.stringify({ access_token: 'token', token_type: 'Bearer', id_token: null })),
     ),
     {
-      message: '"response" body "id_token" property must be a non-empty string',
+      message: '"response" body "id_token" property must be a string',
     },
   )
 

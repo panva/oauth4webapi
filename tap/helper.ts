@@ -95,7 +95,7 @@ export async function setup(
       : undefined),
     response_types: [] as string[],
     require_auth_time: authEndpoint && random(),
-    default_max_age: authEndpoint ? (random() ? (random() ? 30 : 0) : undefined) : undefined,
+    default_max_age: authEndpoint ? (random() ? 30 : undefined) : undefined,
     grant_types: grantTypes,
     jwks: makeJwks(),
   }

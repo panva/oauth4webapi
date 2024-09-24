@@ -183,7 +183,7 @@ test('processPushedAuthorizationResponse()', async (t) => {
       getResponse(JSON.stringify({ request_uri: null, expires_in: 60 }), { status: 201 }),
     ),
     {
-      message: '"response" body "request_uri" property must be a non-empty string',
+      message: '"response" body "request_uri" property must be a string',
     },
   )
 
@@ -196,7 +196,7 @@ test('processPushedAuthorizationResponse()', async (t) => {
       }),
     ),
     {
-      message: '"response" body "expires_in" property must be a positive number',
+      message: '"response" body "expires_in" property must be a number',
     },
   )
 

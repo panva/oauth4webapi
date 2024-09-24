@@ -170,7 +170,7 @@ test('processClientCredentialsResponse()', async (t) => {
       getResponse(JSON.stringify({ token_type: 'Bearer' })),
     ),
     {
-      message: '"response" body "access_token" property must be a non-empty string',
+      message: '"response" body "access_token" property must be a string',
     },
   )
   await t.throwsAsync(
@@ -180,7 +180,7 @@ test('processClientCredentialsResponse()', async (t) => {
       getResponse(JSON.stringify({ access_token: 'token' })),
     ),
     {
-      message: '"response" body "token_type" property must be a non-empty string',
+      message: '"response" body "token_type" property must be a string',
     },
   )
   await t.throwsAsync(
@@ -196,7 +196,7 @@ test('processClientCredentialsResponse()', async (t) => {
       ),
     ),
     {
-      message: '"response" body "expires_in" property must be a positive number',
+      message: '"response" body "expires_in" property must be a number',
     },
   )
 

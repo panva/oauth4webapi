@@ -68,32 +68,6 @@ test('authorizationCodeGrantRequest()', async (t) => {
   )
 
   await t.throwsAsync(
-    lib.authorizationCodeGrantRequest(
-      issuer,
-      tClient,
-      cb('code=authorization_code'),
-      null as any,
-      'verifier',
-    ),
-    {
-      message: '"redirectUri" must be a non-empty string',
-    },
-  )
-
-  await t.throwsAsync(
-    lib.authorizationCodeGrantRequest(
-      issuer,
-      tClient,
-      cb('code=authorization_code'),
-      'redirect_uri',
-      null as any,
-    ),
-    {
-      message: '"codeVerifier" must be a non-empty string',
-    },
-  )
-
-  await t.throwsAsync(
     lib.authorizationCodeGrantRequest(issuer, tClient, cb(''), 'redirect_uri', 'veirfier'),
     {
       message: 'no authorization code in "callbackParameters"',
@@ -301,7 +275,7 @@ test('processAuthorizationCodeOAuth2Response()', async (t) => {
       getResponse(JSON.stringify({ token_type: 'Bearer' })),
     ),
     {
-      message: '"response" body "access_token" property must be a non-empty string',
+      message: '"response" body "access_token" property must be a string',
     },
   )
   await t.throwsAsync(
@@ -311,7 +285,7 @@ test('processAuthorizationCodeOAuth2Response()', async (t) => {
       getResponse(JSON.stringify({ access_token: 'token' })),
     ),
     {
-      message: '"response" body "token_type" property must be a non-empty string',
+      message: '"response" body "token_type" property must be a string',
     },
   )
   await t.throwsAsync(
@@ -327,7 +301,7 @@ test('processAuthorizationCodeOAuth2Response()', async (t) => {
       ),
     ),
     {
-      message: '"response" body "expires_in" property must be a positive number',
+      message: '"response" body "expires_in" property must be a number',
     },
   )
   await t.throwsAsync(
@@ -365,22 +339,25 @@ test('processAuthorizationCodeOAuth2Response()', async (t) => {
       ),
     ),
     {
-      message: '"response" body "refresh_token" property must be a non-empty string',
+      message: '"response" body "refresh_token" property must be a string',
     },
   )
-  for (const id_token of [null, 1, '', false, {}]) {
-    t.deepEqual(
-      await lib.processAuthorizationCodeOAuth2Response(
-        issuer,
-        client,
-        getResponse(JSON.stringify({ access_token: 'token', token_type: 'Bearer', id_token })),
+  await t.throwsAsync(
+    lib.processAuthorizationCodeOAuth2Response(
+      issuer,
+      client,
+      getResponse(
+        JSON.stringify({
+          access_token: 'token',
+          token_type: 'Bearer',
+          id_token: 'something.resembling.anid_token',
+        }),
       ),
-      {
-        access_token: 'token',
-        token_type: 'bearer',
-      },
-    )
-  }
+    ),
+    {
+      code: 'OAUTH_USE_OPENID_CALLBACK',
+    },
+  )
 
   t.deepEqual(
     await lib.processAuthorizationCodeOAuth2Response(
@@ -761,31 +738,6 @@ test('processAuthorizationCodeOpenIDResponse() nonce checks', async (t) => {
     { message: 'ID Token "nonce" claim missing' },
   )
 
-  for (const nonce of [null, '']) {
-    await t.throwsAsync(
-      lib.processAuthorizationCodeOpenIDResponse(
-        tIssuer,
-        client,
-        getResponse(
-          JSON.stringify({
-            access_token: 'token',
-            token_type: 'Bearer',
-            id_token: await new jose.SignJWT({})
-              .setProtectedHeader({ alg: 'RS256' })
-              .setIssuer(issuer.issuer)
-              .setSubject('urn:example:subject')
-              .setAudience(client.client_id)
-              .setExpirationTime('5m')
-              .setIssuedAt()
-              .sign(t.context.RS256.privateKey),
-          }),
-        ),
-        nonce as any,
-      ),
-      { message: '"expectedNonce" must be a non-empty string', name: 'TypeError' },
-    )
-  }
-
   await t.notThrowsAsync(
     lib.processAuthorizationCodeOpenIDResponse(
       tIssuer,
@@ -832,7 +784,10 @@ test('processAuthorizationCodeOpenIDResponse() auth_time checks', async (t) => {
           }),
         ),
       ),
-      { message: 'ID Token "auth_time" (authentication time) must be a positive number' },
+      {
+        message:
+          /ID Token "auth_time" \(authentication time\) must be a (?:positive|non-negative)? ?number/,
+      },
     )
   }
 })

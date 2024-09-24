@@ -172,7 +172,7 @@ test('processDeviceAuthorizationResponse()', async (t) => {
       getResponse(JSON.stringify({ ...validResponse, device_code: undefined }), { status: 200 }),
     ),
     {
-      message: '"response" body "device_code" property must be a non-empty string',
+      message: '"response" body "device_code" property must be a string',
     },
   )
 
@@ -183,7 +183,7 @@ test('processDeviceAuthorizationResponse()', async (t) => {
       getResponse(JSON.stringify({ ...validResponse, user_code: undefined }), { status: 200 }),
     ),
     {
-      message: '"response" body "user_code" property must be a non-empty string',
+      message: '"response" body "user_code" property must be a string',
     },
   )
 
@@ -196,7 +196,7 @@ test('processDeviceAuthorizationResponse()', async (t) => {
       }),
     ),
     {
-      message: '"response" body "verification_uri" property must be a non-empty string',
+      message: '"response" body "verification_uri" property must be a string',
     },
   )
 
@@ -207,7 +207,7 @@ test('processDeviceAuthorizationResponse()', async (t) => {
       getResponse(JSON.stringify({ ...validResponse, expires_in: undefined }), { status: 200 }),
     ),
     {
-      message: '"response" body "expires_in" property must be a positive number',
+      message: '"response" body "expires_in" property must be a number',
     },
   )
 
@@ -220,7 +220,7 @@ test('processDeviceAuthorizationResponse()', async (t) => {
       }),
     ),
     {
-      message: '"response" body "verification_uri_complete" property must be a non-empty string',
+      message: '"response" body "verification_uri_complete" property must be a string',
     },
   )
 
@@ -231,7 +231,7 @@ test('processDeviceAuthorizationResponse()', async (t) => {
       getResponse(JSON.stringify({ ...validResponse, interval: null }), { status: 200 }),
     ),
     {
-      message: '"response" body "interval" property must be a positive number',
+      message: '"response" body "interval" property must be a number',
     },
   )
 })
@@ -242,7 +242,7 @@ test('deviceCodeGrantRequest()', async (t) => {
   })
 
   await t.throwsAsync(lib.deviceCodeGrantRequest(issuer, tClient, null as any), {
-    message: '"deviceCode" must be a non-empty string',
+    message: '"deviceCode" must be a string',
   })
 
   const tIssuer: lib.AuthorizationServer = {
@@ -388,7 +388,7 @@ test('processDeviceCodeResponse() without ID Tokens', async (t) => {
       getResponse(JSON.stringify({ token_type: 'Bearer' })),
     ),
     {
-      message: '"response" body "access_token" property must be a non-empty string',
+      message: '"response" body "access_token" property must be a string',
     },
   )
   await t.throwsAsync(
@@ -398,7 +398,7 @@ test('processDeviceCodeResponse() without ID Tokens', async (t) => {
       getResponse(JSON.stringify({ access_token: 'token' })),
     ),
     {
-      message: '"response" body "token_type" property must be a non-empty string',
+      message: '"response" body "token_type" property must be a string',
     },
   )
   await t.throwsAsync(
@@ -414,7 +414,7 @@ test('processDeviceCodeResponse() without ID Tokens', async (t) => {
       ),
     ),
     {
-      message: '"response" body "expires_in" property must be a positive number',
+      message: '"response" body "expires_in" property must be a number',
     },
   )
   await t.throwsAsync(
@@ -436,7 +436,7 @@ test('processDeviceCodeResponse() without ID Tokens', async (t) => {
       ),
     ),
     {
-      message: '"response" body "refresh_token" property must be a non-empty string',
+      message: '"response" body "refresh_token" property must be a string',
     },
   )
   await t.throwsAsync(
@@ -446,7 +446,7 @@ test('processDeviceCodeResponse() without ID Tokens', async (t) => {
       getResponse(JSON.stringify({ access_token: 'token', token_type: 'Bearer', id_token: null })),
     ),
     {
-      message: '"response" body "id_token" property must be a non-empty string',
+      message: '"response" body "id_token" property must be a string',
     },
   )
 

@@ -27,7 +27,7 @@ test('introspectionRequest()', async (t) => {
   })
 
   await t.throwsAsync(lib.introspectionRequest(issuer, tClient, null as any), {
-    message: '"token" must be a non-empty string',
+    message: '"token" must be a string',
   })
 
   const tIssuer: lib.AuthorizationServer = {

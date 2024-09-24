@@ -23,7 +23,7 @@ test('revocationRequest()', async (t) => {
   })
 
   await t.throwsAsync(lib.revocationRequest(issuer, tClient, null as any), {
-    message: '"token" must be a non-empty string',
+    message: '"token" must be a string',
   })
 
   const tIssuer: lib.AuthorizationServer = {

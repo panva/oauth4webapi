@@ -121,7 +121,7 @@ test('processDiscoveryResponse()', async (t) => {
   await t.throwsAsync(
     lib.processDiscoveryResponse(expected, getResponse(JSON.stringify({ issuer: null }))),
     {
-      message: '"response" body "issuer" property must be a non-empty string',
+      message: '"response" body "issuer" property must be a string',
     },
   )
 
@@ -130,7 +130,7 @@ test('processDiscoveryResponse()', async (t) => {
       expected,
       getResponse(JSON.stringify({ issuer: 'https://another-op.example.com' })),
     ),
-    { message: '"response" body "issuer" does not match "expectedIssuer"' },
+    { message: '"response" body "issuer" property does not match the expected value' },
   )
 
   t.deepEqual(

@@ -19,7 +19,7 @@ export default (QUnit: QUnit) => {
   module('generate.ts')
   test('"alg" value validation', async (t) => {
     for (const value of [null, 1, 0, Infinity, Boolean, undefined, false, true, '']) {
-      await t.rejects(lib.generateKeyPair(value as any), /"alg" must be a non-empty string/)
+      await t.rejects(lib.generateKeyPair(value as any), /"alg" must (?:be a string|not be empty)/)
     }
   })
 

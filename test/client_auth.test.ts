@@ -280,7 +280,7 @@ test('private_key_jwt ({ key: CryptoKey, kid: string })', async (t) => {
         clientPrivateKey: { key: t.context.ES256.publicKey, kid: 123 as any },
       },
     ),
-    { message: '"kid" must be a non-empty string' },
+    { message: '"kid" must be a string' },
   )
   t.pass()
 })

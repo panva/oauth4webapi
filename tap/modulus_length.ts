@@ -29,7 +29,8 @@ export default async (QUnit: QUnit) => {
         ),
         (err: Error) => {
           t.propContains(err, {
-            message: `${privateKey.algorithm.name} modulusLength must be at least 2048 bits`,
+            name: lib.UnsupportedOperationError.name,
+            message: `unsupported ${privateKey.algorithm.name} modulusLength`,
           })
           return true
         },
@@ -52,7 +53,8 @@ export default async (QUnit: QUnit) => {
         ),
         (err: Error) => {
           t.propContains(err, {
-            message: `${privateKey.algorithm.name} modulusLength must be at least 2048 bits`,
+            name: lib.UnsupportedOperationError.name,
+            message: `unsupported ${privateKey.algorithm.name} modulusLength`,
           })
           return true
         },

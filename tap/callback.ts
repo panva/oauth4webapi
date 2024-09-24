@@ -59,6 +59,7 @@ export default (QUnit: QUnit) => {
       (err: Error) => {
         t.propContains(err, {
           message: '"parameters" must be an instance of URLSearchParams, or URL',
+          code: 'ERR_INVALID_ARG_TYPE',
         })
         return true
       },
@@ -140,7 +141,14 @@ export default (QUnit: QUnit) => {
           null as any,
         ),
       (err: Error) => {
-        t.propContains(err, { message: '"expectedState" must be a non-empty string' })
+        t.propContains(err, { message: '"expectedState" argument must be a string' })
+        return true
+      },
+    )
+    t.throws(
+      () => lib.validateAuthResponse(issuer, client, new URLSearchParams('code=foo&state=foo'), ''),
+      (err: Error) => {
+        t.propContains(err, { message: '"expectedState" argument must not be empty' })
         return true
       },
     )

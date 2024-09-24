@@ -94,6 +94,23 @@ export interface PrivateKey {
   [modifyAssertion]?: ModifyAssertionFunction
 }
 
+const ERR_INVALID_ARG_VALUE = 'ERR_INVALID_ARG_VALUE'
+const ERR_INVALID_ARG_TYPE = 'ERR_INVALID_ARG_TYPE'
+const ERR_INCOMPATIBLE_OPTION_PAIR = 'ERR_INCOMPATIBLE_OPTION_PAIR'
+const ERR_MISSING_OPTION = 'ERR_MISSING_OPTION'
+
+type codes =
+  | typeof ERR_INVALID_ARG_VALUE
+  | typeof ERR_INVALID_ARG_TYPE
+  | typeof ERR_INCOMPATIBLE_OPTION_PAIR
+  | typeof ERR_MISSING_OPTION
+
+function CodedTypeError(message: string, code: codes, cause?: unknown) {
+  const err = new TypeError(message, { cause })
+  Object.assign(err, { code })
+  return err
+}
+
 /**
  * Supported Client Authentication Methods.
  *
@@ -1037,7 +1054,11 @@ function decodeBase64Url(input: string) {
     }
     return bytes
   } catch (cause) {
-    throw new OPE('The input to be decoded is not correctly encoded.', { cause })
+    throw CodedTypeError(
+      'The input to be decoded is not correctly encoded.',
+      ERR_INVALID_ARG_VALUE,
+      cause,
+    )
   }
 }
 
@@ -1116,8 +1137,8 @@ export class UnsupportedOperationError extends Error {
   /**
    * @ignore
    */
-  constructor(message?: string) {
-    super(message ?? 'operation not supported')
+  constructor(message?: string, options?: { cause?: unknown }) {
+    super(message ?? 'operation not supported', options)
     this.name = this.constructor.name
     // @ts-ignore
     Error.captureStackTrace?.(this, this.constructor)
@@ -1144,20 +1165,35 @@ export class OperationProcessingError extends Error {
   }
 }
 
-const OPE = OperationProcessingError
+function OPE(message: string, code?: string, cause?: unknown) {
+  return new OperationProcessingError(message, { code, cause })
+}
 
 const dpopNonces: LRU<string, string> = new LRU(100)
 
-function isCryptoKey(key: unknown): key is CryptoKey {
-  return key instanceof CryptoKey
+function assertCryptoKey(key: unknown, it: string): asserts key is CryptoKey {
+  if (!(key instanceof CryptoKey)) {
+    throw CodedTypeError(`${it} must be a private CryptoKey`, ERR_INVALID_ARG_TYPE)
+  }
 }
 
-function isPrivateKey(key: unknown): key is CryptoKey {
-  return isCryptoKey(key) && key.type === 'private'
+function assertPrivateKey(
+  key: unknown,
+  it: string,
+): asserts key is CryptoKey & { type: 'private' } {
+  assertCryptoKey(key, it)
+
+  if (key.type !== 'private') {
+    throw CodedTypeError(`${it} must be a private CryptoKey`, ERR_INVALID_ARG_VALUE)
+  }
 }
 
-function isPublicKey(key: unknown): key is CryptoKey {
-  return isCryptoKey(key) && key.type === 'public'
+function assertPublicKey(key: unknown, it: string): asserts key is CryptoKey & { type: 'public' } {
+  assertCryptoKey(key, it)
+
+  if (key.type !== 'public') {
+    throw CodedTypeError(`${it} must be a public CryptoKey`, ERR_INVALID_ARG_VALUE)
+  }
 }
 
 const SUPPORTED_JWS_ALGS: JWSAlgorithm[] = [
@@ -1283,10 +1319,16 @@ function prepareHeaders(input?: [string, string][] | Record<string, string> | He
     headers.set('user-agent', USER_AGENT)
   }
   if (headers.has('authorization')) {
-    throw new TypeError('"options.headers" must not include the "authorization" header name')
+    throw CodedTypeError(
+      '"options.headers" must not include the "authorization" header name',
+      ERR_INVALID_ARG_VALUE,
+    )
   }
   if (headers.has('dpop')) {
-    throw new TypeError('"options.headers" must not include the "dpop" header name')
+    throw CodedTypeError(
+      '"options.headers" must not include the "dpop" header name',
+      ERR_INVALID_ARG_VALUE,
+    )
   }
   return headers
 }
@@ -1297,7 +1339,10 @@ function signal(value: Exclude<HttpRequestOptions<any>['signal'], undefined>): A
   }
 
   if (!(value instanceof AbortSignal)) {
-    throw new TypeError('"options.signal" must return or be an instance of AbortSignal')
+    throw CodedTypeError(
+      '"options.signal" must return or be an instance of AbortSignal',
+      ERR_INVALID_ARG_TYPE,
+    )
   }
 
   return value
@@ -1324,11 +1369,11 @@ export async function discoveryRequest(
   options?: DiscoveryRequestOptions,
 ): Promise<Response> {
   if (!(issuerIdentifier instanceof URL)) {
-    throw new TypeError('"issuerIdentifier" must be an instance of URL')
+    throw CodedTypeError('"issuerIdentifier" must be an instance of URL', ERR_INVALID_ARG_TYPE)
   }
 
   if (issuerIdentifier.protocol !== 'https:' && issuerIdentifier.protocol !== 'http:') {
-    throw new TypeError('"issuer.protocol" must be "https:" or "http:"')
+    throw CodedTypeError('"issuer.protocol" must be "https:" or "http:"', ERR_INVALID_ARG_VALUE)
   }
 
   const url = new URL(issuerIdentifier.href)
@@ -1346,7 +1391,10 @@ export async function discoveryRequest(
       }
       break
     default:
-      throw new TypeError('"options.algorithm" must be "oidc" (default), or "oauth2"')
+      throw CodedTypeError(
+        '"options.algorithm" must be "oidc" (default), or "oauth2"',
+        ERR_INVALID_ARG_VALUE,
+      )
   }
 
   const headers = prepareHeaders(options?.headers)
@@ -1361,8 +1409,55 @@ export async function discoveryRequest(
   }).then(processDpopNonce)
 }
 
-function validateString(input: unknown): input is string {
-  return typeof input === 'string' && input.length !== 0
+function validateNumber(
+  input: unknown,
+  allow0: boolean,
+  it: string,
+  code?: string,
+  cause?: unknown,
+): asserts input is number {
+  try {
+    if (typeof input !== 'number' || !Number.isFinite(input)) {
+      throw CodedTypeError(`${it} must be a number`, ERR_INVALID_ARG_TYPE, cause)
+    }
+
+    if (input > 0) return
+
+    if (allow0 && input !== 0) {
+      throw CodedTypeError(`${it} must be a non-negative number`, ERR_INVALID_ARG_VALUE, cause)
+    }
+
+    throw CodedTypeError(`${it} must be a positive number`, ERR_INVALID_ARG_VALUE, cause)
+  } catch (err) {
+    if (code) {
+      throw OPE((err as Error).message, code, cause)
+    }
+
+    throw err
+  }
+}
+
+function validateString(
+  input: unknown,
+  it: string,
+  code?: string,
+  cause?: unknown,
+): asserts input is string {
+  try {
+    if (typeof input !== 'string') {
+      throw CodedTypeError(`${it} must be a string`, ERR_INVALID_ARG_TYPE, cause)
+    }
+
+    if (input.length === 0) {
+      throw CodedTypeError(`${it} must not be empty`, ERR_INVALID_ARG_VALUE, cause)
+    }
+  } catch (err) {
+    if (code) {
+      throw OPE((err as Error).message, code, cause)
+    }
+
+    throw err
+  }
 }
 
 /**
@@ -1385,18 +1480,19 @@ export async function processDiscoveryResponse(
   response: Response,
 ): Promise<AuthorizationServer> {
   if (!(expectedIssuerIdentifier instanceof URL)) {
-    throw new TypeError('"expectedIssuer" must be an instance of URL')
+    throw CodedTypeError('"expectedIssuer" must be an instance of URL', ERR_INVALID_ARG_TYPE)
   }
 
   if (!looseInstanceOf(response, Response)) {
-    throw new TypeError('"response" must be an instance of Response')
+    throw CodedTypeError('"response" must be an instance of Response', ERR_INVALID_ARG_TYPE)
   }
 
   if (response.status !== 200) {
-    throw new OPE('"response" is not a conform Authorization Server Metadata response', {
-      cause: response,
-      code: RESPONSE_IS_NOT_CONFORM,
-    })
+    throw OPE(
+      '"response" is not a conform Authorization Server Metadata response',
+      RESPONSE_IS_NOT_CONFORM,
+      response,
+    )
   }
 
   assertReadableResponse(response)
@@ -1405,19 +1501,21 @@ export async function processDiscoveryResponse(
   try {
     json = await response.json()
   } catch (cause) {
-    throw new OPE('failed to parse "response" body as JSON', { cause })
+    throw OPE('failed to parse "response" body as JSON', PARSE_ERROR, cause)
   }
 
   if (!isJsonObject<AuthorizationServer>(json)) {
-    throw new OPE('"response" body must be a top level object')
+    throw OPE('"response" body must be a top level object', INVALID_RESPONSE, { body: json })
   }
 
-  if (!validateString(json.issuer)) {
-    throw new OPE('"response" body "issuer" property must be a non-empty string')
-  }
+  validateString(json.issuer, '"response" body "issuer" property', INVALID_RESPONSE, { body: json })
 
   if (new URL(json.issuer).href !== expectedIssuerIdentifier.href) {
-    throw new OPE('"response" body "issuer" does not match "expectedIssuer"')
+    throw OPE(
+      '"response" body "issuer" property does not match the expected value',
+      JSON_ATTRIBUTE_COMPARISON,
+      { expected: expectedIssuerIdentifier.href, body: json },
+    )
   }
 
   return json
@@ -1437,7 +1535,7 @@ function notJson(response: Response, ...types: string[]) {
   } else {
     msg += types[0]
   }
-  return new OPE(msg, { cause: response, code: RESPONSE_IS_NOT_JSON })
+  return OPE(msg, RESPONSE_IS_NOT_JSON, response)
 }
 
 function assertContentTypes(response: Response, ...types: string[]): void {
@@ -1508,9 +1606,7 @@ export function generateRandomNonce(): string {
  * @see [RFC 7636 - Proof Key for Code Exchange (PKCE)](https://www.rfc-editor.org/rfc/rfc7636.html#section-4)
  */
 export async function calculatePKCECodeChallenge(codeVerifier: string): Promise<string> {
-  if (!validateString(codeVerifier)) {
-    throw new TypeError('"codeVerifier" must be a non-empty string')
-  }
+  validateString(codeVerifier, 'codeVerifier')
 
   return b64u(await crypto.subtle.digest('SHA-256', buf(codeVerifier)))
 }
@@ -1530,8 +1626,8 @@ function getKeyAndKid(input: CryptoKey | PrivateKey | undefined): NormalizedKeyI
     return {}
   }
 
-  if (input.kid !== undefined && !validateString(input.kid)) {
-    throw new TypeError('"kid" must be a non-empty string')
+  if (input.kid !== undefined) {
+    validateString(input.kid, '"kid"')
   }
 
   return {
@@ -1639,7 +1735,9 @@ function psAlg(key: CryptoKey): JWSAlgorithm {
     case 'SHA-512':
       return 'PS512'
     default:
-      throw new UnsupportedOperationError('unsupported RsaHashedKeyAlgorithm hash name')
+      throw new UnsupportedOperationError('unsupported RsaHashedKeyAlgorithm hash name', {
+        cause: key,
+      })
   }
 }
 
@@ -1655,7 +1753,9 @@ function rsAlg(key: CryptoKey): JWSAlgorithm {
     case 'SHA-512':
       return 'RS512'
     default:
-      throw new UnsupportedOperationError('unsupported RsaHashedKeyAlgorithm hash name')
+      throw new UnsupportedOperationError('unsupported RsaHashedKeyAlgorithm hash name', {
+        cause: key,
+      })
   }
 }
 
@@ -1671,7 +1771,7 @@ function esAlg(key: CryptoKey): JWSAlgorithm {
     case 'P-521':
       return 'ES512'
     default:
-      throw new UnsupportedOperationError('unsupported EcKeyAlgorithm namedCurve')
+      throw new UnsupportedOperationError('unsupported EcKeyAlgorithm namedCurve', { cause: key })
   }
 }
 
@@ -1690,7 +1790,7 @@ function keyToJws(key: CryptoKey) {
     case 'Ed448':
       return 'EdDSA'
     default:
-      throw new UnsupportedOperationError('unsupported CryptoKey algorithm name')
+      throw new UnsupportedOperationError('unsupported CryptoKey algorithm name', { cause: key })
   }
 }
 
@@ -1743,50 +1843,47 @@ async function privateKeyJwt(
 
   modifyAssertion?.(header, payload)
 
-  return jwt(header, payload, key)
+  return signJwt(header, payload, key)
 }
 
 function assertAs(as: AuthorizationServer): as is AuthorizationServer {
   if (typeof as !== 'object' || as === null) {
-    throw new TypeError('"as" must be an object')
+    throw CodedTypeError('"as" must be an object', ERR_INVALID_ARG_TYPE)
   }
 
-  if (!validateString(as.issuer)) {
-    throw new TypeError('"as.issuer" property must be a non-empty string')
-  }
+  validateString(as.issuer, '"as.issuer"')
   return true
 }
 
 function assertClient(client: Client): client is Client {
   if (typeof client !== 'object' || client === null) {
-    throw new TypeError('"client" must be an object')
+    throw CodedTypeError('"client" must be an object', ERR_INVALID_ARG_TYPE)
   }
 
-  if (!validateString(client.client_id)) {
-    throw new TypeError('"client.client_id" property must be a non-empty string')
-  }
+  validateString(client.client_id, '"client.client_id"')
   return true
 }
 
-function assertClientSecret(clientSecret: unknown) {
-  if (!validateString(clientSecret)) {
-    throw new TypeError('"client.client_secret" property must be a non-empty string')
-  }
-  return clientSecret
-}
-
-function assertNoClientPrivateKey(clientAuthMethod: string, clientPrivateKey: unknown) {
+function assertNoClientPrivateKey(
+  clientAuthMethod: string,
+  clientPrivateKey: unknown,
+): asserts clientPrivateKey is undefined {
   if (clientPrivateKey !== undefined) {
-    throw new TypeError(
+    throw CodedTypeError(
       `"options.clientPrivateKey" property must not be provided when ${clientAuthMethod} client authentication method is used.`,
+      ERR_INVALID_ARG_TYPE,
     )
   }
 }
 
-function assertNoClientSecret(clientAuthMethod: string, clientSecret: unknown) {
+function assertNoClientSecret(
+  clientAuthMethod: string,
+  clientSecret: unknown,
+): asserts clientSecret is undefined {
   if (clientSecret !== undefined) {
-    throw new TypeError(
+    throw CodedTypeError(
       `"client.client_secret" property must not be provided when ${clientAuthMethod} client authentication method is used.`,
+      ERR_INVALID_ARG_TYPE,
     )
   }
 }
@@ -1809,29 +1906,27 @@ async function clientAuthentication(
     case undefined: // Fall through
     case 'client_secret_post': {
       assertNoClientPrivateKey('client_secret_post', clientPrivateKey)
+      validateString(client.client_secret, '"client.client_secret"')
       body.set('client_id', client.client_id)
-      body.set('client_secret', assertClientSecret(client.client_secret))
+      body.set('client_secret', client.client_secret)
       break
     }
     case 'client_secret_basic': {
       assertNoClientPrivateKey('client_secret_basic', clientPrivateKey)
-      headers.set(
-        'authorization',
-        clientSecretBasic(client.client_id, assertClientSecret(client.client_secret)),
-      )
+      validateString(client.client_secret, '"client.client_secret"')
+      headers.set('authorization', clientSecretBasic(client.client_id, client.client_secret))
       break
     }
     case 'private_key_jwt': {
       assertNoClientSecret('private_key_jwt', client.client_secret)
       if (clientPrivateKey === undefined) {
-        throw new TypeError(
+        throw CodedTypeError(
           '"options.clientPrivateKey" must be provided when "client.token_endpoint_auth_method" is "private_key_jwt"',
+          ERR_INCOMPATIBLE_OPTION_PAIR,
         )
       }
       const { key, kid, modifyAssertion } = getKeyAndKid(clientPrivateKey)
-      if (!isPrivateKey(key)) {
-        throw new TypeError('"options.clientPrivateKey.key" must be a private CryptoKey')
-      }
+      assertPrivateKey(key, '"options.clientPrivateKey.key"')
       body.set('client_id', client.client_id)
       body.set('client_assertion_type', 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer')
       body.set('client_assertion', await privateKeyJwt(as, client, key, kid, modifyAssertion))
@@ -1846,21 +1941,22 @@ async function clientAuthentication(
       break
     }
     default:
-      throw new UnsupportedOperationError('unsupported client token_endpoint_auth_method')
+      throw CodedTypeError('unsupported client token_endpoint_auth_method', ERR_INVALID_ARG_VALUE)
   }
 }
 
 /**
  * Minimal JWT sign() implementation.
  */
-async function jwt(
+async function signJwt(
   header: CompactJWSHeaderParameters,
   payload: Record<string, unknown>,
   key: CryptoKey,
 ) {
   if (!key.usages.includes('sign')) {
-    throw new TypeError(
+    throw CodedTypeError(
       'CryptoKey instances used for signing assertions must include "sign" in their "usages"',
+      ERR_INVALID_ARG_VALUE,
     )
   }
   const input = `${b64u(buf(JSON.stringify(header)))}.${b64u(buf(JSON.stringify(payload)))}`
@@ -1893,9 +1989,7 @@ export async function issueRequestObject(
   parameters = new URLSearchParams(parameters)
 
   const { key, kid, modifyAssertion } = getKeyAndKid(privateKey)
-  if (!isPrivateKey(key)) {
-    throw new TypeError('"privateKey.key" must be a private CryptoKey')
-  }
+  assertPrivateKey(key, '"privateKey.key"')
 
   parameters.set('client_id', client.client_id)
 
@@ -1924,9 +2018,7 @@ export async function issueRequestObject(
     if (value !== null) {
       claims.max_age = parseInt(value, 10)
 
-      if (!Number.isFinite(claims.max_age)) {
-        throw new OPE('"max_age" parameter must be a number')
-      }
+      validateNumber(claims.max_age, true, '"max_age" parameter')
     }
   }
 
@@ -1936,11 +2028,14 @@ export async function issueRequestObject(
       try {
         claims.claims = JSON.parse(value)
       } catch (cause) {
-        throw new OPE('failed to parse the "claims" parameter as JSON', { cause })
+        throw OPE('failed to parse the "claims" parameter as JSON', PARSE_ERROR, cause)
       }
 
       if (!isJsonObject(claims.claims)) {
-        throw new OPE('"claims" parameter must be a JSON with a top level object')
+        throw CodedTypeError(
+          '"claims" parameter must be a JSON with a top level object',
+          ERR_INVALID_ARG_VALUE,
+        )
       }
     }
   }
@@ -1951,11 +2046,18 @@ export async function issueRequestObject(
       try {
         claims.authorization_details = JSON.parse(value)
       } catch (cause) {
-        throw new OPE('failed to parse the "authorization_details" parameter as JSON', { cause })
+        throw OPE(
+          'failed to parse the "authorization_details" parameter as JSON',
+          PARSE_ERROR,
+          cause,
+        )
       }
 
       if (!Array.isArray(claims.authorization_details)) {
-        throw new OPE('"authorization_details" parameter must be a JSON with a top level array')
+        throw CodedTypeError(
+          '"authorization_details" parameter must be a JSON with a top level array',
+          ERR_INVALID_ARG_VALUE,
+        )
       }
     }
   }
@@ -1968,7 +2070,7 @@ export async function issueRequestObject(
 
   modifyAssertion?.(header, claims)
 
-  return jwt(header, claims, key)
+  return signJwt(header, claims, key)
 }
 
 /**
@@ -1984,20 +2086,15 @@ async function dpopProofJwt(
 ) {
   const { privateKey, publicKey, nonce = dpopNonces.get(url.origin) } = options
 
-  if (!isPrivateKey(privateKey)) {
-    throw new TypeError('"DPoP.privateKey" must be a private CryptoKey')
-  }
+  assertPrivateKey(privateKey, '"DPoP.privateKey"')
+  assertPublicKey(publicKey, '"DPoP.publicKey"')
 
-  if (!isPublicKey(publicKey)) {
-    throw new TypeError('"DPoP.publicKey" must be a public CryptoKey')
-  }
-
-  if (nonce !== undefined && !validateString(nonce)) {
-    throw new TypeError('"DPoP.nonce" must be a non-empty string or undefined')
+  if (nonce !== undefined) {
+    validateString(nonce, '"DPoP.nonce"')
   }
 
   if (!publicKey.extractable) {
-    throw new TypeError('"DPoP.publicKey.extractable" must be true')
+    throw CodedTypeError('"DPoP.publicKey.extractable" must be true', ERR_INVALID_ARG_VALUE)
   }
 
   const now = epochTime() + clockSkew
@@ -2017,7 +2114,7 @@ async function dpopProofJwt(
 
   options[modifyAssertion]?.(header, payload)
 
-  headers.set('dpop', await jwt(header, payload, privateKey))
+  headers.set('dpop', await signJwt(header, payload, privateKey))
 }
 
 let jwkCache: WeakMap<CryptoKey, JWK>
@@ -2043,20 +2140,15 @@ function validateEndpoint(
   useMtlsAlias: boolean | undefined,
   enforceHttps: boolean | undefined,
 ) {
-  if (typeof value !== 'string') {
-    if (useMtlsAlias) {
-      throw new TypeError(`"as.mtls_endpoint_aliases.${endpoint}" must be a string`)
-    }
-
-    throw new TypeError(`"as.${endpoint}" must be a string`)
-  }
+  validateString(
+    value,
+    useMtlsAlias ? `"as.mtls_endpoint_aliases.${endpoint}"` : `"as.${endpoint}"`,
+  )
 
   const url = new URL(value)
 
   if (enforceHttps && url.protocol !== 'https:') {
-    throw new OperationProcessingError('only requests to HTTPS are allowed', {
-      code: HTTP_REQUEST_FORBIDDEN,
-    })
+    throw OPE('only requests to HTTPS are allowed', HTTP_REQUEST_FORBIDDEN, url)
   }
 
   return url
@@ -2364,7 +2456,7 @@ function parseWwwAuthenticateChallenges(
   response: Response,
 ): WWWAuthenticateChallenge[] | undefined {
   if (!looseInstanceOf(response, Response)) {
-    throw new TypeError('"response" must be an instance of Response')
+    throw CodedTypeError('"response" must be an instance of Response', ERR_INVALID_ARG_TYPE)
   }
 
   const header = response.headers.get('www-authenticate')
@@ -2420,7 +2512,7 @@ export async function processPushedAuthorizationResponse(
   assertClient(client)
 
   if (!looseInstanceOf(response, Response)) {
-    throw new TypeError('"response" must be an instance of Response')
+    throw CodedTypeError('"response" must be an instance of Response', ERR_INVALID_ARG_TYPE)
   }
 
   let challenges: WWWAuthenticateChallenge[] | undefined
@@ -2439,10 +2531,11 @@ export async function processPushedAuthorizationResponse(
         response,
       })
     }
-    throw new OPE('"response" is not a conform Pushed Authorization Request Endpoint response', {
-      cause: response,
-      code: RESPONSE_IS_NOT_CONFORM,
-    })
+    throw OPE(
+      '"response" is not a conform Pushed Authorization Request Endpoint response',
+      RESPONSE_IS_NOT_CONFORM,
+      response,
+    )
   }
 
   assertReadableResponse(response)
@@ -2451,20 +2544,24 @@ export async function processPushedAuthorizationResponse(
   try {
     json = await response.json()
   } catch (cause) {
-    throw new OPE('failed to parse "response" body as JSON', { cause })
+    throw OPE('failed to parse "response" body as JSON', PARSE_ERROR, cause)
   }
 
   if (!isJsonObject<PushedAuthorizationResponse>(json)) {
-    throw new OPE('"response" body must be a top level object')
+    throw OPE('"response" body must be a top level object', INVALID_RESPONSE, { body: json })
   }
 
-  if (!validateString(json.request_uri)) {
-    throw new OPE('"response" body "request_uri" property must be a non-empty string')
-  }
+  validateString(json.request_uri, '"response" body "request_uri" property', INVALID_RESPONSE, {
+    body: json,
+  })
 
-  if (typeof json.expires_in !== 'number' || json.expires_in <= 0) {
-    throw new OPE('"response" body "expires_in" property must be a positive number')
-  }
+  validateNumber(
+    json.expires_in,
+    false,
+    '"response" body "expires_in" property',
+    INVALID_RESPONSE,
+    { body: json },
+  )
 
   return json
 }
@@ -2511,18 +2608,14 @@ export async function protectedResourceRequest(
   body?: ProtectedResourceRequestBody,
   options?: ProtectedResourceRequestOptions,
 ): Promise<Response> {
-  if (!validateString(accessToken)) {
-    throw new TypeError('"accessToken" must be a non-empty string')
-  }
+  validateString(accessToken, '"accessToken"')
 
   if (!(url instanceof URL)) {
-    throw new TypeError('"url" must be an instance of URL')
+    throw CodedTypeError('"url" must be an instance of URL', ERR_INVALID_ARG_TYPE)
   }
 
   if (options?.[allowInsecureRequests] !== true && url.protocol !== 'https:') {
-    throw new OperationProcessingError('only requests to HTTPS are allowed', {
-      code: HTTP_REQUEST_FORBIDDEN,
-    })
+    throw OPE('only requests to HTTPS are allowed', HTTP_REQUEST_FORBIDDEN, url)
   }
 
   headers = prepareHeaders(headers)
@@ -2706,7 +2799,7 @@ async function getPublicSigKeyFromIssuerJwksUri(
   header: CompactJWSHeaderParameters,
 ): Promise<CryptoKey> {
   const { alg, kid } = header
-  checkSupportedJwsAlg(alg)
+  checkSupportedJwsAlg(header)
 
   if (!jwksMap?.has(as) && isFreshJwksCache(options?.[jwksCache])) {
     setJwksCache(as, options?.[jwksCache].jwks, options?.[jwksCache].uat)
@@ -2741,7 +2834,7 @@ async function getPublicSigKeyFromIssuerJwksUri(
       kty = 'OKP'
       break
     default:
-      throw new UnsupportedOperationError('unsupported JWS algorithm')
+      throw new UnsupportedOperationError('unsupported JWS algorithm', { cause: { alg } })
   }
 
   const candidates = jwks.keys.filter((jwk) => {
@@ -2790,21 +2883,22 @@ async function getPublicSigKeyFromIssuerJwksUri(
       clearJwksCache(as, options?.[jwksCache])
       return getPublicSigKeyFromIssuerJwksUri(as, options, header)
     }
-    throw new OPE('error when selecting a JWT verification key, no applicable keys found')
-  }
-
-  if (length !== 1) {
-    throw new OPE(
-      'error when selecting a JWT verification key, multiple applicable keys found, a "kid" JWT Header Parameter is required',
+    throw OPE(
+      'error when selecting a JWT verification key, no applicable keys found',
+      KEY_SELECTION,
+      { header, candidates, jwks_uri: new URL(as.jwks_uri!) },
     )
   }
 
-  const key = await importJwk(alg, jwk)
-  if (key.type !== 'public') {
-    throw new OPE('jwks_uri must only contain public keys')
+  if (length !== 1) {
+    throw OPE(
+      'error when selecting a JWT verification key, multiple applicable keys found, a "kid" JWT Header Parameter is required',
+      KEY_SELECTION,
+      { header, candidates, jwks_uri: new URL(as.jwks_uri!) },
+    )
   }
 
-  return key
+  return importJwk(alg, jwk)
 }
 
 /**
@@ -2851,7 +2945,7 @@ export async function processUserInfoResponse(
   assertClient(client)
 
   if (!looseInstanceOf(response, Response)) {
-    throw new TypeError('"response" must be an instance of Response')
+    throw CodedTypeError('"response" must be an instance of Response', ERR_INVALID_ARG_TYPE)
   }
 
   let challenges: WWWAuthenticateChallenge[] | undefined
@@ -2863,10 +2957,11 @@ export async function processUserInfoResponse(
   }
 
   if (response.status !== 200) {
-    throw new OPE('"response" is not a conform UserInfo Endpoint response', {
-      cause: response,
-      code: RESPONSE_IS_NOT_CONFORM,
-    })
+    throw OPE(
+      '"response" is not a conform UserInfo Endpoint response',
+      RESPONSE_IS_NOT_CONFORM,
+      response,
+    )
   }
 
   assertReadableResponse(response)
@@ -2892,37 +2987,34 @@ export async function processUserInfoResponse(
     json = claims as JsonValue
   } else {
     if (client.userinfo_signed_response_alg) {
-      throw new OPE('JWT UserInfo Response expected', {
-        cause: response,
-        code: 'OAUTH_JWT_USERINFO_EXPECTED',
-      })
+      throw OPE('JWT UserInfo Response expected', JWT_USERINFO_EXPECTED, response)
     }
 
     assertApplicationJson(response)
     try {
       json = await response.json()
     } catch (cause) {
-      throw new OPE('failed to parse "response" body as JSON', { cause })
+      throw OPE('failed to parse "response" body as JSON', PARSE_ERROR, cause)
     }
   }
 
   if (!isJsonObject<UserInfoResponse>(json)) {
-    throw new OPE('"response" body must be a top level object')
+    throw OPE('"response" body must be a top level object', INVALID_RESPONSE, { body: json })
   }
 
-  if (!validateString(json.sub)) {
-    throw new OPE('"response" body "sub" property must be a non-empty string')
-  }
+  validateString(json.sub, '"response" body "sub" property', INVALID_RESPONSE, { body: json })
 
   switch (expectedSubject) {
     case skipSubjectCheck:
       break
     default:
-      if (!validateString(expectedSubject)) {
-        throw new OPE('"expectedSubject" must be a non-empty string')
-      }
+      validateString(expectedSubject, '"expectedSubject"')
+
       if (json.sub !== expectedSubject) {
-        throw new OPE('unexpected "response" body "sub" value')
+        throw OPE('unexpected "response" body "sub" property value', JSON_ATTRIBUTE_COMPARISON, {
+          expected: expectedSubject,
+          body: json,
+        })
       }
   }
 
@@ -3008,9 +3100,7 @@ export async function refreshTokenGrantRequest(
   assertAs(as)
   assertClient(client)
 
-  if (!validateString(refreshToken)) {
-    throw new TypeError('"refreshToken" must be a non-empty string')
-  }
+  validateString(refreshToken, '"refreshToken"')
 
   const parameters = new URLSearchParams(options?.additionalParameters)
   parameters.set('refresh_token', refreshToken)
@@ -3050,8 +3140,9 @@ export function getValidatedIdTokenClaims(
 
   const claims = idTokenClaims.get(ref)
   if (!claims) {
-    throw new TypeError(
+    throw CodedTypeError(
       '"ref" was already garbage collected or did not resolve from the proper sources',
+      ERR_INVALID_ARG_VALUE,
     )
   }
 
@@ -3091,7 +3182,7 @@ export async function validateIdTokenSignature(
   assertAs(as)
 
   if (!idTokenClaims.has(ref)) {
-    throw new OPE('"ref" does not contain an ID Token to verify the signature of')
+    throw OPE('"ref" does not contain an ID Token to verify the signature of')
   }
 
   const {
@@ -3103,7 +3194,7 @@ export async function validateIdTokenSignature(
   const header: CompactJWSHeaderParameters = JSON.parse(buf(b64u(protectedHeader)))
 
   if (header.alg.startsWith('HS')) {
-    throw new UnsupportedOperationError('unsupported JWS algorithm')
+    throw new UnsupportedOperationError('unsupported JWS algorithm', { cause: { alg: header.alg } })
   }
 
   let key!: CryptoKey
@@ -3119,7 +3210,10 @@ async function validateJwtResponseSignature(
   assertAs(as)
 
   if (!jwtResponseBodies.has(ref)) {
-    throw new OPE('"ref" does not contain a processed JWT Response to verify the signature of')
+    throw CodedTypeError(
+      '"ref" does not contain a processed JWT Response to verify the signature of',
+      ERR_INVALID_ARG_VALUE,
+    )
   }
 
   const {
@@ -3131,7 +3225,7 @@ async function validateJwtResponseSignature(
   const header: CompactJWSHeaderParameters = JSON.parse(buf(b64u(protectedHeader)))
 
   if (header.alg.startsWith('HS')) {
-    throw new UnsupportedOperationError('unsupported JWS algorithm')
+    throw new UnsupportedOperationError('unsupported JWS algorithm', { cause: { alg: header.alg } })
   }
 
   let key!: CryptoKey
@@ -3207,7 +3301,7 @@ async function processGenericAccessTokenResponse(
   assertClient(client)
 
   if (!looseInstanceOf(response, Response)) {
-    throw new TypeError('"response" must be an instance of Response')
+    throw CodedTypeError('"response" must be an instance of Response', ERR_INVALID_ARG_TYPE)
   }
 
   let challenges: WWWAuthenticateChallenge[] | undefined
@@ -3227,10 +3321,11 @@ async function processGenericAccessTokenResponse(
         response,
       })
     }
-    throw new OPE('"response" is not a conform Token Endpoint response', {
-      cause: response,
-      code: RESPONSE_IS_NOT_CONFORM,
-    })
+    throw OPE(
+      '"response" is not a conform Token Endpoint response',
+      RESPONSE_IS_NOT_CONFORM,
+      response,
+    )
   }
 
   assertReadableResponse(response)
@@ -3239,50 +3334,57 @@ async function processGenericAccessTokenResponse(
   try {
     json = await response.json()
   } catch (cause) {
-    throw new OPE('failed to parse "response" body as JSON', { cause })
+    throw OPE('failed to parse "response" body as JSON', PARSE_ERROR, cause)
   }
 
   if (!isJsonObject<TokenEndpointResponse>(json)) {
-    throw new OPE('"response" body must be a top level object')
+    throw OPE('"response" body must be a top level object', INVALID_RESPONSE, { body: json })
   }
 
-  if (!validateString(json.access_token)) {
-    throw new OPE('"response" body "access_token" property must be a non-empty string')
-  }
+  validateString(json.access_token, '"response" body "access_token" property', INVALID_RESPONSE, {
+    body: json,
+  })
 
-  if (!validateString(json.token_type)) {
-    throw new OPE('"response" body "token_type" property must be a non-empty string')
-  }
+  validateString(json.token_type, '"response" body "token_type" property', INVALID_RESPONSE, {
+    body: json,
+  })
 
   // @ts-expect-error
   json.token_type = json.token_type.toLowerCase()
 
   if (json.token_type !== 'dpop' && json.token_type !== 'bearer') {
-    throw new UnsupportedOperationError('unsupported `token_type` value')
+    throw new UnsupportedOperationError('unsupported `token_type` value', { cause: { body: json } })
   }
 
-  if (
-    json.expires_in !== undefined &&
-    (typeof json.expires_in !== 'number' || json.expires_in <= 0)
-  ) {
-    throw new OPE('"response" body "expires_in" property must be a positive number')
+  if (json.expires_in !== undefined) {
+    validateNumber(
+      json.expires_in,
+      false,
+      '"response" body "expires_in" property',
+      INVALID_RESPONSE,
+      { body: json },
+    )
   }
 
-  if (
-    !ignoreRefreshToken &&
-    json.refresh_token !== undefined &&
-    !validateString(json.refresh_token)
-  ) {
-    throw new OPE('"response" body "refresh_token" property must be a non-empty string')
+  if (!ignoreRefreshToken && json.refresh_token !== undefined) {
+    validateString(
+      json.refresh_token,
+      '"response" body "refresh_token" property',
+      INVALID_RESPONSE,
+      { body: json },
+    )
   }
 
+  // allows empty
   if (json.scope !== undefined && typeof json.scope !== 'string') {
-    throw new OPE('"response" body "scope" property must be a string')
+    throw OPE('"response" body "scope" property must be a string', INVALID_RESPONSE, { body: json })
   }
 
   if (!ignoreIdToken) {
-    if (json.id_token !== undefined && !validateString(json.id_token)) {
-      throw new OPE('"response" body "id_token" property must be a non-empty string')
+    if (json.id_token !== undefined) {
+      validateString(json.id_token, '"response" body "id_token" property', INVALID_RESPONSE, {
+        body: json,
+      })
     }
 
     if (json.id_token) {
@@ -3304,18 +3406,29 @@ async function processGenericAccessTokenResponse(
 
       if (Array.isArray(claims.aud) && claims.aud.length !== 1) {
         if (claims.azp === undefined) {
-          throw new OPE('ID Token "aud" (audience) claim includes additional untrusted audiences')
+          throw OPE(
+            'ID Token "aud" (audience) claim includes additional untrusted audiences',
+            JWT_CLAIM_COMPARISON,
+            { claims },
+          )
         }
         if (claims.azp !== client.client_id) {
-          throw new OPE('unexpected ID Token "azp" (authorized party) claim value')
+          throw OPE(
+            'unexpected ID Token "azp" (authorized party) claim value',
+            JWT_CLAIM_COMPARISON,
+            { expected: client.client_id, claims },
+          )
         }
       }
 
-      if (
-        claims.auth_time !== undefined &&
-        (!Number.isFinite(claims.auth_time) || Math.sign(claims.auth_time as number) !== 1)
-      ) {
-        throw new OPE('ID Token "auth_time" (authentication time) must be a positive number')
+      if (claims.auth_time !== undefined) {
+        validateNumber(
+          claims.auth_time,
+          false,
+          'ID Token "auth_time" (authentication time)',
+          INVALID_RESPONSE,
+          { claims },
+        )
       }
 
       idTokenClaims.set(json, [claims as IDToken, jwt])
@@ -3363,10 +3476,16 @@ function validateOptionalAudience(
 function validateAudience(expected: string, result: Awaited<ReturnType<typeof validateJwt>>) {
   if (Array.isArray(result.claims.aud)) {
     if (!result.claims.aud.includes(expected)) {
-      throw new OPE('unexpected JWT "aud" (audience) claim value')
+      throw OPE('unexpected JWT "aud" (audience) claim value', JWT_CLAIM_COMPARISON, {
+        expected,
+        claims: result.claims,
+      })
     }
   } else if (result.claims.aud !== expected) {
-    throw new OPE('unexpected JWT "aud" (audience) claim value')
+    throw OPE('unexpected JWT "aud" (audience) claim value', JWT_CLAIM_COMPARISON, {
+      expected,
+      claims: result.claims,
+    })
   }
 
   return result
@@ -3381,7 +3500,10 @@ function validateOptionalIssuer(expected: string, result: Awaited<ReturnType<typ
 
 function validateIssuer(expected: string, result: Awaited<ReturnType<typeof validateJwt>>) {
   if (result.claims.iss !== expected) {
-    throw new OPE('unexpected JWT "iss" (issuer) claim value')
+    throw OPE('unexpected JWT "iss" (issuer) claim value', JWT_CLAIM_COMPARISON, {
+      expected,
+      claims: result.claims,
+    })
   }
   return result
 }
@@ -3423,22 +3545,19 @@ export async function authorizationCodeGrantRequest(
   assertClient(client)
 
   if (!branded.has(callbackParameters)) {
-    throw new TypeError(
+    throw CodedTypeError(
       '"callbackParameters" must be an instance of URLSearchParams obtained from "validateAuthResponse()", or "validateJwtAuthResponse()',
+      ERR_INVALID_ARG_VALUE,
     )
   }
 
-  if (!validateString(redirectUri)) {
-    throw new TypeError('"redirectUri" must be a non-empty string')
-  }
+  validateString(redirectUri, '"redirectUri"')
 
-  if (!validateString(codeVerifier)) {
-    throw new TypeError('"codeVerifier" must be a non-empty string')
-  }
+  validateString(codeVerifier, '"codeVerifier"')
 
   const code = getURLSearchParameter(callbackParameters, 'code')
   if (!code) {
-    throw new OPE('no authorization code in "callbackParameters"')
+    throw OPE('no authorization code in "callbackParameters"', INVALID_RESPONSE)
   }
 
   const parameters = new URLSearchParams(options?.additionalParameters)
@@ -3505,6 +3624,7 @@ const jwtClaimNames = {
   htm: 'http method',
   htu: 'http uri',
   cnf: 'confirmation',
+  auth_time: 'authentication time',
 }
 
 function validatePresence(
@@ -3513,7 +3633,9 @@ function validatePresence(
 ) {
   for (const claim of required) {
     if (result.claims[claim] === undefined) {
-      throw new OPE(`JWT "${claim}" (${jwtClaimNames[claim]}) claim missing`)
+      throw OPE(`JWT "${claim}" (${jwtClaimNames[claim]}) claim missing`, INVALID_RESPONSE, {
+        claims: result.claims,
+      })
     }
   }
   return result
@@ -3633,11 +3755,14 @@ export async function processAuthorizationCodeOpenIDResponse(
 ): Promise<OpenIDTokenEndpointResponse> {
   const result = await processGenericAccessTokenResponse(as, client, response)
 
-  if (!validateString(result.id_token)) {
-    throw new OPE('"response" body "id_token" property must be a non-empty string', {
-      cause: result,
-      code: USE_OAUTH_CALLBACK,
-    })
+  validateString(result.id_token, '"response" body "id_token" property', USE_OAUTH_CALLBACK, {
+    body: result,
+  })
+
+  if (maxAge !== undefined) {
+    validateNumber(maxAge, false, '"maxAge" argument')
+  } else if (client.default_max_age !== undefined) {
+    validateNumber(client.default_max_age, false, '"client.default_max_age"')
   }
 
   maxAge ??= client.default_max_age ?? skipAuthTimeCheck
@@ -3646,18 +3771,20 @@ export async function processAuthorizationCodeOpenIDResponse(
     (client.require_auth_time || maxAge !== skipAuthTimeCheck) &&
     claims.auth_time === undefined
   ) {
-    throw new OPE('ID Token "auth_time" (authentication time) claim missing')
+    throw OPE('ID Token "auth_time" (authentication time) claim missing', INVALID_RESPONSE, {
+      claims,
+    })
   }
 
   if (maxAge !== skipAuthTimeCheck) {
-    if (typeof maxAge !== 'number' || maxAge < 0) {
-      throw new TypeError('"maxAge" must be a non-negative number')
-    }
-
     const now = epochTime() + getClockSkew(client)
     const tolerance = getClockTolerance(client)
     if (claims.auth_time! + maxAge < now - tolerance) {
-      throw new OPE('too much time has elapsed since the last End-User authentication')
+      throw OPE(
+        'too much time has elapsed since the last End-User authentication',
+        JWT_TIMESTAMP_CHECK,
+        { claims, now, tolerance },
+      )
     }
   }
 
@@ -3665,18 +3792,26 @@ export async function processAuthorizationCodeOpenIDResponse(
     case undefined:
     case expectNoNonce:
       if (claims.nonce !== undefined) {
-        throw new OPE('unexpected ID Token "nonce" claim value')
+        throw OPE('unexpected ID Token "nonce" claim value', JWT_CLAIM_COMPARISON, {
+          expected: undefined,
+          claims,
+        })
       }
       break
     default:
-      if (!validateString(expectedNonce)) {
-        throw new TypeError('"expectedNonce" must be a non-empty string')
-      }
+      validateString(expectedNonce, '"expectedNonce" argument')
+
       if (claims.nonce === undefined) {
-        throw new OPE('ID Token "nonce" claim missing')
+        throw OPE('ID Token "nonce" claim missing', INVALID_RESPONSE, {
+          expected: expectedNonce,
+          claims,
+        })
       }
       if (claims.nonce !== expectedNonce) {
-        throw new OPE('unexpected ID Token "nonce" claim value')
+        throw OPE('unexpected ID Token "nonce" claim value', JWT_CLAIM_COMPARISON, {
+          expected: expectedNonce,
+          claims,
+        })
       }
   }
 
@@ -3708,21 +3843,32 @@ export async function processAuthorizationCodeOAuth2Response(
   const result = await processGenericAccessTokenResponse(as, client, response, true)
 
   if (result.id_token !== undefined) {
-    if (typeof result.id_token === 'string' && result.id_token.length) {
-      throw new OPE(
-        'Unexpected ID Token returned, use processAuthorizationCodeOpenIDResponse() for OpenID Connect callback processing',
-        { cause: result, code: USE_OPENID_CALLBACK },
-      )
-    }
-    // @ts-expect-error
-    delete result.id_token
+    throw OPE(
+      'Unexpected ID Token returned, use processAuthorizationCodeOpenIDResponse() for OpenID Connect callback processing',
+      USE_OPENID_CALLBACK,
+      { body: result },
+    )
   }
 
   return result as OAuth2TokenEndpointResponse
 }
 
-// TODO: remove these exports
-// TODO: revisit all code values
+/**
+ * @ignore
+ */
+export const JWT_USERINFO_EXPECTED = 'OAUTH_JWT_USERINFO_EXPECTED'
+/**
+ * @ignore
+ */
+export const PARSE_ERROR = 'OAUTH_PARSE_ERROR'
+/**
+ * @ignore
+ */
+export const INVALID_RESPONSE = 'OAUTH_INVALID_RESPONSE'
+/**
+ * @ignore
+ */
+export const INVALID_REQUEST = 'OAUTH_INVALID_REQUEST'
 /**
  * @ignore
  */
@@ -3743,10 +3889,31 @@ export const RESPONSE_IS_NOT_CONFORM = 'OAUTH_RESPONSE_IS_NOT_CONFORM'
  * @ignore
  */
 export const HTTP_REQUEST_FORBIDDEN = 'OAUTH_HTTP_REQUEST_FORBIDDEN'
+/**
+ * @ignore
+ */
+export const JWT_TIMESTAMP_CHECK = 'OAUTH_JWT_TIMESTAMP_CHECK_FAILED'
+/**
+ * @ignore
+ */
+export const JWT_CLAIM_COMPARISON = 'OAUTH_JWT_CLAIM_COMPARISON_FAILED'
+/**
+ * @ignore
+ */
+export const JSON_ATTRIBUTE_COMPARISON = 'OAUTH_JSON_ATTRIBUTE_COMPARISON_FAILED'
+/**
+ * Assigned as {@link OperationProcessingError.code} when a JWT signature validation fails to select
+ * an applicable key.
+ *
+ * @group Error Codes
+ */
+export const KEY_SELECTION = 'OAUTH_KEY_SELECTION_FAILED'
 
 function checkJwtType(expected: string, result: Awaited<ReturnType<typeof validateJwt>>) {
   if (typeof result.header.typ !== 'string' || normalizeTyp(result.header.typ) !== expected) {
-    throw new OPE('unexpected JWT "typ" header parameter value')
+    throw OPE('unexpected JWT "typ" header parameter value', INVALID_RESPONSE, {
+      header: result.header,
+    })
   }
 
   return result
@@ -3814,9 +3981,7 @@ export async function genericTokenEndpointRequest(
   assertAs(as)
   assertClient(client)
 
-  if (!validateString(grantType)) {
-    throw new TypeError('"grantType" must be a non-empty string')
-  }
+  validateString(grantType, '"grantType"')
 
   return tokenEndpointRequest(as, client, grantType, new URLSearchParams(parameters), options)
 }
@@ -3878,9 +4043,7 @@ export async function revocationRequest(
   assertAs(as)
   assertClient(client)
 
-  if (!validateString(token)) {
-    throw new TypeError('"token" must be a non-empty string')
-  }
+  validateString(token, '"token"')
 
   const url = resolveEndpoint(
     as,
@@ -3913,7 +4076,7 @@ export async function revocationRequest(
  */
 export async function processRevocationResponse(response: Response): Promise<undefined> {
   if (!looseInstanceOf(response, Response)) {
-    throw new TypeError('"response" must be an instance of Response')
+    throw CodedTypeError('"response" must be an instance of Response', ERR_INVALID_ARG_TYPE)
   }
 
   let challenges: WWWAuthenticateChallenge[] | undefined
@@ -3932,10 +4095,11 @@ export async function processRevocationResponse(response: Response): Promise<und
         response,
       })
     }
-    throw new OPE('"response" is not a conform Revocation Endpoint response', {
-      cause: response,
-      code: RESPONSE_IS_NOT_CONFORM,
-    })
+    throw OPE(
+      '"response" is not a conform Revocation Endpoint response',
+      RESPONSE_IS_NOT_CONFORM,
+      response,
+    )
   }
 
   return undefined
@@ -3962,7 +4126,7 @@ export interface IntrospectionRequestOptions
 
 function assertReadableResponse(response: Response) {
   if (response.bodyUsed) {
-    throw new TypeError('"response" body has been used already')
+    throw CodedTypeError('"response" body has been used already', ERR_INVALID_ARG_VALUE)
   }
 }
 
@@ -3989,9 +4153,7 @@ export async function introspectionRequest(
   assertAs(as)
   assertClient(client)
 
-  if (!validateString(token)) {
-    throw new TypeError('"token" must be a non-empty string')
-  }
+  validateString(token, '"token"')
 
   const url = resolveEndpoint(
     as,
@@ -4065,7 +4227,7 @@ export async function processIntrospectionResponse(
   assertClient(client)
 
   if (!looseInstanceOf(response, Response)) {
-    throw new TypeError('"response" must be an instance of Response')
+    throw CodedTypeError('"response" must be an instance of Response', ERR_INVALID_ARG_TYPE)
   }
 
   let challenges: WWWAuthenticateChallenge[] | undefined
@@ -4084,10 +4246,11 @@ export async function processIntrospectionResponse(
         response,
       })
     }
-    throw new OPE('"response" is not a conform Introspection Endpoint response', {
-      cause: response,
-      code: RESPONSE_IS_NOT_CONFORM,
-    })
+    throw OPE(
+      '"response" is not a conform Introspection Endpoint response',
+      RESPONSE_IS_NOT_CONFORM,
+      response,
+    )
   }
 
   let json: JsonValue
@@ -4113,7 +4276,9 @@ export async function processIntrospectionResponse(
     jwtResponseBodies.set(response, jwt)
     json = claims.token_introspection as JsonValue
     if (!isJsonObject(json)) {
-      throw new OPE('JWT "token_introspection" claim must be a JSON object')
+      throw OPE('JWT "token_introspection" claim must be a JSON object', INVALID_RESPONSE, {
+        claims,
+      })
     }
   } else {
     assertReadableResponse(response)
@@ -4121,15 +4286,17 @@ export async function processIntrospectionResponse(
     try {
       json = await response.json()
     } catch (cause) {
-      throw new OPE('failed to parse "response" body as JSON', { cause })
+      throw OPE('failed to parse "response" body as JSON', PARSE_ERROR, cause)
     }
     if (!isJsonObject(json)) {
-      throw new OPE('"response" body must be a top level object')
+      throw OPE('"response" body must be a top level object', INVALID_RESPONSE, { body: json })
     }
   }
 
   if (typeof json.active !== 'boolean') {
-    throw new OPE('"response" body "active" property must be a boolean')
+    throw OPE('"response" body "active" property must be a boolean', INVALID_RESPONSE, {
+      body: json,
+    })
   }
 
   return json as IntrospectionResponse
@@ -4162,14 +4329,15 @@ export interface JWKS {
 
 async function processJwksResponse(response: Response): Promise<JWKS> {
   if (!looseInstanceOf(response, Response)) {
-    throw new TypeError('"response" must be an instance of Response')
+    throw CodedTypeError('"response" must be an instance of Response', ERR_INVALID_ARG_TYPE)
   }
 
   if (response.status !== 200) {
-    throw new OPE('"response" is not a conform JSON Web Key Set response', {
-      cause: response,
-      code: RESPONSE_IS_NOT_CONFORM,
-    })
+    throw OPE(
+      '"response" is not a conform JSON Web Key Set response',
+      RESPONSE_IS_NOT_CONFORM,
+      response,
+    )
   }
 
   assertReadableResponse(response)
@@ -4178,19 +4346,23 @@ async function processJwksResponse(response: Response): Promise<JWKS> {
   try {
     json = await response.json()
   } catch (cause) {
-    throw new OPE('failed to parse "response" body as JSON', { cause })
+    throw OPE('failed to parse "response" body as JSON', PARSE_ERROR, cause)
   }
 
   if (!isJsonObject<JWKS>(json)) {
-    throw new OPE('"response" body must be a top level object')
+    throw OPE('"response" body must be a top level object', INVALID_RESPONSE, { body: json })
   }
 
   if (!Array.isArray(json.keys)) {
-    throw new OPE('"response" body "keys" property must be an array')
+    throw OPE('"response" body "keys" property must be an array', INVALID_RESPONSE, { body: json })
   }
 
   if (!Array.prototype.every.call(json.keys, isJsonObject)) {
-    throw new OPE('"response" body "keys" property members must be JWK formatted objects')
+    throw OPE(
+      '"response" body "keys" property members must be JWK formatted objects',
+      INVALID_RESPONSE,
+      { body: json },
+    )
   }
 
   return json
@@ -4210,21 +4382,26 @@ async function handleOAuthBodyError(response: Response): Promise<OAuth2Error | u
   return undefined
 }
 
-function checkSupportedJwsAlg(alg: unknown) {
-  if (!SUPPORTED_JWS_ALGS.includes(alg as any)) {
-    throw new UnsupportedOperationError('unsupported JWS "alg" identifier')
+function checkSupportedJwsAlg(header: CompactJWSHeaderParameters) {
+  if (!SUPPORTED_JWS_ALGS.includes(header.alg)) {
+    throw new UnsupportedOperationError('unsupported JWS "alg" identifier', {
+      cause: { alg: header.alg },
+    })
   }
-  return alg
 }
 
-function checkRsaKeyAlgorithm(algorithm: RsaHashedKeyAlgorithm) {
+function checkRsaKeyAlgorithm(key: CryptoKey) {
+  const { algorithm } = key as CryptoKey & { algorithm: RsaHashedKeyAlgorithm }
   if (typeof algorithm.modulusLength !== 'number' || algorithm.modulusLength < 2048) {
-    throw new OPE(`${algorithm.name} modulusLength must be at least 2048 bits`)
+    throw new UnsupportedOperationError(`unsupported ${algorithm.name} modulusLength`, {
+      cause: key,
+    })
   }
 }
 
-function ecdsaHashName(namedCurve: string) {
-  switch (namedCurve) {
+function ecdsaHashName(key: CryptoKey) {
+  const { algorithm } = key as CryptoKey & { algorithm: EcKeyAlgorithm }
+  switch (algorithm.namedCurve) {
     case 'P-256':
       return 'SHA-256'
     case 'P-384':
@@ -4232,7 +4409,7 @@ function ecdsaHashName(namedCurve: string) {
     case 'P-521':
       return 'SHA-512'
     default:
-      throw new UnsupportedOperationError('unsupported ECDSA namedCurve')
+      throw new UnsupportedOperationError('unsupported ECDSA namedCurve', { cause: key })
   }
 }
 
@@ -4241,10 +4418,10 @@ function keyToSubtle(key: CryptoKey): AlgorithmIdentifier | RsaPssParams | Ecdsa
     case 'ECDSA':
       return {
         name: key.algorithm.name,
-        hash: ecdsaHashName((key.algorithm as EcKeyAlgorithm).namedCurve),
+        hash: ecdsaHashName(key),
       } as EcdsaParams
     case 'RSA-PSS': {
-      checkRsaKeyAlgorithm(key.algorithm as RsaHashedKeyAlgorithm)
+      checkRsaKeyAlgorithm(key)
       switch ((key.algorithm as RsaHashedKeyAlgorithm).hash.name) {
         case 'SHA-256': // Fall through
         case 'SHA-384': // Fall through
@@ -4255,17 +4432,17 @@ function keyToSubtle(key: CryptoKey): AlgorithmIdentifier | RsaPssParams | Ecdsa
               parseInt((key.algorithm as RsaHashedKeyAlgorithm).hash.name.slice(-3), 10) >> 3,
           } as RsaPssParams
         default:
-          throw new UnsupportedOperationError('unsupported RSA-PSS hash name')
+          throw new UnsupportedOperationError('unsupported RSA-PSS hash name', { cause: key })
       }
     }
     case 'RSASSA-PKCS1-v1_5':
-      checkRsaKeyAlgorithm(key.algorithm as RsaHashedKeyAlgorithm)
+      checkRsaKeyAlgorithm(key)
       return key.algorithm.name
     case 'Ed448': // Fall through
     case 'Ed25519':
       return key.algorithm.name
   }
-  throw new UnsupportedOperationError('unsupported CryptoKey algorithm name')
+  throw new UnsupportedOperationError('unsupported CryptoKey algorithm name', { cause: key })
 }
 
 const noSignatureCheck = Symbol()
@@ -4276,10 +4453,16 @@ async function validateJwsSignature(
   key: CryptoKey,
   signature: Uint8Array,
 ) {
-  const input = `${protectedHeader}.${payload}`
-  const verified = await crypto.subtle.verify(keyToSubtle(key), key, signature, buf(input))
+  const data = buf(`${protectedHeader}.${payload}`)
+  const algorithm = keyToSubtle(key)
+  const verified = await crypto.subtle.verify(algorithm, key, signature, data)
   if (!verified) {
-    throw new OPE('JWT signature verification failed')
+    throw OPE('JWT signature verification failed', INVALID_RESPONSE, {
+      key,
+      data,
+      signature,
+      algorithm,
+    })
   }
 }
 
@@ -4305,28 +4488,30 @@ async function validateJwt(
       jws = await decryptJwt(jws)
       ;({ 0: protectedHeader, 1: payload, 2: encodedSignature, length } = jws.split('.'))
     } else {
-      throw new UnsupportedOperationError('JWE structure JWTs are not supported')
+      throw new UnsupportedOperationError('JWE decryption is not configured', { cause: jws })
     }
   }
 
   if (length !== 3) {
-    throw new OPE('Invalid JWT')
+    throw OPE('Invalid JWT', INVALID_RESPONSE, jws)
   }
 
   let header: JsonValue
   try {
     header = JSON.parse(buf(b64u(protectedHeader)))
   } catch (cause) {
-    throw new OPE('failed to parse JWT Header body as base64url encoded JSON', { cause })
+    throw OPE('failed to parse JWT Header body as base64url encoded JSON', PARSE_ERROR, cause)
   }
 
   if (!isJsonObject<CompactJWSHeaderParameters>(header)) {
-    throw new OPE('JWT Header must be a top level object')
+    throw OPE('JWT Header must be a top level object', INVALID_RESPONSE, jws)
   }
 
   checkAlg(header)
   if (header.crit !== undefined) {
-    throw new OPE('unexpected JWT "crit" header parameter')
+    throw new UnsupportedOperationError('no JWT "crit" header parameter extensions are supported', {
+      cause: { header },
+    })
   }
 
   const signature = b64u(encodedSignature)
@@ -4340,49 +4525,57 @@ async function validateJwt(
   try {
     claims = JSON.parse(buf(b64u(payload)))
   } catch (cause) {
-    throw new OPE('failed to parse JWT Payload body as base64url encoded JSON', { cause })
+    throw OPE('failed to parse JWT Payload body as base64url encoded JSON', PARSE_ERROR, cause)
   }
 
   if (!isJsonObject<JWTPayload>(claims)) {
-    throw new OPE('JWT Payload must be a top level object')
+    throw OPE('JWT Payload must be a top level object', INVALID_RESPONSE, jws)
   }
 
   const now = epochTime() + clockSkew
 
   if (claims.exp !== undefined) {
     if (typeof claims.exp !== 'number') {
-      throw new OPE('unexpected JWT "exp" (expiration time) claim type')
+      throw OPE('unexpected JWT "exp" (expiration time) claim type', INVALID_RESPONSE, { claims })
     }
 
     if (claims.exp <= now - clockTolerance) {
-      throw new OPE('unexpected JWT "exp" (expiration time) claim value, timestamp is <= now()')
+      throw OPE(
+        'unexpected JWT "exp" (expiration time) claim value, expiration is past current timestamp',
+        JWT_TIMESTAMP_CHECK,
+        { claims, now, tolerance: clockTolerance },
+      )
     }
   }
 
   if (claims.iat !== undefined) {
     if (typeof claims.iat !== 'number') {
-      throw new OPE('unexpected JWT "iat" (issued at) claim type')
+      throw OPE('unexpected JWT "iat" (issued at) claim type', INVALID_RESPONSE, { claims })
     }
   }
 
   if (claims.iss !== undefined) {
     if (typeof claims.iss !== 'string') {
-      throw new OPE('unexpected JWT "iss" (issuer) claim type')
+      throw OPE('unexpected JWT "iss" (issuer) claim type', INVALID_RESPONSE, { claims })
     }
   }
 
   if (claims.nbf !== undefined) {
     if (typeof claims.nbf !== 'number') {
-      throw new OPE('unexpected JWT "nbf" (not before) claim type')
+      throw OPE('unexpected JWT "nbf" (not before) claim type', INVALID_RESPONSE, { claims })
     }
     if (claims.nbf > now + clockTolerance) {
-      throw new OPE('unexpected JWT "nbf" (not before) claim value, timestamp is > now()')
+      throw OPE('unexpected JWT "nbf" (not before) claim value', JWT_TIMESTAMP_CHECK, {
+        claims,
+        now,
+        tolerance: clockTolerance,
+      })
     }
   }
 
   if (claims.aud !== undefined) {
     if (typeof claims.aud !== 'string' && !Array.isArray(claims.aud)) {
-      throw new OPE('unexpected JWT "aud" (audience) claim type')
+      throw OPE('unexpected JWT "aud" (audience) claim type', INVALID_RESPONSE, { claims })
     }
   }
 
@@ -4421,12 +4614,15 @@ export async function validateJwtAuthResponse(
   }
 
   if (!(parameters instanceof URLSearchParams)) {
-    throw new TypeError('"parameters" must be an instance of URLSearchParams, or URL')
+    throw CodedTypeError(
+      '"parameters" must be an instance of URLSearchParams, or URL',
+      ERR_INVALID_ARG_TYPE,
+    )
   }
 
   const response = getURLSearchParameter(parameters, 'response')
   if (!response) {
-    throw new OPE('"parameters" does not contain a JARM response')
+    throw OPE('"parameters" does not contain a JARM response', INVALID_RESPONSE)
   }
 
   const { claims } = await validateJwt(
@@ -4456,9 +4652,14 @@ export async function validateJwtAuthResponse(
   return validateAuthResponse(as, client, result, expectedState)
 }
 
-async function idTokenHash(alg: JWSAlgorithm, data: string, key: CryptoKey) {
+async function idTokenHash(
+  data: string,
+  key: CryptoKey,
+  header: CompactJWSHeaderParameters,
+  claimName: string,
+) {
   let algorithm: string
-  switch (alg) {
+  switch (header.alg) {
     case 'RS256': // Fall through
     case 'PS256': // Fall through
     case 'ES256':
@@ -4479,17 +4680,28 @@ async function idTokenHash(alg: JWSAlgorithm, data: string, key: CryptoKey) {
         algorithm = 'SHA-512'
         break
       }
-      throw new UnsupportedOperationError('unsupported EdDSA curve for *_hash calculation')
+      throw new UnsupportedOperationError(`unsupported EdDSA curve for ${claimName} calculation`, {
+        cause: key,
+      })
     default:
-      throw new UnsupportedOperationError('unsupported JWS algorithm for *_hash calculation')
+      throw new UnsupportedOperationError(
+        `unsupported JWS algorithm for ${claimName} calculation`,
+        { cause: { alg: header.alg } },
+      )
   }
 
   const digest = await crypto.subtle.digest(algorithm, buf(data))
   return b64u(digest.slice(0, digest.byteLength / 2))
 }
 
-async function idTokenHashMatches(data: string, actual: string, alg: JWSAlgorithm, key: CryptoKey) {
-  const expected = await idTokenHash(alg, data, key)
+async function idTokenHashMatches(
+  data: string,
+  actual: string,
+  key: CryptoKey,
+  header: CompactJWSHeaderParameters,
+  claimName: string,
+) {
+  const expected = await idTokenHash(data, key, header, claimName)
   return actual === expected
 }
 
@@ -4530,15 +4742,19 @@ export async function validateDetachedSignatureResponse(
 
   if (parameters instanceof URL) {
     if (!parameters.hash.length) {
-      throw new TypeError(
+      throw CodedTypeError(
         '"parameters" as an instance of URL must contain a hash (fragment) with the Authorization Response parameters',
+        ERR_INVALID_ARG_VALUE,
       )
     }
     parameters = new URLSearchParams(parameters.hash.slice(1))
   }
 
   if (!(parameters instanceof URLSearchParams)) {
-    throw new TypeError('"parameters" must be an instance of URLSearchParams')
+    throw CodedTypeError(
+      '"parameters" must be an instance of URLSearchParams',
+      ERR_INVALID_ARG_TYPE,
+    )
   }
 
   parameters = new URLSearchParams(parameters)
@@ -4551,9 +4767,7 @@ export async function validateDetachedSignatureResponse(
     case expectNoState:
       break
     default:
-      if (!validateString(expectedState)) {
-        throw new TypeError('"expectedState" must be a non-empty string')
-      }
+      validateString(expectedState, '"expectedState" argument')
   }
 
   const result = validateAuthResponse(
@@ -4567,11 +4781,11 @@ export async function validateDetachedSignatureResponse(
   )
 
   if (!id_token) {
-    throw new OPE('"parameters" does not contain an ID Token')
+    throw OPE('"parameters" does not contain an ID Token', INVALID_RESPONSE)
   }
   const code = getURLSearchParameter(parameters, 'code')
   if (!code) {
-    throw new OPE('"parameters" does not contain an Authorization Code')
+    throw OPE('"parameters" does not contain an Authorization Code', INVALID_RESPONSE)
   }
 
   const requiredClaims: (keyof typeof jwtClaimNames)[] = [
@@ -4584,8 +4798,20 @@ export async function validateDetachedSignatureResponse(
     'c_hash',
   ]
 
-  if (typeof expectedState === 'string') {
+  const state = parameters.get('state')
+  if (typeof expectedState === 'string' || state !== null) {
     requiredClaims.push('s_hash')
+  }
+
+  if (maxAge !== undefined) {
+    validateNumber(maxAge, false, '"maxAge" argument')
+  } else if (client.default_max_age !== undefined) {
+    validateNumber(client.default_max_age, false, '"client.default_max_age"')
+  }
+
+  maxAge ??= client.default_max_age ?? skipAuthTimeCheck
+  if (client.require_auth_time || maxAge !== skipAuthTimeCheck) {
+    requiredClaims.push('auth_time')
   }
 
   const { claims, header, key } = await validateJwt(
@@ -4607,74 +4833,91 @@ export async function validateDetachedSignatureResponse(
   const clockSkew = getClockSkew(client)
   const now = epochTime() + clockSkew
   if (claims.iat! < now - 3600) {
-    throw new OPE('unexpected JWT "iat" (issued at) claim value, it is too far in the past')
+    throw OPE(
+      'unexpected JWT "iat" (issued at) claim value, it is too far in the past',
+      JWT_TIMESTAMP_CHECK,
+      { now, claims },
+    )
   }
 
-  if (
-    typeof claims.c_hash !== 'string' ||
-    (await idTokenHashMatches(code, claims.c_hash, header.alg, key!)) !== true
-  ) {
-    throw new OPE('invalid ID Token "c_hash" (code hash) claim value')
+  validateString(claims.c_hash, 'ID Token "c_hash" (code hash) claim value', INVALID_RESPONSE, {
+    claims,
+  })
+
+  if ((await idTokenHashMatches(code, claims.c_hash, key!, header, 'c_hash')) !== true) {
+    throw OPE('invalid ID Token "c_hash" (code hash) claim value', JWT_CLAIM_COMPARISON, {
+      code,
+      c_hash: claims.c_hash,
+      alg: header.alg,
+    })
   }
 
-  if (claims.s_hash !== undefined && typeof expectedState !== 'string') {
-    throw new OPE('could not verify ID Token "s_hash" (state hash) claim value')
+  if (state !== null || claims.s_hash !== undefined) {
+    validateString(claims.s_hash, 'ID Token "s_hash" (state hash) claim value', INVALID_RESPONSE, {
+      claims,
+    })
+    validateString(state, '"state" response parameter', INVALID_RESPONSE, { parameters })
+
+    if ((await idTokenHashMatches(state, claims.s_hash, key!, header, 's_hash')) !== true) {
+      throw OPE('invalid ID Token "s_hash" (state hash) claim value', JWT_CLAIM_COMPARISON, {
+        state,
+        s_hash: claims.s_hash,
+        alg: header.alg,
+      })
+    }
   }
 
-  if (
-    typeof expectedState === 'string' &&
-    (typeof claims.s_hash !== 'string' ||
-      (await idTokenHashMatches(expectedState, claims.s_hash, header.alg, key!)) !== true)
-  ) {
-    throw new OPE('invalid ID Token "s_hash" (state hash) claim value')
-  }
-
-  if (
-    claims.auth_time !== undefined &&
-    (!Number.isFinite(claims.auth_time) || Math.sign(claims.auth_time as number) !== 1)
-  ) {
-    throw new OPE('ID Token "auth_time" (authentication time) must be a positive number')
-  }
-
-  maxAge ??= client.default_max_age ?? skipAuthTimeCheck
-  if (
-    (client.require_auth_time || maxAge !== skipAuthTimeCheck) &&
-    claims.auth_time === undefined
-  ) {
-    throw new OPE('ID Token "auth_time" (authentication time) claim missing')
+  if (claims.auth_time !== undefined) {
+    validateNumber(
+      claims.auth_time,
+      false,
+      'ID Token "auth_time" (authentication time)',
+      INVALID_RESPONSE,
+      { claims },
+    )
   }
 
   if (maxAge !== skipAuthTimeCheck) {
-    if (typeof maxAge !== 'number' || maxAge < 0) {
-      throw new TypeError('"maxAge" must be a non-negative number')
-    }
-
     const now = epochTime() + getClockSkew(client)
     const tolerance = getClockTolerance(client)
     if ((claims as IDToken).auth_time! + maxAge < now - tolerance) {
-      throw new OPE('too much time has elapsed since the last End-User authentication')
+      throw OPE(
+        'too much time has elapsed since the last End-User authentication',
+        JWT_TIMESTAMP_CHECK,
+        { claims, now, tolerance },
+      )
     }
   }
 
-  if (!validateString(expectedNonce)) {
-    throw new TypeError('"expectedNonce" must be a non-empty string')
-  }
+  validateString(expectedNonce, '"expectedNonce" argument')
+
   if (claims.nonce !== expectedNonce) {
-    throw new OPE('unexpected ID Token "nonce" claim value')
+    throw OPE('unexpected ID Token "nonce" claim value', JWT_CLAIM_COMPARISON, {
+      expected: expectedNonce,
+      claims,
+    })
   }
 
   if (Array.isArray(claims.aud) && claims.aud.length !== 1) {
     if (claims.azp === undefined) {
-      throw new OPE('ID Token "aud" (audience) claim includes additional untrusted audiences')
+      throw OPE(
+        'ID Token "aud" (audience) claim includes additional untrusted audiences',
+        JWT_CLAIM_COMPARISON,
+        { claims },
+      )
     }
     if (claims.azp !== client.client_id) {
-      throw new OPE('unexpected ID Token "azp" (authorized party) claim value')
+      throw OPE('unexpected ID Token "azp" (authorized party) claim value', JWT_CLAIM_COMPARISON, {
+        expected: client.client_id,
+        claims,
+      })
     }
   }
 
   return result
 }
 
+// TODO: only do default for ID Tokens or specs that actually define RS256 as the default
 /**
  * If configured must be the configured one (client) if not configured must be signalled by the
  * issuer to be supported (issuer) if not signalled must be fallback
@@ -4686,20 +4929,32 @@ function checkSigningAlgorithm(
 ) {
   if (client !== undefined) {
     if (header.alg !== client) {
-      throw new OPE('unexpected JWT "alg" header parameter')
+      throw OPE('unexpected JWT "alg" header parameter', INVALID_RESPONSE, {
+        header,
+        expected: client,
+        reason: 'client configuration',
+      })
     }
     return
   }
 
   if (Array.isArray(issuer)) {
     if (!issuer.includes(header.alg)) {
-      throw new OPE('unexpected JWT "alg" header parameter')
+      throw OPE('unexpected JWT "alg" header parameter', INVALID_RESPONSE, {
+        header,
+        expected: issuer,
+        reason: 'authorization server metadata',
+      })
     }
     return
   }
 
   if (header.alg !== 'RS256') {
-    throw new OPE('unexpected JWT "alg" header parameter')
+    throw OPE('unexpected JWT "alg" header parameter', INVALID_RESPONSE, {
+      header,
+      expected: 'RS256',
+      reason: 'default value',
+    })
   }
 }
 
@@ -4710,7 +4965,7 @@ function checkSigningAlgorithm(
 function getURLSearchParameter(parameters: URLSearchParams, name: string): string | undefined {
   const { 0: value, length } = parameters.getAll(name)
   if (length > 1) {
-    throw new OPE(`"${name}" parameter must be provided only once`)
+    throw OPE(`"${name}" parameter must be provided only once`, INVALID_RESPONSE)
   }
   return value
 }
@@ -4768,12 +5023,17 @@ export function validateAuthResponse(
   }
 
   if (!(parameters instanceof URLSearchParams)) {
-    throw new TypeError('"parameters" must be an instance of URLSearchParams, or URL')
+    throw CodedTypeError(
+      '"parameters" must be an instance of URLSearchParams, or URL',
+      ERR_INVALID_ARG_TYPE,
+    )
   }
 
   if (getURLSearchParameter(parameters, 'response')) {
-    throw new OPE(
+    throw OPE(
       '"parameters" contains a JARM response, use validateJwtAuthResponse() instead of validateAuthResponse()',
+      INVALID_RESPONSE,
+      { parameters },
     )
   }
 
@@ -4781,31 +5041,39 @@ export function validateAuthResponse(
   const state = getURLSearchParameter(parameters, 'state')
 
   if (!iss && as.authorization_response_iss_parameter_supported) {
-    throw new OPE('response parameter "iss" (issuer) missing')
+    throw OPE('response parameter "iss" (issuer) missing', INVALID_RESPONSE, { parameters })
   }
 
   if (iss && iss !== as.issuer) {
-    throw new OPE('unexpected "iss" (issuer) response parameter value')
+    throw OPE('unexpected "iss" (issuer) response parameter value', INVALID_RESPONSE, {
+      expected: as.issuer,
+      parameters,
+    })
   }
 
   switch (expectedState) {
     case undefined:
     case expectNoState:
       if (state !== undefined) {
-        throw new OPE('unexpected "state" response parameter encountered')
+        throw OPE('unexpected "state" response parameter encountered', INVALID_RESPONSE, {
+          expected: undefined,
+          parameters,
+        })
       }
       break
     case skipStateCheck:
       break
     default:
-      if (!validateString(expectedState)) {
-        throw new OPE('"expectedState" must be a non-empty string')
-      }
-      if (state === undefined) {
-        throw new OPE('response parameter "state" missing')
-      }
+      validateString(expectedState, '"expectedState" argument')
+
       if (state !== expectedState) {
-        throw new OPE('unexpected "state" response parameter value')
+        throw OPE(
+          state === undefined
+            ? 'response parameter "state" missing'
+            : 'unexpected "state" response parameter value',
+          INVALID_RESPONSE,
+          { expected: expectedState, parameters },
+        )
       }
   }
 
@@ -4849,11 +5117,11 @@ function algToSubtle(
         case 'Ed448':
           return crv
         default:
-          throw new UnsupportedOperationError('unsupported EdDSA curve')
+          throw new UnsupportedOperationError('unsupported EdDSA curve', { cause: { alg, crv } })
       }
     }
     default:
-      throw new UnsupportedOperationError('unsupported JWS algorithm')
+      throw new UnsupportedOperationError('unsupported JWS algorithm', { cause: { alg } })
   }
 }
 
@@ -4939,7 +5207,7 @@ export async function processDeviceAuthorizationResponse(
   assertClient(client)
 
   if (!looseInstanceOf(response, Response)) {
-    throw new TypeError('"response" must be an instance of Response')
+    throw CodedTypeError('"response" must be an instance of Response', ERR_INVALID_ARG_TYPE)
   }
 
   let challenges: WWWAuthenticateChallenge[] | undefined
@@ -4958,10 +5226,11 @@ export async function processDeviceAuthorizationResponse(
         response,
       })
     }
-    throw new OPE('"response" is not a conform Device Authorization Endpoint response', {
-      cause: response,
-      code: RESPONSE_IS_NOT_CONFORM,
-    })
+    throw OPE(
+      '"response" is not a conform Device Authorization Endpoint response',
+      RESPONSE_IS_NOT_CONFORM,
+      response,
+    )
   }
 
   assertReadableResponse(response)
@@ -4970,38 +5239,47 @@ export async function processDeviceAuthorizationResponse(
   try {
     json = await response.json()
   } catch (cause) {
-    throw new OPE('failed to parse "response" body as JSON', { cause })
+    throw OPE('failed to parse "response" body as JSON', PARSE_ERROR, cause)
   }
 
   if (!isJsonObject<DeviceAuthorizationResponse>(json)) {
-    throw new OPE('"response" body must be a top level object')
+    throw OPE('"response" body must be a top level object', INVALID_RESPONSE, { body: json })
   }
 
-  if (!validateString(json.device_code)) {
-    throw new OPE('"response" body "device_code" property must be a non-empty string')
+  validateString(json.device_code, '"response" body "device_code" property', INVALID_RESPONSE, {
+    body: json,
+  })
+  validateString(json.user_code, '"response" body "user_code" property', INVALID_RESPONSE, {
+    body: json,
+  })
+  validateString(
+    json.verification_uri,
+    '"response" body "verification_uri" property',
+    INVALID_RESPONSE,
+    { body: json },
+  )
+
+  validateNumber(
+    json.expires_in,
+    false,
+    '"response" body "expires_in" property',
+    INVALID_RESPONSE,
+    { body: json },
+  )
+
+  if (json.verification_uri_complete !== undefined) {
+    validateString(
+      json.verification_uri_complete,
+      '"response" body "verification_uri_complete" property',
+      INVALID_RESPONSE,
+      { body: json },
+    )
   }
 
-  if (!validateString(json.user_code)) {
-    throw new OPE('"response" body "user_code" property must be a non-empty string')
-  }
-
-  if (!validateString(json.verification_uri)) {
-    throw new OPE('"response" body "verification_uri" property must be a non-empty string')
-  }
-
-  if (typeof json.expires_in !== 'number' || json.expires_in <= 0) {
-    throw new OPE('"response" body "expires_in" property must be a positive number')
-  }
-
-  if (
-    json.verification_uri_complete !== undefined &&
-    !validateString(json.verification_uri_complete)
-  ) {
-    throw new OPE('"response" body "verification_uri_complete" property must be a non-empty string')
-  }
-
-  if (json.interval !== undefined && (typeof json.interval !== 'number' || json.interval <= 0)) {
-    throw new OPE('"response" body "interval" property must be a positive number')
+  if (json.interval !== undefined) {
+    validateNumber(json.interval, false, '"response" body "interval" property', INVALID_RESPONSE, {
+      body: json,
+    })
   }
 
   return json
@@ -5029,9 +5307,7 @@ export async function deviceCodeGrantRequest(
   assertAs(as)
   assertClient(client)
 
-  if (!validateString(deviceCode)) {
-    throw new TypeError('"deviceCode" must be a non-empty string')
-  }
+  validateString(deviceCode, '"deviceCode"')
 
   const parameters = new URLSearchParams(options?.additionalParameters)
   parameters.set('device_code', deviceCode)
@@ -5096,9 +5372,8 @@ export async function generateKeyPair(
   alg: JWSAlgorithm,
   options?: GenerateKeyPairOptions,
 ): Promise<CryptoKeyPair> {
-  if (!validateString(alg)) {
-    throw new TypeError('"alg" must be a non-empty string')
-  }
+  validateString(alg, '"alg"')
+
   const algorithm: RsaHashedKeyGenParams | EcKeyGenParams | AlgorithmIdentifier = algToSubtle(
     alg,
     alg === 'EdDSA' ? (options?.crv ?? 'Ed25519') : undefined,
@@ -5162,38 +5437,49 @@ async function validateDPoP(
   accessTokenClaims: JWTPayload,
   options?: Pick<ValidateJWTAccessTokenOptions, typeof clockSkew | typeof clockTolerance>,
 ) {
-  const header = request.headers.get('dpop')
-  if (header === null) {
-    throw new OPE('operation indicated DPoP use but the request has no DPoP HTTP Header')
+  const headerValue = request.headers.get('dpop')
+  if (headerValue === null) {
+    throw OPE(
+      'operation indicated DPoP use but the request has no DPoP HTTP Header',
+      INVALID_REQUEST,
+      { headers: request.headers },
+    )
   }
 
   if (request.headers.get('authorization')?.toLowerCase().startsWith('dpop ') === false) {
-    throw new OPE(
+    throw OPE(
       `operation indicated DPoP use but the request's Authorization HTTP Header scheme is not DPoP`,
+      INVALID_REQUEST,
+      { headers: request.headers },
     )
   }
 
   if (typeof accessTokenClaims.cnf?.jkt !== 'string') {
-    throw new OPE(
+    throw OPE(
       'operation indicated DPoP use but the JWT Access Token has no jkt confirmation claim',
+      INVALID_REQUEST,
+      { claims: accessTokenClaims },
     )
   }
 
   const clockSkew = getClockSkew(options)
   const proof = await validateJwt(
-    header,
+    headerValue,
     checkSigningAlgorithm.bind(
       undefined,
       undefined,
       as?.dpop_signing_alg_values_supported || SUPPORTED_JWS_ALGS,
     ),
-    async ({ jwk, alg }) => {
+    async (header) => {
+      const { jwk, alg } = header
       if (!jwk) {
-        throw new OPE('DPoP Proof is missing the jwk header parameter')
+        throw OPE('DPoP Proof is missing the jwk header parameter', INVALID_REQUEST, { header })
       }
       const key = await importJwk(alg, jwk)
       if (key.type !== 'public') {
-        throw new OPE('DPoP Proof jwk header parameter must contain a public key')
+        throw OPE('DPoP Proof jwk header parameter must contain a public key', INVALID_REQUEST, {
+          header,
+        })
       }
       return key
     },
@@ -5207,25 +5493,34 @@ async function validateDPoP(
   const now = epochTime() + clockSkew
   const diff = Math.abs(now - proof.claims.iat!)
   if (diff > 300) {
-    throw new OPE('DPoP Proof iat is not recent enough')
+    throw OPE('DPoP Proof iat is not recent enough', JWT_TIMESTAMP_CHECK, {
+      now,
+      claims: proof.claims,
+    }) // TODO: add a symbol skip here for when the RS uses nonces
   }
 
   if (proof.claims.htm !== request.method) {
-    throw new OPE('DPoP Proof htm mismatch')
+    throw OPE('DPoP Proof htm mismatch', JWT_CLAIM_COMPARISON, {
+      expected: request.method,
+      claims: proof.claims,
+    })
   }
 
   if (
     typeof proof.claims.htu !== 'string' ||
     normalizeHtu(proof.claims.htu) !== normalizeHtu(request.url)
   ) {
-    throw new OPE('DPoP Proof htu mismatch')
+    throw OPE('DPoP Proof htu mismatch', JWT_CLAIM_COMPARISON, {
+      expected: normalizeHtu(request.url),
+      claims: proof.claims,
+    })
   }
 
   {
     const expected = b64u(await crypto.subtle.digest('SHA-256', encoder.encode(accessToken)))
 
     if (proof.claims.ath !== expected) {
-      throw new OPE('DPoP Proof ath mismatch')
+      throw OPE('DPoP Proof ath mismatch', JWT_CLAIM_COMPARISON, { expected, claims: proof.claims })
     }
   }
 
@@ -5255,14 +5550,17 @@ async function validateDPoP(
         }
         break
       default:
-        throw new UnsupportedOperationError('unsupported JWK key type')
+        throw new UnsupportedOperationError('unsupported JWK key type', { cause: proof.header.jwk })
     }
     const expected = b64u(
       await crypto.subtle.digest('SHA-256', encoder.encode(JSON.stringify(components))),
     )
 
     if (accessTokenClaims.cnf.jkt !== expected) {
-      throw new OPE('JWT Access Token confirmation mismatch')
+      throw OPE('JWT Access Token confirmation mismatch', JWT_CLAIM_COMPARISON, {
+        expected,
+        claims: accessTokenClaims,
+      })
     }
   }
 }
@@ -5307,16 +5605,16 @@ export async function validateJwtAccessToken(
   assertAs(as)
 
   if (!looseInstanceOf(request, Request)) {
-    throw new TypeError('"request" must be an instance of Request')
+    throw CodedTypeError('"request" must be an instance of Request', ERR_INVALID_ARG_TYPE)
   }
 
-  if (!validateString(expectedAudience)) {
-    throw new OPE('"expectedAudience" must be a non-empty string')
-  }
+  validateString(expectedAudience, '"expectedAudience"')
 
   const authorization = request.headers.get('authorization')
   if (authorization === null) {
-    throw new OPE('"request" is missing an Authorization HTTP Header')
+    throw OPE('"request" is missing an Authorization HTTP Header', INVALID_REQUEST, {
+      headers: request.headers,
+    })
   }
   let { 0: scheme, 1: accessToken, length } = authorization.split(' ')
   scheme = scheme.toLowerCase()
@@ -5325,11 +5623,15 @@ export async function validateJwtAccessToken(
     case 'bearer':
       break
     default:
-      throw new UnsupportedOperationError('unsupported Authorization HTTP Header scheme')
+      throw new UnsupportedOperationError('unsupported Authorization HTTP Header scheme', {
+        cause: { headers: request.headers },
+      })
   }
 
   if (length !== 2) {
-    throw new OPE('invalid Authorization HTTP Header format')
+    throw OPE('invalid Authorization HTTP Header format', INVALID_REQUEST, {
+      headers: request.headers,
+    })
   }
 
   const requiredClaims: (keyof typeof jwtClaimNames)[] = [
@@ -5361,24 +5663,28 @@ export async function validateJwtAccessToken(
 
   for (const claim of ['client_id', 'jti', 'sub']) {
     if (typeof claims[claim] !== 'string') {
-      throw new OPE(`unexpected JWT "${claim}" claim type`)
+      throw OPE(`unexpected JWT "${claim}" claim type`, INVALID_REQUEST, { claims })
     }
   }
 
   if ('cnf' in claims) {
     if (!isJsonObject(claims.cnf)) {
-      throw new OPE('unexpected JWT "cnf" (confirmation) claim value')
+      throw OPE('unexpected JWT "cnf" (confirmation) claim value', INVALID_REQUEST, { claims })
     }
 
     const { 0: cnf, length } = Object.keys(claims.cnf)
 
     if (length) {
       if (length !== 1) {
-        throw new UnsupportedOperationError('multiple confirmation claims are not supported')
+        throw new UnsupportedOperationError('multiple confirmation claims are not supported', {
+          cause: { claims },
+        })
       }
 
       if (cnf !== 'jkt') {
-        throw new UnsupportedOperationError('unsupported JWT Confirmation method')
+        throw new UnsupportedOperationError('unsupported JWT Confirmation method', {
+          cause: { claims },
+        })
       }
     }
   }
