@@ -1113,6 +1113,9 @@ class LRU<T1, T2> {
  * @group Errors
  */
 export class UnsupportedOperationError extends Error {
+  /**
+   * @ignore
+   */
   constructor(message?: string) {
     super(message ?? 'operation not supported')
     this.name = this.constructor.name
@@ -1127,6 +1130,9 @@ export class UnsupportedOperationError extends Error {
 export class OperationProcessingError extends Error {
   code?: string
 
+  /**
+   * @ignore
+   */
   constructor(message?: string, options?: { cause?: unknown; code?: string }) {
     super(message, options)
     this.name = this.constructor.name
@@ -2179,6 +2185,9 @@ export class ResponseBodyError extends Error {
    */
   response!: Response
 
+  /**
+   * @ignore
+   */
   constructor(
     message: string,
     options: {
@@ -2227,6 +2236,9 @@ export class AuthorizationResponseError extends Error {
    */
   error_description?: string
 
+  /**
+   * @ignore
+   */
   constructor(
     message: string,
     options: {
@@ -2275,6 +2287,9 @@ export class WWWAuthenticateChallengeError extends Error {
    */
   status: number
 
+  /**
+   * @ignore
+   */
   constructor(message: string, options: { cause: WWWAuthenticateChallenge[]; response: Response }) {
     super(message, options)
     this.name = this.constructor.name
