@@ -735,7 +735,7 @@ test('processAuthorizationCodeOpenIDResponse() nonce checks', async (t) => {
       ),
       'anotherrandom-value',
     ),
-    { message: 'ID Token "nonce" claim missing' },
+    { message: 'JWT "nonce" (nonce) claim missing' },
   )
 
   await t.notThrowsAsync(

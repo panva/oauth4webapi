@@ -3297,8 +3297,9 @@ async function processGenericAccessTokenResponse(
   as: AuthorizationServer,
   client: Client,
   response: Response,
-  ignoreIdToken = false,
-  ignoreRefreshToken = false,
+  ignoreIdToken: boolean,
+  ignoreRefreshToken: boolean,
+  additionalRequiredIdTokenClaims: (keyof typeof jwtClaimNames)[] | undefined,
 ): Promise<TokenEndpointResponse> {
   assertAs(as)
   assertClient(client)
@@ -3388,6 +3389,12 @@ async function processGenericAccessTokenResponse(
     }
 
     if (json.id_token) {
+      const requiredClaims: (keyof typeof jwtClaimNames)[] = ['aud', 'exp', 'iat', 'iss', 'sub']
+
+      if (additionalRequiredIdTokenClaims?.length) {
+        requiredClaims.push(...additionalRequiredIdTokenClaims)
+      }
+
       const { claims, jwt } = await validateJwt(
         json.id_token,
         checkSigningAlgorithm.bind(
@@ -3401,7 +3408,7 @@ async function processGenericAccessTokenResponse(
         getClockTolerance(client),
         client[jweDecrypt],
       )
-        .then(validatePresence.bind(undefined, ['aud', 'exp', 'iat', 'iss', 'sub']))
+        .then(validatePresence.bind(undefined, requiredClaims))
         .then(validateIssuer.bind(undefined, as.issuer))
         .then(validateAudience.bind(undefined, client.client_id))
 
@@ -3461,7 +3468,20 @@ export async function processRefreshTokenResponse(
   client: Client,
   response: Response,
 ): Promise<TokenEndpointResponse> {
-  return processGenericAccessTokenResponse(as, client, response)
+  const additionalRequiredClaims: (keyof typeof jwtClaimNames)[] = []
+
+  if (client.default_max_age !== undefined) {
+    assertNumber(client.default_max_age, false, '"client.default_max_age"')
+    additionalRequiredClaims.push('auth_time')
+  }
+  return processGenericAccessTokenResponse(
+    as,
+    client,
+    response,
+    false,
+    false,
+    additionalRequiredClaims,
+  )
 }
 
 function validateOptionalAudience(
@@ -3754,29 +3774,41 @@ export async function processAuthorizationCodeOpenIDResponse(
   expectedNonce?: string | typeof expectNoNonce,
   maxAge?: number | typeof skipAuthTimeCheck,
 ): Promise<OpenIDTokenEndpointResponse> {
-  const result = await processGenericAccessTokenResponse(as, client, response)
+  const additionalRequiredClaims: (keyof typeof jwtClaimNames)[] = []
 
-  assertString(result.id_token, '"response" body "id_token" property', USE_OAUTH_CALLBACK, {
-    body: result,
-  })
+  switch (expectedNonce) {
+    case undefined:
+    case expectNoNonce:
+      break
+    default:
+      assertString(expectedNonce, '"expectedNonce" argument')
+      additionalRequiredClaims.push('nonce')
+  }
 
   if (maxAge !== undefined) {
     assertNumber(maxAge, false, '"maxAge" argument')
   } else if (client.default_max_age !== undefined) {
     assertNumber(client.default_max_age, false, '"client.default_max_age"')
   }
-
   maxAge ??= client.default_max_age ?? skipAuthTimeCheck
-  const claims = getValidatedIdTokenClaims(result)!
-  if (
-    (client.require_auth_time || maxAge !== skipAuthTimeCheck) &&
-    claims.auth_time === undefined
-  ) {
-    throw OPE('ID Token "auth_time" (authentication time) claim missing', INVALID_RESPONSE, {
-      claims,
-    })
+  if (maxAge !== skipAuthTimeCheck) {
+    additionalRequiredClaims.push('auth_time')
   }
 
+  const result = await processGenericAccessTokenResponse(
+    as,
+    client,
+    response,
+    false,
+    false,
+    additionalRequiredClaims,
+  )
+
+  assertString(result.id_token, '"response" body "id_token" property', USE_OAUTH_CALLBACK, {
+    body: result,
+  })
+
+  const claims = getValidatedIdTokenClaims(result)!
   if (maxAge !== skipAuthTimeCheck) {
     const now = epochTime() + getClockSkew(client)
     const tolerance = getClockTolerance(client)
@@ -3789,31 +3821,18 @@ export async function processAuthorizationCodeOpenIDResponse(
     }
   }
 
-  switch (expectedNonce) {
-    case undefined:
-    case expectNoNonce:
-      if (claims.nonce !== undefined) {
-        throw OPE('unexpected ID Token "nonce" claim value', JWT_CLAIM_COMPARISON, {
-          expected: undefined,
-          claims,
-        })
-      }
-      break
-    default:
-      assertString(expectedNonce, '"expectedNonce" argument')
-
-      if (claims.nonce === undefined) {
-        throw OPE('ID Token "nonce" claim missing', INVALID_RESPONSE, {
-          expected: expectedNonce,
-          claims,
-        })
-      }
-      if (claims.nonce !== expectedNonce) {
-        throw OPE('unexpected ID Token "nonce" claim value', JWT_CLAIM_COMPARISON, {
-          expected: expectedNonce,
-          claims,
-        })
-      }
+  if (expectedNonce === expectNoNonce) {
+    if (claims.nonce !== undefined) {
+      throw OPE('unexpected ID Token "nonce" claim value', JWT_CLAIM_COMPARISON, {
+        expected: undefined,
+        claims,
+      })
+    }
+  } else if (claims.nonce !== expectedNonce) {
+    throw OPE('unexpected ID Token "nonce" claim value', JWT_CLAIM_COMPARISON, {
+      expected: expectedNonce,
+      claims,
+    })
   }
 
   return result as OpenIDTokenEndpointResponse
@@ -3841,7 +3860,14 @@ export async function processAuthorizationCodeOAuth2Response(
   client: Client,
   response: Response,
 ): Promise<OAuth2TokenEndpointResponse> {
-  const result = await processGenericAccessTokenResponse(as, client, response, true)
+  const result = await processGenericAccessTokenResponse(
+    as,
+    client,
+    response,
+    true,
+    false,
+    undefined,
+  )
 
   if (result.id_token !== undefined) {
     throw OPE(
@@ -4078,7 +4104,14 @@ export async function processClientCredentialsResponse(
   client: Client,
   response: Response,
 ): Promise<ClientCredentialsGrantResponse> {
-  const result = await processGenericAccessTokenResponse(as, client, response, true, true)
+  const result = await processGenericAccessTokenResponse(
+    as,
+    client,
+    response,
+    true,
+    true,
+    undefined,
+  )
 
   return result as ClientCredentialsGrantResponse
 }
@@ -5421,7 +5454,21 @@ export async function processDeviceCodeResponse(
   client: Client,
   response: Response,
 ): Promise<TokenEndpointResponse> {
-  return processGenericAccessTokenResponse(as, client, response)
+  const additionalRequiredClaims: (keyof typeof jwtClaimNames)[] = []
+
+  if (client.default_max_age !== undefined) {
+    assertNumber(client.default_max_age, false, '"client.default_max_age"')
+    additionalRequiredClaims.push('auth_time')
+  }
+
+  return processGenericAccessTokenResponse(
+    as,
+    client,
+    response,
+    false,
+    false,
+    additionalRequiredClaims,
+  )
 }
 
 export interface GenerateKeyPairOptions {
