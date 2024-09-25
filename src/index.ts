@@ -1134,12 +1134,14 @@ class LRU<T1, T2> {
  * @group Errors
  */
 export class UnsupportedOperationError extends Error {
+  code: string
   /**
    * @ignore
    */
   constructor(message?: string, options?: { cause?: unknown }) {
     super(message ?? 'operation not supported', options)
     this.name = this.constructor.name
+    this.code = UNSUPPORTED_OPERATION
     // @ts-ignore
     Error.captureStackTrace?.(this, this.constructor)
   }
@@ -2255,6 +2257,8 @@ export class ResponseBodyError extends Error {
    */
   override cause!: Record<string, JsonValue | undefined>
 
+  code: string
+
   /**
    * Error code given in the JSON response
    */
@@ -2289,6 +2293,7 @@ export class ResponseBodyError extends Error {
   ) {
     super(message, options)
     this.name = this.constructor.name
+    this.code = RESPONSE_BODY_ERROR
     this.error = options.cause.error
     this.status = options.response.status
     this.error_description = options.cause.error_description
@@ -2317,6 +2322,8 @@ export class AuthorizationResponseError extends Error {
    */
   override cause!: URLSearchParams
 
+  code: string
+
   /**
    * Error code given in the Authorization Response
    */
@@ -2339,6 +2346,7 @@ export class AuthorizationResponseError extends Error {
   ) {
     super(message, options)
     this.name = this.constructor.name
+    this.code = AUTHORIZATION_RESPONSE_ERROR
     this.error = options.cause.get('error')!
     this.error_description = options.cause.get('error_description') ?? undefined
 
@@ -2368,6 +2376,8 @@ export class WWWAuthenticateChallengeError extends Error {
    */
   override cause!: WWWAuthenticateChallenge[]
 
+  code: string
+
   /**
    * The {@link !Response} that included a WWW-Authenticate HTTP Header challenges, its
    * {@link !Response.bodyUsed} is `true`
@@ -2385,6 +2395,7 @@ export class WWWAuthenticateChallengeError extends Error {
   constructor(message: string, options: { cause: WWWAuthenticateChallenge[]; response: Response }) {
     super(message, options)
     this.name = this.constructor.name
+    this.code = WWW_AUTHENTICATE_CHALLENGE
     this.status = options.response.status
     this.response = options.response
     Object.defineProperty(this, 'response', { enumerable: false })
@@ -3856,51 +3867,121 @@ export async function processAuthorizationCodeOAuth2Response(
 }
 
 /**
- * @ignore
+ * @group Error Codes
+ *
+ * @see {@link WWWAuthenticateChallengeError}
+ */
+export const WWW_AUTHENTICATE_CHALLENGE = 'OAUTH_WWW_AUTHENTICATE_CHALLENGE'
+/**
+ * @group Error Codes
+ *
+ * @see {@link ResponseBodyError}
+ */
+export const RESPONSE_BODY_ERROR = 'OAUTH_RESPONSE_BODY_ERROR'
+/**
+ * @group Error Codes
+ *
+ * @see {@link UnsupportedOperationError}
+ */
+export const UNSUPPORTED_OPERATION = 'OAUTH_UNSUPPORTED_OPERATION'
+/**
+ * @group Error Codes
+ *
+ * @see {@link AuthorizationResponseError}
+ */
+export const AUTHORIZATION_RESPONSE_ERROR = 'OAUTH_AUTHORIZATION_RESPONSE_ERROR'
+/**
+ * Assigned as {@link OperationProcessingError.code} when a JWT UserInfo Response was expected but a
+ * regular JSON one was given instead.
+ *
+ * @group Error Codes
  */
 export const JWT_USERINFO_EXPECTED = 'OAUTH_JWT_USERINFO_EXPECTED'
 /**
- * @ignore
+ * Assigned as {@link OperationProcessingError.code} when the following fails to parse as JSON
+ *
+ * - JWS/JWE Headers
+ * - JSON response bodies
+ * - "claims" authorization request parameters
+ * - "authorization_details" authorization request parameters
+ *
+ * @group Error Codes
  */
 export const PARSE_ERROR = 'OAUTH_PARSE_ERROR'
 /**
- * @ignore
+ * Assigned as {@link OperationProcessingError.code} when authorization server responses are invalid.
+ *
+ * @group Error Codes
  */
 export const INVALID_RESPONSE = 'OAUTH_INVALID_RESPONSE'
 /**
- * @ignore
+ * Assigned as {@link OperationProcessingError.code} during {@link validateJwtAccessToken} when the
+ * request or its contents are invalid.
+ *
+ * @group Error Codes
  */
 export const INVALID_REQUEST = 'OAUTH_INVALID_REQUEST'
 /**
- * @ignore
+ * Assigned as {@link OperationProcessingError.code} during
+ * {@link processAuthorizationCodeOAuth2Response} when the response constains an OpenID Connect which
+ * indicates that {@link processAuthorizationCodeOpenIDResponse} should have been used instead.
+ *
+ * @group Error Codes
  */
 export const USE_OPENID_CALLBACK = 'OAUTH_USE_OPENID_CALLBACK'
 /**
- * @ignore
+ * Assigned as {@link OperationProcessingError.code} during
+ * {@link processAuthorizationCodeOpenIDResponse} when the response doesn't have an OpenID Connect ID
+ * Token, this indicates either a non-conform Authorization Server or that you should use
+ * {@link processAuthorizationCodeOAuth2Response} instead.
+ *
+ * @group Error Codes
  */
 export const USE_OAUTH_CALLBACK = 'OAUTH_USE_OAUTH_CALLBACK'
 /**
- * @ignore
+ * Assigned as {@link OperationProcessingError.code} when a {@link !Response} does not have the
+ * expected `application/json` response-type HTTP Header.
+ *
+ * @group Error Codes
  */
 export const RESPONSE_IS_NOT_JSON = 'OAUTH_RESPONSE_IS_NOT_JSON'
 /**
- * @ignore
+ * Assigned as {@link OperationProcessingError.code} when a {@link !Response} does not have the
+ * expected success HTTP Status Code as defined by its specification.
+ *
+ * @group Error Codes
  */
 export const RESPONSE_IS_NOT_CONFORM = 'OAUTH_RESPONSE_IS_NOT_CONFORM'
 /**
- * @ignore
+ * Assigned as {@link OperationProcessingError.code} when a request is about to made to a non-TLS
+ * secured HTTP endpoint and {@link allowInsecureRequests} is not provided.
+ *
+ * @group Error Codes
  */
 export const HTTP_REQUEST_FORBIDDEN = 'OAUTH_HTTP_REQUEST_FORBIDDEN'
 /**
- * @ignore
+ * Assigned as {@link OperationProcessingError.code} when a JWT NumericDate comparison with the
+ * current timestamp fails.
+ *
+ * @group Error Codes
+ *
+ * @see {@link https://www.rfc-editor.org/rfc/rfc7519.html#section-2 JSON Web Token (JWT)}
  */
 export const JWT_TIMESTAMP_CHECK = 'OAUTH_JWT_TIMESTAMP_CHECK_FAILED'
 /**
- * @ignore
+ * Assigned as {@link OperationProcessingError.code} when a JWT claim is not of a given expected
+ * value.
+ *
+ * @group Error Codes
+ *
+ * @see {@link https://www.rfc-editor.org/rfc/rfc7519.html#section-2 JSON Web Token (JWT)}
  */
 export const JWT_CLAIM_COMPARISON = 'OAUTH_JWT_CLAIM_COMPARISON_FAILED'
 /**
- * @ignore
+ * Assigned as {@link OperationProcessingError.code} when a {@link !Response} JSON body attribute is
+ * not of a given expected value.
+ *
+ * @group Error Codes
  */
 export const JSON_ATTRIBUTE_COMPARISON = 'OAUTH_JSON_ATTRIBUTE_COMPARISON_FAILED'
 /**
@@ -5689,6 +5770,7 @@ export async function validateJwtAccessToken(
     .then(validatePresence.bind(undefined, requiredClaims))
     .then(validateIssuer.bind(undefined, as.issuer))
     .then(validateAudience.bind(undefined, expectedAudience))
+    .catch(reassignRSCode)
 
   for (const claim of ['client_id', 'jti', 'sub']) {
     if (typeof claims[claim] !== 'string') {
@@ -5724,8 +5806,15 @@ export async function validateJwtAccessToken(
     claims.cnf?.jkt !== undefined ||
     request.headers.has('dpop')
   ) {
-    await validateDPoP(request, accessToken, claims, options)
+    await validateDPoP(request, accessToken, claims, options).catch(reassignRSCode)
   }
 
   return claims as JWTAccessTokenClaims
+}
+
+function reassignRSCode(err: unknown): never {
+  if (err instanceof OperationProcessingError && err?.code === INVALID_REQUEST) {
+    err.code = INVALID_RESPONSE
+  }
+  throw err
 }
