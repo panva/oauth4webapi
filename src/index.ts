@@ -2195,7 +2195,7 @@ export async function pushedAuthorizationRequest(
     as,
     'pushed_authorization_request_endpoint',
     client.use_mtls_endpoint_aliases,
-    options?.[allowInsecureRequests],
+    options?.[allowInsecureRequests] !== true,
   )
 
   const body = new URLSearchParams(parameters)

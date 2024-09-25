@@ -117,7 +117,10 @@ export default (QUnit: QUnit) => {
       let request_uri!: string
       if (par) {
         const pushedAuthorizationRequest = () =>
-          lib.pushedAuthorizationRequest(as, client, params, { DPoP })
+          lib.pushedAuthorizationRequest(as, client, params, {
+            DPoP,
+            [lib.allowInsecureRequests]: true,
+          })
         let response = await pushedAuthorizationRequest()
 
         const processPushedAuthorizationResponse = () =>
