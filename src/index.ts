@@ -1411,7 +1411,7 @@ export async function discoveryRequest(
   }).then(processDpopNonce)
 }
 
-function validateNumber(
+function assertNumber(
   input: unknown,
   allow0: boolean,
   it: string,
@@ -1439,7 +1439,7 @@ function validateNumber(
   }
 }
 
-function validateString(
+function assertString(
   input: unknown,
   it: string,
   code?: string,
@@ -1510,7 +1510,7 @@ export async function processDiscoveryResponse(
     throw OPE('"response" body must be a top level object', INVALID_RESPONSE, { body: json })
   }
 
-  validateString(json.issuer, '"response" body "issuer" property', INVALID_RESPONSE, { body: json })
+  assertString(json.issuer, '"response" body "issuer" property', INVALID_RESPONSE, { body: json })
 
   if (new URL(json.issuer).href !== expectedIssuerIdentifier.href) {
     throw OPE(
@@ -1608,7 +1608,7 @@ export function generateRandomNonce(): string {
  * @see [RFC 7636 - Proof Key for Code Exchange (PKCE)](https://www.rfc-editor.org/rfc/rfc7636.html#section-4)
  */
 export async function calculatePKCECodeChallenge(codeVerifier: string): Promise<string> {
-  validateString(codeVerifier, 'codeVerifier')
+  assertString(codeVerifier, 'codeVerifier')
 
   return b64u(await crypto.subtle.digest('SHA-256', buf(codeVerifier)))
 }
@@ -1629,7 +1629,7 @@ function getKeyAndKid(input: CryptoKey | PrivateKey | undefined): NormalizedKeyI
   }
 
   if (input.kid !== undefined) {
-    validateString(input.kid, '"kid"')
+    assertString(input.kid, '"kid"')
   }
 
   return {
@@ -1848,22 +1848,20 @@ async function privateKeyJwt(
   return signJwt(header, payload, key)
 }
 
-function assertAs(as: AuthorizationServer): as is AuthorizationServer {
+function assertAs(as: AuthorizationServer): asserts as is AuthorizationServer {
   if (typeof as !== 'object' || as === null) {
     throw CodedTypeError('"as" must be an object', ERR_INVALID_ARG_TYPE)
   }
 
-  validateString(as.issuer, '"as.issuer"')
-  return true
+  assertString(as.issuer, '"as.issuer"')
 }
 
-function assertClient(client: Client): client is Client {
+function assertClient(client: Client): asserts client is Client {
   if (typeof client !== 'object' || client === null) {
     throw CodedTypeError('"client" must be an object', ERR_INVALID_ARG_TYPE)
   }
 
-  validateString(client.client_id, '"client.client_id"')
-  return true
+  assertString(client.client_id, '"client.client_id"')
 }
 
 function assertNoClientPrivateKey(
@@ -1908,14 +1906,14 @@ async function clientAuthentication(
     case undefined: // Fall through
     case 'client_secret_post': {
       assertNoClientPrivateKey('client_secret_post', clientPrivateKey)
-      validateString(client.client_secret, '"client.client_secret"')
+      assertString(client.client_secret, '"client.client_secret"')
       body.set('client_id', client.client_id)
       body.set('client_secret', client.client_secret)
       break
     }
     case 'client_secret_basic': {
       assertNoClientPrivateKey('client_secret_basic', clientPrivateKey)
-      validateString(client.client_secret, '"client.client_secret"')
+      assertString(client.client_secret, '"client.client_secret"')
       headers.set('authorization', clientSecretBasic(client.client_id, client.client_secret))
       break
     }
@@ -2020,7 +2018,7 @@ export async function issueRequestObject(
     if (value !== null) {
       claims.max_age = parseInt(value, 10)
 
-      validateNumber(claims.max_age, true, '"max_age" parameter')
+      assertNumber(claims.max_age, true, '"max_age" parameter')
     }
   }
 
@@ -2092,7 +2090,7 @@ async function dpopProofJwt(
   assertPublicKey(publicKey, '"DPoP.publicKey"')
 
   if (nonce !== undefined) {
-    validateString(nonce, '"DPoP.nonce"')
+    assertString(nonce, '"DPoP.nonce"')
   }
 
   if (!publicKey.extractable) {
@@ -2142,10 +2140,7 @@ function validateEndpoint(
   useMtlsAlias: boolean | undefined,
   enforceHttps: boolean | undefined,
 ) {
-  validateString(
-    value,
-    useMtlsAlias ? `"as.mtls_endpoint_aliases.${endpoint}"` : `"as.${endpoint}"`,
-  )
+  assertString(value, useMtlsAlias ? `"as.mtls_endpoint_aliases.${endpoint}"` : `"as.${endpoint}"`)
 
   const url = new URL(value)
 
@@ -2562,17 +2557,13 @@ export async function processPushedAuthorizationResponse(
     throw OPE('"response" body must be a top level object', INVALID_RESPONSE, { body: json })
   }
 
-  validateString(json.request_uri, '"response" body "request_uri" property', INVALID_RESPONSE, {
+  assertString(json.request_uri, '"response" body "request_uri" property', INVALID_RESPONSE, {
     body: json,
   })
 
-  validateNumber(
-    json.expires_in,
-    false,
-    '"response" body "expires_in" property',
-    INVALID_RESPONSE,
-    { body: json },
-  )
+  assertNumber(json.expires_in, false, '"response" body "expires_in" property', INVALID_RESPONSE, {
+    body: json,
+  })
 
   return json
 }
@@ -2619,7 +2610,7 @@ export async function protectedResourceRequest(
   body?: ProtectedResourceRequestBody,
   options?: ProtectedResourceRequestOptions,
 ): Promise<Response> {
-  validateString(accessToken, '"accessToken"')
+  assertString(accessToken, '"accessToken"')
 
   if (!(url instanceof URL)) {
     throw CodedTypeError('"url" must be an instance of URL', ERR_INVALID_ARG_TYPE)
@@ -3014,13 +3005,13 @@ export async function processUserInfoResponse(
     throw OPE('"response" body must be a top level object', INVALID_RESPONSE, { body: json })
   }
 
-  validateString(json.sub, '"response" body "sub" property', INVALID_RESPONSE, { body: json })
+  assertString(json.sub, '"response" body "sub" property', INVALID_RESPONSE, { body: json })
 
   switch (expectedSubject) {
     case skipSubjectCheck:
       break
     default:
-      validateString(expectedSubject, '"expectedSubject"')
+      assertString(expectedSubject, '"expectedSubject"')
 
       if (json.sub !== expectedSubject) {
         throw OPE('unexpected "response" body "sub" property value', JSON_ATTRIBUTE_COMPARISON, {
@@ -3112,7 +3103,7 @@ export async function refreshTokenGrantRequest(
   assertAs(as)
   assertClient(client)
 
-  validateString(refreshToken, '"refreshToken"')
+  assertString(refreshToken, '"refreshToken"')
 
   const parameters = new URLSearchParams(options?.additionalParameters)
   parameters.set('refresh_token', refreshToken)
@@ -3353,11 +3344,11 @@ async function processGenericAccessTokenResponse(
     throw OPE('"response" body must be a top level object', INVALID_RESPONSE, { body: json })
   }
 
-  validateString(json.access_token, '"response" body "access_token" property', INVALID_RESPONSE, {
+  assertString(json.access_token, '"response" body "access_token" property', INVALID_RESPONSE, {
     body: json,
   })
 
-  validateString(json.token_type, '"response" body "token_type" property', INVALID_RESPONSE, {
+  assertString(json.token_type, '"response" body "token_type" property', INVALID_RESPONSE, {
     body: json,
   })
 
@@ -3369,7 +3360,7 @@ async function processGenericAccessTokenResponse(
   }
 
   if (json.expires_in !== undefined) {
-    validateNumber(
+    assertNumber(
       json.expires_in,
       false,
       '"response" body "expires_in" property',
@@ -3379,12 +3370,9 @@ async function processGenericAccessTokenResponse(
   }
 
   if (!ignoreRefreshToken && json.refresh_token !== undefined) {
-    validateString(
-      json.refresh_token,
-      '"response" body "refresh_token" property',
-      INVALID_RESPONSE,
-      { body: json },
-    )
+    assertString(json.refresh_token, '"response" body "refresh_token" property', INVALID_RESPONSE, {
+      body: json,
+    })
   }
 
   // allows empty
@@ -3394,7 +3382,7 @@ async function processGenericAccessTokenResponse(
 
   if (!ignoreIdToken) {
     if (json.id_token !== undefined) {
-      validateString(json.id_token, '"response" body "id_token" property', INVALID_RESPONSE, {
+      assertString(json.id_token, '"response" body "id_token" property', INVALID_RESPONSE, {
         body: json,
       })
     }
@@ -3435,7 +3423,7 @@ async function processGenericAccessTokenResponse(
       }
 
       if (claims.auth_time !== undefined) {
-        validateNumber(
+        assertNumber(
           claims.auth_time,
           false,
           'ID Token "auth_time" (authentication time)',
@@ -3564,9 +3552,9 @@ export async function authorizationCodeGrantRequest(
     )
   }
 
-  validateString(redirectUri, '"redirectUri"')
+  assertString(redirectUri, '"redirectUri"')
 
-  validateString(codeVerifier, '"codeVerifier"')
+  assertString(codeVerifier, '"codeVerifier"')
 
   const code = getURLSearchParameter(callbackParameters, 'code')
   if (!code) {
@@ -3768,14 +3756,14 @@ export async function processAuthorizationCodeOpenIDResponse(
 ): Promise<OpenIDTokenEndpointResponse> {
   const result = await processGenericAccessTokenResponse(as, client, response)
 
-  validateString(result.id_token, '"response" body "id_token" property', USE_OAUTH_CALLBACK, {
+  assertString(result.id_token, '"response" body "id_token" property', USE_OAUTH_CALLBACK, {
     body: result,
   })
 
   if (maxAge !== undefined) {
-    validateNumber(maxAge, false, '"maxAge" argument')
+    assertNumber(maxAge, false, '"maxAge" argument')
   } else if (client.default_max_age !== undefined) {
-    validateNumber(client.default_max_age, false, '"client.default_max_age"')
+    assertNumber(client.default_max_age, false, '"client.default_max_age"')
   }
 
   maxAge ??= client.default_max_age ?? skipAuthTimeCheck
@@ -3812,7 +3800,7 @@ export async function processAuthorizationCodeOpenIDResponse(
       }
       break
     default:
-      validateString(expectedNonce, '"expectedNonce" argument')
+      assertString(expectedNonce, '"expectedNonce" argument')
 
       if (claims.nonce === undefined) {
         throw OPE('ID Token "nonce" claim missing', INVALID_RESPONSE, {
@@ -4064,7 +4052,7 @@ export async function genericTokenEndpointRequest(
   assertAs(as)
   assertClient(client)
 
-  validateString(grantType, '"grantType"')
+  assertString(grantType, '"grantType"')
 
   return tokenEndpointRequest(as, client, grantType, new URLSearchParams(parameters), options)
 }
@@ -4126,7 +4114,7 @@ export async function revocationRequest(
   assertAs(as)
   assertClient(client)
 
-  validateString(token, '"token"')
+  assertString(token, '"token"')
 
   const url = resolveEndpoint(
     as,
@@ -4207,7 +4195,7 @@ export interface IntrospectionRequestOptions
   requestJwtResponse?: boolean
 }
 
-function assertReadableResponse(response: Response) {
+function assertReadableResponse(response: Response): void {
   if (response.bodyUsed) {
     throw CodedTypeError('"response" body has been used already', ERR_INVALID_ARG_VALUE)
   }
@@ -4236,7 +4224,7 @@ export async function introspectionRequest(
   assertAs(as)
   assertClient(client)
 
-  validateString(token, '"token"')
+  assertString(token, '"token"')
 
   const url = resolveEndpoint(
     as,
@@ -4852,7 +4840,7 @@ export async function validateDetachedSignatureResponse(
     case expectNoState:
       break
     default:
-      validateString(expectedState, '"expectedState" argument')
+      assertString(expectedState, '"expectedState" argument')
   }
 
   const result = validateAuthResponse(
@@ -4889,9 +4877,9 @@ export async function validateDetachedSignatureResponse(
   }
 
   if (maxAge !== undefined) {
-    validateNumber(maxAge, false, '"maxAge" argument')
+    assertNumber(maxAge, false, '"maxAge" argument')
   } else if (client.default_max_age !== undefined) {
-    validateNumber(client.default_max_age, false, '"client.default_max_age"')
+    assertNumber(client.default_max_age, false, '"client.default_max_age"')
   }
 
   maxAge ??= client.default_max_age ?? skipAuthTimeCheck
@@ -4926,7 +4914,7 @@ export async function validateDetachedSignatureResponse(
     )
   }
 
-  validateString(claims.c_hash, 'ID Token "c_hash" (code hash) claim value', INVALID_RESPONSE, {
+  assertString(claims.c_hash, 'ID Token "c_hash" (code hash) claim value', INVALID_RESPONSE, {
     claims,
   })
 
@@ -4939,10 +4927,10 @@ export async function validateDetachedSignatureResponse(
   }
 
   if (state !== null || claims.s_hash !== undefined) {
-    validateString(claims.s_hash, 'ID Token "s_hash" (state hash) claim value', INVALID_RESPONSE, {
+    assertString(claims.s_hash, 'ID Token "s_hash" (state hash) claim value', INVALID_RESPONSE, {
       claims,
     })
-    validateString(state, '"state" response parameter', INVALID_RESPONSE, { parameters })
+    assertString(state, '"state" response parameter', INVALID_RESPONSE, { parameters })
 
     if ((await idTokenHashMatches(state, claims.s_hash, key!, header, 's_hash')) !== true) {
       throw OPE('invalid ID Token "s_hash" (state hash) claim value', JWT_CLAIM_COMPARISON, {
@@ -4954,7 +4942,7 @@ export async function validateDetachedSignatureResponse(
   }
 
   if (claims.auth_time !== undefined) {
-    validateNumber(
+    assertNumber(
       claims.auth_time,
       false,
       'ID Token "auth_time" (authentication time)',
@@ -4975,7 +4963,7 @@ export async function validateDetachedSignatureResponse(
     }
   }
 
-  validateString(expectedNonce, '"expectedNonce" argument')
+  assertString(expectedNonce, '"expectedNonce" argument')
 
   if (claims.nonce !== expectedNonce) {
     throw OPE('unexpected ID Token "nonce" claim value', JWT_CLAIM_COMPARISON, {
@@ -5160,7 +5148,7 @@ export function validateAuthResponse(
     case skipStateCheck:
       break
     default:
-      validateString(expectedState, '"expectedState" argument')
+      assertString(expectedState, '"expectedState" argument')
 
       if (state !== expectedState) {
         throw OPE(
@@ -5342,29 +5330,25 @@ export async function processDeviceAuthorizationResponse(
     throw OPE('"response" body must be a top level object', INVALID_RESPONSE, { body: json })
   }
 
-  validateString(json.device_code, '"response" body "device_code" property', INVALID_RESPONSE, {
+  assertString(json.device_code, '"response" body "device_code" property', INVALID_RESPONSE, {
     body: json,
   })
-  validateString(json.user_code, '"response" body "user_code" property', INVALID_RESPONSE, {
+  assertString(json.user_code, '"response" body "user_code" property', INVALID_RESPONSE, {
     body: json,
   })
-  validateString(
+  assertString(
     json.verification_uri,
     '"response" body "verification_uri" property',
     INVALID_RESPONSE,
     { body: json },
   )
 
-  validateNumber(
-    json.expires_in,
-    false,
-    '"response" body "expires_in" property',
-    INVALID_RESPONSE,
-    { body: json },
-  )
+  assertNumber(json.expires_in, false, '"response" body "expires_in" property', INVALID_RESPONSE, {
+    body: json,
+  })
 
   if (json.verification_uri_complete !== undefined) {
-    validateString(
+    assertString(
       json.verification_uri_complete,
       '"response" body "verification_uri_complete" property',
       INVALID_RESPONSE,
@@ -5373,7 +5357,7 @@ export async function processDeviceAuthorizationResponse(
   }
 
   if (json.interval !== undefined) {
-    validateNumber(json.interval, false, '"response" body "interval" property', INVALID_RESPONSE, {
+    assertNumber(json.interval, false, '"response" body "interval" property', INVALID_RESPONSE, {
       body: json,
     })
   }
@@ -5403,7 +5387,7 @@ export async function deviceCodeGrantRequest(
   assertAs(as)
   assertClient(client)
 
-  validateString(deviceCode, '"deviceCode"')
+  assertString(deviceCode, '"deviceCode"')
 
   const parameters = new URLSearchParams(options?.additionalParameters)
   parameters.set('device_code', deviceCode)
@@ -5468,7 +5452,7 @@ export async function generateKeyPair(
   alg: JWSAlgorithm,
   options?: GenerateKeyPairOptions,
 ): Promise<CryptoKeyPair> {
-  validateString(alg, '"alg"')
+  assertString(alg, '"alg"')
 
   const algorithm: RsaHashedKeyGenParams | EcKeyGenParams | AlgorithmIdentifier = algToSubtle(
     alg,
@@ -5713,7 +5697,7 @@ export async function validateJwtAccessToken(
     throw CodedTypeError('"request" must be an instance of Request', ERR_INVALID_ARG_TYPE)
   }
 
-  validateString(expectedAudience, '"expectedAudience"')
+  assertString(expectedAudience, '"expectedAudience"')
 
   const authorization = request.headers.get('authorization')
   if (authorization === null) {
