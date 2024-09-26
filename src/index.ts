@@ -3324,7 +3324,7 @@ async function processGenericAccessTokenResponse(
   if (response.status !== 200) {
     let err: OAuth2Error | undefined
     if ((err = await handleOAuthBodyError(response))) {
-      await response.body!.cancel()
+      await response.body?.cancel()
       throw new ResponseBodyError('server responded with an error in the response body', {
         cause: err,
         response,
@@ -4101,6 +4101,30 @@ export async function genericTokenEndpointRequest(
   assertString(grantType, '"grantType"')
 
   return tokenEndpointRequest(as, client, grantType, new URLSearchParams(parameters), options)
+}
+
+/**
+ * Validates Token Endpoint {@link !Response} instance to be one coming from the
+ * {@link AuthorizationServer.token_endpoint `as.token_endpoint`}.
+ *
+ * @param as Authorization Server Metadata.
+ * @param client Client Metadata.
+ * @param response Resolved value from {@link genericTokenEndpointRequest}.
+ *
+ * @group JWT Bearer Token Grant Type
+ * @group SAML 2.0 Bearer Assertion Grant Type
+ * @group Token Exchange Grant Type
+ *
+ * @see {@link https://www.rfc-editor.org/rfc/rfc8693.html Token Exchange Grant Type}
+ * @see {@link https://www.rfc-editor.org/rfc/rfc7523.html#section-2.1 JWT Bearer Token Grant Type}
+ * @see {@link https://www.rfc-editor.org/rfc/rfc7522.html#section-2.1 SAML 2.0 Bearer Assertion Grant Type}
+ */
+export async function processGenericTokenEndpointResponse(
+  as: AuthorizationServer,
+  client: Client,
+  response: Response,
+): Promise<TokenEndpointResponse> {
+  return processGenericAccessTokenResponse(as, client, response)
 }
 
 /**

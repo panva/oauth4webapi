@@ -82,27 +82,31 @@ export default (QUnit: QUnit) => {
       {
         let clientCredentialsGrantRequest: () => ReturnType<
           typeof lib.clientCredentialsGrantRequest
-        >
+        > = async () => {
+          if (random()) {
+            return lib.clientCredentialsGrantRequest(as, client, params, {
+              DPoP,
+              [lib.allowInsecureRequests]: true,
+              ...authenticated,
+            })
+          }
 
-        if (random()) {
-          clientCredentialsGrantRequest = () =>
-            lib.clientCredentialsGrantRequest(as, client, params, {
-              DPoP,
-              [lib.allowInsecureRequests]: true,
-              ...authenticated,
-            })
-        } else {
-          clientCredentialsGrantRequest = () =>
-            lib.genericTokenEndpointRequest(as, client, 'client_credentials', params, {
-              DPoP,
-              [lib.allowInsecureRequests]: true,
-              ...authenticated,
-            })
+          return lib.genericTokenEndpointRequest(as, client, 'client_credentials', params, {
+            DPoP,
+            [lib.allowInsecureRequests]: true,
+            ...authenticated,
+          })
         }
         let response = await clientCredentialsGrantRequest()
 
-        const processClientCredentialsResponse = () =>
-          lib.processClientCredentialsResponse(as, client, response)
+        const processClientCredentialsResponse = () => {
+          if (random()) {
+            return lib.processClientCredentialsResponse(as, client, response)
+          }
+
+          return lib.processGenericTokenEndpointResponse(as, client, response)
+        }
+
         let result = await processClientCredentialsResponse().catch(async (err) => {
           if (isDpopNonceError(t, err)) {
             response = await clientCredentialsGrantRequest()
