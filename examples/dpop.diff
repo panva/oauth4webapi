@@ -1,5 +1,5 @@
 diff --git a/examples/oauth.ts b/examples/dpop.ts
-index 6f4b65e..ff21863 100644
+index d8185be..a4a57a1 100644
 --- a/examples/oauth.ts
 +++ b/examples/dpop.ts
 @@ -15,6 +15,12 @@ let client_secret!: string
@@ -31,16 +31,16 @@ index 6f4b65e..ff21863 100644
 +
 +  let response = await authorizationCodeGrantRequest()
 +
-+  const processAuthorizationCodeOAuth2Response = () =>
-+    oauth.processAuthorizationCodeOAuth2Response(as, client, response)
++  const processAuthorizationCodeResponse = () =>
++    oauth.processAuthorizationCodeResponse(as, client, response)
  
--  const result = await oauth.processAuthorizationCodeOAuth2Response(as, client, response)
-+  let result = await processAuthorizationCodeOAuth2Response().catch(async (err) => {
+-  const result = await oauth.processAuthorizationCodeResponse(as, client, response)
++  let result = await processAuthorizationCodeResponse().catch(async (err) => {
 +    if (err instanceof oauth.ResponseBodyError) {
 +      if (result.error === 'use_dpop_nonce') {
 +        // the AS-signalled nonce is now cached, retrying
 +        response = await authorizationCodeGrantRequest()
-+        return processAuthorizationCodeOAuth2Response()
++        return processAuthorizationCodeResponse()
 +      }
 +    }
 +    throw err

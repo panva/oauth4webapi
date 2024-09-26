@@ -1,5 +1,5 @@
 diff --git a/examples/oauth.ts b/examples/oidc.ts
-index 6f4b65e..7edd516 100644
+index d8185be..3426a96 100644
 --- a/examples/oauth.ts
 +++ b/examples/oidc.ts
 @@ -36,7 +36,7 @@ const code_challenge_method = 'S256'
@@ -46,12 +46,14 @@ index 6f4b65e..7edd516 100644
  
    const response = await oauth.authorizationCodeGrantRequest(
      as,
-@@ -75,19 +76,19 @@ let access_token: string
+@@ -75,19 +76,21 @@ let access_token: string
      code_verifier,
    )
  
--  const result = await oauth.processAuthorizationCodeOAuth2Response(as, client, response)
-+  const result = await oauth.processAuthorizationCodeOpenIDResponse(as, client, response, nonce)
+-  const result = await oauth.processAuthorizationCodeResponse(as, client, response)
++  const result = await oauth.processAuthorizationCodeResponse(as, client, response, {
++    expectedNonce: nonce,
++  })
  
    console.log('Access Token Response', result)
    ;({ access_token } = result)

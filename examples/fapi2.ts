@@ -101,15 +101,15 @@ let access_token: string
 
   let response = await authorizationCodeGrantRequest()
 
-  const processAuthorizationCodeOAuth2Response = () =>
-    oauth.processAuthorizationCodeOAuth2Response(as, client, response)
+  const processAuthorizationCodeResponse = () =>
+    oauth.processAuthorizationCodeResponse(as, client, response)
 
-  let result = await processAuthorizationCodeOAuth2Response().catch(async (err) => {
+  let result = await processAuthorizationCodeResponse().catch(async (err) => {
     if (err instanceof oauth.ResponseBodyError) {
       if (result.error === 'use_dpop_nonce') {
         // the AS-signalled nonce is now cached, retrying
         response = await authorizationCodeGrantRequest()
-        return processAuthorizationCodeOAuth2Response()
+        return processAuthorizationCodeResponse()
       }
     }
     throw err

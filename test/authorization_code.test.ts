@@ -240,36 +240,27 @@ test('authorizationCodeGrantRequest() w/ DPoP', async (t) => {
   )
 })
 
-test('processAuthorizationCodeOAuth2Response()', async (t) => {
-  await t.throwsAsync(lib.processAuthorizationCodeOAuth2Response(issuer, client, null as any), {
+test('processAuthorizationCodeResponse()', async (t) => {
+  await t.throwsAsync(lib.processAuthorizationCodeResponse(issuer, client, null as any), {
     message: '"response" must be an instance of Response',
   })
   await t.throwsAsync(
-    lib.processAuthorizationCodeOAuth2Response(issuer, client, getResponse('', { status: 404 })),
+    lib.processAuthorizationCodeResponse(issuer, client, getResponse('', { status: 404 })),
     {
       message: '"response" is not a conform Token Endpoint response',
     },
   )
+  await t.throwsAsync(lib.processAuthorizationCodeResponse(issuer, client, getResponse('{"')), {
+    message: 'failed to parse "response" body as JSON',
+  })
+  await t.throwsAsync(lib.processAuthorizationCodeResponse(issuer, client, getResponse('null')), {
+    message: '"response" body must be a top level object',
+  })
+  await t.throwsAsync(lib.processAuthorizationCodeResponse(issuer, client, getResponse('[]')), {
+    message: '"response" body must be a top level object',
+  })
   await t.throwsAsync(
-    lib.processAuthorizationCodeOAuth2Response(issuer, client, getResponse('{"')),
-    {
-      message: 'failed to parse "response" body as JSON',
-    },
-  )
-  await t.throwsAsync(
-    lib.processAuthorizationCodeOAuth2Response(issuer, client, getResponse('null')),
-    {
-      message: '"response" body must be a top level object',
-    },
-  )
-  await t.throwsAsync(
-    lib.processAuthorizationCodeOAuth2Response(issuer, client, getResponse('[]')),
-    {
-      message: '"response" body must be a top level object',
-    },
-  )
-  await t.throwsAsync(
-    lib.processAuthorizationCodeOAuth2Response(
+    lib.processAuthorizationCodeResponse(
       issuer,
       client,
       getResponse(JSON.stringify({ token_type: 'Bearer' })),
@@ -279,7 +270,7 @@ test('processAuthorizationCodeOAuth2Response()', async (t) => {
     },
   )
   await t.throwsAsync(
-    lib.processAuthorizationCodeOAuth2Response(
+    lib.processAuthorizationCodeResponse(
       issuer,
       client,
       getResponse(JSON.stringify({ access_token: 'token' })),
@@ -289,7 +280,7 @@ test('processAuthorizationCodeOAuth2Response()', async (t) => {
     },
   )
   await t.throwsAsync(
-    lib.processAuthorizationCodeOAuth2Response(
+    lib.processAuthorizationCodeResponse(
       issuer,
       client,
       getResponse(
@@ -305,7 +296,7 @@ test('processAuthorizationCodeOAuth2Response()', async (t) => {
     },
   )
   await t.throwsAsync(
-    lib.processAuthorizationCodeOAuth2Response(
+    lib.processAuthorizationCodeResponse(
       issuer,
       client,
       getResponse(
@@ -321,7 +312,7 @@ test('processAuthorizationCodeOAuth2Response()', async (t) => {
     },
   )
   await t.throwsAsync(
-    lib.processAuthorizationCodeOAuth2Response(
+    lib.processAuthorizationCodeResponse(
       issuer,
       client,
       getResponse(JSON.stringify({ access_token: 'token', token_type: 'Bearer', scope: null })),
@@ -331,7 +322,7 @@ test('processAuthorizationCodeOAuth2Response()', async (t) => {
     },
   )
   await t.throwsAsync(
-    lib.processAuthorizationCodeOAuth2Response(
+    lib.processAuthorizationCodeResponse(
       issuer,
       client,
       getResponse(
@@ -343,7 +334,7 @@ test('processAuthorizationCodeOAuth2Response()', async (t) => {
     },
   )
   await t.throwsAsync(
-    lib.processAuthorizationCodeOAuth2Response(
+    lib.processAuthorizationCodeResponse(
       issuer,
       client,
       getResponse(
@@ -355,12 +346,12 @@ test('processAuthorizationCodeOAuth2Response()', async (t) => {
       ),
     ),
     {
-      code: 'OAUTH_USE_OPENID_CALLBACK',
+      code: 'OAUTH_PARSE_ERROR',
     },
   )
 
   t.deepEqual(
-    await lib.processAuthorizationCodeOAuth2Response(
+    await lib.processAuthorizationCodeResponse(
       issuer,
       client,
       getResponse(
@@ -383,7 +374,7 @@ test('processAuthorizationCodeOAuth2Response()', async (t) => {
   )
 
   let err = await t.throwsAsync(
-    lib.processAuthorizationCodeOAuth2Response(
+    lib.processAuthorizationCodeResponse(
       issuer,
       client,
       getResponse(JSON.stringify({ error: 'invalid_grant' }), { status: 400 }),
@@ -397,10 +388,10 @@ test('processAuthorizationCodeOAuth2Response()', async (t) => {
   }
 })
 
-test('processAuthorizationCodeOpenIDResponse() - ignores signatures', async (t) => {
+test('processAuthorizationCodeResponse() - ignores signatures', async (t) => {
   await t.notThrowsAsync(
     lib
-      .processAuthorizationCodeOpenIDResponse(
+      .processAuthorizationCodeResponse(
         { ...issuer, id_token_signing_alg_values_supported: ['ES256'] },
         client,
         getResponse(
@@ -426,11 +417,11 @@ test('processAuthorizationCodeOpenIDResponse() - ignores signatures', async (t) 
   )
 })
 
-test('processAuthorizationCodeOpenIDResponse() with an ID Token (alg signalled)', async (t) => {
+test('processAuthorizationCodeResponse() with an ID Token (alg signalled)', async (t) => {
   const tIssuer: lib.AuthorizationServer = { ...issuer, jwks_uri: endpoint('jwks') }
   await t.notThrowsAsync(
     lib
-      .processAuthorizationCodeOpenIDResponse(
+      .processAuthorizationCodeResponse(
         { ...tIssuer, id_token_signing_alg_values_supported: ['ES256'] },
         client,
         getResponse(
@@ -458,11 +449,11 @@ test('processAuthorizationCodeOpenIDResponse() with an ID Token (alg signalled)'
   )
 })
 
-test('processAuthorizationCodeOpenIDResponse() with an ID Token (alg specified)', async (t) => {
+test('processAuthorizationCodeResponse() with an ID Token (alg specified)', async (t) => {
   const tIssuer: lib.AuthorizationServer = { ...issuer, jwks_uri: endpoint('jwks') }
 
   await t.notThrowsAsync(
-    lib.processAuthorizationCodeOpenIDResponse(
+    lib.processAuthorizationCodeResponse(
       tIssuer,
       { ...client, id_token_signed_response_alg: 'ES256' },
       getResponse(
@@ -483,11 +474,11 @@ test('processAuthorizationCodeOpenIDResponse() with an ID Token (alg specified)'
   )
 })
 
-test('processAuthorizationCodeOpenIDResponse() with an ID Token (alg default)', async (t) => {
+test('processAuthorizationCodeResponse() with an ID Token (alg default)', async (t) => {
   const tIssuer: lib.AuthorizationServer = { ...issuer, jwks_uri: endpoint('jwks') }
 
   await t.notThrowsAsync(
-    lib.processAuthorizationCodeOpenIDResponse(
+    lib.processAuthorizationCodeResponse(
       tIssuer,
       client,
       getResponse(
@@ -508,11 +499,11 @@ test('processAuthorizationCodeOpenIDResponse() with an ID Token (alg default)', 
   )
 })
 
-test('processAuthorizationCodeOpenIDResponse() with an ID Token (alg mismatches)', async (t) => {
+test('processAuthorizationCodeResponse() with an ID Token (alg mismatches)', async (t) => {
   const tIssuer: lib.AuthorizationServer = { ...issuer, jwks_uri: endpoint('jwks') }
 
   await t.throwsAsync(
-    lib.processAuthorizationCodeOpenIDResponse(
+    lib.processAuthorizationCodeResponse(
       tIssuer,
       client,
       getResponse(
@@ -534,7 +525,7 @@ test('processAuthorizationCodeOpenIDResponse() with an ID Token (alg mismatches)
   )
 
   await t.throwsAsync(
-    lib.processAuthorizationCodeOpenIDResponse(
+    lib.processAuthorizationCodeResponse(
       {
         ...tIssuer,
         id_token_signing_alg_values_supported: ['RS256'],
@@ -559,7 +550,7 @@ test('processAuthorizationCodeOpenIDResponse() with an ID Token (alg mismatches)
   )
 
   await t.throwsAsync(
-    lib.processAuthorizationCodeOpenIDResponse(
+    lib.processAuthorizationCodeResponse(
       tIssuer,
       { ...client, id_token_signed_response_alg: 'RS256' },
       getResponse(
@@ -581,11 +572,11 @@ test('processAuthorizationCodeOpenIDResponse() with an ID Token (alg mismatches)
   )
 })
 
-test('processAuthorizationCodeOpenIDResponse() with an ID Token typ: "JWT"', async (t) => {
+test('processAuthorizationCodeResponse() with an ID Token typ: "JWT"', async (t) => {
   const tIssuer: lib.AuthorizationServer = { ...issuer, jwks_uri: endpoint('jwks') }
 
   await t.notThrowsAsync(
-    lib.processAuthorizationCodeOpenIDResponse(
+    lib.processAuthorizationCodeResponse(
       tIssuer,
       client,
       getResponse(
@@ -606,11 +597,11 @@ test('processAuthorizationCodeOpenIDResponse() with an ID Token typ: "JWT"', asy
   )
 })
 
-test('processAuthorizationCodeOpenIDResponse() with an ID Token typ: "application/jwt"', async (t) => {
+test('processAuthorizationCodeResponse() with an ID Token typ: "application/jwt"', async (t) => {
   const tIssuer: lib.AuthorizationServer = { ...issuer, jwks_uri: endpoint('jwks') }
 
   await t.notThrowsAsync(
-    lib.processAuthorizationCodeOpenIDResponse(
+    lib.processAuthorizationCodeResponse(
       tIssuer,
       client,
       getResponse(
@@ -632,7 +623,7 @@ test('processAuthorizationCodeOpenIDResponse() with an ID Token typ: "applicatio
 })
 
 for (const alg of ALGS) {
-  test(`processAuthorizationCodeOpenIDResponse() with an ${alg} ID Token`, async (t) => {
+  test(`processAuthorizationCodeResponse() with an ${alg} ID Token`, async (t) => {
     const tIssuer: lib.AuthorizationServer = {
       ...issuer,
       id_token_signing_alg_values_supported: [alg],
@@ -640,7 +631,7 @@ for (const alg of ALGS) {
     }
 
     await t.notThrowsAsync(
-      lib.processAuthorizationCodeOpenIDResponse(
+      lib.processAuthorizationCodeResponse(
         tIssuer,
         client,
         getResponse(
@@ -663,11 +654,11 @@ for (const alg of ALGS) {
   })
 }
 
-test('processAuthorizationCodeOpenIDResponse() nonce checks', async (t) => {
+test('processAuthorizationCodeResponse() nonce checks', async (t) => {
   const tIssuer: lib.AuthorizationServer = { ...issuer, jwks_uri: endpoint('jwks') }
 
   await t.throwsAsync(
-    lib.processAuthorizationCodeOpenIDResponse(
+    lib.processAuthorizationCodeResponse(
       tIssuer,
       client,
       getResponse(
@@ -691,7 +682,7 @@ test('processAuthorizationCodeOpenIDResponse() nonce checks', async (t) => {
   )
 
   await t.throwsAsync(
-    lib.processAuthorizationCodeOpenIDResponse(
+    lib.processAuthorizationCodeResponse(
       tIssuer,
       client,
       getResponse(
@@ -710,13 +701,13 @@ test('processAuthorizationCodeOpenIDResponse() nonce checks', async (t) => {
             .sign(t.context.RS256.privateKey),
         }),
       ),
-      'anotherrandom-value',
+      { expectedNonce: 'anotherrandom-value' },
     ),
     { message: 'unexpected ID Token "nonce" claim value' },
   )
 
   await t.throwsAsync(
-    lib.processAuthorizationCodeOpenIDResponse(
+    lib.processAuthorizationCodeResponse(
       tIssuer,
       client,
       getResponse(
@@ -733,13 +724,15 @@ test('processAuthorizationCodeOpenIDResponse() nonce checks', async (t) => {
             .sign(t.context.RS256.privateKey),
         }),
       ),
-      'anotherrandom-value',
+      {
+        expectedNonce: 'anotherrandom-value',
+      },
     ),
     { message: 'JWT "nonce" (nonce) claim missing' },
   )
 
   await t.notThrowsAsync(
-    lib.processAuthorizationCodeOpenIDResponse(
+    lib.processAuthorizationCodeResponse(
       tIssuer,
       client,
       getResponse(
@@ -756,17 +749,19 @@ test('processAuthorizationCodeOpenIDResponse() nonce checks', async (t) => {
             .sign(t.context.RS256.privateKey),
         }),
       ),
-      'random-value',
+      {
+        expectedNonce: 'random-value',
+      },
     ),
   )
 })
 
-test('processAuthorizationCodeOpenIDResponse() auth_time checks', async (t) => {
+test('processAuthorizationCodeResponse() auth_time checks', async (t) => {
   const tIssuer: lib.AuthorizationServer = { ...issuer, jwks_uri: endpoint('jwks') }
 
   for (const auth_time of [0, -1, null, '1', [], {}, true]) {
     await t.throwsAsync(
-      lib.processAuthorizationCodeOpenIDResponse(
+      lib.processAuthorizationCodeResponse(
         tIssuer,
         client,
         getResponse(
@@ -792,11 +787,11 @@ test('processAuthorizationCodeOpenIDResponse() auth_time checks', async (t) => {
   }
 })
 
-test('processAuthorizationCodeOpenIDResponse() azp checks', async (t) => {
+test('processAuthorizationCodeResponse() azp checks', async (t) => {
   const tIssuer: lib.AuthorizationServer = { ...issuer, jwks_uri: endpoint('jwks') }
 
   await t.throwsAsync(
-    lib.processAuthorizationCodeOpenIDResponse(
+    lib.processAuthorizationCodeResponse(
       tIssuer,
       client,
       getResponse(
@@ -818,7 +813,7 @@ test('processAuthorizationCodeOpenIDResponse() azp checks', async (t) => {
   )
 
   await t.throwsAsync(
-    lib.processAuthorizationCodeOpenIDResponse(
+    lib.processAuthorizationCodeResponse(
       tIssuer,
       client,
       getResponse(
@@ -840,7 +835,7 @@ test('processAuthorizationCodeOpenIDResponse() azp checks', async (t) => {
   )
 
   await t.notThrowsAsync(
-    lib.processAuthorizationCodeOpenIDResponse(
+    lib.processAuthorizationCodeResponse(
       tIssuer,
       client,
       getResponse(

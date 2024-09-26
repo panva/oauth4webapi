@@ -1,5 +1,5 @@
 diff --git a/examples/oauth.ts b/examples/refresh_token.ts
-index 6f4b65e..d3f0185 100644
+index d8185be..b4e2bda 100644
 --- a/examples/oauth.ts
 +++ b/examples/refresh_token.ts
 @@ -44,7 +44,7 @@ let state: string | undefined
@@ -20,7 +20,7 @@ index 6f4b65e..d3f0185 100644
    const currentUrl: URL = getCurrentUrl()
    const params = oauth.validateAuthResponse(as, client, currentUrl, state)
 @@ -78,7 +79,7 @@ let access_token: string
-   const result = await oauth.processAuthorizationCodeOAuth2Response(as, client, response)
+   const result = await oauth.processAuthorizationCodeResponse(as, client, response)
  
    console.log('Access Token Response', result)
 -  ;({ access_token } = result)

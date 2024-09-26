@@ -10,7 +10,7 @@ const response = () =>
 test('handles empty scope from the Token Endpoint', async (t) => {
   await t.notThrowsAsync(() =>
     Promise.all([
-      lib.processAuthorizationCodeOAuth2Response(issuer, client, response()),
+      lib.processAuthorizationCodeResponse(issuer, client, response()),
       lib.processDeviceCodeResponse(issuer, client, response()),
       lib.processClientCredentialsResponse(issuer, client, response()),
       lib.processRefreshTokenResponse(issuer, client, response()),

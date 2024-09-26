@@ -1,5 +1,5 @@
 diff --git a/examples/oauth.ts b/examples/private_key_jwt.ts
-index 6f4b65e..d13c813 100644
+index d8185be..e73fc36 100644
 --- a/examples/oauth.ts
 +++ b/examples/private_key_jwt.ts
 @@ -9,12 +9,16 @@ let algorithm!:
@@ -37,4 +37,4 @@ index 6f4b65e..d13c813 100644
 +    { clientPrivateKey },
    )
  
-   const result = await oauth.processAuthorizationCodeOAuth2Response(as, client, response)
+   const result = await oauth.processAuthorizationCodeResponse(as, client, response)

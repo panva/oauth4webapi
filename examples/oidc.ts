@@ -76,7 +76,9 @@ let access_token: string
     code_verifier,
   )
 
-  const result = await oauth.processAuthorizationCodeOpenIDResponse(as, client, response, nonce)
+  const result = await oauth.processAuthorizationCodeResponse(as, client, response, {
+    expectedNonce: nonce,
+  })
 
   console.log('Access Token Response', result)
   ;({ access_token } = result)

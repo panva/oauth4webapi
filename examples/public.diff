@@ -1,5 +1,5 @@
 diff --git a/examples/oauth.ts b/examples/public.ts
-index 6f4b65e..189e5be 100644
+index d8185be..4572662 100644
 --- a/examples/oauth.ts
 +++ b/examples/public.ts
 @@ -9,7 +9,6 @@ let algorithm!:

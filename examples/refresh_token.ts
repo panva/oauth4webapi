@@ -76,7 +76,7 @@ let refresh_token: string | undefined
     code_verifier,
   )
 
-  const result = await oauth.processAuthorizationCodeOAuth2Response(as, client, response)
+  const result = await oauth.processAuthorizationCodeResponse(as, client, response)
 
   console.log('Access Token Response', result)
   ;({ access_token, refresh_token } = result)

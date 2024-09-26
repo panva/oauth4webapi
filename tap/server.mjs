@@ -46,6 +46,7 @@ const provider = new Provider('http://localhost:3000', {
             }
           : { accessTokenFormat: 'opaque' }),
       }),
+      useGrantedResource: () => true,
     },
     requestObjects: {
       mode: 'strict',

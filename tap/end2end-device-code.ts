@@ -33,7 +33,7 @@ export default (QUnit: QUnit) => {
       const resource = 'urn:example:resource:jwt'
       const params = new URLSearchParams()
       params.set('resource', resource)
-      params.set('scope', 'api:write')
+      params.set('scope', 'openid api:write')
 
       let response = await lib.deviceAuthorizationRequest(as, client, params, {
         [lib.allowInsecureRequests]: true,

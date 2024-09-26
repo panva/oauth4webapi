@@ -3114,9 +3114,9 @@ const idTokenClaims = new WeakMap<TokenEndpointResponse, [IDToken, string]>()
 const jwtResponseBodies = new WeakMap<Response, string>()
 
 /**
- * Returns ID Token claims validated during {@link processAuthorizationCodeOpenIDResponse}.
+ * Returns ID Token claims validated during {@link processAuthorizationCodeResponse}.
  *
- * @param ref Value previously resolved from {@link processAuthorizationCodeOpenIDResponse}.
+ * @param ref Value previously resolved from {@link processAuthorizationCodeResponse}.
  *
  * @returns JWT Claims Set from an ID Token.
  *
@@ -3156,7 +3156,7 @@ export interface ValidateSignatureOptions extends HttpRequestOptions<'GET'>, JWK
 
 /**
  * Validates the JWS Signature of an ID Token included in results previously resolved from
- * {@link processAuthorizationCodeOpenIDResponse}, {@link processRefreshTokenResponse}, or
+ * {@link processAuthorizationCodeResponse}, {@link processRefreshTokenResponse}, or
  * {@link processDeviceCodeResponse} for non-repudiation purposes.
  *
  * Note: Validating signatures of ID Tokens received via direct communication between the Client and
@@ -3167,7 +3167,7 @@ export interface ValidateSignatureOptions extends HttpRequestOptions<'GET'>, JWK
  * Note: Supports only digital signatures.
  *
  * @param as Authorization Server Metadata.
- * @param ref Value previously resolved from {@link processAuthorizationCodeOpenIDResponse},
+ * @param ref Value previously resolved from {@link processAuthorizationCodeResponse},
  *   {@link processRefreshTokenResponse}, or {@link processDeviceCodeResponse}.
  *
  * @returns Resolves if the signature validates, rejects otherwise.
@@ -3297,9 +3297,7 @@ async function processGenericAccessTokenResponse(
   as: AuthorizationServer,
   client: Client,
   response: Response,
-  ignoreIdToken: boolean,
-  ignoreRefreshToken: boolean,
-  additionalRequiredIdTokenClaims: (keyof typeof jwtClaimNames)[] | undefined,
+  additionalRequiredIdTokenClaims?: (keyof typeof jwtClaimNames)[],
 ): Promise<TokenEndpointResponse> {
   assertAs(as)
   assertClient(client)
@@ -3370,7 +3368,7 @@ async function processGenericAccessTokenResponse(
     )
   }
 
-  if (!ignoreRefreshToken && json.refresh_token !== undefined) {
+  if (json.refresh_token !== undefined) {
     assertString(json.refresh_token, '"response" body "refresh_token" property', INVALID_RESPONSE, {
       body: json,
     })
@@ -3381,66 +3379,71 @@ async function processGenericAccessTokenResponse(
     throw OPE('"response" body "scope" property must be a string', INVALID_RESPONSE, { body: json })
   }
 
-  if (!ignoreIdToken) {
-    if (json.id_token !== undefined) {
-      assertString(json.id_token, '"response" body "id_token" property', INVALID_RESPONSE, {
-        body: json,
-      })
+  if (json.id_token !== undefined) {
+    assertString(json.id_token, '"response" body "id_token" property', INVALID_RESPONSE, {
+      body: json,
+    })
+
+    const requiredClaims: (keyof typeof jwtClaimNames)[] = ['aud', 'exp', 'iat', 'iss', 'sub']
+
+    if (client.require_auth_time === true) {
+      requiredClaims.push('auth_time')
     }
 
-    if (json.id_token) {
-      const requiredClaims: (keyof typeof jwtClaimNames)[] = ['aud', 'exp', 'iat', 'iss', 'sub']
+    if (client.default_max_age !== undefined) {
+      assertNumber(client.default_max_age, false, '"client.default_max_age"')
+      requiredClaims.push('auth_time')
+    }
 
-      if (additionalRequiredIdTokenClaims?.length) {
-        requiredClaims.push(...additionalRequiredIdTokenClaims)
-      }
+    if (additionalRequiredIdTokenClaims?.length) {
+      requiredClaims.push(...additionalRequiredIdTokenClaims)
+    }
 
-      const { claims, jwt } = await validateJwt(
-        json.id_token,
-        checkSigningAlgorithm.bind(
-          undefined,
-          client.id_token_signed_response_alg,
-          as.id_token_signing_alg_values_supported,
-          'RS256',
-        ),
-        noSignatureCheck,
-        getClockSkew(client),
-        getClockTolerance(client),
-        client[jweDecrypt],
-      )
-        .then(validatePresence.bind(undefined, requiredClaims))
-        .then(validateIssuer.bind(undefined, as.issuer))
-        .then(validateAudience.bind(undefined, client.client_id))
+    const { claims, jwt } = await validateJwt(
+      json.id_token,
+      checkSigningAlgorithm.bind(
+        undefined,
+        client.id_token_signed_response_alg,
+        as.id_token_signing_alg_values_supported,
+        'RS256',
+      ),
+      noSignatureCheck,
+      getClockSkew(client),
+      getClockTolerance(client),
+      client[jweDecrypt],
+    )
+      .then(validatePresence.bind(undefined, requiredClaims))
+      .then(validateIssuer.bind(undefined, as.issuer))
+      .then(validateAudience.bind(undefined, client.client_id))
 
-      if (Array.isArray(claims.aud) && claims.aud.length !== 1) {
-        if (claims.azp === undefined) {
-          throw OPE(
-            'ID Token "aud" (audience) claim includes additional untrusted audiences',
-            JWT_CLAIM_COMPARISON,
-            { claims },
-          )
-        }
-        if (claims.azp !== client.client_id) {
-          throw OPE(
-            'unexpected ID Token "azp" (authorized party) claim value',
-            JWT_CLAIM_COMPARISON,
-            { expected: client.client_id, claims },
-          )
-        }
-      }
-
-      if (claims.auth_time !== undefined) {
-        assertNumber(
-          claims.auth_time,
-          false,
-          'ID Token "auth_time" (authentication time)',
-          INVALID_RESPONSE,
+    if (Array.isArray(claims.aud) && claims.aud.length !== 1) {
+      if (claims.azp === undefined) {
+        throw OPE(
+          'ID Token "aud" (audience) claim includes additional untrusted audiences',
+          JWT_CLAIM_COMPARISON,
           { claims },
         )
       }
-
-      idTokenClaims.set(json, [claims as IDToken, jwt])
+      if (claims.azp !== client.client_id) {
+        throw OPE(
+          'unexpected ID Token "azp" (authorized party) claim value',
+          JWT_CLAIM_COMPARISON,
+          { expected: client.client_id, claims },
+        )
+      }
     }
+
+    if (claims.auth_time !== undefined) {
+      assertNumber(
+        claims.auth_time,
+        false,
+        'ID Token "auth_time" (authentication time)',
+        INVALID_RESPONSE,
+        { claims },
+      )
+    }
+
+    idTokenClaims.set(json, [claims as IDToken, jwt])
   }
 
   return json
@@ -3468,20 +3471,7 @@ export async function processRefreshTokenResponse(
   client: Client,
   response: Response,
 ): Promise<TokenEndpointResponse> {
-  const additionalRequiredClaims: (keyof typeof jwtClaimNames)[] = []
-
-  if (client.default_max_age !== undefined) {
-    assertNumber(client.default_max_age, false, '"client.default_max_age"')
-    additionalRequiredClaims.push('auth_time')
-  }
-  return processGenericAccessTokenResponse(
-    as,
-    client,
-    response,
-    false,
-    false,
-    additionalRequiredClaims,
-  )
+  return processGenericAccessTokenResponse(as, client, response)
 }
 
 function validateOptionalAudience(
@@ -3703,47 +3693,40 @@ export interface OpenIDTokenEndpointResponse {
   readonly [parameter: string]: JsonValue | undefined
 }
 
-export interface OAuth2TokenEndpointResponse {
-  readonly access_token: string
-  readonly expires_in?: number
-  readonly id_token?: undefined
-  readonly refresh_token?: string
-  readonly scope?: string
-  readonly authorization_details?: AuthorizationDetails[]
-  /**
-   * NOTE: because the value is case insensitive it is always returned lowercased
-   */
-  readonly token_type: 'bearer' | 'dpop' | Lowercase<string>
-
-  readonly [parameter: string]: JsonValue | undefined
-}
-
-export interface ClientCredentialsGrantResponse {
-  readonly access_token: string
-  readonly expires_in?: number
-  readonly scope?: string
-  readonly authorization_details?: AuthorizationDetails[]
-  /**
-   * NOTE: because the value is case insensitive it is always returned lowercased
-   */
-  readonly token_type: 'bearer' | 'dpop' | Lowercase<string>
-
-  readonly [parameter: string]: JsonValue | undefined
-}
-
 /**
- * Use this as a value to {@link processAuthorizationCodeOpenIDResponse} `expectedNonce` parameter to
+ * Use this as a value to {@link processAuthorizationCodeResponse} `oidc.expectedNonce` parameter to
  * indicate no `nonce` ID Token claim value is expected, i.e. no `nonce` parameter value was sent
  * with the authorization request.
  */
 export const expectNoNonce: unique symbol = Symbol()
 
 /**
- * Use this as a value to {@link processAuthorizationCodeOpenIDResponse} `maxAge` parameter to
+ * Use this as a value to {@link processAuthorizationCodeResponse} `oidc.maxAge` parameter to
  * indicate no `auth_time` ID Token claim value check should be performed.
  */
 export const skipAuthTimeCheck: unique symbol = Symbol()
 
+/**
+ * (OAuth 2.0) Validates Authorization Code Grant {@link !Response} instance to be one coming from
+ * the {@link AuthorizationServer.token_endpoint `as.token_endpoint`}.
+ *
+ * @param as Authorization Server Metadata.
+ * @param client Client Metadata.
+ * @param response Resolved value from {@link authorizationCodeGrantRequest}.
+ *
+ * @returns Resolves with an object representing the parsed successful response. OAuth 2.0 protocol
+ *   style errors are rejected using {@link ResponseBodyError}. WWW-Authenticate HTTP Header
+ *   challenges are rejected with {@link WWWAuthenticateChallengeError}.
+ *
+ * @group Authorization Code Grant
+ *
+ * @see [RFC 6749 - The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html#section-4.1)
+ */
+export async function processAuthorizationCodeResponse(
+  as: AuthorizationServer,
+  client: Client,
+  response: Response,
+): Promise<TokenEndpointResponse>
 /**
  * (OpenID Connect only) Validates Authorization Code Grant {@link !Response} instance to be one
  * coming from the {@link AuthorizationServer.token_endpoint `as.token_endpoint`}.
@@ -3751,12 +3734,8 @@ export const skipAuthTimeCheck: unique symbol = Symbol()
  * @param as Authorization Server Metadata.
  * @param client Client Metadata.
  * @param response Resolved value from {@link authorizationCodeGrantRequest}.
- * @param expectedNonce Expected ID Token `nonce` claim value. Default is {@link expectNoNonce}.
- * @param maxAge ID Token {@link IDToken.auth_time `auth_time`} claim value will be checked to be
- *   present and conform to the `maxAge` value. Use of this option is required if you sent a
- *   `max_age` parameter in an authorization request. Default is
- *   {@link Client.default_max_age `client.default_max_age`} and falls back to
- *   {@link skipAuthTimeCheck}.
+ * @param oidc Indicates that the response must be an OpenID Connect response including an ID Token.
+ *   Can also be `true` to use its default options.
  *
  * @returns Resolves with an object representing the parsed successful response. OAuth 2.0 protocol
  *   style errors are rejected using {@link ResponseBodyError}. WWW-Authenticate HTTP Header
@@ -3767,17 +3746,72 @@ export const skipAuthTimeCheck: unique symbol = Symbol()
  * @see [RFC 6749 - The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html#section-4.1)
  * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#CodeFlowAuth)
  */
-export async function processAuthorizationCodeOpenIDResponse(
+export async function processAuthorizationCodeResponse(
   as: AuthorizationServer,
   client: Client,
   response: Response,
-  expectedNonce?: string | typeof expectNoNonce,
-  maxAge?: number | typeof skipAuthTimeCheck,
+  oidc: {
+    /**
+     * Expected ID Token `nonce` claim value. Default is {@link expectNoNonce}.
+     */
+    expectedNonce?: string | typeof expectNoNonce
+    /**
+     * ID Token {@link IDToken.auth_time `auth_time`} claim value will be checked to be present and
+     * conform to the `maxAge` value. Use of this option is required if you sent a `max_age`
+     * parameter in an authorization request. Default is
+     * {@link Client.default_max_age `client.default_max_age`} and falls back to
+     * {@link skipAuthTimeCheck}.
+     */
+    maxAge?: number | typeof skipAuthTimeCheck
+  },
+): Promise<OpenIDTokenEndpointResponse>
+/**
+ * @ignore
+ */
+export async function processAuthorizationCodeResponse(
+  as: AuthorizationServer,
+  client: Client,
+  response: Response,
+  oidc: true,
+): Promise<OpenIDTokenEndpointResponse>
+export async function processAuthorizationCodeResponse(
+  as: AuthorizationServer,
+  client: Client,
+  response: Response,
+  oidc?:
+    | {
+        expectedNonce?: string | typeof expectNoNonce
+        maxAge?: number | typeof skipAuthTimeCheck
+      }
+    | true,
+): Promise<TokenEndpointResponse> {
+  if (oidc) {
+    if (oidc === true) oidc = {}
+    return processAuthorizationCodeOpenIDResponse(
+      as,
+      client,
+      response,
+      oidc.expectedNonce,
+      oidc.maxAge,
+    )
+  }
+
+  return processAuthorizationCodeOAuth2Response(as, client, response)
+}
+
+async function processAuthorizationCodeOpenIDResponse(
+  as: AuthorizationServer,
+  client: Client,
+  response: Response,
+  expectedNonce: string | typeof expectNoNonce | undefined,
+  maxAge: number | typeof skipAuthTimeCheck | undefined,
 ): Promise<OpenIDTokenEndpointResponse> {
   const additionalRequiredClaims: (keyof typeof jwtClaimNames)[] = []
 
   switch (expectedNonce) {
     case undefined:
+      expectedNonce = expectNoNonce
+      break
     case expectNoNonce:
       break
     default:
@@ -3785,26 +3819,26 @@ export async function processAuthorizationCodeOpenIDResponse(
       additionalRequiredClaims.push('nonce')
   }
 
-  if (maxAge !== undefined) {
-    assertNumber(maxAge, false, '"maxAge" argument')
-  } else if (client.default_max_age !== undefined) {
-    assertNumber(client.default_max_age, false, '"client.default_max_age"')
-  }
-  maxAge ??= client.default_max_age ?? skipAuthTimeCheck
-  if (maxAge !== skipAuthTimeCheck) {
-    additionalRequiredClaims.push('auth_time')
+  maxAge ??= client.default_max_age
+  switch (maxAge) {
+    case undefined:
+      maxAge = skipAuthTimeCheck
+      break
+    case skipAuthTimeCheck:
+      break
+    default:
+      assertNumber(maxAge, false, '"maxAge" argument')
+      additionalRequiredClaims.push('auth_time')
   }
 
   const result = await processGenericAccessTokenResponse(
     as,
     client,
     response,
-    false,
-    false,
     additionalRequiredClaims,
   )
 
-  assertString(result.id_token, '"response" body "id_token" property', USE_OAUTH_CALLBACK, {
+  assertString(result.id_token, '"response" body "id_token" property', INVALID_RESPONSE, {
     body: result,
   })
 
@@ -3838,46 +3872,37 @@ export async function processAuthorizationCodeOpenIDResponse(
   return result as OpenIDTokenEndpointResponse
 }
 
-/**
- * (OAuth 2.0 without OpenID Connect only) Validates Authorization Code Grant {@link !Response}
- * instance to be one coming from the
- * {@link AuthorizationServer.token_endpoint `as.token_endpoint`}.
- *
- * @param as Authorization Server Metadata.
- * @param client Client Metadata.
- * @param response Resolved value from {@link authorizationCodeGrantRequest}.
- *
- * @returns Resolves with an object representing the parsed successful response. OAuth 2.0 protocol
- *   style errors are rejected using {@link ResponseBodyError}. WWW-Authenticate HTTP Header
- *   challenges are rejected with {@link WWWAuthenticateChallengeError}.
- *
- * @group Authorization Code Grant
- *
- * @see [RFC 6749 - The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html#section-4.1)
- */
-export async function processAuthorizationCodeOAuth2Response(
+async function processAuthorizationCodeOAuth2Response(
   as: AuthorizationServer,
   client: Client,
   response: Response,
-): Promise<OAuth2TokenEndpointResponse> {
-  const result = await processGenericAccessTokenResponse(
-    as,
-    client,
-    response,
-    true,
-    false,
-    undefined,
-  )
+): Promise<TokenEndpointResponse> {
+  const result = await processGenericAccessTokenResponse(as, client, response)
 
-  if (result.id_token !== undefined) {
-    throw OPE(
-      'Unexpected ID Token returned, use processAuthorizationCodeOpenIDResponse() for OpenID Connect callback processing',
-      USE_OPENID_CALLBACK,
-      { body: result },
-    )
+  const claims = getValidatedIdTokenClaims(result)
+  if (claims) {
+    if (client.default_max_age !== undefined) {
+      assertNumber(client.default_max_age, false, '"client.default_max_age"')
+      const now = epochTime() + getClockSkew(client)
+      const tolerance = getClockTolerance(client)
+      if (claims.auth_time! + client.default_max_age < now - tolerance) {
+        throw OPE(
+          'too much time has elapsed since the last End-User authentication',
+          JWT_TIMESTAMP_CHECK,
+          { claims, now, tolerance },
+        )
+      }
+    }
+
+    if (claims.nonce !== undefined) {
+      throw OPE('unexpected ID Token "nonce" claim value', JWT_CLAIM_COMPARISON, {
+        expected: undefined,
+        claims,
+      })
+    }
   }
 
-  return result as OAuth2TokenEndpointResponse
+  return result
 }
 
 /**
@@ -3935,23 +3960,6 @@ export const INVALID_RESPONSE = 'OAUTH_INVALID_RESPONSE'
  * @group Error Codes
  */
 export const INVALID_REQUEST = 'OAUTH_INVALID_REQUEST'
-/**
- * Assigned as {@link OperationProcessingError.code} during
- * {@link processAuthorizationCodeOAuth2Response} when the response constains an OpenID Connect which
- * indicates that {@link processAuthorizationCodeOpenIDResponse} should have been used instead.
- *
- * @group Error Codes
- */
-export const USE_OPENID_CALLBACK = 'OAUTH_USE_OPENID_CALLBACK'
-/**
- * Assigned as {@link OperationProcessingError.code} during
- * {@link processAuthorizationCodeOpenIDResponse} when the response doesn't have an OpenID Connect ID
- * Token, this indicates either a non-conform Authorization Server or that you should use
- * {@link processAuthorizationCodeOAuth2Response} instead.
- *
- * @group Error Codes
- */
-export const USE_OAUTH_CALLBACK = 'OAUTH_USE_OAUTH_CALLBACK'
 /**
  * Assigned as {@link OperationProcessingError.code} when a {@link !Response} does not have the
  * expected `application/json` response-type HTTP Header.
@@ -4103,17 +4111,8 @@ export async function processClientCredentialsResponse(
   as: AuthorizationServer,
   client: Client,
   response: Response,
-): Promise<ClientCredentialsGrantResponse> {
-  const result = await processGenericAccessTokenResponse(
-    as,
-    client,
-    response,
-    true,
-    true,
-    undefined,
-  )
-
-  return result as ClientCredentialsGrantResponse
+): Promise<TokenEndpointResponse> {
+  return processGenericAccessTokenResponse(as, client, response)
 }
 
 export interface RevocationRequestOptions
@@ -5454,21 +5453,7 @@ export async function processDeviceCodeResponse(
   client: Client,
   response: Response,
 ): Promise<TokenEndpointResponse> {
-  const additionalRequiredClaims: (keyof typeof jwtClaimNames)[] = []
-
-  if (client.default_max_age !== undefined) {
-    assertNumber(client.default_max_age, false, '"client.default_max_age"')
-    additionalRequiredClaims.push('auth_time')
-  }
-
-  return processGenericAccessTokenResponse(
-    as,
-    client,
-    response,
-    false,
-    false,
-    additionalRequiredClaims,
-  )
+  return processGenericAccessTokenResponse(as, client, response)
 }
 
 export interface GenerateKeyPairOptions {

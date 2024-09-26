@@ -1,5 +1,5 @@
 diff --git a/examples/oauth.ts b/examples/jarm.ts
-index 6f4b65e..efc3e31 100644
+index d8185be..46f11b5 100644
 --- a/examples/oauth.ts
 +++ b/examples/jarm.ts
 @@ -47,6 +47,7 @@ let state: string | undefined

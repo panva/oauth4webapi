@@ -1,5 +1,5 @@
 diff --git a/examples/fapi2.ts b/examples/fapi2-message-signing.ts
-index 8de0d2e..fe2dc9a 100644
+index 68904db..179b97d 100644
 --- a/examples/fapi2.ts
 +++ b/examples/fapi2-message-signing.ts
 @@ -25,6 +25,11 @@ let DPoP!: oauth.CryptoKeyPair
@@ -45,7 +45,7 @@ index 8de0d2e..fe2dc9a 100644
  
    const pushedAuthorizationRequest = () =>
      oauth.pushedAuthorizationRequest(as, client, params, {
-@@ -94,27 +110,30 @@ let request_uri: string
+@@ -94,7 +110,7 @@ let request_uri: string
  let access_token: string
  {
    const currentUrl: URL = getCurrentUrl()
@@ -54,24 +54,16 @@ index 8de0d2e..fe2dc9a 100644
  
    const authorizationCodeGrantRequest = () =>
      oauth.authorizationCodeGrantRequest(as, client, params, redirect_uri, code_verifier, { DPoP })
- 
+@@ -102,7 +118,7 @@ let access_token: string
    let response = await authorizationCodeGrantRequest()
  
--  const processAuthorizationCodeOAuth2Response = () =>
--    oauth.processAuthorizationCodeOAuth2Response(as, client, response)
-+  const processAuthorizationCodeOpenIDResponse = () =>
-+    oauth.processAuthorizationCodeOpenIDResponse(as, client, response)
+   const processAuthorizationCodeResponse = () =>
+-    oauth.processAuthorizationCodeResponse(as, client, response)
++    oauth.processAuthorizationCodeResponse(as, client, response, true)
  
--  let result = await processAuthorizationCodeOAuth2Response().catch(async (err) => {
-+  let result = await processAuthorizationCodeOpenIDResponse().catch(async (err) => {
+   let result = await processAuthorizationCodeResponse().catch(async (err) => {
      if (err instanceof oauth.ResponseBodyError) {
-       if (result.error === 'use_dpop_nonce') {
-         // the AS-signalled nonce is now cached, retrying
-         response = await authorizationCodeGrantRequest()
--        return processAuthorizationCodeOAuth2Response()
-+        return processAuthorizationCodeOpenIDResponse()
-       }
-     }
+@@ -115,6 +131,9 @@ let access_token: string
      throw err
    })
  

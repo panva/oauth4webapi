@@ -194,12 +194,15 @@ export default (QUnit: QUnit) => {
           )
         let response = await authorizationCodeGrantRequest()
 
-        const processAuthorizationCodeOpenIDResponse = () =>
-          lib.processAuthorizationCodeOpenIDResponse(as, client, response, nonce, maxAge)
-        let result = await processAuthorizationCodeOpenIDResponse().catch(async (err) => {
+        const processAuthorizationCodeResponse = () =>
+          lib.processAuthorizationCodeResponse(as, client, response, {
+            expectedNonce: nonce,
+            maxAge,
+          })
+        let result = await processAuthorizationCodeResponse().catch(async (err) => {
           if (isDpopNonceError(t, err)) {
             response = await authorizationCodeGrantRequest()
-            return processAuthorizationCodeOpenIDResponse()
+            return processAuthorizationCodeResponse()
           }
 
           throw err

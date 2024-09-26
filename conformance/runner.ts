@@ -358,7 +358,7 @@ export const flow = (options?: MacroOptions) => {
 
       let currentUrl = new URL(authorization_endpoint_response_redirect)
 
-      let sub: string
+      let sub: string | undefined
       let access_token: string
       {
         let params: ReturnType<typeof oauth.validateAuthResponse>
@@ -394,13 +394,15 @@ export const flow = (options?: MacroOptions) => {
           )
         let response = await request()
 
-        let result: oauth.OAuth2TokenEndpointResponse | oauth.OpenIDTokenEndpointResponse
+        let result: oauth.TokenEndpointResponse
 
         try {
           if (scope.includes('openid')) {
-            result = await oauth.processAuthorizationCodeOpenIDResponse(as, client, response, nonce)
+            result = await oauth.processAuthorizationCodeResponse(as, client, response, {
+              expectedNonce: nonce,
+            })
           } else {
-            result = await oauth.processAuthorizationCodeOAuth2Response(as, client, response)
+            result = await oauth.processAuthorizationCodeResponse(as, client, response)
           }
         } catch (err) {
           if (DPoP && err instanceof oauth.ResponseBodyError && err.error === 'use_dpop_nonce') {
@@ -408,14 +410,11 @@ export const flow = (options?: MacroOptions) => {
             t.log('retrying with a newly obtained dpop nonce')
             response = await request()
             if (scope.includes('openid')) {
-              result = await oauth.processAuthorizationCodeOpenIDResponse(
-                as,
-                client,
-                response,
-                nonce,
-              )
+              result = await oauth.processAuthorizationCodeResponse(as, client, response, {
+                expectedNonce: nonce,
+              })
             } else {
-              result = await oauth.processAuthorizationCodeOAuth2Response(as, client, response)
+              result = await oauth.processAuthorizationCodeResponse(as, client, response)
             }
           } else {
             throw err
@@ -428,8 +427,8 @@ export const flow = (options?: MacroOptions) => {
 
         t.log('token endpoint response body', { ...result })
         ;({ access_token } = result)
-        if (result.id_token) {
-          const claims = oauth.getValidatedIdTokenClaims(result)
+        const claims = oauth.getValidatedIdTokenClaims(result)
+        if (claims) {
           t.log('ID Token Claims', claims)
           ;({ sub } = claims)
         }
