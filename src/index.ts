@@ -1481,7 +1481,10 @@ export async function processDiscoveryResponse(
   expectedIssuerIdentifier: URL,
   response: Response,
 ): Promise<AuthorizationServer> {
-  if (!(expectedIssuerIdentifier instanceof URL)) {
+  if (
+    !(expectedIssuerIdentifier instanceof URL) &&
+    expectedIssuerIdentifier !== _nodiscoverycheck
+  ) {
     throw CodedTypeError('"expectedIssuer" must be an instance of URL', ERR_INVALID_ARG_TYPE)
   }
 
@@ -1512,7 +1515,11 @@ export async function processDiscoveryResponse(
 
   assertString(json.issuer, '"response" body "issuer" property', INVALID_RESPONSE, { body: json })
 
-  if (new URL(json.issuer).href !== expectedIssuerIdentifier.href) {
+  if (
+    new URL(json.issuer).href !== expectedIssuerIdentifier.href &&
+    // @ts-expect-error
+    expectedIssuerIdentifier !== _nodiscoverycheck
+  ) {
     throw OPE(
       '"response" body "issuer" property does not match the expected value',
       JSON_ATTRIBUTE_COMPARISON,
@@ -2984,7 +2991,7 @@ export async function processUserInfoResponse(
       client[jweDecrypt],
     )
       .then(validateOptionalAudience.bind(undefined, client.client_id))
-      .then(validateOptionalIssuer.bind(undefined, as.issuer))
+      .then(validateOptionalIssuer.bind(undefined, as))
 
     jwtResponseBodies.set(response, jwt)
     json = claims as JsonValue
@@ -3413,7 +3420,7 @@ async function processGenericAccessTokenResponse(
       client[jweDecrypt],
     )
       .then(validatePresence.bind(undefined, requiredClaims))
-      .then(validateIssuer.bind(undefined, as.issuer))
+      .then(validateIssuer.bind(undefined, as))
       .then(validateAudience.bind(undefined, client.client_id))
 
     if (Array.isArray(claims.aud) && claims.aud.length !== 1) {
@@ -3502,14 +3509,16 @@ function validateAudience(expected: string, result: Awaited<ReturnType<typeof va
   return result
 }
 
-function validateOptionalIssuer(expected: string, result: Awaited<ReturnType<typeof validateJwt>>) {
+function validateOptionalIssuer(as: AuthorizationServer, result: Awaited<ReturnType<typeof validateJwt>>) {
   if (result.claims.iss !== undefined) {
-    return validateIssuer(expected, result)
+    return validateIssuer(as, result)
   }
   return result
 }
 
-function validateIssuer(expected: string, result: Awaited<ReturnType<typeof validateJwt>>) {
+function validateIssuer(as: AuthorizationServer, result: Awaited<ReturnType<typeof validateJwt>>) {
+  // @ts-ignore
+  const expected = as[_expectedIssuer]?.(result) ?? as.issuer
   if (result.claims.iss !== expected) {
     throw OPE('unexpected JWT "iss" (issuer) claim value', JWT_CLAIM_COMPARISON, {
       expected,
@@ -3564,8 +3573,6 @@ export async function authorizationCodeGrantRequest(
 
   assertString(redirectUri, '"redirectUri"')
 
-  assertString(codeVerifier, '"codeVerifier"')
-
   const code = getURLSearchParameter(callbackParameters, 'code')
   if (!code) {
     throw OPE('no authorization code in "callbackParameters"', INVALID_RESPONSE)
@@ -3573,8 +3580,13 @@ export async function authorizationCodeGrantRequest(
 
   const parameters = new URLSearchParams(options?.additionalParameters)
   parameters.set('redirect_uri', redirectUri)
-  parameters.set('code_verifier', codeVerifier)
   parameters.set('code', code)
+
+  // @ts-expect-error
+  if (codeVerifier !== _nopkce) {
+    assertString(codeVerifier, '"codeVerifier"')
+    parameters.set('code_verifier', codeVerifier)
+  }
 
   return tokenEndpointRequest(as, client, 'authorization_code', parameters, options)
 }
@@ -4374,7 +4386,7 @@ export async function processIntrospectionResponse(
     )
       .then(checkJwtType.bind(undefined, 'token-introspection+jwt'))
       .then(validatePresence.bind(undefined, ['aud', 'iat', 'iss']))
-      .then(validateIssuer.bind(undefined, as.issuer))
+      .then(validateIssuer.bind(undefined, as))
       .then(validateAudience.bind(undefined, client.client_id))
 
     jwtResponseBodies.set(response, jwt)
@@ -4743,7 +4755,7 @@ export async function validateJwtAuthResponse(
     client[jweDecrypt],
   )
     .then(validatePresence.bind(undefined, ['aud', 'exp', 'iss']))
-    .then(validateIssuer.bind(undefined, as.issuer))
+    .then(validateIssuer.bind(undefined, as))
     .then(validateAudience.bind(undefined, client.client_id))
 
   const result = new URLSearchParams()
@@ -4933,7 +4945,7 @@ export async function validateDetachedSignatureResponse(
     client[jweDecrypt],
   )
     .then(validatePresence.bind(undefined, requiredClaims))
-    .then(validateIssuer.bind(undefined, as.issuer))
+    .then(validateIssuer.bind(undefined, as))
     .then(validateAudience.bind(undefined, client.client_id))
 
   const clockSkew = getClockSkew(client)
@@ -5784,7 +5796,7 @@ export async function validateJwtAccessToken(
   )
     .then(checkJwtType.bind(undefined, 'at+jwt'))
     .then(validatePresence.bind(undefined, requiredClaims))
-    .then(validateIssuer.bind(undefined, as.issuer))
+    .then(validateIssuer.bind(undefined, as))
     .then(validateAudience.bind(undefined, expectedAudience))
     .catch(reassignRSCode)
 
@@ -5834,3 +5846,36 @@ function reassignRSCode(err: unknown): never {
   }
   throw err
 }
+
+/**
+ * This is not part of the public API.
+ *
+ * @private
+ *
+ * @ignore
+ *
+ * @internal
+ */
+export const _nopkce: unique symbol = Symbol()
+
+/**
+ * This is not part of the public API.
+ *
+ * @private
+ *
+ * @ignore
+ *
+ * @internal
+ */
+export const _nodiscoverycheck: unique symbol = Symbol()
+
+/**
+ * This is not part of the public API.
+ *
+ * @private
+ *
+ * @ignore
+ *
+ * @internal
+ */
+export const _expectedIssuer: unique symbol = Symbol()

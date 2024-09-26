@@ -17,6 +17,7 @@
     "noFallthroughCasesInSwitch": true,
     "noImplicitOverride": true,
     "noImplicitReturns": true,
-    "types": []
+    "types": [],
+    "stripInternal": true
   }
 }
