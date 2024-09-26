@@ -157,17 +157,17 @@ export type ClientAuthenticationMethod =
  * ```ts
  * interface PS256 extends RsaHashedKeyAlgorithm {
  *   name: 'RSA-PSS'
- *   hash: 'SHA-256'
+ *   hash: { name: 'SHA-256' }
  * }
  *
  * interface PS384 extends RsaHashedKeyAlgorithm {
  *   name: 'RSA-PSS'
- *   hash: 'SHA-384'
+ *   hash: { name: 'SHA-384' }
  * }
  *
  * interface PS512 extends RsaHashedKeyAlgorithm {
  *   name: 'RSA-PSS'
- *   hash: 'SHA-512'
+ *   hash: { name: 'SHA-512' }
  * }
  * ```
  *
@@ -199,17 +199,17 @@ export type ClientAuthenticationMethod =
  * ```ts
  * interface RS256 extends RsaHashedKeyAlgorithm {
  *   name: 'RSASSA-PKCS1-v1_5'
- *   hash: 'SHA-256'
+ *   hash: { name: 'SHA-256' }
  * }
  *
  * interface RS384 extends RsaHashedKeyAlgorithm {
  *   name: 'RSASSA-PKCS1-v1_5'
- *   hash: 'SHA-384'
+ *   hash: { name: 'SHA-384' }
  * }
  *
  * interface RS512 extends RsaHashedKeyAlgorithm {
  *   name: 'RSASSA-PKCS1-v1_5'
- *   hash: 'SHA-512'
+ *   hash: { name: 'SHA-512' }
  * }
  * ```
  *
@@ -926,7 +926,7 @@ export interface Client {
    * JWS `alg` algorithm REQUIRED for signing UserInfo Responses. When not configured the default is
    * to allow only algorithms listed in
    * {@link AuthorizationServer.userinfo_signing_alg_values_supported `as.userinfo_signing_alg_values_supported`}
-   * and fall back to `RS256` when the authorization server metadata is not set.
+   * and fail otherwise.
    */
   userinfo_signed_response_alg?: string
   /**
@@ -2247,7 +2247,7 @@ export interface OAuth2Error {
  * Pragma: no-cache
  *
  * {
- *   "error":"invalid_request"
+ *   "error": "invalid_request"
  * }
  * ```
  *
@@ -5324,11 +5324,32 @@ export async function deviceAuthorizationRequest(
 }
 
 export interface DeviceAuthorizationResponse {
+  /**
+   * The device verification code
+   */
   readonly device_code: string
+  /**
+   * The end-user verification code
+   */
   readonly user_code: string
+  /**
+   * The end-user verification URI on the authorization server. The URI should be short and easy to
+   * remember as end users will be asked to manually type it into their user agent.
+   */
   readonly verification_uri: string
+  /**
+   * The lifetime in seconds of the "device_code" and "user_code"
+   */
   readonly expires_in: number
+  /**
+   * A verification URI that includes the "user_code" (or other information with the same function
+   * as the "user_code"), which is designed for non-textual transmission
+   */
   readonly verification_uri_complete?: string
+  /**
+   * The minimum amount of time in seconds that the client should wait between polling requests to
+   * the token endpoint.
+   */
   readonly interval?: number
 
   readonly [parameter: string]: JsonValue | undefined
