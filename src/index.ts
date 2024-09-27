@@ -2618,23 +2618,7 @@ export interface ProtectedResourceRequestOptions
   [clockSkew]?: number
 }
 
-/**
- * Performs a protected resource request at an arbitrary URL.
- *
- * Authorization Header is used to transmit the Access Token value.
- *
- * @param accessToken The Access Token for the request.
- * @param method The HTTP method for the request.
- * @param url Target URL for the request.
- * @param headers Headers for the request.
- * @param body Request body compatible with the Fetch API and the request's method.
- *
- * @group Accessing Protected Resources
- *
- * @see [RFC 6750 - The OAuth 2.0 Authorization Framework: Bearer Token Usage](https://www.rfc-editor.org/rfc/rfc6750.html#section-2.1)
- * @see [RFC 9449 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)](https://www.rfc-editor.org/rfc/rfc9449.html#name-protected-resource-access)
- */
-export async function protectedResourceRequest(
+async function resourceRequest(
   accessToken: string,
   method: string,
   url: URL,
@@ -2672,18 +2656,46 @@ export async function protectedResourceRequest(
     method,
     redirect: 'manual',
     signal: options?.signal ? signal(options.signal) : null,
+  }).then(processDpopNonce)
+}
+
+/**
+ * Performs a protected resource request at an arbitrary URL.
+ *
+ * Authorization Header is used to transmit the Access Token value.
+ *
+ * @param accessToken The Access Token for the request.
+ * @param method The HTTP method for the request.
+ * @param url Target URL for the request.
+ * @param headers Headers for the request.
+ * @param body Request body compatible with the Fetch API and the request's method.
+ *
+ * @returns Resolves with a {@link !Response} instance. WWW-Authenticate HTTP Header challenges are
+ *   rejected with {@link WWWAuthenticateChallengeError}.
+ *
+ * @group Accessing Protected Resources
+ *
+ * @see [RFC 6750 - The OAuth 2.0 Authorization Framework: Bearer Token Usage](https://www.rfc-editor.org/rfc/rfc6750.html#section-2.1)
+ * @see [RFC 9449 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)](https://www.rfc-editor.org/rfc/rfc9449.html#name-protected-resource-access)
+ */
+export async function protectedResourceRequest(
+  accessToken: string,
+  method: string,
+  url: URL,
+  headers?: Headers,
+  body?: ProtectedResourceRequestBody,
+  options?: ProtectedResourceRequestOptions,
+): Promise<Response> {
+  return resourceRequest(accessToken, method, url, headers, body, options).then((response) => {
+    let challenges: WWWAuthenticateChallenge[] | undefined
+    if ((challenges = parseWwwAuthenticateChallenges(response))) {
+      throw new WWWAuthenticateChallengeError(
+        'server responded with a challenge in the WWW-Authenticate HTTP Header',
+        { cause: challenges, response },
+      )
+    }
+    return response
   })
-    .then(processDpopNonce)
-    .then((response) => {
-      let challenges: WWWAuthenticateChallenge[] | undefined
-      if ((challenges = parseWwwAuthenticateChallenges(response))) {
-        throw new WWWAuthenticateChallengeError(
-          'server responded with a challenge in the WWW-Authenticate HTTP Header',
-          { cause: challenges, response },
-        )
-      }
-      return response
-    })
 }
 
 export interface UserInfoRequestOptions extends HttpRequestOptions<'GET'>, DPoPRequestOptions {}
@@ -2728,7 +2740,7 @@ export async function userInfoRequest(
     headers.append('accept', 'application/jwt')
   }
 
-  return protectedResourceRequest(accessToken, 'GET', url, headers, null, {
+  return resourceRequest(accessToken, 'GET', url, headers, null, {
     ...options,
     [clockSkew]: getClockSkew(client),
   } as ProtectedResourceRequestOptions)

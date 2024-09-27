@@ -443,9 +443,10 @@ export const flow = (options?: MacroOptions) => {
             DPoP,
           })
         }
-        let response: Response
+        let response = await request()
         try {
-          response = await request()
+          let result = await oauth.processUserInfoResponse(as, client, sub!, response)
+          t.log('userinfo endpoint response', { ...result })
         } catch (err) {
           t.log('error', inspect(err, { depth: Infinity }))
           if (DPoP && err instanceof oauth.WWWAuthenticateChallengeError) {
@@ -464,9 +465,6 @@ export const flow = (options?: MacroOptions) => {
             throw err
           }
         }
-
-        const result = await oauth.processUserInfoResponse(as, client, sub!, response)
-        t.log('userinfo endpoint response', { ...result })
       }
 
       if (accounts_endpoint) {
