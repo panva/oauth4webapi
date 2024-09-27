@@ -19,7 +19,8 @@ const tClient: lib.Client = { ...client, client_secret: 'foo' }
 
 test('pushedAuthorizationRequest()', async (t) => {
   await t.throwsAsync(lib.pushedAuthorizationRequest(issuer, tClient, new URLSearchParams()), {
-    message: '"as.pushed_authorization_request_endpoint" must be a string',
+    message:
+      'authorization server metadata does not contain a valid "as.pushed_authorization_request_endpoint"',
   })
 
   const tIssuer: lib.AuthorizationServer = {

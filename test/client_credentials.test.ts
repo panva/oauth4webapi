@@ -19,8 +19,21 @@ const tClient: lib.Client = { ...client, client_secret: 'foo' }
 
 test('clientCredentialsGrantRequest()', async (t) => {
   await t.throwsAsync(lib.clientCredentialsGrantRequest(issuer, tClient, new URLSearchParams()), {
-    message: '"as.token_endpoint" must be a string',
+    message: 'authorization server metadata does not contain a valid "as.token_endpoint"',
+    code: 'OAUTH_MISSING_SERVER_METADATA',
   })
+
+  await t.throwsAsync(
+    lib.clientCredentialsGrantRequest(
+      { ...issuer, token_endpoint: '' },
+      tClient,
+      new URLSearchParams(),
+    ),
+    {
+      message: 'authorization server metadata does not contain a valid "as.token_endpoint"',
+      code: 'OAUTH_INVALID_SERVER_METADATA',
+    },
+  )
 
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,

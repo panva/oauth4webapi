@@ -23,7 +23,7 @@ const tClient: lib.Client = { ...client, client_secret: 'foo' }
 
 test('refreshTokenGrantRequest()', async (t) => {
   await t.throwsAsync(lib.refreshTokenGrantRequest(issuer, tClient, 'refresh_token'), {
-    message: '"as.token_endpoint" must be a string',
+    message: 'authorization server metadata does not contain a valid "as.token_endpoint"',
   })
 
   await t.throwsAsync(lib.refreshTokenGrantRequest(issuer, tClient, null as any), {

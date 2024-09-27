@@ -19,7 +19,7 @@ const tClient: lib.Client = { ...client, client_secret: 'foo' }
 
 test('revocationRequest()', async (t) => {
   await t.throwsAsync(lib.revocationRequest(issuer, tClient, 'token'), {
-    message: '"as.revocation_endpoint" must be a string',
+    message: 'authorization server metadata does not contain a valid "as.revocation_endpoint"',
   })
 
   await t.throwsAsync(lib.revocationRequest(issuer, tClient, null as any), {

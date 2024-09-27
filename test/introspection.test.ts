@@ -23,7 +23,7 @@ const tClient: lib.Client = { ...client, client_secret: 'foo' }
 
 test('introspectionRequest()', async (t) => {
   await t.throwsAsync(lib.introspectionRequest(issuer, tClient, 'token'), {
-    message: '"as.introspection_endpoint" must be a string',
+    message: 'authorization server metadata does not contain a valid "as.introspection_endpoint"',
   })
 
   await t.throwsAsync(lib.introspectionRequest(issuer, tClient, null as any), {

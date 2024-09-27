@@ -23,7 +23,8 @@ const tClient: lib.Client = { ...client, token_endpoint_auth_method: 'none' }
 
 test('deviceAuthorizationRequest()', async (t) => {
   await t.throwsAsync(lib.deviceAuthorizationRequest(issuer, tClient, new URLSearchParams()), {
-    message: '"as.device_authorization_endpoint" must be a string',
+    message:
+      'authorization server metadata does not contain a valid "as.device_authorization_endpoint"',
   })
 
   const tIssuer: lib.AuthorizationServer = {
@@ -238,7 +239,7 @@ test('processDeviceAuthorizationResponse()', async (t) => {
 
 test('deviceCodeGrantRequest()', async (t) => {
   await t.throwsAsync(lib.deviceCodeGrantRequest(issuer, tClient, 'device_code'), {
-    message: '"as.token_endpoint" must be a string',
+    message: 'authorization server metadata does not contain a valid "as.token_endpoint"',
   })
 
   await t.throwsAsync(lib.deviceCodeGrantRequest(issuer, tClient, null as any), {

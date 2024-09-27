@@ -2136,29 +2136,59 @@ async function publicJwk(key: CryptoKey) {
   return jwkCache.get(key) || getSetPublicJwkCache(key)
 }
 
+// @ts-ignore
+const URLParse: (url: string | URL, base?: string | URL) => URL | null = URL.parse
+  ? // @ts-ignore
+    (url, base) => URL.parse(url, base)
+  : (url, base) => {
+      try {
+        return new URL(url, base)
+      } catch {
+        return null
+      }
+    }
+
+/**
+ * @ignore
+ */
+export function checkProtocol(url: URL, enforceHttps: boolean | undefined) {
+  if (enforceHttps && url.protocol !== 'https:') {
+    throw OPE('only requests to HTTPS are allowed', HTTP_REQUEST_FORBIDDEN, url)
+  }
+
+  if (url.protocol !== 'https:' && url.protocol !== 'http:') {
+    throw OPE('only HTTP and HTTPS requests are allowed', REQUEST_PROTOCOL_FORBIDDEN, url)
+  }
+}
+
 function validateEndpoint(
   value: unknown,
   endpoint: keyof AuthorizationServer,
   useMtlsAlias: boolean | undefined,
   enforceHttps: boolean | undefined,
 ) {
-  assertString(value, useMtlsAlias ? `"as.mtls_endpoint_aliases.${endpoint}"` : `"as.${endpoint}"`)
-
-  const url = new URL(value)
-
-  if (enforceHttps && url.protocol !== 'https:') {
-    throw OPE('only requests to HTTPS are allowed', HTTP_REQUEST_FORBIDDEN, url)
+  let url: URL | null
+  if (typeof value !== 'string' || !(url = URLParse(value))) {
+    throw OPE(
+      `authorization server metadata does not contain a valid ${useMtlsAlias ? `"as.mtls_endpoint_aliases.${endpoint}"` : `"as.${endpoint}"`}`,
+      value === undefined ? MISSING_SERVER_METADATA : INVALID_SERVER_METADATA,
+    )
   }
+
+  checkProtocol(url, enforceHttps)
 
   return url
 }
 
-function resolveEndpoint(
+/**
+ * @ignore
+ */
+export function resolveEndpoint(
   as: AuthorizationServer,
   endpoint: keyof AuthorizationServer,
   useMtlsAlias: boolean | undefined,
   enforceHttps: boolean | undefined,
-) {
+): URL {
   if (useMtlsAlias && as.mtls_endpoint_aliases && endpoint in as.mtls_endpoint_aliases) {
     return validateEndpoint(
       as.mtls_endpoint_aliases[endpoint],
@@ -2618,9 +2648,7 @@ export async function protectedResourceRequest(
     throw CodedTypeError('"url" must be an instance of URL', ERR_INVALID_ARG_TYPE)
   }
 
-  if (options?.[allowInsecureRequests] !== true && url.protocol !== 'https:') {
-    throw OPE('only requests to HTTPS are allowed', HTTP_REQUEST_FORBIDDEN, url)
-  }
+  checkProtocol(url, options?.[allowInsecureRequests] !== true)
 
   headers = prepareHeaders(headers)
 
@@ -3504,7 +3532,10 @@ function validateAudience(expected: string, result: Awaited<ReturnType<typeof va
   return result
 }
 
-function validateOptionalIssuer(as: AuthorizationServer, result: Awaited<ReturnType<typeof validateJwt>>) {
+function validateOptionalIssuer(
+  as: AuthorizationServer,
+  result: Awaited<ReturnType<typeof validateJwt>>,
+) {
   if (result.claims.iss !== undefined) {
     return validateIssuer(as, result)
   }
@@ -3989,6 +4020,13 @@ export const RESPONSE_IS_NOT_CONFORM = 'OAUTH_RESPONSE_IS_NOT_CONFORM'
  */
 export const HTTP_REQUEST_FORBIDDEN = 'OAUTH_HTTP_REQUEST_FORBIDDEN'
 /**
+ * Assigned as {@link OperationProcessingError.code} when a request is about to made to a non-HTTP(S)
+ * endpoint.
+ *
+ * @group Error Codes
+ */
+export const REQUEST_PROTOCOL_FORBIDDEN = 'OAUTH_REQUEST_PROTOCOL_FORBIDDEN'
+/**
  * Assigned as {@link OperationProcessingError.code} when a JWT NumericDate comparison with the
  * current timestamp fails.
  *
@@ -4020,6 +4058,18 @@ export const JSON_ATTRIBUTE_COMPARISON = 'OAUTH_JSON_ATTRIBUTE_COMPARISON_FAILED
  * @group Error Codes
  */
 export const KEY_SELECTION = 'OAUTH_KEY_SELECTION_FAILED'
+/**
+ * Assigned as {@link OperationProcessingError.code} when the AS configuration is missing metadata.
+ *
+ * @group Error Codes
+ */
+export const MISSING_SERVER_METADATA = 'OAUTH_MISSING_SERVER_METADATA'
+/**
+ * Assigned as {@link OperationProcessingError.code} when the AS configuration has invalid metadata.
+ *
+ * @group Error Codes
+ */
+export const INVALID_SERVER_METADATA = 'OAUTH_INVALID_SERVER_METADATA'
 
 function checkJwtType(expected: string, result: Awaited<ReturnType<typeof validateJwt>>) {
   if (typeof result.header.typ !== 'string' || normalizeTyp(result.header.typ) !== expected) {

@@ -55,7 +55,7 @@ test('authorizationCodeGrantRequest()', async (t) => {
       'verifier',
     ),
     {
-      message: '"as.token_endpoint" must be a string',
+      message: 'authorization server metadata does not contain a valid "as.token_endpoint"',
     },
   )
 

@@ -93,8 +93,7 @@ test('userInfoRequest() w/ jwt signal', async (t) => {
 
 test('userInfoRequest() requires userinfo_endpoint', async (t) => {
   await t.throwsAsync(lib.userInfoRequest(issuer, client, 'token'), {
-    name: 'TypeError',
-    message: '"as.userinfo_endpoint" must be a string',
+    message: 'authorization server metadata does not contain a valid "as.userinfo_endpoint"',
   })
 })
 
