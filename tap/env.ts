@@ -10,7 +10,7 @@ export const isElectron =
 
 export const isNode =
   // @ts-ignore
-  !isBun && !isElectron && typeof process !== 'undefined'
+  !isBun && !isElectron && !isDeno && typeof process !== 'undefined'
 
 export const isEdgeRuntime =
   // @ts-ignore
