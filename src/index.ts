@@ -114,24 +114,20 @@ function CodedTypeError(message: string, code: codes, cause?: unknown) {
 /**
  * Supported Client Authentication Methods.
  *
- * - **`client_secret_post`** (default) uses the HTTP request body to send
- *   {@link Client.client_id `client_id`} and {@link Client.client_secret `client_secret`} as
- *   `application/x-www-form-urlencoded` body parameters.
- * - **`client_secret_basic`** uses the HTTP `Basic` authentication scheme to send
- *   {@link Client.client_id `client_id`} and {@link Client.client_secret `client_secret`} in an
- *   `Authorization` HTTP Header.
- * - **`private_key_jwt`** uses the HTTP request body to send {@link Client.client_id `client_id`},
- *   `client_assertion_type`, and `client_assertion` as `application/x-www-form-urlencoded` body
- *   parameters. The `client_assertion` is signed using a private key supplied as an
- *   {@link AuthenticatedRequestOptions.clientPrivateKey options parameter}.
- * - **`none`** (public client) uses the HTTP request body to send only
- *   {@link Client.client_id `client_id`} as `application/x-www-form-urlencoded` body parameter.
- * - **`tls_client_auth`** uses the HTTP request body to send only {@link Client.client_id `client_id`}
- *   as `application/x-www-form-urlencoded` body parameter and the mTLS key and certificate is
+ * - **`client_secret_post`** (default) uses the HTTP request body to send `client_id` and
+ *   `client_secret` as `application/x-www-form-urlencoded` body parameters.
+ * - **`client_secret_basic`** uses the HTTP `Basic` authentication scheme to send `client_id` and
+ *   `client_secret` in an `Authorization` HTTP Header.
+ * - **`private_key_jwt`** uses the HTTP request body to send `client_id`, `client_assertion_type`,
+ *   and `client_assertion` as `application/x-www-form-urlencoded` body parameters.
+ * - **`none`** (public client) uses the HTTP request body to send only `client_id` as
+ *   `application/x-www-form-urlencoded` body parameter.
+ * - **`tls_client_auth`** uses the HTTP request body to send only `client_id` as
+ *   `application/x-www-form-urlencoded` body parameter and the mTLS key and certificate is
  *   configured through {@link customFetch}.
- * - **`self_signed_tls_client_auth`** uses the HTTP request body to send only
- *   {@link Client.client_id `client_id`} as `application/x-www-form-urlencoded` body parameter and
- *   the mTLS key and certificate is configured through {@link customFetch}.
+ * - **`self_signed_tls_client_auth`** uses the HTTP request body to send only `client_id` as
+ *   `application/x-www-form-urlencoded` body parameter and the mTLS key and certificate is
+ *   configured through {@link customFetch}.
  *
  * @see [RFC 6749 - The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html#section-2.3)
  * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication)
@@ -946,9 +942,8 @@ export interface Client {
    * where present. Default is `false`.
    *
    * When combined with {@link customFetch} (to use a Fetch API implementation that supports client
-   * certificates) this can be used to target FAPI 2.0 profiles that utilize Mutual-TLS for either
-   * client authentication or sender constraining. FAPI 1.0 Advanced profiles that use PAR and JARM
-   * can also be targetted.
+   * certificates) this can be used to target security profiles that utilize Mutual-TLS for either
+   * client authentication or sender constraining.
    *
    * @example
    *
