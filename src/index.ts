@@ -2997,7 +2997,6 @@ export async function processUserInfoResponse(
         as.userinfo_signing_alg_values_supported,
         undefined,
       ),
-      noSignatureCheck,
       getClockSkew(client),
       getClockTolerance(client),
       client[jweDecrypt],
@@ -3446,7 +3445,6 @@ async function processGenericAccessTokenResponse(
         as.id_token_signing_alg_values_supported,
         'RS256',
       ),
-      noSignatureCheck,
       getClockSkew(client),
       getClockTolerance(client),
       client[jweDecrypt],
@@ -3674,7 +3672,6 @@ interface CompactJWSHeaderParameters {
 interface ParsedJWT {
   header: CompactJWSHeaderParameters
   claims: JWTPayload
-  signature: Uint8Array
   jwt: string
 }
 
@@ -4481,7 +4478,6 @@ export async function processIntrospectionResponse(
         as.introspection_signing_alg_values_supported,
         'RS256',
       ),
-      noSignatureCheck,
       getClockSkew(client),
       getClockTolerance(client),
       client[jweDecrypt],
@@ -4663,8 +4659,6 @@ function keyToSubtle(key: CryptoKey): AlgorithmIdentifier | RsaPssParams | Ecdsa
   throw new UnsupportedOperationError('unsupported CryptoKey algorithm name', { cause: key })
 }
 
-const noSignatureCheck = Symbol()
-
 async function validateJwsSignature(
   protectedHeader: string,
   payload: string,
@@ -4694,17 +4688,16 @@ export interface JweDecryptFunction {
 async function validateJwt(
   jws: string,
   checkAlg: (h: CompactJWSHeaderParameters) => void,
-  getKey: ((h: CompactJWSHeaderParameters) => Promise<CryptoKey>) | typeof noSignatureCheck,
   clockSkew: number,
   clockTolerance: number,
   decryptJwt: JweDecryptFunction | undefined,
-): Promise<ParsedJWT & { key?: CryptoKey }> {
-  let { 0: protectedHeader, 1: payload, 2: encodedSignature, length } = jws.split('.')
+): Promise<ParsedJWT> {
+  let { 0: protectedHeader, 1: payload, length } = jws.split('.')
 
   if (length === 5) {
     if (decryptJwt !== undefined) {
       jws = await decryptJwt(jws)
-      ;({ 0: protectedHeader, 1: payload, 2: encodedSignature, length } = jws.split('.'))
+      ;({ 0: protectedHeader, 1: payload, length } = jws.split('.'))
     } else {
       throw new UnsupportedOperationError('JWE decryption is not configured', { cause: jws })
     }
@@ -4730,13 +4723,6 @@ async function validateJwt(
     throw new UnsupportedOperationError('no JWT "crit" header parameter extensions are supported', {
       cause: { header },
     })
-  }
-
-  const signature = b64u(encodedSignature)
-  let key!: CryptoKey
-  if (getKey !== noSignatureCheck) {
-    key = await getKey(header)
-    await validateJwsSignature(protectedHeader, payload, key, signature)
   }
 
   let claims: JsonValue
@@ -4797,7 +4783,7 @@ async function validateJwt(
     }
   }
 
-  return { header, claims, signature, key, jwt: jws }
+  return { header, claims, jwt: jws }
 }
 
 /**
@@ -4843,7 +4829,7 @@ export async function validateJwtAuthResponse(
     throw OPE('"parameters" does not contain a JARM response', INVALID_RESPONSE)
   }
 
-  const { claims } = await validateJwt(
+  const { claims, header, jwt } = await validateJwt(
     response,
     checkSigningAlgorithm.bind(
       undefined,
@@ -4851,7 +4837,6 @@ export async function validateJwtAuthResponse(
       as.authorization_signing_alg_values_supported,
       'RS256',
     ),
-    getPublicSigKeyFromIssuerJwksUri.bind(undefined, as, options),
     getClockSkew(client),
     getClockTolerance(client),
     client[jweDecrypt],
@@ -4859,6 +4844,12 @@ export async function validateJwtAuthResponse(
     .then(validatePresence.bind(undefined, ['aud', 'exp', 'iss']))
     .then(validateIssuer.bind(undefined, as))
     .then(validateAudience.bind(undefined, client.client_id))
+
+  const { 0: protectedHeader, 1: payload, 2: encodedSignature } = jwt.split('.')
+
+  const signature = b64u(encodedSignature)
+  const key = await getPublicSigKeyFromIssuerJwksUri(as, options, header)
+  await validateJwsSignature(protectedHeader, payload, key, signature)
 
   const result = new URLSearchParams()
   for (const [key, value] of Object.entries(claims)) {
@@ -5033,7 +5024,7 @@ export async function validateDetachedSignatureResponse(
     requiredClaims.push('auth_time')
   }
 
-  const { claims, header, key } = await validateJwt(
+  const { claims, header, jwt } = await validateJwt(
     id_token,
     checkSigningAlgorithm.bind(
       undefined,
@@ -5041,7 +5032,6 @@ export async function validateDetachedSignatureResponse(
       as.id_token_signing_alg_values_supported,
       'RS256',
     ),
-    getPublicSigKeyFromIssuerJwksUri.bind(undefined, as, options),
     getClockSkew(client),
     getClockTolerance(client),
     client[jweDecrypt],
@@ -5063,29 +5053,6 @@ export async function validateDetachedSignatureResponse(
   assertString(claims.c_hash, 'ID Token "c_hash" (code hash) claim value', INVALID_RESPONSE, {
     claims,
   })
-
-  if ((await idTokenHashMatches(code, claims.c_hash, key!, header, 'c_hash')) !== true) {
-    throw OPE('invalid ID Token "c_hash" (code hash) claim value', JWT_CLAIM_COMPARISON, {
-      code,
-      c_hash: claims.c_hash,
-      alg: header.alg,
-    })
-  }
-
-  if (state !== null || claims.s_hash !== undefined) {
-    assertString(claims.s_hash, 'ID Token "s_hash" (state hash) claim value', INVALID_RESPONSE, {
-      claims,
-    })
-    assertString(state, '"state" response parameter', INVALID_RESPONSE, { parameters })
-
-    if ((await idTokenHashMatches(state, claims.s_hash, key!, header, 's_hash')) !== true) {
-      throw OPE('invalid ID Token "s_hash" (state hash) claim value', JWT_CLAIM_COMPARISON, {
-        state,
-        s_hash: claims.s_hash,
-        alg: header.alg,
-      })
-    }
-  }
 
   if (claims.auth_time !== undefined) {
     assertNumber(
@@ -5130,6 +5097,35 @@ export async function validateDetachedSignatureResponse(
       throw OPE('unexpected ID Token "azp" (authorized party) claim value', JWT_CLAIM_COMPARISON, {
         expected: client.client_id,
         claims,
+      })
+    }
+  }
+
+  const { 0: protectedHeader, 1: payload, 2: encodedSignature } = jwt.split('.')
+
+  const signature = b64u(encodedSignature)
+  const key = await getPublicSigKeyFromIssuerJwksUri(as, options, header)
+  await validateJwsSignature(protectedHeader, payload, key, signature)
+
+  if ((await idTokenHashMatches(code, claims.c_hash, key!, header, 'c_hash')) !== true) {
+    throw OPE('invalid ID Token "c_hash" (code hash) claim value', JWT_CLAIM_COMPARISON, {
+      code,
+      c_hash: claims.c_hash,
+      alg: header.alg,
+    })
+  }
+
+  if (state !== null || claims.s_hash !== undefined) {
+    assertString(claims.s_hash, 'ID Token "s_hash" (state hash) claim value', INVALID_RESPONSE, {
+      claims,
+    })
+    assertString(state, '"state" response parameter', INVALID_RESPONSE, { parameters })
+
+    if ((await idTokenHashMatches(state, claims.s_hash, key!, header, 's_hash')) !== true) {
+      throw OPE('invalid ID Token "s_hash" (state hash) claim value', JWT_CLAIM_COMPARISON, {
+        state,
+        s_hash: claims.s_hash,
+        alg: header.alg,
       })
     }
   }
@@ -5731,19 +5727,6 @@ async function validateDPoP(
       undefined,
       SUPPORTED_JWS_ALGS,
     ),
-    async (header) => {
-      const { jwk, alg } = header
-      if (!jwk) {
-        throw OPE('DPoP Proof is missing the jwk header parameter', INVALID_REQUEST, { header })
-      }
-      const key = await importJwk(alg, jwk)
-      if (key.type !== 'public') {
-        throw OPE('DPoP Proof jwk header parameter must contain a public key', INVALID_REQUEST, {
-          header,
-        })
-      }
-      return key
-    },
     clockSkew,
     getClockTolerance(options),
     undefined,
@@ -5824,6 +5807,23 @@ async function validateDPoP(
       })
     }
   }
+
+  const { 0: protectedHeader, 1: payload, 2: encodedSignature } = headerValue.split('.')
+
+  const signature = b64u(encodedSignature)
+  const { jwk, alg } = proof.header
+  if (!jwk) {
+    throw OPE('DPoP Proof is missing the jwk header parameter', INVALID_REQUEST, {
+      header: proof.header,
+    })
+  }
+  const key = await importJwk(alg, jwk)
+  if (key.type !== 'public') {
+    throw OPE('DPoP Proof jwk header parameter must contain a public key', INVALID_REQUEST, {
+      header: proof.header,
+    })
+  }
+  await validateJwsSignature(protectedHeader, payload, key, signature)
 }
 
 /**
@@ -5909,7 +5909,7 @@ export async function validateJwtAccessToken(
     requiredClaims.push('cnf')
   }
 
-  const { claims } = await validateJwt(
+  const { claims, header } = await validateJwt(
     accessToken,
     checkSigningAlgorithm.bind(
       undefined,
@@ -5917,7 +5917,6 @@ export async function validateJwtAccessToken(
       undefined,
       SUPPORTED_JWS_ALGS,
     ),
-    getPublicSigKeyFromIssuerJwksUri.bind(undefined, as, options),
     getClockSkew(options),
     getClockTolerance(options),
     undefined,
@@ -5955,6 +5954,12 @@ export async function validateJwtAccessToken(
       }
     }
   }
+
+  const { 0: protectedHeader, 1: payload, 2: encodedSignature } = accessToken.split('.')
+
+  const signature = b64u(encodedSignature)
+  const key = await getPublicSigKeyFromIssuerJwksUri(as, options, header)
+  await validateJwsSignature(protectedHeader, payload, key, signature)
 
   if (
     options?.requireDPoP ||
