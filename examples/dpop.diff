@@ -1,5 +1,5 @@
 diff --git a/examples/oauth.ts b/examples/dpop.ts
-index d8185be..a4a57a1 100644
+index d55e62d..0cb9bdd 100644
 --- a/examples/oauth.ts
 +++ b/examples/dpop.ts
 @@ -15,6 +15,12 @@ let client_secret!: string
@@ -15,19 +15,28 @@ index d8185be..a4a57a1 100644
  
  // End of prerequisites
  
-@@ -67,15 +73,24 @@ let access_token: string
+@@ -64,16 +70,32 @@ let access_token: string
    const currentUrl: URL = getCurrentUrl()
    const params = oauth.validateAuthResponse(as, client, currentUrl, state)
  
 -  const response = await oauth.authorizationCodeGrantRequest(
 -    as,
 -    client,
+-    clientAuth,
 -    params,
 -    redirect_uri,
 -    code_verifier,
 -  )
 +  const authorizationCodeGrantRequest = () =>
-+    oauth.authorizationCodeGrantRequest(as, client, params, redirect_uri, code_verifier, { DPoP })
++    oauth.authorizationCodeGrantRequest(
++      as,
++      client,
++      clientAuth,
++      params,
++      redirect_uri,
++      code_verifier,
++      { DPoP },
++    )
 +
 +  let response = await authorizationCodeGrantRequest()
 +
@@ -48,7 +57,7 @@ index d8185be..a4a57a1 100644
  
    console.log('Access Token Response', result)
    ;({ access_token } = result)
-@@ -83,11 +98,29 @@ let access_token: string
+@@ -81,11 +103,29 @@ let access_token: string
  
  // Protected Resource Request
  {

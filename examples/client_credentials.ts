@@ -16,11 +16,8 @@ const as = await oauth
   .discoveryRequest(issuer, { algorithm })
   .then((response) => oauth.processDiscoveryResponse(issuer, response))
 
-const client: oauth.Client = {
-  client_id,
-  client_secret,
-  token_endpoint_auth_method: 'client_secret_basic',
-}
+const client: oauth.Client = { client_id }
+const clientAuth = oauth.ClientSecretPost(client_secret)
 
 // Client Credentials Grant Request & Response
 let access_token: string
@@ -28,7 +25,7 @@ let access_token: string
   const parameters = new URLSearchParams()
   parameters.set('scope', 'api:read')
 
-  const response = await oauth.clientCredentialsGrantRequest(as, client, parameters)
+  const response = await oauth.clientCredentialsGrantRequest(as, client, clientAuth, parameters)
 
   const result = await oauth.processClientCredentialsResponse(as, client, response)
 

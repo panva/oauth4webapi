@@ -1,8 +1,8 @@
 diff --git a/examples/oauth.ts b/examples/oidc.ts
-index d8185be..3426a96 100644
+index d55e62d..bc0455e 100644
 --- a/examples/oauth.ts
 +++ b/examples/oidc.ts
-@@ -36,7 +36,7 @@ const code_challenge_method = 'S256'
+@@ -33,7 +33,7 @@ const code_challenge_method = 'S256'
   */
  const code_verifier = oauth.generateRandomCodeVerifier()
  const code_challenge = await oauth.calculatePKCECodeChallenge(code_verifier)
@@ -11,7 +11,7 @@ index d8185be..3426a96 100644
  
  {
    // redirect user to as.authorization_endpoint
-@@ -44,17 +44,17 @@ let state: string | undefined
+@@ -41,17 +41,17 @@ let state: string | undefined
    authorizationUrl.searchParams.set('client_id', client.client_id)
    authorizationUrl.searchParams.set('redirect_uri', redirect_uri)
    authorizationUrl.searchParams.set('response_type', 'code')
@@ -33,7 +33,7 @@ index d8185be..3426a96 100644
    }
  
    // now redirect the user to authorizationUrl.href
-@@ -62,10 +62,11 @@ let state: string | undefined
+@@ -59,10 +59,11 @@ let state: string | undefined
  
  // one eternity later, the user lands back on the redirect_uri
  // Authorization Code Grant Request & Response
@@ -46,7 +46,7 @@ index d8185be..3426a96 100644
  
    const response = await oauth.authorizationCodeGrantRequest(
      as,
-@@ -75,19 +76,21 @@ let access_token: string
+@@ -73,19 +74,21 @@ let access_token: string
      code_verifier,
    )
  

@@ -1,5 +1,5 @@
 diff --git a/examples/oauth.ts b/examples/fapi2.ts
-index d8185be..68904db 100644
+index d55e62d..b8ec053 100644
 --- a/examples/oauth.ts
 +++ b/examples/fapi2.ts
 @@ -9,12 +9,22 @@ let algorithm!:
@@ -26,14 +26,12 @@ index d8185be..68904db 100644
  
  // End of prerequisites
  
-@@ -24,38 +34,57 @@ const as = await oauth
+@@ -23,36 +33,55 @@ const as = await oauth
+   .then((response) => oauth.processDiscoveryResponse(issuer, response))
  
- const client: oauth.Client = {
-   client_id,
--  client_secret,
--  token_endpoint_auth_method: 'client_secret_basic',
-+  token_endpoint_auth_method: 'private_key_jwt',
- }
+ const client: oauth.Client = { client_id }
+-const clientAuth = oauth.ClientSecretPost(client_secret)
++const clientAuth = oauth.PrivateKeyJwt(clientPrivateKey)
  
  const code_challenge_method = 'S256'
  /**
@@ -59,9 +57,8 @@ index d8185be..68904db 100644
 +  params.set('scope', 'api:read')
 +
 +  const pushedAuthorizationRequest = () =>
-+    oauth.pushedAuthorizationRequest(as, client, params, {
++    oauth.pushedAuthorizationRequest(as, client, clientAuth, params, {
 +      DPoP,
-+      clientPrivateKey,
 +    })
 +  let response = await pushedAuthorizationRequest()
 +
@@ -103,7 +100,7 @@ index d8185be..68904db 100644
  
    // now redirect the user to authorizationUrl.href
  }
-@@ -65,17 +94,26 @@ let state: string | undefined
+@@ -62,18 +91,34 @@ let state: string | undefined
  let access_token: string
  {
    const currentUrl: URL = getCurrentUrl()
@@ -111,13 +108,22 @@ index d8185be..68904db 100644
 +  const params = oauth.validateAuthResponse(as, client, currentUrl)
 +
 +  const authorizationCodeGrantRequest = () =>
-+    oauth.authorizationCodeGrantRequest(as, client, params, redirect_uri, code_verifier, { DPoP })
++    oauth.authorizationCodeGrantRequest(
++      as,
++      client,
++      clientAuth,
++      params,
++      redirect_uri,
++      code_verifier,
++      { DPoP },
++    )
 +
 +  let response = await authorizationCodeGrantRequest()
  
 -  const response = await oauth.authorizationCodeGrantRequest(
 -    as,
 -    client,
+-    clientAuth,
 -    params,
 -    redirect_uri,
 -    code_verifier,
@@ -139,7 +145,7 @@ index d8185be..68904db 100644
  
    console.log('Access Token Response', result)
    ;({ access_token } = result)
-@@ -83,11 +121,29 @@ let access_token: string
+@@ -81,11 +126,29 @@ let access_token: string
  
  // Protected Resource Request
  {

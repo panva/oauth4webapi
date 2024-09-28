@@ -22,11 +22,11 @@ test.before(setupJwks)
 const tClient: lib.Client = { ...client, client_secret: 'foo' }
 
 test('introspectionRequest()', async (t) => {
-  await t.throwsAsync(lib.introspectionRequest(issuer, tClient, 'token'), {
+  await t.throwsAsync(lib.introspectionRequest(issuer, tClient, lib.None(), 'token'), {
     message: 'authorization server metadata does not contain a valid "as.introspection_endpoint"',
   })
 
-  await t.throwsAsync(lib.introspectionRequest(issuer, tClient, null as any), {
+  await t.throwsAsync(lib.introspectionRequest(issuer, tClient, lib.None(), null as any), {
     message: '"token" must be a string',
   })
 
@@ -49,7 +49,7 @@ test('introspectionRequest()', async (t) => {
     })
     .reply(200, { active: false })
 
-  await t.notThrowsAsync(lib.introspectionRequest(tIssuer, tClient, 'token'))
+  await t.notThrowsAsync(lib.introspectionRequest(tIssuer, tClient, lib.None(), 'token'))
 })
 
 test('introspectionRequest() w/ Extra Parameters', async (t) => {
@@ -70,13 +70,13 @@ test('introspectionRequest() w/ Extra Parameters', async (t) => {
     .times(3)
 
   await t.notThrowsAsync(
-    lib.introspectionRequest(tIssuer, tClient, 'token', {
+    lib.introspectionRequest(tIssuer, tClient, lib.None(), 'token', {
       additionalParameters: new URLSearchParams('token_type_hint=access_token'),
     }),
   )
 
   await t.notThrowsAsync(
-    lib.introspectionRequest(tIssuer, tClient, 'token', {
+    lib.introspectionRequest(tIssuer, tClient, lib.None(), 'token', {
       additionalParameters: {
         token_type_hint: 'access_token',
       },
@@ -84,7 +84,7 @@ test('introspectionRequest() w/ Extra Parameters', async (t) => {
   )
 
   await t.notThrowsAsync(
-    lib.introspectionRequest(tIssuer, tClient, 'token', {
+    lib.introspectionRequest(tIssuer, tClient, lib.None(), 'token', {
       additionalParameters: [['token_type_hint', 'access_token']],
     }),
   )
@@ -119,7 +119,9 @@ test('introspectionRequest() w/ Custom Headers', async (t) => {
     Object.fromEntries(entries),
     new Headers(Object.fromEntries(entries)),
   ]) {
-    await t.notThrowsAsync(lib.introspectionRequest(tIssuer, tClient, 'token', { headers }))
+    await t.notThrowsAsync(
+      lib.introspectionRequest(tIssuer, tClient, lib.None(), 'token', { headers }),
+    )
   }
 })
 
@@ -143,7 +145,7 @@ test('introspectionRequest() forced jwt', async (t) => {
     .reply(200, { active: false })
 
   await t.notThrowsAsync(
-    lib.introspectionRequest(tIssuer, tClient, 'token', { requestJwtResponse: true }),
+    lib.introspectionRequest(tIssuer, tClient, lib.None(), 'token', { requestJwtResponse: true }),
   )
 })
 
@@ -170,6 +172,7 @@ test('introspectionRequest() jwt through client metadata', async (t) => {
     lib.introspectionRequest(
       tIssuer,
       { ...tClient, introspection_signed_response_alg: 'ES256' },
+      lib.None(),
       'token',
     ),
   )
@@ -198,6 +201,7 @@ test('introspectionRequest() forced json', async (t) => {
     lib.introspectionRequest(
       tIssuer,
       { ...tClient, introspection_signed_response_alg: 'ES256' },
+      lib.None(),
       'token',
       { requestJwtResponse: false },
     ),

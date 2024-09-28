@@ -28,11 +28,8 @@ const as = await oauth
   .discoveryRequest(issuer, { algorithm })
   .then((response) => oauth.processDiscoveryResponse(issuer, response))
 
-const client: oauth.Client = {
-  client_id,
-  client_secret,
-  token_endpoint_auth_method: 'client_secret_basic',
-}
+const client: oauth.Client = { client_id }
+const clientAuth = oauth.ClientSecretPost(client_secret)
 
 const code_challenge_method = 'S256'
 /**
@@ -74,7 +71,15 @@ let access_token: string
   const params = oauth.validateAuthResponse(as, client, currentUrl, state)
 
   const authorizationCodeGrantRequest = () =>
-    oauth.authorizationCodeGrantRequest(as, client, params, redirect_uri, code_verifier, { DPoP })
+    oauth.authorizationCodeGrantRequest(
+      as,
+      client,
+      clientAuth,
+      params,
+      redirect_uri,
+      code_verifier,
+      { DPoP },
+    )
 
   let response = await authorizationCodeGrantRequest()
 

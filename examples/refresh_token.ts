@@ -22,11 +22,8 @@ const as = await oauth
   .discoveryRequest(issuer, { algorithm })
   .then((response) => oauth.processDiscoveryResponse(issuer, response))
 
-const client: oauth.Client = {
-  client_id,
-  client_secret,
-  token_endpoint_auth_method: 'client_secret_basic',
-}
+const client: oauth.Client = { client_id }
+const clientAuth = oauth.ClientSecretPost(client_secret)
 
 const code_challenge_method = 'S256'
 /**
@@ -71,6 +68,7 @@ let refresh_token: string | undefined
   const response = await oauth.authorizationCodeGrantRequest(
     as,
     client,
+    clientAuth,
     params,
     redirect_uri,
     code_verifier,
@@ -95,7 +93,7 @@ let refresh_token: string | undefined
 
 // Refresh Token Grant Request & Response
 if (refresh_token) {
-  const response = await oauth.refreshTokenGrantRequest(as, client, refresh_token)
+  const response = await oauth.refreshTokenGrantRequest(as, client, clientAuth, refresh_token)
 
   const result = await oauth.processRefreshTokenResponse(as, client, response)
 

@@ -48,8 +48,8 @@ export default async (QUnit: QUnit) => {
             ...client,
             token_endpoint_auth_method: 'private_key_jwt',
           },
+          lib.PrivateKeyJwt(privateKey),
           new URLSearchParams(),
-          { clientPrivateKey: privateKey },
         ),
         (err: Error) => {
           t.propContains(err, {

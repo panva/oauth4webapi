@@ -19,14 +19,14 @@ test.before(setup)
 test.after(teardown)
 test.before(setupJwks)
 
-const tClient: lib.Client = { ...client, client_secret: 'foo' }
+const tClient: lib.Client = { ...client }
 
 test('refreshTokenGrantRequest()', async (t) => {
-  await t.throwsAsync(lib.refreshTokenGrantRequest(issuer, tClient, 'refresh_token'), {
+  await t.throwsAsync(lib.refreshTokenGrantRequest(issuer, tClient, lib.None(), 'refresh_token'), {
     message: 'authorization server metadata does not contain a valid "as.token_endpoint"',
   })
 
-  await t.throwsAsync(lib.refreshTokenGrantRequest(issuer, tClient, null as any), {
+  await t.throwsAsync(lib.refreshTokenGrantRequest(issuer, tClient, lib.None(), null as any), {
     message: '"refreshToken" must be a string',
   })
 
@@ -53,7 +53,9 @@ test('refreshTokenGrantRequest()', async (t) => {
     })
     .reply(200, { access_token: 'token', token_type: 'Bearer' })
 
-  await t.notThrowsAsync(lib.refreshTokenGrantRequest(tIssuer, tClient, 'refresh_token'))
+  await t.notThrowsAsync(
+    lib.refreshTokenGrantRequest(tIssuer, tClient, lib.None(), 'refresh_token'),
+  )
 })
 
 test('refreshTokenGrantRequest() w/ Extra Parameters', async (t) => {
@@ -75,13 +77,13 @@ test('refreshTokenGrantRequest() w/ Extra Parameters', async (t) => {
     .times(3)
 
   await t.notThrowsAsync(
-    lib.refreshTokenGrantRequest(tIssuer, tClient, 'refresh_token', {
+    lib.refreshTokenGrantRequest(tIssuer, tClient, lib.None(), 'refresh_token', {
       additionalParameters: new URLSearchParams('resource=urn:example:resource'),
     }),
   )
 
   await t.notThrowsAsync(
-    lib.refreshTokenGrantRequest(tIssuer, tClient, 'refresh_token', {
+    lib.refreshTokenGrantRequest(tIssuer, tClient, lib.None(), 'refresh_token', {
       additionalParameters: {
         resource: 'urn:example:resource',
       },
@@ -89,7 +91,7 @@ test('refreshTokenGrantRequest() w/ Extra Parameters', async (t) => {
   )
 
   await t.notThrowsAsync(
-    lib.refreshTokenGrantRequest(tIssuer, tClient, 'refresh_token', {
+    lib.refreshTokenGrantRequest(tIssuer, tClient, lib.None(), 'refresh_token', {
       additionalParameters: [['resource', 'urn:example:resource']],
     }),
   )
@@ -126,7 +128,7 @@ test('refreshTokenGrantRequest() w/ Custom Headers', async (t) => {
     new Headers(Object.fromEntries(entries)),
   ]) {
     await t.notThrowsAsync(
-      lib.refreshTokenGrantRequest(tIssuer, tClient, 'refresh_token', { headers }),
+      lib.refreshTokenGrantRequest(tIssuer, tClient, lib.None(), 'refresh_token', { headers }),
     )
   }
 })
@@ -148,7 +150,9 @@ test('refreshTokenGrantRequest() w/ DPoP', async (t) => {
     .reply(200, { access_token: 'token', token_type: 'DPoP' })
 
   const DPoP = await lib.generateKeyPair('ES256')
-  await t.notThrowsAsync(lib.refreshTokenGrantRequest(tIssuer, tClient, 'refresh_token', { DPoP }))
+  await t.notThrowsAsync(
+    lib.refreshTokenGrantRequest(tIssuer, tClient, lib.None(), 'refresh_token', { DPoP }),
+  )
 })
 
 test('processRefreshTokenResponse() without ID Tokens', async (t) => {

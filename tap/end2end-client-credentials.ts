@@ -11,7 +11,7 @@ export default (QUnit: QUnit) => {
 
   const alg = 'ES256'
 
-  const authMethodOptions: lib.ClientAuthenticationMethod[] = [
+  const authMethodOptions: string[] = [
     'client_secret_basic',
     'client_secret_post',
     'private_key_jwt',
@@ -19,7 +19,7 @@ export default (QUnit: QUnit) => {
   ]
 
   const options = (
-    authMethod: lib.ClientAuthenticationMethod,
+    authMethod: string,
     ...flags: Array<'dpop' | 'jwtIntrospection' | 'encryption'>
   ) => {
     const conf = { authMethod, dpop: false, jwtIntrospection: false, encryption: false }
@@ -66,8 +66,28 @@ export default (QUnit: QUnit) => {
       )
       const DPoP = dpop ? await lib.generateKeyPair(alg as lib.JWSAlgorithm) : undefined
 
-      const authenticated: lib.AuthenticatedRequestOptions = {
-        clientPrivateKey: authMethod === 'private_key_jwt' ? clientPrivateKey : undefined,
+      let clientAuth: lib.ClientAuthenticationImplementation
+      switch (authMethod) {
+        case 'client_secret_basic':
+          clientAuth = lib.ClientSecretBasic(client.client_secret as string)
+          break
+        case 'client_secret_post':
+          clientAuth = lib.ClientSecretPost(client.client_secret as string)
+          break
+        case 'private_key_jwt':
+          clientAuth = lib.PrivateKeyJwt({
+            ...clientPrivateKey,
+            [lib.modifyAssertion](h, p) {
+              t.equal(h.alg, 'ES256')
+              p.foo = 'bar'
+            },
+          })
+          break
+        case 'none':
+          clientAuth = lib.None()
+          break
+        default:
+          throw new Error('unreachable')
       }
 
       const as = await lib
@@ -84,18 +104,23 @@ export default (QUnit: QUnit) => {
           typeof lib.clientCredentialsGrantRequest
         > = async () => {
           if (random()) {
-            return lib.clientCredentialsGrantRequest(as, client, params, {
+            return lib.clientCredentialsGrantRequest(as, client, clientAuth, params, {
               DPoP,
               [lib.allowInsecureRequests]: true,
-              ...authenticated,
             })
           }
 
-          return lib.genericTokenEndpointRequest(as, client, 'client_credentials', params, {
-            DPoP,
-            [lib.allowInsecureRequests]: true,
-            ...authenticated,
-          })
+          return lib.genericTokenEndpointRequest(
+            as,
+            client,
+            clientAuth,
+            'client_credentials',
+            params,
+            {
+              DPoP,
+              [lib.allowInsecureRequests]: true,
+            },
+          )
         }
         let response = await clientCredentialsGrantRequest()
 
@@ -120,16 +145,7 @@ export default (QUnit: QUnit) => {
         t.equal(token_type, dpop ? 'dpop' : 'bearer')
 
         {
-          let response = await lib.introspectionRequest(as, client, access_token, {
-            clientPrivateKey: authenticated.clientPrivateKey
-              ? {
-                  ...clientPrivateKey,
-                  [lib.modifyAssertion](h, p) {
-                    t.equal(h.alg, 'ES256')
-                    p.foo = 'bar'
-                  },
-                }
-              : undefined,
+          let response = await lib.introspectionRequest(as, client, clientAuth, access_token, {
             [lib.allowInsecureRequests]: true,
             async [lib.customFetch](...params: Parameters<typeof fetch>) {
               if (authMethod === 'private_key_jwt') {
@@ -162,9 +178,8 @@ export default (QUnit: QUnit) => {
         }
 
         {
-          let response = await lib.revocationRequest(as, client, access_token, {
+          let response = await lib.revocationRequest(as, client, clientAuth, access_token, {
             [lib.allowInsecureRequests]: true,
-            ...authenticated,
           })
           await lib.processRevocationResponse(response)
         }

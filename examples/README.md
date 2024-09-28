@@ -24,8 +24,8 @@ A collection of examples for the most common use cases.
   - JWT Secured Authorization Response Mode (JARM) - [source](jarm.ts) | [diff](jarm.diff)
   - Pushed Authorization Request (PAR) - [source](par.ts) | [diff](par.diff)
 - Client Authentication
-  - Client Secret in HTTP Authorization Header - [source](oauth.ts)
-  - Client Secret in HTTP Body - [source](client_secret_post.ts) | [diff](client_secret_post.diff)
+  - Client Secret in HTTP Body - [source](oauth.ts)
+  - Client Secret in HTTP Authorization Header - [source](client_secret_basic.ts) | [diff](client_secret_basic.diff)
   - Private Key JWT Client Authentication - [source](private_key_jwt.ts) | [diff](private_key_jwt.diff)
   - Public Client - [source](public.ts) | [diff](public.diff)
 - Other Grants

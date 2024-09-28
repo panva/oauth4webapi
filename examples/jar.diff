@@ -1,5 +1,5 @@
 diff --git a/examples/oauth.ts b/examples/jar.ts
-index d8185be..16c1ade 100644
+index d55e62d..456e1fb 100644
 --- a/examples/oauth.ts
 +++ b/examples/jar.ts
 @@ -15,6 +15,11 @@ let client_secret!: string
@@ -14,7 +14,7 @@ index d8185be..16c1ade 100644
  
  // End of prerequisites
  
-@@ -38,15 +43,16 @@ const code_verifier = oauth.generateRandomCodeVerifier()
+@@ -35,15 +40,16 @@ const code_verifier = oauth.generateRandomCodeVerifier()
  const code_challenge = await oauth.calculatePKCECodeChallenge(code_verifier)
  let state: string | undefined
  
@@ -39,7 +39,7 @@ index d8185be..16c1ade 100644
  
    /**
     * We cannot be sure the AS supports PKCE so we're going to use state too. Use of PKCE is
-@@ -54,9 +60,18 @@ let state: string | undefined
+@@ -51,9 +57,18 @@ let state: string | undefined
     */
    if (as.code_challenge_methods_supported?.includes('S256') !== true) {
      state = oauth.generateRandomState()

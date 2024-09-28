@@ -18,10 +18,13 @@ test.after(teardown)
 const tClient: lib.Client = { ...client, client_secret: 'foo' }
 
 test('pushedAuthorizationRequest()', async (t) => {
-  await t.throwsAsync(lib.pushedAuthorizationRequest(issuer, tClient, new URLSearchParams()), {
-    message:
-      'authorization server metadata does not contain a valid "as.pushed_authorization_request_endpoint"',
-  })
+  await t.throwsAsync(
+    lib.pushedAuthorizationRequest(issuer, tClient, lib.None(), new URLSearchParams()),
+    {
+      message:
+        'authorization server metadata does not contain a valid "as.pushed_authorization_request_endpoint"',
+    },
+  )
 
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
@@ -50,14 +53,15 @@ test('pushedAuthorizationRequest()', async (t) => {
     lib.pushedAuthorizationRequest(
       tIssuer,
       tClient,
+      lib.None(),
       new URLSearchParams({ response_type: 'code' }),
     ),
   )
   await t.notThrowsAsync(
-    lib.pushedAuthorizationRequest(tIssuer, tClient, { response_type: 'code' }),
+    lib.pushedAuthorizationRequest(tIssuer, tClient, lib.None(), { response_type: 'code' }),
   )
   await t.notThrowsAsync(
-    lib.pushedAuthorizationRequest(tIssuer, tClient, [['response_type', 'code']]),
+    lib.pushedAuthorizationRequest(tIssuer, tClient, lib.None(), [['response_type', 'code']]),
   )
 })
 
@@ -90,7 +94,9 @@ test('pushedAuthorizationRequest() w/ Custom Headers', async (t) => {
     new Headers(Object.fromEntries(entries)),
   ]) {
     await t.notThrowsAsync(
-      lib.pushedAuthorizationRequest(tIssuer, tClient, new URLSearchParams(), { headers }),
+      lib.pushedAuthorizationRequest(tIssuer, tClient, lib.None(), new URLSearchParams(), {
+        headers,
+      }),
     )
   }
 })
@@ -114,7 +120,7 @@ test('pushedAuthorizationRequest() w/ DPoP', async (t) => {
 
   const DPoP = await lib.generateKeyPair('ES256')
   await t.notThrowsAsync(
-    lib.pushedAuthorizationRequest(tIssuer, tClient, new URLSearchParams(), { DPoP }),
+    lib.pushedAuthorizationRequest(tIssuer, tClient, lib.None(), new URLSearchParams(), { DPoP }),
   )
 })
 
@@ -144,7 +150,7 @@ test('pushedAuthorizationRequest() w/ Request Object', async (t) => {
   })
 
   await t.notThrowsAsync(
-    lib.pushedAuthorizationRequest(tIssuer, tClient, new URLSearchParams({ request })),
+    lib.pushedAuthorizationRequest(tIssuer, tClient, lib.None(), new URLSearchParams({ request })),
   )
 })
 

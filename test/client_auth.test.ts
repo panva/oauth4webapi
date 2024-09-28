@@ -34,7 +34,8 @@ test('client_secret_basic', async (t) => {
 
   await lib.revocationRequest(
     { ...issuer, revocation_endpoint: endpoint('test-basic') },
-    { ...client, client_secret: 'foo', token_endpoint_auth_method: 'client_secret_basic' },
+    client,
+    lib.ClientSecretBasic('foo'),
     'token',
   )
   t.pass()
@@ -67,32 +68,8 @@ test('client_secret_basic (appendix b)', async (t) => {
     {
       ...client,
       client_id: "client %&+-_.!~*'()",
-      client_secret: "client %&+-_.!~*'()",
-      token_endpoint_auth_method: 'client_secret_basic',
     },
-    'token',
-  )
-  t.pass()
-})
-
-test('client_secret_post (default)', async (t) => {
-  t.context
-    .intercept({
-      path: '/test-post',
-      method: 'POST',
-      headers(headers) {
-        return !('authorization' in headers)
-      },
-      body(body) {
-        const params = new URLSearchParams(body)
-        return params.get('client_id') === client.client_id && params.get('client_secret') === 'foo'
-      },
-    })
-    .reply(200, '')
-
-  await lib.revocationRequest(
-    { ...issuer, revocation_endpoint: endpoint('test-post') },
-    { ...client, client_secret: 'foo' },
+    lib.ClientSecretBasic("client %&+-_.!~*'()"),
     'token',
   )
   t.pass()
@@ -115,13 +92,14 @@ test('client_secret_post', async (t) => {
 
   await lib.revocationRequest(
     { ...issuer, revocation_endpoint: endpoint('test-post') },
-    { ...client, client_secret: 'foo', token_endpoint_auth_method: 'client_secret_post' },
+    client,
+    lib.ClientSecretPost('foo'),
     'token',
   )
   t.pass()
 })
 
-test('private_key_jwt ({ key: CryptoKey })', async (t) => {
+test('private_key_jwt', async (t) => {
   const tIssuer = {
     ...issuer,
     revocation_endpoint: endpoint('test-pkjwt-1'),
@@ -160,46 +138,26 @@ test('private_key_jwt ({ key: CryptoKey })', async (t) => {
       },
     })
     .reply(200, '')
+    .times(2)
 
   await lib.revocationRequest(
     tIssuer,
-    {
-      ...client,
-      token_endpoint_auth_method: 'private_key_jwt',
-    },
+    client,
+    lib.PrivateKeyJwt({ key: t.context.ES256.privateKey }),
     'token',
-    {
-      clientPrivateKey: { key: t.context.ES256.privateKey },
-    },
   )
-  await t.throwsAsync(
-    lib.revocationRequest(
-      { ...issuer, revocation_endpoint: endpoint('test-pkjwt') },
-      {
-        ...client,
-        token_endpoint_auth_method: 'private_key_jwt',
-      },
-      'token',
-      {
-        clientPrivateKey: { key: t.context.ES256.publicKey },
-      },
-    ),
-    { message: '"options.clientPrivateKey.key" must be a private CryptoKey' },
+  await lib.revocationRequest(
+    tIssuer,
+    client,
+    lib.PrivateKeyJwt(t.context.ES256.privateKey),
+    'token',
   )
-  await t.throwsAsync(
-    lib.revocationRequest(
-      { ...issuer, revocation_endpoint: endpoint('test-pkjwt') },
-      {
-        ...client,
-        token_endpoint_auth_method: 'private_key_jwt',
-      },
-      'token',
-      {
-        clientPrivateKey: { key: null as any },
-      },
-    ),
-    { message: '"options.clientPrivateKey.key" must be a private CryptoKey' },
-  )
+  t.throws(() => lib.PrivateKeyJwt({ key: t.context.ES256.publicKey }), {
+    message: '"clientPrivateKey.key" must be a private CryptoKey',
+  })
+  t.throws(() => lib.PrivateKeyJwt({ key: null as any }), {
+    message: '"clientPrivateKey.key" must be a private CryptoKey',
+  })
   t.pass()
 })
 
@@ -245,111 +203,16 @@ test('private_key_jwt ({ key: CryptoKey, kid: string })', async (t) => {
 
   await lib.revocationRequest(
     tIssuer,
-    {
-      ...client,
-      token_endpoint_auth_method: 'private_key_jwt',
-    },
+    client,
+    lib.PrivateKeyJwt({ key: t.context.ES256.privateKey, kid: 'keyId' }),
     'token',
-    {
-      clientPrivateKey: { key: t.context.ES256.privateKey, kid: 'keyId' },
-    },
   )
-  await t.throwsAsync(
-    lib.revocationRequest(
-      { ...issuer, revocation_endpoint: endpoint('test-pkjwt') },
-      {
-        ...client,
-        token_endpoint_auth_method: 'private_key_jwt',
-      },
-      'token',
-      {
-        clientPrivateKey: { key: t.context.ES256.publicKey, kid: 'keyId' },
-      },
-    ),
-    { message: '"options.clientPrivateKey.key" must be a private CryptoKey' },
-  )
-  await t.throwsAsync(
-    lib.revocationRequest(
-      { ...issuer, revocation_endpoint: endpoint('test-pkjwt') },
-      {
-        ...client,
-        token_endpoint_auth_method: 'private_key_jwt',
-      },
-      'token',
-      {
-        clientPrivateKey: { key: t.context.ES256.publicKey, kid: 123 as any },
-      },
-    ),
-    { message: '"kid" must be a string' },
-  )
-  t.pass()
-})
-
-test('private_key_jwt (CryptoKey)', async (t) => {
-  const tIssuer = {
-    ...issuer,
-    revocation_endpoint: endpoint('test-pkjwt-3'),
-    token_endpoint: endpoint('token'),
-  }
-
-  t.context
-    .intercept({
-      path: '/test-pkjwt-3',
-      method: 'POST',
-      headers(headers) {
-        return !('authorization' in headers)
-      },
-      body(body) {
-        const params = new URLSearchParams(body)
-        t.false(params.has('client_secret'))
-        t.true(params.has('client_assertion'))
-        t.is(params.get('client_id'), client.client_id)
-        t.is(
-          params.get('client_assertion_type'),
-          'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
-        )
-
-        const assertion = jose.decodeJwt(params.get('client_assertion')!)
-        t.deepEqual(assertion.aud, [tIssuer.issuer, tIssuer.token_endpoint])
-        t.is(assertion.iss, client.client_id)
-        t.is(assertion.sub, client.client_id)
-        t.is(typeof assertion.exp, 'number')
-        t.is(typeof assertion.iat, 'number')
-        t.is(typeof assertion.nbf, 'number')
-        t.is(typeof assertion.jti, 'string')
-        const header = jose.decodeProtectedHeader(params.get('client_assertion')!)
-        t.is(header.kid, undefined)
-
-        return true
-      },
-    })
-    .reply(200, '')
-
-  await lib.revocationRequest(
-    tIssuer,
-    {
-      ...client,
-      token_endpoint_auth_method: 'private_key_jwt',
-    },
-    'token',
-    {
-      clientPrivateKey: t.context.ES256.privateKey,
-    },
-  )
-  await t.throwsAsync(
-    lib.revocationRequest(
-      { ...issuer, revocation_endpoint: endpoint('test-pkjwt') },
-      {
-        ...client,
-        token_endpoint_auth_method: 'private_key_jwt',
-      },
-      'token',
-      {
-        clientPrivateKey: t.context.ES256.publicKey,
-      },
-    ),
-    { message: '"options.clientPrivateKey.key" must be a private CryptoKey' },
-  )
+  t.throws(() => lib.PrivateKeyJwt({ key: t.context.ES256.publicKey, kid: 'keyId' }), {
+    message: '"clientPrivateKey.key" must be a private CryptoKey',
+  })
+  t.throws(() => lib.PrivateKeyJwt({ key: t.context.ES256.publicKey, kid: 123 as any }), {
+    message: '"kid" must be a string',
+  })
   t.pass()
 })
 
@@ -369,14 +232,9 @@ for (const alg of ALGS) {
 
     await lib.revocationRequest(
       { ...issuer, revocation_endpoint: endpoint(`test-${alg}`) },
-      {
-        ...client,
-        token_endpoint_auth_method: 'private_key_jwt',
-      },
+      client,
+      lib.PrivateKeyJwt(t.context[alg].privateKey),
       'token',
-      {
-        clientPrivateKey: { key: t.context[alg].privateKey },
-      },
     )
     await jose.compactVerify(assertion, t.context[alg].publicKey)
     t.pass()
@@ -400,10 +258,8 @@ test('none', async (t) => {
 
   await lib.revocationRequest(
     { ...issuer, revocation_endpoint: endpoint('test-none') },
-    {
-      ...client,
-      token_endpoint_auth_method: 'none',
-    },
+    client,
+    lib.None(),
     'token',
   )
   t.pass()

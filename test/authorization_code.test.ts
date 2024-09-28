@@ -50,6 +50,7 @@ test('authorizationCodeGrantRequest()', async (t) => {
     lib.authorizationCodeGrantRequest(
       issuer,
       tClient,
+      lib.None(),
       cb('code=authorization_code'),
       'redirect_uri',
       'verifier',
@@ -60,7 +61,14 @@ test('authorizationCodeGrantRequest()', async (t) => {
   )
 
   await t.throwsAsync(
-    lib.authorizationCodeGrantRequest(issuer, tClient, null as any, 'redirect_uri', 'verifier'),
+    lib.authorizationCodeGrantRequest(
+      issuer,
+      tClient,
+      lib.None(),
+      null as any,
+      'redirect_uri',
+      'verifier',
+    ),
     {
       message:
         '"callbackParameters" must be an instance of URLSearchParams obtained from "validateAuthResponse()", or "validateJwtAuthResponse()',
@@ -68,7 +76,14 @@ test('authorizationCodeGrantRequest()', async (t) => {
   )
 
   await t.throwsAsync(
-    lib.authorizationCodeGrantRequest(issuer, tClient, cb(''), 'redirect_uri', 'veirfier'),
+    lib.authorizationCodeGrantRequest(
+      issuer,
+      tClient,
+      lib.None(),
+      cb(''),
+      'redirect_uri',
+      'veirfier',
+    ),
     {
       message: 'no authorization code in "callbackParameters"',
     },
@@ -103,6 +118,7 @@ test('authorizationCodeGrantRequest()', async (t) => {
     lib.authorizationCodeGrantRequest(
       tIssuer,
       tClient,
+      lib.None(),
       cb('code=authorization_code'),
       'redirect_uri',
       'verifier',
@@ -131,6 +147,7 @@ test('authorizationCodeGrantRequest() w/ Extra Parameters', async (t) => {
     lib.authorizationCodeGrantRequest(
       tIssuer,
       tClient,
+      lib.None(),
       cb('code=authorization_code'),
       'redirect_uri',
       'verifier',
@@ -144,6 +161,7 @@ test('authorizationCodeGrantRequest() w/ Extra Parameters', async (t) => {
     lib.authorizationCodeGrantRequest(
       tIssuer,
       tClient,
+      lib.None(),
       cb('code=authorization_code'),
       'redirect_uri',
       'verifier',
@@ -159,6 +177,7 @@ test('authorizationCodeGrantRequest() w/ Extra Parameters', async (t) => {
     lib.authorizationCodeGrantRequest(
       tIssuer,
       tClient,
+      lib.None(),
       cb('code=authorization_code'),
       'redirect_uri',
       'verifier',
@@ -202,6 +221,7 @@ test('authorizationCodeGrantRequest() w/ Custom Headers', async (t) => {
       lib.authorizationCodeGrantRequest(
         tIssuer,
         tClient,
+        lib.None(),
         cb('code=authorization_code'),
         'redirect_uri',
         'verifier',
@@ -232,6 +252,7 @@ test('authorizationCodeGrantRequest() w/ DPoP', async (t) => {
     lib.authorizationCodeGrantRequest(
       tIssuer,
       tClient,
+      lib.None(),
       cb('code=authorization_code'),
       'redirect_uri',
       'verifier',

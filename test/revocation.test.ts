@@ -15,14 +15,15 @@ const test = anyTest as TestFn<Context>
 test.before(setup)
 test.after(teardown)
 
-const tClient: lib.Client = { ...client, client_secret: 'foo' }
+const tClient: lib.Client = { ...client }
+const auth = lib.None()
 
 test('revocationRequest()', async (t) => {
-  await t.throwsAsync(lib.revocationRequest(issuer, tClient, 'token'), {
+  await t.throwsAsync(lib.revocationRequest(issuer, tClient, auth, 'token'), {
     message: 'authorization server metadata does not contain a valid "as.revocation_endpoint"',
   })
 
-  await t.throwsAsync(lib.revocationRequest(issuer, tClient, null as any), {
+  await t.throwsAsync(lib.revocationRequest(issuer, tClient, auth, null as any), {
     message: '"token" must be a string',
   })
 
@@ -45,7 +46,7 @@ test('revocationRequest()', async (t) => {
     })
     .reply(200, { access_token: 'token', token_type: 'Bearer' })
 
-  await t.notThrowsAsync(lib.revocationRequest(tIssuer, tClient, 'token'))
+  await t.notThrowsAsync(lib.revocationRequest(tIssuer, tClient, auth, 'token'))
 })
 
 test('revocationRequest() w/ Extra Parameters', async (t) => {
@@ -66,13 +67,13 @@ test('revocationRequest() w/ Extra Parameters', async (t) => {
     .times(3)
 
   await t.notThrowsAsync(
-    lib.revocationRequest(tIssuer, tClient, 'token', {
+    lib.revocationRequest(tIssuer, tClient, auth, 'token', {
       additionalParameters: new URLSearchParams('token_type_hint=access_token'),
     }),
   )
 
   await t.notThrowsAsync(
-    lib.revocationRequest(tIssuer, tClient, 'token', {
+    lib.revocationRequest(tIssuer, tClient, auth, 'token', {
       additionalParameters: {
         token_type_hint: 'access_token',
       },
@@ -80,7 +81,7 @@ test('revocationRequest() w/ Extra Parameters', async (t) => {
   )
 
   await t.notThrowsAsync(
-    lib.revocationRequest(tIssuer, tClient, 'token', {
+    lib.revocationRequest(tIssuer, tClient, auth, 'token', {
       additionalParameters: [['token_type_hint', 'access_token']],
     }),
   )
@@ -116,7 +117,7 @@ test('revocationRequest() w/ Custom Headers', async (t) => {
     Object.fromEntries(entries),
     new Headers(Object.fromEntries(entries)),
   ]) {
-    await t.notThrowsAsync(lib.revocationRequest(tIssuer, tClient, 'token', { headers }))
+    await t.notThrowsAsync(lib.revocationRequest(tIssuer, tClient, auth, 'token', { headers }))
   }
 })
 

@@ -60,7 +60,7 @@ export default (QUnit: QUnit) => {
       const { client, issuerIdentifier, clientPrivateKey } = await setup(
         alg,
         kp,
-        'client_secret_basic',
+        'client_secret_post',
         jar,
         jwtUserinfo,
         false,
@@ -87,6 +87,8 @@ export default (QUnit: QUnit) => {
         nonce = lib.generateRandomNonce()
         params.set('nonce', nonce)
       }
+
+      const clientAuth = lib.ClientSecretBasic(client.client_secret as string)
 
       params.set('client_id', client.client_id)
       params.set('code_challenge', code_challenge)
@@ -117,7 +119,7 @@ export default (QUnit: QUnit) => {
       let request_uri!: string
       if (par) {
         const pushedAuthorizationRequest = () =>
-          lib.pushedAuthorizationRequest(as, client, params, {
+          lib.pushedAuthorizationRequest(as, client, clientAuth, params, {
             DPoP,
             [lib.allowInsecureRequests]: true,
           })
@@ -187,6 +189,7 @@ export default (QUnit: QUnit) => {
           lib.authorizationCodeGrantRequest(
             as,
             client,
+            clientAuth,
             callbackParams,
             'http://localhost:3000/cb',
             code_verifier,
@@ -242,7 +245,7 @@ export default (QUnit: QUnit) => {
 
         {
           const refreshTokenGrantRequest = () =>
-            lib.refreshTokenGrantRequest(as, client, refresh_token, {
+            lib.refreshTokenGrantRequest(as, client, clientAuth, refresh_token, {
               DPoP,
               [lib.allowInsecureRequests]: true,
             })

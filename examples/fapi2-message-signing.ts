@@ -37,10 +37,8 @@ const as = await oauth
   .discoveryRequest(issuer, { algorithm })
   .then((response) => oauth.processDiscoveryResponse(issuer, response))
 
-const client: oauth.Client = {
-  client_id,
-  token_endpoint_auth_method: 'private_key_jwt',
-}
+const client: oauth.Client = { client_id }
+const clientAuth = oauth.PrivateKeyJwt(clientPrivateKey)
 
 const code_challenge_method = 'S256'
 /**
@@ -74,9 +72,8 @@ let request_uri: string
   params.set('request', request)
 
   const pushedAuthorizationRequest = () =>
-    oauth.pushedAuthorizationRequest(as, client, params, {
+    oauth.pushedAuthorizationRequest(as, client, clientAuth, params, {
       DPoP,
-      clientPrivateKey,
     })
   let response = await pushedAuthorizationRequest()
 
@@ -113,7 +110,15 @@ let access_token: string
   const params = await oauth.validateJwtAuthResponse(as, client, currentUrl)
 
   const authorizationCodeGrantRequest = () =>
-    oauth.authorizationCodeGrantRequest(as, client, params, redirect_uri, code_verifier, { DPoP })
+    oauth.authorizationCodeGrantRequest(
+      as,
+      client,
+      clientAuth,
+      params,
+      redirect_uri,
+      code_verifier,
+      { DPoP },
+    )
 
   let response = await authorizationCodeGrantRequest()
 

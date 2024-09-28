@@ -1,5 +1,5 @@
 diff --git a/examples/fapi2.ts b/examples/fapi2-message-signing.ts
-index 68904db..179b97d 100644
+index b8ec053..3fe9af1 100644
 --- a/examples/fapi2.ts
 +++ b/examples/fapi2-message-signing.ts
 @@ -25,6 +25,11 @@ let DPoP!: oauth.CryptoKeyPair
@@ -14,7 +14,7 @@ index 68904db..179b97d 100644
  
  // End of prerequisites
  
-@@ -46,8 +51,8 @@ const code_challenge_method = 'S256'
+@@ -44,8 +49,8 @@ const code_challenge_method = 'S256'
  const code_verifier = oauth.generateRandomCodeVerifier()
  const code_challenge = await oauth.calculatePKCECodeChallenge(code_verifier)
  
@@ -25,7 +25,7 @@ index 68904db..179b97d 100644
  {
    const params = new URLSearchParams()
    params.set('client_id', client.client_id)
-@@ -55,7 +60,18 @@ let request_uri: string
+@@ -53,7 +58,18 @@ let request_uri: string
    params.set('code_challenge_method', code_challenge_method)
    params.set('redirect_uri', redirect_uri)
    params.set('response_type', 'code')
@@ -44,8 +44,8 @@ index 68904db..179b97d 100644
 +  params.set('request', request)
  
    const pushedAuthorizationRequest = () =>
-     oauth.pushedAuthorizationRequest(as, client, params, {
-@@ -94,7 +110,7 @@ let request_uri: string
+     oauth.pushedAuthorizationRequest(as, client, clientAuth, params, {
+@@ -91,7 +107,7 @@ let request_uri: string
  let access_token: string
  {
    const currentUrl: URL = getCurrentUrl()
@@ -53,8 +53,8 @@ index 68904db..179b97d 100644
 +  const params = await oauth.validateJwtAuthResponse(as, client, currentUrl)
  
    const authorizationCodeGrantRequest = () =>
-     oauth.authorizationCodeGrantRequest(as, client, params, redirect_uri, code_verifier, { DPoP })
-@@ -102,7 +118,7 @@ let access_token: string
+     oauth.authorizationCodeGrantRequest(
+@@ -107,7 +123,7 @@ let access_token: string
    let response = await authorizationCodeGrantRequest()
  
    const processAuthorizationCodeResponse = () =>
@@ -63,7 +63,7 @@ index 68904db..179b97d 100644
  
    let result = await processAuthorizationCodeResponse().catch(async (err) => {
      if (err instanceof oauth.ResponseBodyError) {
-@@ -115,6 +131,9 @@ let access_token: string
+@@ -120,6 +136,9 @@ let access_token: string
      throw err
    })
  

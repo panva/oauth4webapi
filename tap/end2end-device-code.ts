@@ -17,7 +17,7 @@ export default (QUnit: QUnit) => {
       const { client, issuerIdentifier } = await setup(
         alg,
         kp,
-        'client_secret_basic',
+        'client_secret_post',
         false,
         false,
         false,
@@ -25,6 +25,8 @@ export default (QUnit: QUnit) => {
         false,
       )
       const DPoP = dpop ? await lib.generateKeyPair(alg as lib.JWSAlgorithm) : undefined
+
+      const clientAuth = lib.ClientSecretBasic(client.client_secret as string)
 
       const as = await lib
         .discoveryRequest(issuerIdentifier, { [lib.allowInsecureRequests]: true })
@@ -35,7 +37,7 @@ export default (QUnit: QUnit) => {
       params.set('resource', resource)
       params.set('scope', 'openid api:write')
 
-      let response = await lib.deviceAuthorizationRequest(as, client, params, {
+      let response = await lib.deviceAuthorizationRequest(as, client, clientAuth, params, {
         [lib.allowInsecureRequests]: true,
       })
 
@@ -51,7 +53,7 @@ export default (QUnit: QUnit) => {
 
       {
         const deviceCodeGrantRequest = () =>
-          lib.deviceCodeGrantRequest(as, client, device_code, {
+          lib.deviceCodeGrantRequest(as, client, clientAuth, device_code, {
             DPoP,
             [lib.allowInsecureRequests]: true,
           })

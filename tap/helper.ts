@@ -25,7 +25,7 @@ export function random() {
 export async function setup(
   alg: lib.JWSAlgorithm,
   kp: CryptoKeyPair,
-  authMethod: lib.ClientAuthenticationMethod,
+  authMethod: string,
   jar: boolean,
   jwtUserinfo: boolean,
   jwtIntrospection: boolean,

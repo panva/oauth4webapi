@@ -15,10 +15,8 @@ const as = await oauth
   .discoveryRequest(issuer, { algorithm })
   .then((response) => oauth.processDiscoveryResponse(issuer, response))
 
-const client: oauth.Client = {
-  client_id,
-  token_endpoint_auth_method: 'none',
-}
+const client: oauth.Client = { client_id }
+const clientAuth = oauth.None()
 
 let device_code: string
 let interval: number
@@ -31,7 +29,7 @@ let verification_uri_complete: string | undefined
   const parameters = new URLSearchParams()
   parameters.set('scope', 'api:read')
 
-  const response = await oauth.deviceAuthorizationRequest(as, client, parameters)
+  const response = await oauth.deviceAuthorizationRequest(as, client, clientAuth, parameters)
 
   const result = await oauth.processDeviceAuthorizationResponse(as, client, response)
 
@@ -59,7 +57,7 @@ let access_token: string
 
   while (success === undefined) {
     await wait()
-    const response = await oauth.deviceCodeGrantRequest(as, client, device_code)
+    const response = await oauth.deviceCodeGrantRequest(as, client, clientAuth, device_code)
 
     success = await oauth.processDeviceCodeResponse(as, client, response).catch((err) => {
       if (err instanceof oauth.ResponseBodyError) {

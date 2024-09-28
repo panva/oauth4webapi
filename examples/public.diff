@@ -1,5 +1,5 @@
 diff --git a/examples/oauth.ts b/examples/public.ts
-index d8185be..4572662 100644
+index d55e62d..437cd06 100644
 --- a/examples/oauth.ts
 +++ b/examples/public.ts
 @@ -9,7 +9,6 @@ let algorithm!:
@@ -10,13 +10,12 @@ index d8185be..4572662 100644
  /**
   * Value used in the authorization request as redirect_uri pre-registered at the Authorization
   * Server.
-@@ -24,8 +23,7 @@ const as = await oauth
+@@ -23,7 +22,7 @@ const as = await oauth
+   .then((response) => oauth.processDiscoveryResponse(issuer, response))
  
- const client: oauth.Client = {
-   client_id,
--  client_secret,
--  token_endpoint_auth_method: 'client_secret_basic',
-+  token_endpoint_auth_method: 'none',
- }
+ const client: oauth.Client = { client_id }
+-const clientAuth = oauth.ClientSecretPost(client_secret)
++const clientAuth = oauth.None()
  
  const code_challenge_method = 'S256'
+ /**

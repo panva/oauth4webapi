@@ -112,38 +112,6 @@ function CodedTypeError(message: string, code: codes, cause?: unknown) {
 }
 
 /**
- * Supported Client Authentication Methods.
- *
- * - **`client_secret_post`** (default) uses the HTTP request body to send `client_id` and
- *   `client_secret` as `application/x-www-form-urlencoded` body parameters.
- * - **`client_secret_basic`** uses the HTTP `Basic` authentication scheme to send `client_id` and
- *   `client_secret` in an `Authorization` HTTP Header.
- * - **`private_key_jwt`** uses the HTTP request body to send `client_id`, `client_assertion_type`,
- *   and `client_assertion` as `application/x-www-form-urlencoded` body parameters.
- * - **`none`** (public client) uses the HTTP request body to send only `client_id` as
- *   `application/x-www-form-urlencoded` body parameter.
- * - **`tls_client_auth`** uses the HTTP request body to send only `client_id` as
- *   `application/x-www-form-urlencoded` body parameter and the mTLS key and certificate is
- *   configured through {@link customFetch}.
- * - **`self_signed_tls_client_auth`** uses the HTTP request body to send only `client_id` as
- *   `application/x-www-form-urlencoded` body parameter and the mTLS key and certificate is
- *   configured through {@link customFetch}.
- *
- * @see [RFC 6749 - The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html#section-2.3)
- * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication)
- * @see [OAuth Token Endpoint Authentication Methods](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#token-endpoint-auth-method)
- * @see [RFC 8705 - OAuth 2.0 Mutual-TLS Client Authentication (PKI Mutual-TLS Method)](https://www.rfc-editor.org/rfc/rfc8705.html#name-pki-mutual-tls-method)
- * @see [RFC 8705 - OAuth 2.0 Mutual-TLS Client Authentication (Self-Signed Certificate Mutual-TLS Method)](https://www.rfc-editor.org/rfc/rfc8705.html#name-self-signed-certificate-mut)
- */
-export type ClientAuthenticationMethod =
-  | 'client_secret_post'
-  | 'client_secret_basic'
-  | 'private_key_jwt'
-  | 'none'
-  | 'tls_client_auth'
-  | 'self_signed_tls_client_auth'
-
-/**
  * Supported JWS `alg` Algorithm identifiers.
  *
  * @example
@@ -890,15 +858,6 @@ export interface Client {
    * Client identifier.
    */
   client_id: string
-  /**
-   * Client secret.
-   */
-  client_secret?: string
-  /**
-   * Client {@link ClientAuthenticationMethod authentication method} for the client's authenticated
-   * requests. Default is `client_secret_post`.
-   */
-  token_endpoint_auth_method?: ClientAuthenticationMethod
   /**
    * JWS `alg` algorithm required for signing the ID Token issued to this Client. When not
    * configured the default is to allow only algorithms listed in
@@ -1676,56 +1635,9 @@ export interface DPoPRequestOptions {
   DPoP?: DPoPOptions
 }
 
-export interface AuthenticatedRequestOptions {
-  /**
-   * Private key to use for `private_key_jwt`
-   * {@link ClientAuthenticationMethod client authentication}. Its algorithm must be compatible with
-   * a supported {@link JWSAlgorithm JWS `alg` Algorithm}.
-   */
-  clientPrivateKey?: CryptoKey | PrivateKey
-}
-
 export interface PushedAuthorizationRequestOptions
   extends HttpRequestOptions<'POST', URLSearchParams>,
-    AuthenticatedRequestOptions,
     DPoPRequestOptions {}
-
-/**
- * The client identifier is encoded using the `application/x-www-form-urlencoded` encoding algorithm
- * per Appendix B, and the encoded value is used as the username; the client password is encoded
- * using the same algorithm and used as the password.
- */
-function formUrlEncode(token: string) {
-  return encodeURIComponent(token).replace(/(?:[-_.!~*'()]|%20)/g, (substring) => {
-    switch (substring) {
-      case '-':
-      case '_':
-      case '.':
-      case '!':
-      case '~':
-      case '*':
-      case "'":
-      case '(':
-      case ')':
-        return `%${substring.charCodeAt(0).toString(16).toUpperCase()}`
-      case '%20':
-        return '+'
-      default:
-        throw new Error()
-    }
-  })
-}
-
-/**
- * Formats client_id and client_secret as an HTTP Basic Authentication header as per the OAuth 2.0
- * specified in RFC6749.
- */
-function clientSecretBasic(clientId: string, clientSecret: string) {
-  const username = formUrlEncode(clientId)
-  const password = formUrlEncode(clientSecret)
-  const credentials = btoa(`${username}:${password}`)
-  return `Basic ${credentials}`
-}
 
 /**
  * Determines an RSASSA-PSS algorithm identifier from CryptoKey instance properties.
@@ -1819,37 +1731,6 @@ function epochTime() {
   return Math.floor(Date.now() / 1000)
 }
 
-function clientAssertion(as: AuthorizationServer, client: Client) {
-  const now = epochTime() + getClockSkew(client)
-  return {
-    jti: randomBytes(),
-    aud: [as.issuer, as.token_endpoint!],
-    exp: now + 60,
-    iat: now,
-    nbf: now,
-    iss: client.client_id,
-    sub: client.client_id,
-  }
-}
-
-/**
- * Generates a unique client assertion to be used in `private_key_jwt` authenticated requests.
- */
-async function privateKeyJwt(
-  as: AuthorizationServer,
-  client: Client,
-  key: CryptoKey,
-  kid?: string,
-  modifyAssertion?: ModifyAssertionFunction,
-) {
-  const header = { alg: keyToJws(key), kid }
-  const payload = clientAssertion(as, client)
-
-  modifyAssertion?.(header, payload)
-
-  return signJwt(header, payload, key)
-}
-
 function assertAs(as: AuthorizationServer): asserts as is AuthorizationServer {
   if (typeof as !== 'object' || as === null) {
     throw CodedTypeError('"as" must be an object', ERR_INVALID_ARG_TYPE)
@@ -1866,85 +1747,171 @@ function assertClient(client: Client): asserts client is Client {
   assertString(client.client_id, '"client.client_id"')
 }
 
-function assertNoClientPrivateKey(
-  clientAuthMethod: string,
-  clientPrivateKey: unknown,
-): asserts clientPrivateKey is undefined {
-  if (clientPrivateKey !== undefined) {
-    throw CodedTypeError(
-      `"options.clientPrivateKey" property must not be provided when ${clientAuthMethod} client authentication method is used.`,
-      ERR_INVALID_ARG_TYPE,
-    )
-  }
-}
-
-function assertNoClientSecret(
-  clientAuthMethod: string,
-  clientSecret: unknown,
-): asserts clientSecret is undefined {
-  if (clientSecret !== undefined) {
-    throw CodedTypeError(
-      `"client.client_secret" property must not be provided when ${clientAuthMethod} client authentication method is used.`,
-      ERR_INVALID_ARG_TYPE,
-    )
-  }
+/**
+ * The client identifier is encoded using the `application/x-www-form-urlencoded` encoding algorithm
+ * per Appendix B, and the encoded value is used as the username; the client password is encoded
+ * using the same algorithm and used as the password.
+ */
+function formUrlEncode(token: string) {
+  return encodeURIComponent(token).replace(/(?:[-_.!~*'()]|%20)/g, (substring) => {
+    switch (substring) {
+      case '-':
+      case '_':
+      case '.':
+      case '!':
+      case '~':
+      case '*':
+      case "'":
+      case '(':
+      case ')':
+        return `%${substring.charCodeAt(0).toString(16).toUpperCase()}`
+      case '%20':
+        return '+'
+      default:
+        throw new Error()
+    }
+  })
 }
 
 /**
- * Applies supported client authentication to an URLSearchParams instance representing the request
- * body and/or a Headers instance to be sent with an authenticated request.
+ * Implementation of the Client's Authentication Method as the Authorization Server.
+ *
+ * @see {@link ClientSecretPost}
+ * @see {@link ClientSecretBasic}
+ * @see {@link PrivateKeyJwt}
+ * @see {@link None}
+ * @see {@link TlsClientAuth}
+ * @see {@link SelfSignedTlsClientAuth}
+ * @see [OAuth Token Endpoint Authentication Methods](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#token-endpoint-auth-method)
  */
-async function clientAuthentication(
+export type ClientAuthenticationImplementation = (
   as: AuthorizationServer,
   client: Client,
   body: URLSearchParams,
   headers: Headers,
-  clientPrivateKey?: CryptoKey | PrivateKey,
-) {
-  body.delete('client_secret')
-  body.delete('client_assertion_type')
-  body.delete('client_assertion')
-  switch (client.token_endpoint_auth_method) {
-    case undefined: // Fall through
-    case 'client_secret_post': {
-      assertNoClientPrivateKey('client_secret_post', clientPrivateKey)
-      assertString(client.client_secret, '"client.client_secret"')
-      body.set('client_id', client.client_id)
-      body.set('client_secret', client.client_secret)
-      break
-    }
-    case 'client_secret_basic': {
-      assertNoClientPrivateKey('client_secret_basic', clientPrivateKey)
-      assertString(client.client_secret, '"client.client_secret"')
-      headers.set('authorization', clientSecretBasic(client.client_id, client.client_secret))
-      break
-    }
-    case 'private_key_jwt': {
-      assertNoClientSecret('private_key_jwt', client.client_secret)
-      if (clientPrivateKey === undefined) {
-        throw CodedTypeError(
-          '"options.clientPrivateKey" must be provided when "client.token_endpoint_auth_method" is "private_key_jwt"',
-          ERR_INCOMPATIBLE_OPTION_PAIR,
-        )
-      }
-      const { key, kid, modifyAssertion } = getKeyAndKid(clientPrivateKey)
-      assertPrivateKey(key, '"options.clientPrivateKey.key"')
-      body.set('client_id', client.client_id)
-      body.set('client_assertion_type', 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer')
-      body.set('client_assertion', await privateKeyJwt(as, client, key, kid, modifyAssertion))
-      break
-    }
-    case 'tls_client_auth':
-    case 'self_signed_tls_client_auth':
-    case 'none': {
-      assertNoClientSecret(client.token_endpoint_auth_method, client.client_secret)
-      assertNoClientPrivateKey(client.token_endpoint_auth_method, clientPrivateKey)
-      body.set('client_id', client.client_id)
-      break
-    }
-    default:
-      throw CodedTypeError('unsupported client token_endpoint_auth_method', ERR_INVALID_ARG_VALUE)
+) => void | Promise<void>
+
+/**
+ * **`client_secret_post`** uses the HTTP request body to send `client_id` and `client_secret` as
+ * `application/x-www-form-urlencoded` body parameters
+ *
+ * @param clientSecret
+ *
+ * @group Client Authentication Methods
+ *
+ * @see [OAuth Token Endpoint Authentication Methods](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#token-endpoint-auth-method)
+ * @see [RFC 6749 - The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html#section-2.3)
+ * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication)
+ */
+export function ClientSecretPost(clientSecret: string): ClientAuthenticationImplementation {
+  assertString(clientSecret, '"clientSecret"')
+  return (_as, client, body, _headers) => {
+    body.set('client_id', client.client_id)
+    body.set('client_secret', clientSecret)
   }
+}
+
+/**
+ * **`client_secret_basic`** uses the HTTP `Basic` authentication scheme to send `client_id` and
+ * `client_secret` in an `Authorization` HTTP Header.
+ *
+ * @param clientSecret
+ *
+ * @group Client Authentication Methods
+ *
+ * @see [OAuth Token Endpoint Authentication Methods](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#token-endpoint-auth-method)
+ * @see [RFC 6749 - The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html#section-2.3)
+ * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication)
+ */
+export function ClientSecretBasic(clientSecret: string): ClientAuthenticationImplementation {
+  assertString(clientSecret, '"clientSecret"')
+  return (_as, client, _body, headers) => {
+    const username = formUrlEncode(client.client_id)
+    const password = formUrlEncode(clientSecret)
+    const credentials = btoa(`${username}:${password}`)
+    headers.set('authorization', `Basic ${credentials}`)
+  }
+}
+
+/**
+ * **`private_key_jwt`** uses the HTTP request body to send `client_id`, `client_assertion_type`,
+ * and `client_assertion` as `application/x-www-form-urlencoded` body parameters. Digital signature
+ * is used for the assertion's authenticity and integrity.
+ *
+ * @param clientPrivateKey
+ *
+ * @group Client Authentication Methods
+ *
+ * @see [OAuth Token Endpoint Authentication Methods](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#token-endpoint-auth-method)
+ * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication)
+ */
+export function PrivateKeyJwt(
+  clientPrivateKey: CryptoKey | PrivateKey,
+): ClientAuthenticationImplementation {
+  const { key, kid, modifyAssertion } = getKeyAndKid(clientPrivateKey)
+  assertPrivateKey(key, '"clientPrivateKey.key"')
+  return async (as, client, body, _headers) => {
+    const header = { alg: keyToJws(key), kid }
+    const now = epochTime() + getClockSkew(client)
+    const payload = {
+      jti: randomBytes(),
+      aud: [as.issuer, as.token_endpoint!],
+      exp: now + 60,
+      iat: now,
+      nbf: now,
+      iss: client.client_id,
+      sub: client.client_id,
+    }
+
+    modifyAssertion?.(header, payload)
+
+    body.set('client_id', client.client_id)
+    body.set('client_assertion_type', 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer')
+    body.set('client_assertion', await signJwt(header, payload, key))
+  }
+}
+
+/**
+ * **`none`** (public client) uses the HTTP request body to send only `client_id` as
+ * `application/x-www-form-urlencoded` body parameter.
+ *
+ * @group Client Authentication Methods
+ *
+ * @see [OAuth Token Endpoint Authentication Methods](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#token-endpoint-auth-method)
+ * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication)
+ */
+export function None(): ClientAuthenticationImplementation {
+  return (_as, client, body, _headers) => {
+    body.set('client_id', client.client_id)
+  }
+}
+
+/**
+ * **`self_signed_tls_client_auth`** uses the HTTP request body to send only `client_id` as
+ * `application/x-www-form-urlencoded` body parameter and the mTLS key and certificate is configured
+ * through {@link customFetch}.
+ *
+ * @group Client Authentication Methods
+ *
+ * @see [OAuth Token Endpoint Authentication Methods](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#token-endpoint-auth-method)
+ * @see [RFC 8705 - OAuth 2.0 Mutual-TLS Client Authentication (Self-Signed Certificate Mutual-TLS Method)](https://www.rfc-editor.org/rfc/rfc8705.html#name-self-signed-certificate-mut)
+ */
+export function SelfSignedTlsClientAuth(): ClientAuthenticationImplementation {
+  return None()
+}
+
+/**
+ * **`tls_client_auth`** uses the HTTP request body to send only `client_id` as
+ * `application/x-www-form-urlencoded` body parameter and the mTLS key and certificate is configured
+ * through {@link customFetch}.
+ *
+ * @group Client Authentication Methods
+ *
+ * @see [OAuth Token Endpoint Authentication Methods](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#token-endpoint-auth-method)
+ * @see [RFC 8705 - OAuth 2.0 Mutual-TLS Client Authentication (PKI Mutual-TLS Method)](https://www.rfc-editor.org/rfc/rfc8705.html#name-pki-mutual-tls-method)
+ */
+export function TlsClientAuth(): ClientAuthenticationImplementation {
+  return None()
 }
 
 /**
@@ -2207,6 +2174,7 @@ export function resolveEndpoint(
  *
  * @param as Authorization Server Metadata.
  * @param client Client Metadata.
+ * @param clientAuthentication Client Authentication Method.
  * @param parameters Authorization Request parameters.
  *
  * @group Pushed Authorization Requests (PAR)
@@ -2217,6 +2185,7 @@ export function resolveEndpoint(
 export async function pushedAuthorizationRequest(
   as: AuthorizationServer,
   client: Client,
+  clientAuthentication: ClientAuthenticationImplementation,
   parameters: URLSearchParams | Record<string, string> | string[][],
   options?: PushedAuthorizationRequestOptions,
 ): Promise<Response> {
@@ -2240,7 +2209,7 @@ export async function pushedAuthorizationRequest(
     await dpopProofJwt(headers, options.DPoP, url, 'POST', getClockSkew(client))
   }
 
-  return authenticatedRequest(as, client, url, body, headers, options)
+  return authenticatedRequest(as, client, clientAuthentication, url, body, headers, options)
 }
 
 export interface PushedAuthorizationResponse {
@@ -3069,13 +3038,13 @@ export async function processUserInfoResponse(
 async function authenticatedRequest(
   as: AuthorizationServer,
   client: Client,
+  clientAuthentication: ClientAuthenticationImplementation,
   url: URL,
   body: URLSearchParams,
   headers: Headers,
-  options?: Omit<HttpRequestOptions<'POST', URLSearchParams>, 'headers'> &
-    AuthenticatedRequestOptions,
+  options?: Omit<HttpRequestOptions<'POST', URLSearchParams>, 'headers'>,
 ) {
-  await clientAuthentication(as, client, body, headers, options?.clientPrivateKey)
+  await clientAuthentication(as, client, body, headers)
   headers.set('content-type', 'application/x-www-form-urlencoded;charset=UTF-8')
 
   return (options?.[customFetch] || fetch)(url.href, {
@@ -3089,7 +3058,6 @@ async function authenticatedRequest(
 
 export interface TokenEndpointRequestOptions
   extends HttpRequestOptions<'POST', URLSearchParams>,
-    AuthenticatedRequestOptions,
     DPoPRequestOptions {
   /**
    * Any additional parameters to send. This cannot override existing parameter values.
@@ -3100,6 +3068,7 @@ export interface TokenEndpointRequestOptions
 async function tokenEndpointRequest(
   as: AuthorizationServer,
   client: Client,
+  clientAuthentication: ClientAuthenticationImplementation,
   grantType: string,
   parameters: URLSearchParams,
   options?: Omit<TokenEndpointRequestOptions, 'additionalParameters'>,
@@ -3119,7 +3088,7 @@ async function tokenEndpointRequest(
     await dpopProofJwt(headers, options.DPoP, url, 'POST', getClockSkew(client))
   }
 
-  return authenticatedRequest(as, client, url, parameters, headers, options)
+  return authenticatedRequest(as, client, clientAuthentication, url, parameters, headers, options)
 }
 
 /**
@@ -3128,6 +3097,7 @@ async function tokenEndpointRequest(
  *
  * @param as Authorization Server Metadata.
  * @param client Client Metadata.
+ * @param clientAuthentication Client Authentication Method.
  * @param refreshToken Refresh Token value.
  *
  * @group Refreshing an Access Token
@@ -3139,6 +3109,7 @@ async function tokenEndpointRequest(
 export async function refreshTokenGrantRequest(
   as: AuthorizationServer,
   client: Client,
+  clientAuthentication: ClientAuthenticationImplementation,
   refreshToken: string,
   options?: TokenEndpointRequestOptions,
 ): Promise<Response> {
@@ -3149,7 +3120,14 @@ export async function refreshTokenGrantRequest(
 
   const parameters = new URLSearchParams(options?.additionalParameters)
   parameters.set('refresh_token', refreshToken)
-  return tokenEndpointRequest(as, client, 'refresh_token', parameters, options)
+  return tokenEndpointRequest(
+    as,
+    client,
+    clientAuthentication,
+    'refresh_token',
+    parameters,
+    options,
+  )
 }
 
 const idTokenClaims = new WeakMap<TokenEndpointResponse, [IDToken, string]>()
@@ -3578,6 +3556,7 @@ function brand(searchParams: URLSearchParams) {
  *
  * @param as Authorization Server Metadata.
  * @param client Client Metadata.
+ * @param clientAuthentication Client Authentication Method.
  * @param callbackParameters Parameters obtained from the callback to redirect_uri, this is returned
  *   from {@link validateAuthResponse}, or {@link validateJwtAuthResponse}.
  * @param redirectUri `redirect_uri` value used in the authorization request.
@@ -3594,6 +3573,7 @@ function brand(searchParams: URLSearchParams) {
 export async function authorizationCodeGrantRequest(
   as: AuthorizationServer,
   client: Client,
+  clientAuthentication: ClientAuthenticationImplementation,
   callbackParameters: URLSearchParams,
   redirectUri: string,
   codeVerifier: string,
@@ -3626,7 +3606,14 @@ export async function authorizationCodeGrantRequest(
     parameters.set('code_verifier', codeVerifier)
   }
 
-  return tokenEndpointRequest(as, client, 'authorization_code', parameters, options)
+  return tokenEndpointRequest(
+    as,
+    client,
+    clientAuthentication,
+    'authorization_code',
+    parameters,
+    options,
+  )
 }
 
 interface JWTPayload {
@@ -4095,7 +4082,6 @@ function checkJwtType(expected: string, result: Awaited<ReturnType<typeof valida
 
 export interface ClientCredentialsGrantRequestOptions
   extends HttpRequestOptions<'POST', URLSearchParams>,
-    AuthenticatedRequestOptions,
     DPoPRequestOptions {}
 
 /**
@@ -4104,6 +4090,7 @@ export interface ClientCredentialsGrantRequestOptions
  *
  * @param as Authorization Server Metadata.
  * @param client Client Metadata.
+ * @param clientAuthentication Client Authentication Method.
  *
  * @group Client Credentials Grant
  *
@@ -4113,6 +4100,7 @@ export interface ClientCredentialsGrantRequestOptions
 export async function clientCredentialsGrantRequest(
   as: AuthorizationServer,
   client: Client,
+  clientAuthentication: ClientAuthenticationImplementation,
   parameters: URLSearchParams | Record<string, string> | string[][],
   options?: ClientCredentialsGrantRequestOptions,
 ): Promise<Response> {
@@ -4122,6 +4110,7 @@ export async function clientCredentialsGrantRequest(
   return tokenEndpointRequest(
     as,
     client,
+    clientAuthentication,
     'client_credentials',
     new URLSearchParams(parameters),
     options,
@@ -4135,6 +4124,7 @@ export async function clientCredentialsGrantRequest(
  *
  * @param as Authorization Server Metadata.
  * @param client Client Metadata.
+ * @param clientAuthentication Client Authentication Method.
  * @param grantType Grant Type.
  *
  * @group JWT Bearer Token Grant Type
@@ -4148,6 +4138,7 @@ export async function clientCredentialsGrantRequest(
 export async function genericTokenEndpointRequest(
   as: AuthorizationServer,
   client: Client,
+  clientAuthentication: ClientAuthenticationImplementation,
   grantType: string,
   parameters: URLSearchParams | Record<string, string> | string[][],
   options?: Omit<TokenEndpointRequestOptions, 'additionalParameters'>,
@@ -4157,7 +4148,14 @@ export async function genericTokenEndpointRequest(
 
   assertString(grantType, '"grantType"')
 
-  return tokenEndpointRequest(as, client, grantType, new URLSearchParams(parameters), options)
+  return tokenEndpointRequest(
+    as,
+    client,
+    clientAuthentication,
+    grantType,
+    new URLSearchParams(parameters),
+    options,
+  )
 }
 
 /**
@@ -4208,9 +4206,7 @@ export async function processClientCredentialsResponse(
   return processGenericAccessTokenResponse(as, client, response)
 }
 
-export interface RevocationRequestOptions
-  extends HttpRequestOptions<'POST', URLSearchParams>,
-    AuthenticatedRequestOptions {
+export interface RevocationRequestOptions extends HttpRequestOptions<'POST', URLSearchParams> {
   /**
    * Any additional parameters to send. This cannot override existing parameter values.
    */
@@ -4223,6 +4219,7 @@ export interface RevocationRequestOptions
  *
  * @param as Authorization Server Metadata.
  * @param client Client Metadata.
+ * @param clientAuthentication Client Authentication Method.
  * @param token Token to revoke. You can provide the `token_type_hint` parameter via
  *   {@link RevocationRequestOptions.additionalParameters options}.
  *
@@ -4233,6 +4230,7 @@ export interface RevocationRequestOptions
 export async function revocationRequest(
   as: AuthorizationServer,
   client: Client,
+  clientAuthentication: ClientAuthenticationImplementation,
   token: string,
   options?: RevocationRequestOptions,
 ): Promise<Response> {
@@ -4254,7 +4252,7 @@ export async function revocationRequest(
   const headers = prepareHeaders(options?.headers)
   headers.delete('accept')
 
-  return authenticatedRequest(as, client, url, body, headers, options)
+  return authenticatedRequest(as, client, clientAuthentication, url, body, headers, options)
 }
 
 /**
@@ -4301,9 +4299,7 @@ export async function processRevocationResponse(response: Response): Promise<und
   return undefined
 }
 
-export interface IntrospectionRequestOptions
-  extends HttpRequestOptions<'POST', URLSearchParams>,
-    AuthenticatedRequestOptions {
+export interface IntrospectionRequestOptions extends HttpRequestOptions<'POST', URLSearchParams> {
   /**
    * Any additional parameters to send. This cannot override existing parameter values.
    */
@@ -4332,6 +4328,7 @@ function assertReadableResponse(response: Response): void {
  *
  * @param as Authorization Server Metadata.
  * @param client Client Metadata.
+ * @param clientAuthentication Client Authentication Method.
  * @param token Token to introspect. You can provide the `token_type_hint` parameter via
  *   {@link IntrospectionRequestOptions.additionalParameters options}.
  *
@@ -4343,6 +4340,7 @@ function assertReadableResponse(response: Response): void {
 export async function introspectionRequest(
   as: AuthorizationServer,
   client: Client,
+  clientAuthentication: ClientAuthenticationImplementation,
   token: string,
   options?: IntrospectionRequestOptions,
 ): Promise<Response> {
@@ -4367,7 +4365,7 @@ export async function introspectionRequest(
     headers.set('accept', 'application/json')
   }
 
-  return authenticatedRequest(as, client, url, body, headers, options)
+  return authenticatedRequest(as, client, clientAuthentication, url, body, headers, options)
 }
 
 export interface ConfirmationClaims {
@@ -5340,8 +5338,7 @@ async function importJwk(alg: JWSAlgorithm, jwk: JWK) {
 }
 
 export interface DeviceAuthorizationRequestOptions
-  extends HttpRequestOptions<'POST', URLSearchParams>,
-    AuthenticatedRequestOptions {}
+  extends HttpRequestOptions<'POST', URLSearchParams> {}
 
 /**
  * Performs a Device Authorization Request at the
@@ -5349,6 +5346,7 @@ export interface DeviceAuthorizationRequestOptions
  *
  * @param as Authorization Server Metadata.
  * @param client Client Metadata.
+ * @param clientAuthentication Client Authentication Method.
  * @param parameters Device Authorization Request parameters.
  *
  * @group Device Authorization Grant
@@ -5358,6 +5356,7 @@ export interface DeviceAuthorizationRequestOptions
 export async function deviceAuthorizationRequest(
   as: AuthorizationServer,
   client: Client,
+  clientAuthentication: ClientAuthenticationImplementation,
   parameters: URLSearchParams | Record<string, string> | string[][],
   options?: DeviceAuthorizationRequestOptions,
 ): Promise<Response> {
@@ -5377,7 +5376,7 @@ export async function deviceAuthorizationRequest(
   const headers = prepareHeaders(options?.headers)
   headers.set('accept', 'application/json')
 
-  return authenticatedRequest(as, client, url, body, headers, options)
+  return authenticatedRequest(as, client, clientAuthentication, url, body, headers, options)
 }
 
 export interface DeviceAuthorizationResponse {
@@ -5517,6 +5516,7 @@ export async function processDeviceAuthorizationResponse(
  *
  * @param as Authorization Server Metadata.
  * @param client Client Metadata.
+ * @param clientAuthentication Client Authentication Method.
  * @param deviceCode Device Code.
  *
  * @group Device Authorization Grant
@@ -5527,6 +5527,7 @@ export async function processDeviceAuthorizationResponse(
 export async function deviceCodeGrantRequest(
   as: AuthorizationServer,
   client: Client,
+  clientAuthentication: ClientAuthenticationImplementation,
   deviceCode: string,
   options?: TokenEndpointRequestOptions,
 ): Promise<Response> {
@@ -5540,6 +5541,7 @@ export async function deviceCodeGrantRequest(
   return tokenEndpointRequest(
     as,
     client,
+    clientAuthentication,
     'urn:ietf:params:oauth:grant-type:device_code',
     parameters,
     options,

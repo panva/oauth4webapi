@@ -41,10 +41,8 @@ const as = await oauth
   .discoveryRequest(issuer, { algorithm })
   .then((response) => oauth.processDiscoveryResponse(issuer, response))
 
-const client: oauth.Client = {
-  client_id,
-  token_endpoint_auth_method: 'private_key_jwt',
-}
+const client: oauth.Client = { client_id }
+const clientAuth = oauth.PrivateKeyJwt(clientPrivateKey)
 
 const code_challenge_method = 'S256'
 /**
@@ -95,11 +93,11 @@ let access_token: string
   const response = await oauth.authorizationCodeGrantRequest(
     as,
     client,
+    clientAuth,
     params,
     redirect_uri,
     code_verifier,
     {
-      clientPrivateKey,
       [oauth.customFetch]: (url, init) => {
         return undici.fetch(url, {
           ...init,

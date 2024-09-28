@@ -163,7 +163,6 @@ export const flow = (options?: MacroOptions) => {
       const decoder = new TextDecoder()
       const client: oauth.Client = {
         client_id: configuration.client.client_id,
-        client_secret: configuration.client.client_secret,
         async [oauth.jweDecrypt](jwe) {
           const { plaintext } = await compactDecrypt(
             jwe,
@@ -177,38 +176,34 @@ export const flow = (options?: MacroOptions) => {
         use_mtls_endpoint_aliases: configuration.client.use_mtls_endpoint_aliases,
       }
 
+      let clientAuth: oauth.ClientAuthenticationImplementation
       switch (variant.client_auth_type) {
         case 'mtls':
-          client.token_endpoint_auth_method = 'self_signed_tls_client_auth'
+          clientAuth = oauth.SelfSignedTlsClientAuth()
           break
         case 'none':
+          clientAuth = oauth.None()
+          break
         case 'private_key_jwt':
+          const [jwk] = configuration.client.jwks.keys
+          clientAuth = oauth.PrivateKeyJwt({
+            kid: jwk.kid,
+            key: await importPrivateKey(JWS_ALGORITHM, jwk),
+          })
+          break
         case 'client_secret_basic':
+          clientAuth = oauth.ClientSecretBasic(configuration.client.client_secret!)
+          break
         case 'client_secret_post':
-          client.token_endpoint_auth_method = variant.client_auth_type
+          clientAuth = oauth.ClientSecretPost(configuration.client.client_secret!)
           break
         default:
-          client.token_endpoint_auth_method = 'client_secret_basic'
+          clientAuth = oauth.ClientSecretPost(configuration.client.client_secret!)
           break
       }
 
       if (instance.name.includes('client-secret-basic')) {
-        client.token_endpoint_auth_method = 'client_secret_basic'
-      }
-
-      let clientPrivateKey!: oauth.PrivateKey
-
-      switch (client.token_endpoint_auth_method) {
-        case 'none':
-          delete client.client_secret
-          break
-        case 'private_key_jwt':
-          delete client.client_secret
-          const [jwk] = configuration.client.jwks.keys
-          clientPrivateKey = {
-            kid: jwk.kid,
-            key: await importPrivateKey(JWS_ALGORITHM, jwk),
-          }
+        clientAuth = oauth.ClientSecretBasic(configuration.client.client_secret!)
       }
 
       const mtlsFetch = (...args: Parameters<typeof fetch>) => {
@@ -320,10 +315,9 @@ export const flow = (options?: MacroOptions) => {
       if (usesPar(plan)) {
         t.log('PAR request with', Object.fromEntries(authorizationUrl.searchParams.entries()))
         const request = () =>
-          oauth.pushedAuthorizationRequest(as, client, authorizationUrl.searchParams, {
+          oauth.pushedAuthorizationRequest(as, client, clientAuth, authorizationUrl.searchParams, {
             ...clientAuthOptions('par'),
             DPoP,
-            clientPrivateKey,
           })
         let par = await request()
 
@@ -383,12 +377,12 @@ export const flow = (options?: MacroOptions) => {
           oauth.authorizationCodeGrantRequest(
             as,
             client,
+            clientAuth,
             params,
             configuration.client.redirect_uri,
             code_verifier,
             {
               ...clientAuthOptions('token'),
-              clientPrivateKey,
               DPoP,
             },
           )

@@ -22,10 +22,13 @@ test.before(setupJwks)
 const tClient: lib.Client = { ...client, token_endpoint_auth_method: 'none' }
 
 test('deviceAuthorizationRequest()', async (t) => {
-  await t.throwsAsync(lib.deviceAuthorizationRequest(issuer, tClient, new URLSearchParams()), {
-    message:
-      'authorization server metadata does not contain a valid "as.device_authorization_endpoint"',
-  })
+  await t.throwsAsync(
+    lib.deviceAuthorizationRequest(issuer, tClient, lib.None(), new URLSearchParams()),
+    {
+      message:
+        'authorization server metadata does not contain a valid "as.device_authorization_endpoint"',
+    },
+  )
 
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
@@ -55,14 +58,19 @@ test('deviceAuthorizationRequest()', async (t) => {
     lib.deviceAuthorizationRequest(
       tIssuer,
       tClient,
+      lib.None(),
       new URLSearchParams({ resource: 'urn:example:resource' }),
     ),
   )
   await t.notThrowsAsync(
-    lib.deviceAuthorizationRequest(tIssuer, tClient, { resource: 'urn:example:resource' }),
+    lib.deviceAuthorizationRequest(tIssuer, tClient, lib.None(), {
+      resource: 'urn:example:resource',
+    }),
   )
   await t.notThrowsAsync(
-    lib.deviceAuthorizationRequest(tIssuer, tClient, [['resource', 'urn:example:resource']]),
+    lib.deviceAuthorizationRequest(tIssuer, tClient, lib.None(), [
+      ['resource', 'urn:example:resource'],
+    ]),
   )
 })
 
@@ -96,7 +104,9 @@ test('deviceAuthorizationRequest() w/ Custom Headers', async (t) => {
     new Headers(Object.fromEntries(entries)),
   ]) {
     await t.notThrowsAsync(
-      lib.deviceAuthorizationRequest(tIssuer, tClient, new URLSearchParams(), { headers }),
+      lib.deviceAuthorizationRequest(tIssuer, tClient, lib.None(), new URLSearchParams(), {
+        headers,
+      }),
     )
   }
 })
@@ -238,11 +248,11 @@ test('processDeviceAuthorizationResponse()', async (t) => {
 })
 
 test('deviceCodeGrantRequest()', async (t) => {
-  await t.throwsAsync(lib.deviceCodeGrantRequest(issuer, tClient, 'device_code'), {
+  await t.throwsAsync(lib.deviceCodeGrantRequest(issuer, tClient, lib.None(), 'device_code'), {
     message: 'authorization server metadata does not contain a valid "as.token_endpoint"',
   })
 
-  await t.throwsAsync(lib.deviceCodeGrantRequest(issuer, tClient, null as any), {
+  await t.throwsAsync(lib.deviceCodeGrantRequest(issuer, tClient, lib.None(), null as any), {
     message: '"deviceCode" must be a string',
   })
 
@@ -268,7 +278,7 @@ test('deviceCodeGrantRequest()', async (t) => {
     })
     .reply(200, { access_token: 'token', token_type: 'Bearer' })
 
-  await t.notThrowsAsync(lib.deviceCodeGrantRequest(tIssuer, tClient, 'device_code'))
+  await t.notThrowsAsync(lib.deviceCodeGrantRequest(tIssuer, tClient, lib.None(), 'device_code'))
 })
 
 test('deviceCodeGrantRequest() w/ Extra Parameters', async (t) => {
@@ -290,13 +300,13 @@ test('deviceCodeGrantRequest() w/ Extra Parameters', async (t) => {
     .times(3)
 
   await t.notThrowsAsync(
-    lib.deviceCodeGrantRequest(tIssuer, tClient, 'device_code', {
+    lib.deviceCodeGrantRequest(tIssuer, tClient, lib.None(), 'device_code', {
       additionalParameters: new URLSearchParams('resource=urn:example:resource'),
     }),
   )
 
   await t.notThrowsAsync(
-    lib.deviceCodeGrantRequest(tIssuer, tClient, 'device_code', {
+    lib.deviceCodeGrantRequest(tIssuer, tClient, lib.None(), 'device_code', {
       additionalParameters: {
         resource: 'urn:example:resource',
       },
@@ -304,7 +314,7 @@ test('deviceCodeGrantRequest() w/ Extra Parameters', async (t) => {
   )
 
   await t.notThrowsAsync(
-    lib.deviceCodeGrantRequest(tIssuer, tClient, 'device_code', {
+    lib.deviceCodeGrantRequest(tIssuer, tClient, lib.None(), 'device_code', {
       additionalParameters: [['resource', 'urn:example:resource']],
     }),
   )
@@ -339,7 +349,9 @@ test('deviceCodeGrantRequest() w/ Custom Headers', async (t) => {
     Object.fromEntries(entries),
     new Headers(Object.fromEntries(entries)),
   ]) {
-    await t.notThrowsAsync(lib.deviceCodeGrantRequest(tIssuer, tClient, 'device_code', { headers }))
+    await t.notThrowsAsync(
+      lib.deviceCodeGrantRequest(tIssuer, tClient, lib.None(), 'device_code', { headers }),
+    )
   }
 })
 
@@ -360,7 +372,9 @@ test('deviceCodeGrantRequest() w/ DPoP', async (t) => {
     .reply(200, { access_token: 'token', token_type: 'DPoP' })
 
   const DPoP = await lib.generateKeyPair('ES256')
-  await t.notThrowsAsync(lib.deviceCodeGrantRequest(tIssuer, tClient, 'device_code', { DPoP }))
+  await t.notThrowsAsync(
+    lib.deviceCodeGrantRequest(tIssuer, tClient, lib.None(), 'device_code', { DPoP }),
+  )
 })
 
 test('processDeviceCodeResponse() without ID Tokens', async (t) => {

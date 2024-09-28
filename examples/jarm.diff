@@ -1,8 +1,8 @@
 diff --git a/examples/oauth.ts b/examples/jarm.ts
-index d8185be..46f11b5 100644
+index d55e62d..f2ad78a 100644
 --- a/examples/oauth.ts
 +++ b/examples/jarm.ts
-@@ -47,6 +47,7 @@ let state: string | undefined
+@@ -44,6 +44,7 @@ let state: string | undefined
    authorizationUrl.searchParams.set('scope', 'api:read')
    authorizationUrl.searchParams.set('code_challenge', code_challenge)
    authorizationUrl.searchParams.set('code_challenge_method', code_challenge_method)
@@ -10,7 +10,7 @@ index d8185be..46f11b5 100644
  
    /**
     * We cannot be sure the AS supports PKCE so we're going to use state too. Use of PKCE is
-@@ -65,7 +66,7 @@ let state: string | undefined
+@@ -62,7 +63,7 @@ let state: string | undefined
  let access_token: string
  {
    const currentUrl: URL = getCurrentUrl()

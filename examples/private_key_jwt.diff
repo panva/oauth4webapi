@@ -1,5 +1,5 @@
 diff --git a/examples/oauth.ts b/examples/private_key_jwt.ts
-index d8185be..e73fc36 100644
+index d55e62d..8bf4f3a 100644
 --- a/examples/oauth.ts
 +++ b/examples/private_key_jwt.ts
 @@ -9,12 +9,16 @@ let algorithm!:
@@ -20,21 +20,12 @@ index d8185be..e73fc36 100644
  
  // End of prerequisites
  
-@@ -24,8 +28,7 @@ const as = await oauth
+@@ -23,7 +27,7 @@ const as = await oauth
+   .then((response) => oauth.processDiscoveryResponse(issuer, response))
  
- const client: oauth.Client = {
-   client_id,
--  client_secret,
--  token_endpoint_auth_method: 'client_secret_basic',
-+  token_endpoint_auth_method: 'private_key_jwt',
- }
+ const client: oauth.Client = { client_id }
+-const clientAuth = oauth.ClientSecretPost(client_secret)
++const clientAuth = oauth.PrivateKeyJwt(clientPrivateKey)
  
  const code_challenge_method = 'S256'
-@@ -73,6 +76,7 @@ let access_token: string
-     params,
-     redirect_uri,
-     code_verifier,
-+    { clientPrivateKey },
-   )
- 
-   const result = await oauth.processAuthorizationCodeResponse(as, client, response)
+ /**

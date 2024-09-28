@@ -18,15 +18,19 @@ test.after(teardown)
 const tClient: lib.Client = { ...client, client_secret: 'foo' }
 
 test('clientCredentialsGrantRequest()', async (t) => {
-  await t.throwsAsync(lib.clientCredentialsGrantRequest(issuer, tClient, new URLSearchParams()), {
-    message: 'authorization server metadata does not contain a valid "as.token_endpoint"',
-    code: 'OAUTH_MISSING_SERVER_METADATA',
-  })
+  await t.throwsAsync(
+    lib.clientCredentialsGrantRequest(issuer, tClient, lib.None(), new URLSearchParams()),
+    {
+      message: 'authorization server metadata does not contain a valid "as.token_endpoint"',
+      code: 'OAUTH_MISSING_SERVER_METADATA',
+    },
+  )
 
   await t.throwsAsync(
     lib.clientCredentialsGrantRequest(
       { ...issuer, token_endpoint: '' },
       tClient,
+      lib.None(),
       new URLSearchParams(),
     ),
     {
@@ -63,14 +67,19 @@ test('clientCredentialsGrantRequest()', async (t) => {
     lib.clientCredentialsGrantRequest(
       tIssuer,
       tClient,
+      lib.None(),
       new URLSearchParams({ resource: 'urn:example:resource' }),
     ),
   )
   await t.notThrowsAsync(
-    lib.clientCredentialsGrantRequest(tIssuer, tClient, { resource: 'urn:example:resource' }),
+    lib.clientCredentialsGrantRequest(tIssuer, tClient, lib.None(), {
+      resource: 'urn:example:resource',
+    }),
   )
   await t.notThrowsAsync(
-    lib.clientCredentialsGrantRequest(tIssuer, tClient, [['resource', 'urn:example:resource']]),
+    lib.clientCredentialsGrantRequest(tIssuer, tClient, lib.None(), [
+      ['resource', 'urn:example:resource'],
+    ]),
   )
 })
 
@@ -95,6 +104,7 @@ test('clientCredentialsGrantRequest() w/ Extra Parameters', async (t) => {
     lib.clientCredentialsGrantRequest(
       tIssuer,
       tClient,
+      lib.None(),
       new URLSearchParams('resource=urn:example:resource'),
     ),
   )
@@ -130,7 +140,9 @@ test('clientCredentialsGrantRequest() w/ Custom Headers', async (t) => {
     new Headers(Object.fromEntries(entries)),
   ]) {
     await t.notThrowsAsync(
-      lib.clientCredentialsGrantRequest(tIssuer, tClient, new URLSearchParams(), { headers }),
+      lib.clientCredentialsGrantRequest(tIssuer, tClient, lib.None(), new URLSearchParams(), {
+        headers,
+      }),
     )
   }
 })
@@ -153,7 +165,9 @@ test('clientCredentialsGrantRequest() w/ DPoP', async (t) => {
 
   const DPoP = await lib.generateKeyPair('ES256')
   await t.notThrowsAsync(
-    lib.clientCredentialsGrantRequest(tIssuer, tClient, new URLSearchParams(), { DPoP }),
+    lib.clientCredentialsGrantRequest(tIssuer, tClient, lib.None(), new URLSearchParams(), {
+      DPoP,
+    }),
   )
 })
 
