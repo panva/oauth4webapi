@@ -1,5 +1,5 @@
 diff --git a/examples/oauth.ts b/examples/fapi2.ts
-index d55e62d..b8ec053 100644
+index d55e62d..e49247d 100644
 --- a/examples/oauth.ts
 +++ b/examples/fapi2.ts
 @@ -9,12 +9,22 @@ let algorithm!:
@@ -17,7 +17,7 @@ index d55e62d..b8ec053 100644
 + * session. In the browser environment you shall use IndexedDB to persist the generated
 + * CryptoKeyPair.
 + */
-+let DPoP!: oauth.CryptoKeyPair
++let DPoPKeys!: oauth.CryptoKeyPair
 +/**
 + * A key that the client has pre-registered at the Authorization Server for use with Private Key JWT
 + * client authentication method.
@@ -26,12 +26,13 @@ index d55e62d..b8ec053 100644
  
  // End of prerequisites
  
-@@ -23,36 +33,55 @@ const as = await oauth
+@@ -23,36 +33,56 @@ const as = await oauth
    .then((response) => oauth.processDiscoveryResponse(issuer, response))
  
  const client: oauth.Client = { client_id }
 -const clientAuth = oauth.ClientSecretPost(client_secret)
 +const clientAuth = oauth.PrivateKeyJwt(clientPrivateKey)
++const DPoP = oauth.DPoP(client, DPoPKeys)
  
  const code_challenge_method = 'S256'
  /**
@@ -100,7 +101,7 @@ index d55e62d..b8ec053 100644
  
    // now redirect the user to authorizationUrl.href
  }
-@@ -62,18 +91,34 @@ let state: string | undefined
+@@ -62,18 +92,34 @@ let state: string | undefined
  let access_token: string
  {
    const currentUrl: URL = getCurrentUrl()
@@ -145,7 +146,7 @@ index d55e62d..b8ec053 100644
  
    console.log('Access Token Response', result)
    ;({ access_token } = result)
-@@ -81,11 +126,29 @@ let access_token: string
+@@ -81,11 +127,29 @@ let access_token: string
  
  // Protected Resource Request
  {

@@ -118,7 +118,7 @@ test('pushedAuthorizationRequest() w/ DPoP', async (t) => {
     })
     .reply(200, { request_uri: 'urn:example:uri', expires_in: 60 })
 
-  const DPoP = await lib.generateKeyPair('ES256')
+  const DPoP = lib.DPoP(tClient, await lib.generateKeyPair('ES256'))
   await t.notThrowsAsync(
     lib.pushedAuthorizationRequest(tIssuer, tClient, lib.None(), new URLSearchParams(), { DPoP }),
   )

@@ -1,6 +1,6 @@
 import anyTest, { type TestFn } from 'ava'
 import * as crypto from 'crypto'
-import setup, { type Context, teardown } from './_setup.js'
+import setup, { type Context, teardown, client } from './_setup.js'
 import * as jose from 'jose'
 import * as lib from '../src/index.js'
 
@@ -10,8 +10,8 @@ test.before(setup)
 test.after(teardown)
 
 test('dpop()', async (t) => {
-  const sign = await lib.generateKeyPair('ES256')
-  const publicJwk = await jose.exportJWK(sign.publicKey)
+  const kp = await lib.generateKeyPair('ES256')
+  const publicJwk = await jose.exportJWK(kp.publicKey)
 
   t.context.mock
     .get('https://rs.example.com')
@@ -35,6 +35,7 @@ test('dpop()', async (t) => {
     })
     .reply(200, '')
 
+  const sign = lib.DPoP(client, kp)
   const url = new URL('https://rs.example.com/resource?foo#bar')
   const response = await lib.protectedResourceRequest('token', 'GET', url, undefined, undefined, {
     DPoP: sign,
@@ -43,8 +44,6 @@ test('dpop()', async (t) => {
 })
 
 test('dpop() w/ a nonce', async (t) => {
-  const sign = await lib.generateKeyPair('ES256')
-
   t.context.mock
     .get('https://rs2.example.com')
     .intercept({
@@ -61,6 +60,7 @@ test('dpop() w/ a nonce', async (t) => {
     .reply(401, '', { headers: { 'DPoP-Nonce': 'foo' } })
 
   const url = new URL('https://rs2.example.com/resource?foo#bar')
+  const sign = lib.DPoP(client, await lib.generateKeyPair('ES256'))
   await lib.protectedResourceRequest('token', 'GET', url, undefined, undefined, {
     DPoP: sign,
   })

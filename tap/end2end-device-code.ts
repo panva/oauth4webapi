@@ -24,7 +24,16 @@ export default (QUnit: QUnit) => {
         ['refresh_token', 'urn:ietf:params:oauth:grant-type:device_code'],
         false,
       )
-      const DPoP = dpop ? await lib.generateKeyPair(alg as lib.JWSAlgorithm) : undefined
+      const DPoPKeyPair = await lib.generateKeyPair(alg as lib.JWSAlgorithm)
+      const DPoP = dpop
+        ? lib.DPoP(client, {
+            ...DPoPKeyPair,
+            [lib.modifyAssertion](h, p) {
+              t.equal(h.alg, 'ES256')
+              p.foo = 'bar'
+            },
+          })
+        : undefined
 
       const clientAuth = lib.ClientSecretBasic(client.client_secret as string)
 
@@ -83,15 +92,7 @@ export default (QUnit: QUnit) => {
           undefined,
           undefined,
           {
-            DPoP: DPoP
-              ? {
-                  ...DPoP,
-                  [lib.modifyAssertion](h, p) {
-                    t.equal(h.alg, 'ES256')
-                    p.foo = 'bar'
-                  },
-                }
-              : undefined,
+            DPoP,
             [lib.allowInsecureRequests]: true,
             async [lib.customFetch](...params: Parameters<typeof fetch>) {
               const url = new URL(params[0] as string)
@@ -111,7 +112,7 @@ export default (QUnit: QUnit) => {
               if (DPoP) {
                 t.equal(
                   jwtAccessToken.cnf!.jkt,
-                  await jose.calculateJwkThumbprint(await jose.exportJWK(DPoP.publicKey)),
+                  await jose.calculateJwkThumbprint(await jose.exportJWK(DPoPKeyPair.publicKey)),
                 )
 
                 t.propContains(await jose.decodeJwt(request.headers.get('dpop')!), { foo: 'bar' })

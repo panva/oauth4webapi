@@ -25,7 +25,7 @@ export default async (QUnit: QUnit) => {
           new URL('https://rs.example.com/api'),
           undefined,
           undefined,
-          { DPoP: { privateKey, publicKey } },
+          { DPoP: lib.DPoP(client, { privateKey, publicKey }) },
         ),
         (err: Error) => {
           t.propContains(err, {

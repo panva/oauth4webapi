@@ -163,7 +163,7 @@ test('clientCredentialsGrantRequest() w/ DPoP', async (t) => {
     })
     .reply(200, { access_token: 'token', token_type: 'DPoP' })
 
-  const DPoP = await lib.generateKeyPair('ES256')
+  const DPoP = lib.DPoP(tClient, await lib.generateKeyPair('ES256'))
   await t.notThrowsAsync(
     lib.clientCredentialsGrantRequest(tIssuer, tClient, lib.None(), new URLSearchParams(), {
       DPoP,

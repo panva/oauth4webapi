@@ -371,7 +371,7 @@ test('deviceCodeGrantRequest() w/ DPoP', async (t) => {
     })
     .reply(200, { access_token: 'token', token_type: 'DPoP' })
 
-  const DPoP = await lib.generateKeyPair('ES256')
+  const DPoP = lib.DPoP(tClient, await lib.generateKeyPair('ES256'))
   await t.notThrowsAsync(
     lib.deviceCodeGrantRequest(tIssuer, tClient, lib.None(), 'device_code', { DPoP }),
   )

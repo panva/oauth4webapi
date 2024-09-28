@@ -20,7 +20,7 @@ let redirect_uri!: string
  * session. In the browser environment you shall use IndexedDB to persist the generated
  * CryptoKeyPair.
  */
-let DPoP!: oauth.CryptoKeyPair
+let DPoPKeys!: oauth.CryptoKeyPair
 
 // End of prerequisites
 
@@ -30,6 +30,7 @@ const as = await oauth
 
 const client: oauth.Client = { client_id }
 const clientAuth = oauth.ClientSecretPost(client_secret)
+const DPoP = oauth.DPoP(client, DPoPKeys)
 
 const code_challenge_method = 'S256'
 /**

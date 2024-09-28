@@ -1,8 +1,8 @@
 diff --git a/examples/fapi2.ts b/examples/fapi2-message-signing.ts
-index b8ec053..3fe9af1 100644
+index e49247d..76ce800 100644
 --- a/examples/fapi2.ts
 +++ b/examples/fapi2-message-signing.ts
-@@ -25,6 +25,11 @@ let DPoP!: oauth.CryptoKeyPair
+@@ -25,6 +25,11 @@ let DPoPKeys!: oauth.CryptoKeyPair
   * client authentication method.
   */
  let clientPrivateKey!: oauth.CryptoKey
@@ -14,7 +14,7 @@ index b8ec053..3fe9af1 100644
  
  // End of prerequisites
  
-@@ -44,8 +49,8 @@ const code_challenge_method = 'S256'
+@@ -45,8 +50,8 @@ const code_challenge_method = 'S256'
  const code_verifier = oauth.generateRandomCodeVerifier()
  const code_challenge = await oauth.calculatePKCECodeChallenge(code_verifier)
  
@@ -25,7 +25,7 @@ index b8ec053..3fe9af1 100644
  {
    const params = new URLSearchParams()
    params.set('client_id', client.client_id)
-@@ -53,7 +58,18 @@ let request_uri: string
+@@ -54,7 +59,18 @@ let request_uri: string
    params.set('code_challenge_method', code_challenge_method)
    params.set('redirect_uri', redirect_uri)
    params.set('response_type', 'code')
@@ -45,7 +45,7 @@ index b8ec053..3fe9af1 100644
  
    const pushedAuthorizationRequest = () =>
      oauth.pushedAuthorizationRequest(as, client, clientAuth, params, {
-@@ -91,7 +107,7 @@ let request_uri: string
+@@ -92,7 +108,7 @@ let request_uri: string
  let access_token: string
  {
    const currentUrl: URL = getCurrentUrl()
@@ -54,7 +54,7 @@ index b8ec053..3fe9af1 100644
  
    const authorizationCodeGrantRequest = () =>
      oauth.authorizationCodeGrantRequest(
-@@ -107,7 +123,7 @@ let access_token: string
+@@ -108,7 +124,7 @@ let access_token: string
    let response = await authorizationCodeGrantRequest()
  
    const processAuthorizationCodeResponse = () =>
@@ -63,7 +63,7 @@ index b8ec053..3fe9af1 100644
  
    let result = await processAuthorizationCodeResponse().catch(async (err) => {
      if (err instanceof oauth.ResponseBodyError) {
-@@ -120,6 +136,9 @@ let access_token: string
+@@ -121,6 +137,9 @@ let access_token: string
      throw err
    })
  

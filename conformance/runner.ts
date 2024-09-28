@@ -303,12 +303,14 @@ export const flow = (options?: MacroOptions) => {
         authorizationUrl.searchParams.set('response_type', response_type)
       }
 
-      let DPoP!: oauth.CryptoKeyPair
+      let DPoPKeyPair!: oauth.CryptoKeyPair
+      let DPoP!: oauth.DPoPRequestOptions['DPoP']
       if (usesDpop(variant)) {
-        DPoP = await oauth.generateKeyPair(JWS_ALGORITHM as oauth.JWSAlgorithm)
+        DPoPKeyPair = await oauth.generateKeyPair(JWS_ALGORITHM as oauth.JWSAlgorithm)
+        DPoP = oauth.DPoP(client, DPoPKeyPair)
         authorizationUrl.searchParams.set(
           'dpop_jkt',
-          await calculateJwkThumbprint(await exportJWK(DPoP.publicKey)),
+          await calculateJwkThumbprint(await exportJWK(DPoPKeyPair.publicKey)),
         )
       }
 
@@ -325,7 +327,11 @@ export const flow = (options?: MacroOptions) => {
         try {
           result = await oauth.processPushedAuthorizationResponse(as, client, par)
         } catch (err) {
-          if (DPoP && err instanceof oauth.ResponseBodyError && err.error === 'use_dpop_nonce') {
+          if (
+            DPoPKeyPair &&
+            err instanceof oauth.ResponseBodyError &&
+            err.error === 'use_dpop_nonce'
+          ) {
             t.log('error', inspect(err, { depth: Infinity }))
             t.log('retrying with a newly obtained dpop nonce')
             par = await request()
@@ -399,7 +405,11 @@ export const flow = (options?: MacroOptions) => {
             result = await oauth.processAuthorizationCodeResponse(as, client, response)
           }
         } catch (err) {
-          if (DPoP && err instanceof oauth.ResponseBodyError && err.error === 'use_dpop_nonce') {
+          if (
+            DPoPKeyPair &&
+            err instanceof oauth.ResponseBodyError &&
+            err.error === 'use_dpop_nonce'
+          ) {
             t.log('error', inspect(err, { depth: Infinity }))
             t.log('retrying with a newly obtained dpop nonce')
             response = await request()
@@ -443,7 +453,7 @@ export const flow = (options?: MacroOptions) => {
           t.log('userinfo endpoint response', { ...result })
         } catch (err) {
           t.log('error', inspect(err, { depth: Infinity }))
-          if (DPoP && err instanceof oauth.WWWAuthenticateChallengeError) {
+          if (DPoPKeyPair && err instanceof oauth.WWWAuthenticateChallengeError) {
             const { 0: challenge, length } = err.cause
             if (
               length === 1 &&
@@ -483,7 +493,7 @@ export const flow = (options?: MacroOptions) => {
           accounts = await request()
         } catch (err) {
           t.log('error', inspect(err, { depth: Infinity }))
-          if (DPoP && err instanceof oauth.WWWAuthenticateChallengeError) {
+          if (DPoPKeyPair && err instanceof oauth.WWWAuthenticateChallengeError) {
             const { 0: challenge, length } = err.cause
             if (
               length === 1 &&

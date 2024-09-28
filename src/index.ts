@@ -1027,64 +1027,6 @@ function b64u(input: string | Uint8Array | ArrayBuffer) {
 }
 
 /**
- * Simple LRU
- */
-class LRU<T1, T2> {
-  cache = new Map<T1, T2>()
-  _cache = new Map<T1, T2>()
-  maxSize: number
-
-  constructor(maxSize: number) {
-    this.maxSize = maxSize
-  }
-
-  get(key: T1) {
-    let v = this.cache.get(key)
-    if (v) {
-      return v
-    }
-
-    if ((v = this._cache.get(key))) {
-      this.update(key, v)
-      return v
-    }
-
-    return undefined
-  }
-
-  has(key: T1) {
-    return this.cache.has(key) || this._cache.has(key)
-  }
-
-  set(key: T1, value: T2) {
-    if (this.cache.has(key)) {
-      this.cache.set(key, value)
-    } else {
-      this.update(key, value)
-    }
-    return this
-  }
-
-  delete(key: T1) {
-    if (this.cache.has(key)) {
-      return this.cache.delete(key)
-    }
-    if (this._cache.has(key)) {
-      return this._cache.delete(key)
-    }
-    return false
-  }
-
-  update(key: T1, value: T2) {
-    this.cache.set(key, value)
-    if (this.cache.size >= this.maxSize) {
-      this._cache = this.cache
-      this.cache = new Map()
-    }
-  }
-}
-
-/**
  * @group Errors
  */
 export class UnsupportedOperationError extends Error {
@@ -1124,8 +1066,6 @@ export class OperationProcessingError extends Error {
 function OPE(message: string, code?: string, cause?: unknown) {
   return new OperationProcessingError(message, { code, cause })
 }
-
-const dpopNonces: LRU<string, string> = new LRU(100)
 
 function assertCryptoKey(key: unknown, it: string): asserts key is CryptoKey {
   if (!(key instanceof CryptoKey)) {
@@ -1243,16 +1183,6 @@ export interface DiscoveryRequestOptions extends HttpRequestOptions<'GET'> {
   algorithm?: 'oidc' | 'oauth2'
 }
 
-function processDpopNonce(response: Response) {
-  try {
-    const nonce = response.headers.get('dpop-nonce')
-    if (nonce) {
-      dpopNonces.set(new URL(response.url).origin, nonce)
-    }
-  } catch {}
-  return response
-}
-
 function normalizeTyp(value: string) {
   return value.toLowerCase().replace(/^application\//, '')
 }
@@ -1362,7 +1292,7 @@ export async function discoveryRequest(
     method: 'GET',
     redirect: 'manual',
     signal: options?.signal ? signal(options.signal) : null,
-  }).then(processDpopNonce)
+  })
 }
 
 function assertNumber(
@@ -1600,7 +1530,7 @@ function getKeyAndKid(input: CryptoKey | PrivateKey | undefined): NormalizedKeyI
   }
 }
 
-export interface DPoPOptions extends CryptoKeyPair {
+export interface DPoPKeyPair extends CryptoKeyPair {
   /**
    * Private CryptoKey instance to sign the DPoP Proof JWT with.
    *
@@ -1609,16 +1539,9 @@ export interface DPoPOptions extends CryptoKeyPair {
   privateKey: CryptoKey
 
   /**
-   * The public key corresponding to {@link DPoPOptions.privateKey}.
+   * The public key corresponding to {@link DPoPKeyPair.privateKey}.
    */
   publicKey: CryptoKey
-
-  /**
-   * Server-Provided Nonce to use in the request. This option serves as an override in case the
-   * self-correcting mechanism does not work with a particular server. Previously received nonces
-   * will be used automatically.
-   */
-  nonce?: string
 
   /**
    * Use to modify the DPoP Proof JWT right before it is signed.
@@ -1630,9 +1553,9 @@ export interface DPoPOptions extends CryptoKeyPair {
 
 export interface DPoPRequestOptions {
   /**
-   * DPoP-related options.
+   * DPoP handle, obtained from {@link DPoP}
    */
-  DPoP?: DPoPOptions
+  DPoP?: DPoPHandle
 }
 
 export interface PushedAuthorizationRequestOptions
@@ -2042,50 +1965,6 @@ export async function issueRequestObject(
   return signJwt(header, claims, key)
 }
 
-/**
- * Generates a unique DPoP Proof JWT
- */
-async function dpopProofJwt(
-  headers: Headers,
-  options: DPoPOptions,
-  url: URL,
-  htm: string,
-  clockSkew: number,
-  accessToken?: string,
-) {
-  const { privateKey, publicKey, nonce = dpopNonces.get(url.origin) } = options
-
-  assertPrivateKey(privateKey, '"DPoP.privateKey"')
-  assertPublicKey(publicKey, '"DPoP.publicKey"')
-
-  if (nonce !== undefined) {
-    assertString(nonce, '"DPoP.nonce"')
-  }
-
-  if (!publicKey.extractable) {
-    throw CodedTypeError('"DPoP.publicKey.extractable" must be true', ERR_INVALID_ARG_VALUE)
-  }
-
-  const now = epochTime() + clockSkew
-  const header = {
-    alg: keyToJws(privateKey),
-    typ: 'dpop+jwt',
-    jwk: await publicJwk(publicKey),
-  }
-  const payload = {
-    iat: now,
-    jti: randomBytes(),
-    htm,
-    nonce,
-    htu: `${url.origin}${url.pathname}`,
-    ath: accessToken ? b64u(await crypto.subtle.digest('SHA-256', buf(accessToken))) : undefined,
-  }
-
-  options[modifyAssertion]?.(header, payload)
-
-  headers.set('dpop', await signJwt(header, payload, privateKey))
-}
-
 let jwkCache: WeakMap<CryptoKey, JWK>
 
 async function getSetPublicJwkCache(key: CryptoKey) {
@@ -2206,10 +2085,141 @@ export async function pushedAuthorizationRequest(
   headers.set('accept', 'application/json')
 
   if (options?.DPoP !== undefined) {
-    await dpopProofJwt(headers, options.DPoP, url, 'POST', getClockSkew(client))
+    assertDPoP(options.DPoP)
+    await options.DPoP.addProof(url, headers, 'POST')
   }
 
-  return authenticatedRequest(as, client, clientAuthentication, url, body, headers, options)
+  const response = await authenticatedRequest(
+    as,
+    client,
+    clientAuthentication,
+    url,
+    body,
+    headers,
+    options,
+  )
+  options?.DPoP?.cacheNonce(response)
+  return response
+}
+
+/**
+ * DPoP handle, obtained from {@link DPoP}
+ */
+export interface DPoPHandle {
+  /**
+   * This is not part of the public API.
+   *
+   * @private
+   *
+   * @ignore
+   *
+   * @internal
+   */
+  addProof(url: URL, headers: Headers, htm: string, accessToken?: string): Promise<void>
+  /**
+   * This is not part of the public API.
+   *
+   * @private
+   *
+   * @ignore
+   *
+   * @internal
+   */
+  cacheNonce(response: Response): void
+}
+
+class DPoPHandler implements DPoPHandle {
+  #header?: CompactJWSHeaderParameters
+  #privateKey: CryptoKey
+  #publicKey: CryptoKey
+  #clockSkew: number
+  #modifyAssertion?: ModifyAssertionFunction
+  #map?: Map<string, string>
+
+  constructor(client: Client, keyPair: DPoPKeyPair) {
+    assertPrivateKey(keyPair?.privateKey, '"DPoP.privateKey"')
+    assertPublicKey(keyPair?.publicKey, '"DPoP.publicKey"')
+
+    if (!keyPair.publicKey.extractable) {
+      throw CodedTypeError('"DPoP.publicKey.extractable" must be true', ERR_INVALID_ARG_VALUE)
+    }
+
+    this.#modifyAssertion = keyPair[modifyAssertion]
+    this.#clockSkew = getClockSkew(client)
+    this.#privateKey = keyPair.privateKey
+    this.#publicKey = keyPair.publicKey
+    branded.add(this)
+  }
+
+  #get(key: string) {
+    this.#map ||= new Map()
+    let item = this.#map.get(key)
+    if (item) {
+      this.#map.delete(key)
+      this.#map.set(key, item)
+    }
+    return item
+  }
+
+  #set(key: string, val: string) {
+    this.#map ||= new Map()
+    this.#map.delete(key)
+    if (this.#map.size === 100) {
+      this.#map.delete(this.#map.keys().next().value!)
+    }
+    this.#map.set(key, val)
+  }
+
+  async addProof(url: URL, headers: Headers, htm: string, accessToken?: string): Promise<void> {
+    this.#header ||= {
+      alg: keyToJws(this.#privateKey),
+      typ: 'dpop+jwt',
+      jwk: await publicJwk(this.#publicKey),
+    }
+
+    const nonce = this.#get(url.origin)
+
+    const now = epochTime() + this.#clockSkew
+    const payload = {
+      iat: now,
+      jti: randomBytes(),
+      htm,
+      nonce,
+      htu: `${url.origin}${url.pathname}`,
+      ath: accessToken ? b64u(await crypto.subtle.digest('SHA-256', buf(accessToken))) : undefined,
+    }
+
+    this.#modifyAssertion?.(this.#header, payload)
+
+    headers.set('dpop', await signJwt(this.#header, payload, this.#privateKey))
+  }
+
+  cacheNonce(response: Response): void {
+    try {
+      const nonce = response.headers.get('dpop-nonce')
+      if (nonce) {
+        this.#set(new URL(response.url).origin, nonce)
+      }
+    } catch {}
+  }
+}
+
+/**
+ * Returns a wrapper / handle around a {@link !CryptoKeyPair} that is used for negotiating and
+ * proving proof-of-possession to sender-constrain OAuth 2.0 tokens via DPoP at the Authorization
+ * Server and Resource Server.
+ *
+ * This wrapper / handle also keeps track of server-issued nonces, allowing this module to
+ * automatically retry requests with a fresh nonce when the server indicates the need to use one.
+ *
+ * @param keyPair Public/private key pair to sign the DPoP Proof JWT with
+ *
+ * @group DPoP
+ *
+ * @see {@link !DPoP RFC 9449 - OAuth 2.0 Demonstrating Proof of Possession (DPoP)}
+ */
+export function DPoP(client: Client, keyPair: DPoPKeyPair): DPoPHandle {
+  return new DPoPHandler(client, keyPair)
 }
 
 export interface PushedAuthorizationResponse {
@@ -2533,6 +2543,7 @@ export async function processPushedAuthorizationResponse(
   if (response.status !== 201) {
     let err: OAuth2Error | undefined
     if ((err = await handleOAuthBodyError(response))) {
+      await response.body?.cancel()
       throw new ResponseBodyError('server responded with an error in the response body', {
         cause: err,
         response,
@@ -2580,11 +2591,12 @@ export type ProtectedResourceRequestBody =
 
 export interface ProtectedResourceRequestOptions
   extends Omit<HttpRequestOptions<string, ProtectedResourceRequestBody>, 'headers'>,
-    DPoPRequestOptions {
-  /**
-   * See {@link clockSkew}.
-   */
-  [clockSkew]?: number
+    DPoPRequestOptions {}
+
+function assertDPoP(option: DPoPHandle): asserts option is DPoPHandler {
+  if (!branded.has(option)) {
+    throw CodedTypeError('"options.DPoP" is not a valid DPoPHandle', ERR_INVALID_ARG_VALUE)
+  }
 }
 
 async function resourceRequest(
@@ -2605,27 +2617,23 @@ async function resourceRequest(
 
   headers = prepareHeaders(headers)
 
-  if (options?.DPoP === undefined) {
-    headers.set('authorization', `Bearer ${accessToken}`)
-  } else {
-    await dpopProofJwt(
-      headers,
-      options.DPoP,
-      url,
-      method.toUpperCase(),
-      getClockSkew({ [clockSkew]: options?.[clockSkew] }),
-      accessToken,
-    )
+  if (options?.DPoP) {
+    assertDPoP(options.DPoP)
+    await options.DPoP.addProof(url, headers, method.toUpperCase(), accessToken)
     headers.set('authorization', `DPoP ${accessToken}`)
+  } else {
+    headers.set('authorization', `Bearer ${accessToken}`)
   }
 
-  return (options?.[customFetch] || fetch)(url.href, {
+  const response = await (options?.[customFetch] || fetch)(url.href, {
     body,
     headers: Object.fromEntries(headers.entries()),
     method,
     redirect: 'manual',
     signal: options?.signal ? signal(options.signal) : null,
-  }).then(processDpopNonce)
+  })
+  options?.DPoP?.cacheNonce(response)
+  return response
 }
 
 /**
@@ -3053,7 +3061,7 @@ async function authenticatedRequest(
     method: 'POST',
     redirect: 'manual',
     signal: options?.signal ? signal(options.signal) : null,
-  }).then(processDpopNonce)
+  })
 }
 
 export interface TokenEndpointRequestOptions
@@ -3085,10 +3093,21 @@ async function tokenEndpointRequest(
   headers.set('accept', 'application/json')
 
   if (options?.DPoP !== undefined) {
-    await dpopProofJwt(headers, options.DPoP, url, 'POST', getClockSkew(client))
+    assertDPoP(options.DPoP)
+    await options.DPoP.addProof(url, headers, 'POST')
   }
 
-  return authenticatedRequest(as, client, clientAuthentication, url, parameters, headers, options)
+  const response = await authenticatedRequest(
+    as,
+    client,
+    clientAuthentication,
+    url,
+    parameters,
+    headers,
+    options,
+  )
+  options?.DPoP?.cacheNonce(response)
+  return response
 }
 
 /**
@@ -3544,7 +3563,7 @@ function validateIssuer(as: AuthorizationServer, result: Awaited<ReturnType<type
   return result
 }
 
-const branded = new WeakSet<URLSearchParams>()
+const branded = new WeakSet<URLSearchParams | DPoPHandle>()
 function brand(searchParams: URLSearchParams) {
   branded.add(searchParams)
   return searchParams
@@ -3648,6 +3667,8 @@ interface CompactJWSHeaderParameters {
   typ?: string
   crit?: string[]
   jwk?: JWK
+
+  [parameter: string]: JsonValue | undefined
 }
 
 interface ParsedJWT {
@@ -4284,6 +4305,7 @@ export async function processRevocationResponse(response: Response): Promise<und
   if (response.status !== 200) {
     let err: OAuth2Error | undefined
     if ((err = await handleOAuthBodyError(response))) {
+      await response.body?.cancel()
       throw new ResponseBodyError('server responded with an error in the response body', {
         cause: err,
         response,
@@ -4435,6 +4457,7 @@ export async function processIntrospectionResponse(
   if (response.status !== 200) {
     let err: OAuth2Error | undefined
     if ((err = await handleOAuthBodyError(response))) {
+      await response.body?.cancel()
       throw new ResponseBodyError('server responded with an error in the response body', {
         cause: err,
         response,
@@ -4515,7 +4538,7 @@ async function jwksRequest(
     method: 'GET',
     redirect: 'manual',
     signal: options?.signal ? signal(options.signal) : null,
-  }).then(processDpopNonce)
+  })
 }
 
 export interface JWKS {
@@ -5450,6 +5473,7 @@ export async function processDeviceAuthorizationResponse(
   if (response.status !== 200) {
     let err: OAuth2Error | undefined
     if ((err = await handleOAuthBodyError(response))) {
+      await response.body?.cancel()
       throw new ResponseBodyError('server responded with an error in the response body', {
         cause: err,
         response,
