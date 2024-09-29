@@ -1792,6 +1792,60 @@ export function PrivateKeyJwt(
   }
 }
 
+/**
+ * **`client_secret_jwt`** uses the HTTP request body to send `client_id`, `client_assertion_type`,
+ * and `client_assertion` as `application/x-www-form-urlencoded` body parameters. HMAC is used for
+ * the assertion's authenticity and integrity.
+ *
+ * @param clientSecret
+ * @param options
+ *
+ * @group Client Authentication Methods
+ *
+ * @see [OAuth Token Endpoint Authentication Methods](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#token-endpoint-auth-method)
+ * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication)
+ */
+export function ClientSecretJwt(
+  clientSecret: string,
+  options?: {
+    [modifyAssertion]?: ModifyAssertionFunction
+  },
+): ClientAuthenticationImplementation {
+  assertString(clientSecret, '"clientSecret"')
+  const modify = options?.[modifyAssertion]
+  let key: CryptoKey
+  return async (as, client, body, _headers) => {
+    key ||= await crypto.subtle.importKey(
+      'raw',
+      buf(clientSecret),
+      { hash: 'SHA-256', name: 'HMAC' },
+      false,
+      ['sign'],
+    )
+
+    const header = { alg: 'HS256' }
+    const now = epochTime() + getClockSkew(client)
+    const payload = {
+      jti: randomBytes(),
+      aud: [as.issuer, as.token_endpoint!],
+      exp: now + 60,
+      iat: now,
+      nbf: now,
+      iss: client.client_id,
+      sub: client.client_id,
+    }
+
+    modify?.(header, payload)
+
+    const data = `${b64u(buf(JSON.stringify(header)))}.${b64u(buf(JSON.stringify(payload)))}`
+    const hmac = await crypto.subtle.sign(key.algorithm, key, buf(data))
+
+    body.set('client_id', client.client_id)
+    body.set('client_assertion_type', 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer')
+    body.set('client_assertion', `${data}.${b64u(new Uint8Array(hmac))}`)
+  }
+}
+
 // TODO: should the auth methods be getting a client meta in the outer function?
 
 /**
@@ -5678,7 +5732,7 @@ async function validateDPoP(
   }
 
   {
-    const expected = b64u(await crypto.subtle.digest('SHA-256', encoder.encode(accessToken)))
+    const expected = b64u(await crypto.subtle.digest('SHA-256', buf(accessToken)))
 
     if (proof.claims.ath !== expected) {
       throw OPE('DPoP Proof ath mismatch', JWT_CLAIM_COMPARISON, { expected, claims: proof.claims })
@@ -5713,9 +5767,7 @@ async function validateDPoP(
       default:
         throw new UnsupportedOperationError('unsupported JWK key type', { cause: proof.header.jwk })
     }
-    const expected = b64u(
-      await crypto.subtle.digest('SHA-256', encoder.encode(JSON.stringify(components))),
-    )
+    const expected = b64u(await crypto.subtle.digest('SHA-256', buf(JSON.stringify(components))))
 
     if (accessTokenClaims.cnf.jkt !== expected) {
       throw OPE('JWT Access Token confirmation mismatch', JWT_CLAIM_COMPARISON, {

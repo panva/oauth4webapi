@@ -12,8 +12,9 @@ export default (QUnit: QUnit) => {
   const alg = 'ES256'
 
   const authMethodOptions: string[] = [
-    'client_secret_basic',
     'client_secret_post',
+    'client_secret_basic',
+    'client_secret_jwt',
     'private_key_jwt',
     'none',
   ]
@@ -75,6 +76,9 @@ export default (QUnit: QUnit) => {
           break
         case 'client_secret_post':
           clientAuth = lib.ClientSecretPost(client.client_secret as string)
+          break
+        case 'client_secret_jwt':
+          clientAuth = lib.ClientSecretJwt(client.client_secret as string)
           break
         case 'private_key_jwt':
           clientAuth = lib.PrivateKeyJwt({

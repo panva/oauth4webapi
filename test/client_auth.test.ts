@@ -264,3 +264,48 @@ test('none', async (t) => {
   )
   t.pass()
 })
+
+test('client_secret_jwt', async (t) => {
+  const tIssuer = {
+    ...issuer,
+    revocation_endpoint: endpoint('test-csjwt-1'),
+    token_endpoint: endpoint('token'),
+  }
+
+  t.context
+    .intercept({
+      path: '/test-csjwt-1',
+      method: 'POST',
+      headers(headers) {
+        return !('authorization' in headers)
+      },
+      body(body) {
+        const params = new URLSearchParams(body)
+        t.false(params.has('client_secret'))
+        t.true(params.has('client_assertion'))
+        t.is(params.get('client_id'), client.client_id)
+        t.is(
+          params.get('client_assertion_type'),
+          'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
+        )
+
+        const assertion = jose.decodeJwt(params.get('client_assertion')!)
+        t.is(assertion.aud, tIssuer.issuer)
+        t.is(assertion.iss, client.client_id)
+        t.is(assertion.sub, client.client_id)
+        t.is(typeof assertion.exp, 'number')
+        t.is(typeof assertion.iat, 'number')
+        t.is(typeof assertion.nbf, 'number')
+        t.is(typeof assertion.jti, 'string')
+        const header = jose.decodeProtectedHeader(params.get('client_assertion')!)
+        t.is(header.kid, undefined)
+        t.is(header.alg, 'HS256')
+
+        return true
+      },
+    })
+    .reply(200, '')
+
+  await lib.revocationRequest(tIssuer, client, lib.ClientSecretJwt('client_secret'), 'token')
+  t.pass()
+})
