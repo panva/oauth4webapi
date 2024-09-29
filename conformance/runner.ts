@@ -426,7 +426,7 @@ export const flow = (options?: MacroOptions) => {
         }
 
         if (nonRepudiation(plan, variant)) {
-          await oauth.validateIdTokenSignature(as, result)
+          await oauth.validateApplicationLevelSignature(as, response)
         }
 
         t.log('token endpoint response body', { ...result })

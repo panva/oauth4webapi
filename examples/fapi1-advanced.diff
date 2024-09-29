@@ -1,5 +1,5 @@
 diff --git a/examples/oauth.ts b/examples/fapi1-advanced.ts
-index d55e62d..deeecd9 100644
+index d55e62d..cfcd4d7 100644
 --- a/examples/oauth.ts
 +++ b/examples/fapi1-advanced.ts
 @@ -1,20 +1,39 @@
@@ -139,7 +139,7 @@ index d55e62d..deeecd9 100644
 +  const result = await oauth.processAuthorizationCodeResponse(as, client, response, true)
 +
 +  // Check ID Token signature for non-repudiation purposes
-+  await oauth.validateIdTokenSignature(as, result)
++  await oauth.validateApplicationLevelSignature(as, response)
  
    console.log('Access Token Response', result)
    ;({ access_token } = result)

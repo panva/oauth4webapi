@@ -1794,6 +1794,8 @@ export function PrivateKeyJwt(
   }
 }
 
+// TODO: should the auth methods be getting a client meta in the outer function?
+
 /**
  * **`none`** (public client) uses the HTTP request body to send only `client_id` as
  * `application/x-www-form-urlencoded` body parameter.
@@ -3004,7 +3006,7 @@ export async function processUserInfoResponse(
       .then(validateOptionalAudience.bind(undefined, client.client_id))
       .then(validateOptionalIssuer.bind(undefined, as))
 
-    jwtResponseBodies.set(response, jwt)
+    jwtRefs.set(response, jwt)
     json = claims as JsonValue
   } else {
     if (client.userinfo_signed_response_alg) {
@@ -3148,8 +3150,8 @@ export async function refreshTokenGrantRequest(
   )
 }
 
-const idTokenClaims = new WeakMap<TokenEndpointResponse, [IDToken, string]>()
-const jwtResponseBodies = new WeakMap<Response, string>()
+const idTokenClaims = new WeakMap<TokenEndpointResponse, IDToken>()
+const jwtRefs = new WeakMap<Response, string>()
 
 /**
  * Returns ID Token claims validated during {@link processAuthorizationCodeResponse}.
@@ -3187,81 +3189,52 @@ export function getValidatedIdTokenClaims(
     )
   }
 
-  return claims[0]
+  return claims
 }
 
 export interface ValidateSignatureOptions extends HttpRequestOptions<'GET'>, JWKSCacheOptions {}
 
 /**
- * Validates the JWS Signature of an ID Token included in results previously resolved from
- * {@link processAuthorizationCodeResponse}, {@link processRefreshTokenResponse}, or
- * {@link processDeviceCodeResponse} for non-repudiation purposes.
+ * Validates the JWS Signature of either a JWT {@link !Response.body} or
+ * {@link TokenEndpointResponse.id_token} of a processed {@link !Response}
  *
- * Note: Validating signatures of ID Tokens received via direct communication between the Client and
- * the Token Endpoint (which it is here) is not mandatory since the TLS server validation is used to
- * validate the issuer instead of checking the token signature. You only need to use this method for
- * non-repudiation purposes.
+ * Note: Validating signatures of JWTs received via direct communication between the Client and a
+ * TLS-secured Endpoint (which it is here) is not mandatory since the TLS server validation is used
+ * to validate the issuer instead of checking the token signature. You only need to use this method
+ * for non-repudiation purposes.
  *
  * Note: Supports only digital signatures.
  *
  * @param as Authorization Server Metadata.
- * @param ref Value previously resolved from {@link processAuthorizationCodeResponse},
- *   {@link processRefreshTokenResponse}, or {@link processDeviceCodeResponse}.
+ * @param ref Response previously processed by this module that contained an ID Token or its
+ *   response body was a JWT
  *
  * @returns Resolves if the signature validates, rejects otherwise.
  *
- * @group Authorization Code Grant w/ OpenID Connect (OIDC)
  * @group FAPI 1.0 Advanced
+ * @group FAPI 2.0 Message Signing
+ * @group Authorization Code Grant w/ OpenID Connect (OIDC)
+ * @group OpenID Connect (OIDC) UserInfo
+ * @group Token Introspection
  *
- * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#IDTokenValidation)
+ * @see [draft-ietf-oauth-jwt-introspection-response-12 - JWT Response for OAuth Token Introspection](https://www.ietf.org/archive/id/draft-ietf-oauth-jwt-introspection-response-12.html#section-5)
+ * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#UserInfo)
  */
-export async function validateIdTokenSignature(
-  as: AuthorizationServer,
-  ref: OpenIDTokenEndpointResponse | TokenEndpointResponse,
-  options?: ValidateSignatureOptions,
-): Promise<void> {
-  assertAs(as)
-
-  if (!idTokenClaims.has(ref)) {
-    throw OPE('"ref" does not contain an ID Token to verify the signature of')
-  }
-
-  const {
-    0: protectedHeader,
-    1: payload,
-    2: encodedSignature,
-  } = idTokenClaims.get(ref)![1].split('.')
-
-  const header: CompactJWSHeaderParameters = JSON.parse(buf(b64u(protectedHeader)))
-
-  if (header.alg.startsWith('HS')) {
-    throw new UnsupportedOperationError('unsupported JWS algorithm', { cause: { alg: header.alg } })
-  }
-
-  let key!: CryptoKey
-  key = await getPublicSigKeyFromIssuerJwksUri(as, options, header)
-  await validateJwsSignature(protectedHeader, payload, key, b64u(encodedSignature))
-}
-
-async function validateJwtResponseSignature(
+export async function validateApplicationLevelSignature(
   as: AuthorizationServer,
   ref: Response,
   options?: ValidateSignatureOptions,
 ): Promise<void> {
   assertAs(as)
 
-  if (!jwtResponseBodies.has(ref)) {
+  if (!jwtRefs.has(ref)) {
     throw CodedTypeError(
       '"ref" does not contain a processed JWT Response to verify the signature of',
       ERR_INVALID_ARG_VALUE,
     )
   }
 
-  const {
-    0: protectedHeader,
-    1: payload,
-    2: encodedSignature,
-  } = jwtResponseBodies.get(ref)!.split('.')
+  const { 0: protectedHeader, 1: payload, 2: encodedSignature } = jwtRefs.get(ref)!.split('.')
 
   const header: CompactJWSHeaderParameters = JSON.parse(buf(b64u(protectedHeader)))
 
@@ -3272,63 +3245,6 @@ async function validateJwtResponseSignature(
   let key!: CryptoKey
   key = await getPublicSigKeyFromIssuerJwksUri(as, options, header)
   await validateJwsSignature(protectedHeader, payload, key, b64u(encodedSignature))
-}
-
-/**
- * Validates the JWS Signature of a JWT {@link !Response} body of response previously processed by
- * {@link processUserInfoResponse} for non-repudiation purposes.
- *
- * Note: Validating signatures of JWTs received via direct communication between the Client and a
- * TLS-secured Endpoint (which it is here) is not mandatory since the TLS server validation is used
- * to validate the issuer instead of checking the token signature. You only need to use this method
- * for non-repudiation purposes.
- *
- * Note: Supports only digital signatures.
- *
- * @param as Authorization Server Metadata.
- * @param ref Response previously processed by {@link processUserInfoResponse}.
- *
- * @returns Resolves if the signature validates, rejects otherwise.
- *
- * @group Authorization Code Grant w/ OpenID Connect (OIDC)
- * @group OpenID Connect (OIDC) UserInfo
- *
- * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#UserInfo)
- */
-export function validateJwtUserInfoSignature(
-  as: AuthorizationServer,
-  ref: Response,
-  options?: ValidateSignatureOptions,
-): Promise<void> {
-  return validateJwtResponseSignature(as, ref, options)
-}
-
-/**
- * Validates the JWS Signature of an JWT {@link !Response} body of responses previously processed by
- * {@link processIntrospectionResponse} for non-repudiation purposes.
- *
- * Note: Validating signatures of JWTs received via direct communication between the Client and a
- * TLS-secured Endpoint (which it is here) is not mandatory since the TLS server validation is used
- * to validate the issuer instead of checking the token signature. You only need to use this method
- * for non-repudiation purposes.
- *
- * Note: Supports only digital signatures.
- *
- * @param as Authorization Server Metadata.
- * @param ref Response previously processed by {@link processIntrospectionResponse}.
- *
- * @returns Resolves if the signature validates, rejects otherwise.
- *
- * @group Token Introspection
- *
- * @see [draft-ietf-oauth-jwt-introspection-response-12 - JWT Response for OAuth Token Introspection](https://www.ietf.org/archive/id/draft-ietf-oauth-jwt-introspection-response-12.html#section-5)
- */
-export function validateJwtIntrospectionSignature(
-  as: AuthorizationServer,
-  ref: Response,
-  options?: ValidateSignatureOptions,
-): Promise<void> {
-  return validateJwtResponseSignature(as, ref, options)
 }
 
 async function processGenericAccessTokenResponse(
@@ -3480,7 +3396,8 @@ async function processGenericAccessTokenResponse(
       )
     }
 
-    idTokenClaims.set(json, [claims as IDToken, jwt])
+    jwtRefs.set(response, jwt)
+    idTokenClaims.set(json, claims as IDToken)
   }
 
   return json
@@ -4487,7 +4404,7 @@ export async function processIntrospectionResponse(
       .then(validateIssuer.bind(undefined, as))
       .then(validateAudience.bind(undefined, client.client_id))
 
-    jwtResponseBodies.set(response, jwt)
+    jwtRefs.set(response, jwt)
     json = claims.token_introspection as JsonValue
     if (!isJsonObject(json)) {
       throw OPE('JWT "token_introspection" claim must be a JSON object', INVALID_RESPONSE, {
@@ -4800,6 +4717,8 @@ async function validateJwt(
  * @group Authorization Code Grant
  * @group Authorization Code Grant w/ OpenID Connect (OIDC)
  * @group JWT Secured Authorization Response Mode for OAuth 2.0 (JARM)
+ * @group FAPI 2.0 Message Signing
+ * @group FAPI 1.0 Advanced
  *
  * @see [JWT Secured Authorization Response Mode for OAuth 2.0 (JARM)](https://openid.net/specs/openid-financial-api-jarm.html)
  */

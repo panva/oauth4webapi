@@ -138,7 +138,7 @@ let access_token: string
   })
 
   // Check ID Token signature for non-repudiation purposes
-  await oauth.validateIdTokenSignature(as, result)
+  await oauth.validateApplicationLevelSignature(as, response)
 
   console.log('Access Token Response', result)
   ;({ access_token } = result)

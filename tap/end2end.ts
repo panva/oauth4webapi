@@ -220,7 +220,9 @@ export default (QUnit: QUnit) => {
           throw new Error()
         }
         const { sub } = lib.getValidatedIdTokenClaims(result)
-        await lib.validateIdTokenSignature(as, result, { [lib.allowInsecureRequests]: true })
+        await lib.validateApplicationLevelSignature(as, response, {
+          [lib.allowInsecureRequests]: true,
+        })
 
         {
           const userInfoRequest = () =>
@@ -239,7 +241,7 @@ export default (QUnit: QUnit) => {
           await lib.processUserInfoResponse(as, client, sub, response)
 
           if (jwtUserinfo) {
-            await lib.validateJwtUserInfoSignature(as, response, {
+            await lib.validateApplicationLevelSignature(as, response, {
               [lib.allowInsecureRequests]: true,
             })
           }

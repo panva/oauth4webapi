@@ -166,7 +166,7 @@ export default (QUnit: QUnit) => {
           const result = await lib.processIntrospectionResponse(as, client, response)
 
           if (jwtIntrospection) {
-            await lib.validateJwtIntrospectionSignature(as, response, {
+            await lib.validateApplicationLevelSignature(as, response, {
               [lib.allowInsecureRequests]: true,
             })
           }

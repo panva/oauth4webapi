@@ -1,5 +1,5 @@
 diff --git a/examples/fapi2.ts b/examples/fapi2-message-signing.ts
-index e49247d..76ce800 100644
+index e49247d..5857c0c 100644
 --- a/examples/fapi2.ts
 +++ b/examples/fapi2-message-signing.ts
 @@ -25,6 +25,11 @@ let DPoPKeys!: oauth.CryptoKeyPair
@@ -68,7 +68,7 @@ index e49247d..76ce800 100644
    })
  
 +  // Check ID Token signature for non-repudiation purposes
-+  await oauth.validateIdTokenSignature(as, result)
++  await oauth.validateApplicationLevelSignature(as, response)
 +
    console.log('Access Token Response', result)
    ;({ access_token } = result)
