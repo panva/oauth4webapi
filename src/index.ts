@@ -1034,8 +1034,8 @@ export class UnsupportedOperationError extends Error {
   /**
    * @ignore
    */
-  constructor(message?: string, options?: { cause?: unknown }) {
-    super(message ?? 'operation not supported', options)
+  constructor(message: string, options?: { cause?: unknown }) {
+    super(message, options)
     this.name = this.constructor.name
     this.code = UNSUPPORTED_OPERATION
     // @ts-ignore
@@ -1052,7 +1052,7 @@ export class OperationProcessingError extends Error {
   /**
    * @ignore
    */
-  constructor(message?: string, options?: { cause?: unknown; code?: string }) {
+  constructor(message: string, options?: { cause?: unknown; code?: string }) {
     super(message, options)
     this.name = this.constructor.name
     if (options?.code) {
