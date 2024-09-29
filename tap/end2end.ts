@@ -74,7 +74,7 @@ export default (QUnit: QUnit) => {
         : undefined
 
       const as = await lib
-        .discoveryRequest(issuerIdentifier)
+        .discoveryRequest(issuerIdentifier, { [lib.allowInsecureRequests]: true })
         .then((response) => lib.processDiscoveryResponse(issuerIdentifier, response))
 
       const code_verifier = lib.generateRandomCodeVerifier()

@@ -1258,9 +1258,7 @@ export async function discoveryRequest(
     throw CodedTypeError('"issuerIdentifier" must be an instance of URL', ERR_INVALID_ARG_TYPE)
   }
 
-  if (issuerIdentifier.protocol !== 'https:' && issuerIdentifier.protocol !== 'http:') {
-    throw CodedTypeError('"issuer.protocol" must be "https:" or "http:"', ERR_INVALID_ARG_VALUE)
-  }
+  checkProtocol(issuerIdentifier, options?.[allowInsecureRequests] !== true)
 
   const url = new URL(issuerIdentifier.href)
 
