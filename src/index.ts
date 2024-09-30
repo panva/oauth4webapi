@@ -76,7 +76,7 @@ export interface PrivateKey {
   /**
    * An asymmetric private CryptoKey.
    *
-   * Its algorithm must be compatible with a supported {@link JWSAlgorithm JWS `alg` Algorithm}.
+   * Its algorithm must be compatible with a supported {@link JWSAlgorithm JWS Algorithm}.
    */
   key: CryptoKey
 
@@ -106,7 +106,9 @@ function CodedTypeError(message: string, code: codes, cause?: unknown) {
 }
 
 /**
- * JWS `alg` Algorithm identifiers for which Digital Signature validation is implemented.
+ * JWS `alg` Algorithm identifiers from the
+ * {@link https://www.iana.org/assignments/jose/jose.xhtml#web-signature-encryption-algorithms JSON Web Signature and Encryption Algorithms IANA registry}
+ * for which Digital Signature validation is implemented.
  */
 export type JWSAlgorithm =
   // widely used
@@ -1434,7 +1436,7 @@ export interface DPoPKeyPair extends CryptoKeyPair {
   /**
    * Private CryptoKey instance to sign the DPoP Proof JWT with.
    *
-   * Its algorithm must be compatible with a supported {@link JWSAlgorithm JWS `alg` Algorithm}.
+   * Its algorithm must be compatible with a supported {@link JWSAlgorithm JWS Algorithm}.
    */
   privateKey: CryptoKey
 
@@ -1597,7 +1599,7 @@ function formUrlEncode(token: string) {
 }
 
 /**
- * Implementation of the Client's Authentication Method as the Authorization Server.
+ * Implementation of the Client's Authentication Method at the Authorization Server.
  *
  * @see {@link ClientSecretPost}
  * @see {@link ClientSecretBasic}
@@ -1620,7 +1622,7 @@ export type ClientAuth = (
  *
  * @param clientSecret
  *
- * @group Client Authentication Methods
+ * @group Client Authentication
  *
  * @see [OAuth Token Endpoint Authentication Methods](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#token-endpoint-auth-method)
  * @see [RFC 6749 - The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html#section-2.3)
@@ -1640,7 +1642,7 @@ export function ClientSecretPost(clientSecret: string): ClientAuth {
  *
  * @param clientSecret
  *
- * @group Client Authentication Methods
+ * @group Client Authentication
  *
  * @see [OAuth Token Endpoint Authentication Methods](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#token-endpoint-auth-method)
  * @see [RFC 6749 - The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html#section-2.3)
@@ -1663,7 +1665,7 @@ export function ClientSecretBasic(clientSecret: string): ClientAuth {
  *
  * @param clientPrivateKey
  *
- * @group Client Authentication Methods
+ * @group Client Authentication
  *
  * @see [OAuth Token Endpoint Authentication Methods](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#token-endpoint-auth-method)
  * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication)
@@ -1700,7 +1702,7 @@ export function PrivateKeyJwt(clientPrivateKey: CryptoKey | PrivateKey): ClientA
  * @param clientSecret
  * @param options
  *
- * @group Client Authentication Methods
+ * @group Client Authentication
  *
  * @see [OAuth Token Endpoint Authentication Methods](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#token-endpoint-auth-method)
  * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication)
@@ -1752,7 +1754,7 @@ export function ClientSecretJwt(
  * **`none`** (public client) uses the HTTP request body to send only `client_id` as
  * `application/x-www-form-urlencoded` body parameter.
  *
- * @group Client Authentication Methods
+ * @group Client Authentication
  *
  * @see [OAuth Token Endpoint Authentication Methods](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#token-endpoint-auth-method)
  * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication)
@@ -1768,7 +1770,7 @@ export function None(): ClientAuth {
  * `application/x-www-form-urlencoded` body parameter and the mTLS key and certificate is configured
  * through {@link customFetch}.
  *
- * @group Client Authentication Methods
+ * @group Client Authentication
  *
  * @see [OAuth Token Endpoint Authentication Methods](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#token-endpoint-auth-method)
  * @see [RFC 8705 - OAuth 2.0 Mutual-TLS Client Authentication (Self-Signed Certificate Mutual-TLS Method)](https://www.rfc-editor.org/rfc/rfc8705.html#name-self-signed-certificate-mut)
@@ -1782,7 +1784,7 @@ export function SelfSignedTlsClientAuth(): ClientAuth {
  * `application/x-www-form-urlencoded` body parameter and the mTLS key and certificate is configured
  * through {@link customFetch}.
  *
- * @group Client Authentication Methods
+ * @group Client Authentication
  *
  * @see [OAuth Token Endpoint Authentication Methods](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#token-endpoint-auth-method)
  * @see [RFC 8705 - OAuth 2.0 Mutual-TLS Client Authentication (PKI Mutual-TLS Method)](https://www.rfc-editor.org/rfc/rfc8705.html#name-pki-mutual-tls-method)
@@ -2323,8 +2325,7 @@ export class AuthorizationResponseError extends Error {
  *
  * ```http
  * HTTP/1.1 401 Unauthorized
- * WWW-Authenticate: Bearer realm="example",
- *                          error="invalid_token",
+ * WWW-Authenticate: Bearer error="invalid_token",
  *                          error_description="The access token expired"
  * ```
  *
@@ -2643,6 +2644,7 @@ export interface UserInfoRequestOptions extends HttpRequestOptions<'GET'>, DPoPR
  *
  * @group Authorization Code Grant w/ OpenID Connect (OIDC)
  * @group OpenID Connect (OIDC) UserInfo
+ * @group Accessing Protected Resources
  *
  * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#UserInfo)
  * @see [RFC 9449 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)](https://www.rfc-editor.org/rfc/rfc9449.html#name-protected-resource-access)
@@ -2907,6 +2909,7 @@ function getContentType(response: Response) {
  *
  * @group Authorization Code Grant w/ OpenID Connect (OIDC)
  * @group OpenID Connect (OIDC) UserInfo
+ * @group Accessing Protected Resources
  *
  * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#UserInfo)
  */
