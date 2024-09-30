@@ -24,7 +24,7 @@ export default (QUnit: QUnit) => {
         ['refresh_token', 'urn:ietf:params:oauth:grant-type:device_code'],
         false,
       )
-      const DPoPKeyPair = await lib.generateKeyPair(alg as lib.JWSAlgorithm)
+      const DPoPKeyPair = await lib.generateKeyPair(alg)
       const DPoP = dpop
         ? lib.DPoP(client, {
             ...DPoPKeyPair,

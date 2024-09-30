@@ -65,9 +65,7 @@ export default (QUnit: QUnit) => {
         ['client_credentials'],
         encryption,
       )
-      const DPoP = dpop
-        ? lib.DPoP(client, await lib.generateKeyPair(alg as lib.JWSAlgorithm))
-        : undefined
+      const DPoP = dpop ? lib.DPoP(client, await lib.generateKeyPair(alg)) : undefined
 
       let clientAuth: lib.ClientAuth
       switch (authMethod) {

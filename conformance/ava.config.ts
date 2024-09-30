@@ -9,7 +9,11 @@ import * as api from './api.js'
 
 const UUID = crypto.randomUUID()
 
-import { JWS_ALGORITHM, PLAN_NAME, VARIANT } from './env.js'
+const {
+  PLAN_NAME = 'oidcc-client-basic-certification-test-plan',
+  VARIANT = '{}',
+  ALG = 'PS256',
+} = process.env
 
 switch (PLAN_NAME) {
   case 'oidcc-client-basic-certification-test-plan':
@@ -156,9 +160,8 @@ export default async () => {
     scope: getScope(variant),
     redirect_uri: `https://client-${UUID}.local/cb`,
     jwks: {
-      keys: [await key(JWS_ALGORITHM)],
+      keys: [await key(ALG)],
     },
-    id_token_signed_response_alg: JWS_ALGORITHM,
     use_mtls_endpoint_aliases: false,
     certificate: '',
   }
@@ -185,7 +188,7 @@ export default async () => {
       ? {
           server: {
             jwks: {
-              keys: [await key(JWS_ALGORITHM)],
+              keys: [await key(ALG)],
             },
           },
         }
@@ -267,6 +270,7 @@ export default async () => {
         variant,
         plan,
         mtls,
+        ALG,
       }),
     },
     concurrency: 1,

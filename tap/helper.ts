@@ -23,7 +23,7 @@ export function random() {
 }
 
 export async function setup(
-  alg: lib.JWSAlgorithm,
+  alg: string,
   kp: CryptoKeyPair,
   authMethod: string,
   jar: boolean,

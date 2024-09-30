@@ -2,9 +2,9 @@ import type { ExecutionContext } from 'ava'
 import * as undici from 'undici'
 import * as jose from 'jose'
 
-import type { AuthorizationServer, Client, JWSAlgorithm } from '../src/index.js'
+import type { AuthorizationServer, Client } from '../src/index.js'
 
-export const ALGS: JWSAlgorithm[] = [
+export const ALGS = [
   'ES256',
   'RS256',
   'PS256',

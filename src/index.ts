@@ -96,14 +96,8 @@ export interface PrivateKey {
 
 const ERR_INVALID_ARG_VALUE = 'ERR_INVALID_ARG_VALUE'
 const ERR_INVALID_ARG_TYPE = 'ERR_INVALID_ARG_TYPE'
-const ERR_INCOMPATIBLE_OPTION_PAIR = 'ERR_INCOMPATIBLE_OPTION_PAIR'
-const ERR_MISSING_OPTION = 'ERR_MISSING_OPTION'
 
-type codes =
-  | typeof ERR_INVALID_ARG_VALUE
-  | typeof ERR_INVALID_ARG_TYPE
-  | typeof ERR_INCOMPATIBLE_OPTION_PAIR
-  | typeof ERR_MISSING_OPTION
+type codes = typeof ERR_INVALID_ARG_VALUE | typeof ERR_INVALID_ARG_TYPE
 
 function CodedTypeError(message: string, code: codes, cause?: unknown) {
   const err = new TypeError(message, { cause })
@@ -112,84 +106,7 @@ function CodedTypeError(message: string, code: codes, cause?: unknown) {
 }
 
 /**
- * Supported JWS `alg` Algorithm identifiers.
- *
- * @example
- *
- * {@link !CryptoKey.algorithm} for the `PS256`, `PS384`, or `PS512` JWS Algorithm Identifiers
- *
- * ```ts
- * interface PS256 extends RsaHashedKeyAlgorithm {
- *   name: 'RSA-PSS'
- *   hash: { name: 'SHA-256' }
- * }
- *
- * interface PS384 extends RsaHashedKeyAlgorithm {
- *   name: 'RSA-PSS'
- *   hash: { name: 'SHA-384' }
- * }
- *
- * interface PS512 extends RsaHashedKeyAlgorithm {
- *   name: 'RSA-PSS'
- *   hash: { name: 'SHA-512' }
- * }
- * ```
- *
- * @example
- *
- * {@link !CryptoKey.algorithm} for the `ES256`, `ES384`, or `ES512` JWS Algorithm Identifiers
- *
- * ```ts
- * interface ES256 extends EcKeyAlgorithm {
- *   name: 'ECDSA'
- *   namedCurve: 'P-256'
- * }
- *
- * interface ES384 extends EcKeyAlgorithm {
- *   name: 'ECDSA'
- *   namedCurve: 'P-384'
- * }
- *
- * interface ES512 extends EcKeyAlgorithm {
- *   name: 'ECDSA'
- *   namedCurve: 'P-521'
- * }
- * ```
- *
- * @example
- *
- * {@link !CryptoKey.algorithm} for the `RS256`, `RS384`, or `RS512` JWS Algorithm Identifiers
- *
- * ```ts
- * interface RS256 extends RsaHashedKeyAlgorithm {
- *   name: 'RSASSA-PKCS1-v1_5'
- *   hash: { name: 'SHA-256' }
- * }
- *
- * interface RS384 extends RsaHashedKeyAlgorithm {
- *   name: 'RSASSA-PKCS1-v1_5'
- *   hash: { name: 'SHA-384' }
- * }
- *
- * interface RS512 extends RsaHashedKeyAlgorithm {
- *   name: 'RSASSA-PKCS1-v1_5'
- *   hash: { name: 'SHA-512' }
- * }
- * ```
- *
- * @example
- *
- * {@link !CryptoKey.algorithm} for the `EdDSA` JWS Algorithm Identifier (Experimental)
- *
- * Runtime support for this algorithm is limited, it depends on the [Secure Curves in the Web
- * Cryptography API](https://wicg.github.io/webcrypto-secure-curves/) proposal which is yet to be
- * widely adopted. If the proposal changes this implementation will follow up with a minor release.
- *
- * ```ts
- * interface EdDSA extends KeyAlgorithm {
- *   name: 'Ed25519' | 'Ed448'
- * }
- * ```
+ * JWS `alg` Algorithm identifiers for which Digital Signature validation is implemented.
  */
 export type JWSAlgorithm =
   // widely used
@@ -863,11 +780,11 @@ export interface Client {
   id_token_signed_response_alg?: string
   /**
    * JWS `alg` algorithm required for signing authorization responses. When not configured the
-   * default is to allow only {@link JWSAlgorithm supported algorithms} listed in
+   * default is to allow only algorithms listed in
    * {@link AuthorizationServer.authorization_signing_alg_values_supported `as.authorization_signing_alg_values_supported`}
    * and fall back to `RS256` when the authorization server metadata is not set.
    */
-  authorization_signed_response_alg?: JWSAlgorithm
+  authorization_signed_response_alg?: string
   /**
    * Boolean value specifying whether the {@link IDToken.auth_time `auth_time`} Claim in the ID Token
    * is REQUIRED. Default is `false`.
@@ -1089,19 +1006,6 @@ function assertPublicKey(key: unknown, it: string): asserts key is CryptoKey & {
     throw CodedTypeError(`${it} must be a public CryptoKey`, ERR_INVALID_ARG_VALUE)
   }
 }
-
-const SUPPORTED_JWS_ALGS: JWSAlgorithm[] = [
-  'PS256',
-  'ES256',
-  'RS256',
-  'PS384',
-  'ES384',
-  'RS384',
-  'PS512',
-  'ES512',
-  'RS512',
-  'EdDSA',
-]
 
 export interface JWKSCacheOptions {
   /**
@@ -1561,7 +1465,7 @@ export interface PushedAuthorizationRequestOptions
 /**
  * Determines an RSASSA-PSS algorithm identifier from CryptoKey instance properties.
  */
-function psAlg(key: CryptoKey): JWSAlgorithm {
+function psAlg(key: CryptoKey): string {
   switch ((key.algorithm as RsaHashedKeyAlgorithm).hash.name) {
     case 'SHA-256':
       return 'PS256'
@@ -1579,7 +1483,7 @@ function psAlg(key: CryptoKey): JWSAlgorithm {
 /**
  * Determines an RSASSA-PKCS1-v1_5 algorithm identifier from CryptoKey instance properties.
  */
-function rsAlg(key: CryptoKey): JWSAlgorithm {
+function rsAlg(key: CryptoKey): string {
   switch ((key.algorithm as RsaHashedKeyAlgorithm).hash.name) {
     case 'SHA-256':
       return 'RS256'
@@ -1597,7 +1501,7 @@ function rsAlg(key: CryptoKey): JWSAlgorithm {
 /**
  * Determines an ECDSA algorithm identifier from CryptoKey instance properties.
  */
-function esAlg(key: CryptoKey): JWSAlgorithm {
+function esAlg(key: CryptoKey): string {
   switch ((key.algorithm as EcKeyAlgorithm).namedCurve) {
     case 'P-256':
       return 'ES256'
@@ -3625,7 +3529,7 @@ export interface IDToken extends JWTPayload {
 }
 
 interface CompactJWSHeaderParameters {
-  alg: JWSAlgorithm
+  alg: string
   kid?: string
   typ?: string
   crit?: string[]
@@ -4561,8 +4465,26 @@ async function handleOAuthBodyError(response: Response): Promise<OAuth2Error | u
   return undefined
 }
 
+function supported(alg: string) {
+  switch (alg) {
+    case 'PS256':
+    case 'ES256':
+    case 'RS256':
+    case 'PS384':
+    case 'ES384':
+    case 'RS384':
+    case 'PS512':
+    case 'ES512':
+    case 'RS512':
+    case 'EdDSA':
+      return true
+    default:
+      return false
+  }
+}
+
 function checkSupportedJwsAlg(header: CompactJWSHeaderParameters) {
-  if (!SUPPORTED_JWS_ALGS.includes(header.alg)) {
+  if (!supported(header.alg)) {
     throw new UnsupportedOperationError('unsupported JWS "alg" identifier', {
       cause: { alg: header.alg },
     })
@@ -5098,6 +5020,8 @@ export async function validateDetachedSignatureResponse(
   return result
 }
 
+const SUPPORTED_JWS_ALGS: unique symbol = Symbol()
+
 /**
  * If configured must be the configured one (client), if not configured must be signalled by the
  * issuer to be supported (issuer), if not signalled may be a default fallback, otherwise its a
@@ -5106,7 +5030,7 @@ export async function validateDetachedSignatureResponse(
 function checkSigningAlgorithm(
   client: string | string[] | undefined,
   issuer: string[] | undefined,
-  fallback: string | string[] | undefined,
+  fallback: string | string[] | typeof SUPPORTED_JWS_ALGS | undefined,
   header: CompactJWSHeaderParameters,
 ) {
   if (client !== undefined) {
@@ -5132,7 +5056,13 @@ function checkSigningAlgorithm(
   }
 
   if (fallback !== undefined) {
-    if (typeof fallback === 'string' ? header.alg !== fallback : !fallback.includes(header.alg)) {
+    if (
+      typeof fallback === 'string'
+        ? header.alg !== fallback
+        : typeof fallback === 'symbol'
+          ? !supported(header.alg)
+          : !fallback.includes(header.alg)
+    ) {
       throw OPE('unexpected JWT "alg" header parameter', INVALID_RESPONSE, {
         header,
         expected: fallback,
@@ -5285,7 +5215,7 @@ export function validateAuthResponse(
 }
 
 function algToSubtle(
-  alg: JWSAlgorithm,
+  alg: string,
   crv?: string,
 ): RsaHashedImportParams | EcKeyImportParams | AlgorithmIdentifier {
   switch (alg) {
@@ -5316,7 +5246,7 @@ function algToSubtle(
   }
 }
 
-async function importJwk(alg: JWSAlgorithm, jwk: JWK) {
+async function importJwk(alg: string, jwk: JWK) {
   const { ext, key_ops, use, ...key } = jwk
   return crypto.subtle.importKey('jwk', key, algToSubtle(alg, jwk.crv), true, ['verify'])
 }
@@ -5577,12 +5507,13 @@ export interface GenerateKeyPairOptions {
 /**
  * Generates a {@link !CryptoKeyPair} for a given JWS `alg` Algorithm identifier.
  *
- * @param alg Supported JWS `alg` Algorithm identifier.
+ * @param alg Supported JWS `alg` Algorithm identifier. Must be a
+ *   {@link JWSAlgorithm supported JWS Algorithm}.
  *
  * @group Utilities
  */
 export async function generateKeyPair(
-  alg: JWSAlgorithm,
+  alg: string,
   options?: GenerateKeyPairOptions,
 ): Promise<CryptoKeyPair> {
   assertString(alg, '"alg"')
@@ -5637,7 +5568,7 @@ export interface ValidateJWTAccessTokenOptions extends HttpRequestOptions<'GET'>
 
   /**
    * Supported (or expected) JWT "alg" header parameter values for the JWT Access Token (and DPoP
-   * Proof JWTs). Default is {@link JWSAlgorithm}
+   * Proof JWTs). Default is all {@link JWSAlgorithm supported JWS Algorithms}.
    */
   signingAlgorithms?: string[]
 }

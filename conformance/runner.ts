@@ -17,7 +17,6 @@ import {
   type Test,
 } from './api.js'
 
-import { JWS_ALGORITHM } from './env.js'
 const conformance = JSON.parse(process.env.CONFORMANCE!)
 
 const configuration: {
@@ -33,6 +32,7 @@ const configuration: {
   }
 } = conformance.configuration
 
+const ALG = conformance.ALG as string
 export const plan: Plan = conformance.plan
 export const variant: Record<string, string> = conformance.variant
 export const mtls: { key: string; cert: string } = conformance.mtls || {}
@@ -198,7 +198,7 @@ export const flow = (options?: MacroOptions) => {
           const [jwk] = configuration.client.jwks.keys
           clientAuth = oauth.PrivateKeyJwt({
             kid: jwk.kid,
-            key: await importPrivateKey(JWS_ALGORITHM, jwk),
+            key: await importPrivateKey(ALG, jwk),
           })
           break
         case 'client_secret_basic':
@@ -303,7 +303,7 @@ export const flow = (options?: MacroOptions) => {
         }
 
         const [jwk] = configuration.client.jwks.keys
-        const privateKey = await importPrivateKey(JWS_ALGORITHM, jwk)
+        const privateKey = await importPrivateKey(ALG, jwk)
 
         authorizationUrl.searchParams.set(
           'request',
@@ -316,7 +316,7 @@ export const flow = (options?: MacroOptions) => {
       let DPoPKeyPair!: oauth.CryptoKeyPair
       let DPoP!: oauth.DPoPRequestOptions['DPoP']
       if (usesDpop(variant)) {
-        DPoPKeyPair = await oauth.generateKeyPair(JWS_ALGORITHM as oauth.JWSAlgorithm)
+        DPoPKeyPair = await oauth.generateKeyPair(ALG)
         DPoP = oauth.DPoP(client, DPoPKeyPair)
         authorizationUrl.searchParams.set(
           'dpop_jkt',
