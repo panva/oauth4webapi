@@ -176,7 +176,7 @@ export const flow = (options?: MacroOptions) => {
         use_mtls_endpoint_aliases: configuration.client.use_mtls_endpoint_aliases,
       }
 
-      let clientAuth: oauth.ClientAuthenticationImplementation
+      let clientAuth: oauth.ClientAuth
       switch (variant.client_auth_type) {
         case 'mtls':
           clientAuth = oauth.SelfSignedTlsClientAuth()

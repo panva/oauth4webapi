@@ -311,7 +311,6 @@ export const clockTolerance: unique symbol = Symbol()
  *
  * ```js
  * import ky from 'ky'
- * import * as oauth from 'oauth4webapi'
  *
  * // example use
  * await oauth.discoveryRequest(new URL('https://as.example.com'), {
@@ -345,7 +344,6 @@ export const clockTolerance: unique symbol = Symbol()
  *
  * ```js
  * import * as undici from 'undici'
- * import * as oauth from 'oauth4webapi'
  *
  * const mockAgent = new undici.MockAgent()
  * mockAgent.disableNetConnect()
@@ -372,22 +370,20 @@ export const customFetch: unique symbol = Symbol()
  * Changing Private Key JWT client assertion audience issued from an array to a string
  *
  * ```ts
- * import * as oauth from 'oauth4webapi'
- *
  * // Prerequisites
  * let as!: oauth.AuthorizationServer
  * let client!: oauth.Client
  * let parameters!: URLSearchParams
  * let clientPrivateKey!: oauth.CryptoKey
  *
- * const response = await oauth.pushedAuthorizationRequest(as, client, parameters, {
- *   clientPrivateKey: {
- *     key: clientPrivateKey,
- *     [oauth.modifyAssertion](header, payload) {
- *       payload.aud = as.issuer
- *     },
+ * let clientAuth = oauth.PrivateKeyJwt({
+ *   key: clientPrivateKey,
+ *   [oauth.modifyAssertion](header, payload) {
+ *     payload.aud = as.issuer
  *   },
  * })
+ *
+ * const response = await oauth.pushedAuthorizationRequest(as, client, clientAuth, parameters)
  * ```
  *
  * @example
@@ -395,8 +391,6 @@ export const customFetch: unique symbol = Symbol()
  * Changing Request Object issued by {@link issueRequestObject} to have an expiration of 5 minutes
  *
  * ```ts
- * import * as oauth from 'oauth4webapi'
- *
  * // Prerequisites
  * let as!: oauth.AuthorizationServer
  * let client!: oauth.Client
@@ -428,7 +422,6 @@ export const modifyAssertion: unique symbol = Symbol()
  * Decrypting JARM responses
  *
  * ```ts
- * import * as oauth from 'oauth4webapi'
  * import * as jose from 'jose'
  *
  * // Prerequisites
@@ -436,18 +429,21 @@ export const modifyAssertion: unique symbol = Symbol()
  * let key!: oauth.CryptoKey
  * let alg!: string
  * let enc!: string
+ * let currentUrl!: URL
  *
  * const decoder = new TextDecoder()
  *
  * const client: oauth.Client = {
  *   client_id: 'urn:example:client_id',
  *   async [oauth.jweDecrypt](jwe) {
- *     const { plaintext } = await compactDecrypt(jwe, key, {
- *       keyManagementAlgorithms: [alg],
- *       contentEncryptionAlgorithms: [enc],
- *     }).catch((cause) => {
- *       throw new oauth.OperationProcessingError('decryption failed', { cause })
- *     })
+ *     const { plaintext } = await jose
+ *       .compactDecrypt(jwe, key, {
+ *         keyManagementAlgorithms: [alg],
+ *         contentEncryptionAlgorithms: [enc],
+ *       })
+ *       .catch((cause: unknown) => {
+ *         throw new oauth.OperationProcessingError('decryption failed', { cause })
+ *       })
  *
  *     return decoder.decode(plaintext)
  *   },
@@ -489,19 +485,19 @@ export const jweDecrypt: unique symbol = Symbol()
  * @example
  *
  * ```ts
- * import * as oauth from 'oauth4webapi'
- *
  * // Prerequisites
  * let as!: oauth.AuthorizationServer
  * let request!: Request
  * let expectedAudience!: string
+ * let getPreviouslyCachedJWKS!: () => Promise<oauth.ExportedJWKSCache>
+ * let storeNewJWKScache!: (cache: oauth.ExportedJWKSCache) => Promise<void>
  *
  * // Load JSON Web Key Set cache
  * const jwksCache: oauth.JWKSCacheInput = (await getPreviouslyCachedJWKS()) || {}
  * const { uat } = jwksCache
  *
  * // Use JSON Web Key Set cache
- * const accessTokenClaims = await validateJwtAccessToken(as, request, expectedAudience, {
+ * const accessTokenClaims = await oauth.validateJwtAccessToken(as, request, expectedAudience, {
  *   [oauth.jwksCache]: jwksCache,
  * })
  *
@@ -911,7 +907,6 @@ export interface Client {
    *
    * ```ts
    * import * as undici from 'undici'
-   * import * as oauth from 'oauth4webapi'
    *
    * // Prerequisites
    * let as!: oauth.AuthorizationServer
@@ -920,9 +915,11 @@ export interface Client {
    * let key!: string // PEM-encoded key
    * let cert!: string // PEM-encoded certificate
    *
+   * let clientAuth = oauth.TlsClientAuth()
    * const agent = new undici.Agent({ connect: { key, cert } })
    *
-   * const response = await oauth.pushedAuthorizationRequest(as, client, params, {
+   * const response = await oauth.pushedAuthorizationRequest(as, client, clientAuth, params, {
+   *   // @ts-ignore
    *   [oauth.customFetch]: (...args) =>
    *     undici.fetch(args[0], { ...args[1], dispatcher: agent }),
    * })
@@ -934,8 +931,6 @@ export interface Client {
    * Certificate-Bound Access Tokens support.
    *
    * ```ts
-   * import * as oauth from 'oauth4webapi'
-   *
    * // Prerequisites
    * let as!: oauth.AuthorizationServer
    * let client!: oauth.Client & { use_mtls_endpoint_aliases: true }
@@ -943,9 +938,12 @@ export interface Client {
    * let key!: string // PEM-encoded key
    * let cert!: string // PEM-encoded certificate
    *
+   * let clientAuth = oauth.TlsClientAuth()
+   * // @ts-ignore
    * const agent = Deno.createHttpClient({ key, cert })
    *
-   * const response = await oauth.pushedAuthorizationRequest(as, client, params, {
+   * const response = await oauth.pushedAuthorizationRequest(as, client, clientAuth, params, {
+   *   // @ts-ignore
    *   [oauth.customFetch]: (...args) => fetch(args[0], { ...args[1], client: agent }),
    * })
    * ```
@@ -1705,7 +1703,7 @@ function formUrlEncode(token: string) {
  * @see {@link SelfSignedTlsClientAuth}
  * @see [OAuth Token Endpoint Authentication Methods](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#token-endpoint-auth-method)
  */
-export type ClientAuthenticationImplementation = (
+export type ClientAuth = (
   as: AuthorizationServer,
   client: Client,
   body: URLSearchParams,
@@ -1724,7 +1722,7 @@ export type ClientAuthenticationImplementation = (
  * @see [RFC 6749 - The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html#section-2.3)
  * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication)
  */
-export function ClientSecretPost(clientSecret: string): ClientAuthenticationImplementation {
+export function ClientSecretPost(clientSecret: string): ClientAuth {
   assertString(clientSecret, '"clientSecret"')
   return (_as, client, body, _headers) => {
     body.set('client_id', client.client_id)
@@ -1744,7 +1742,7 @@ export function ClientSecretPost(clientSecret: string): ClientAuthenticationImpl
  * @see [RFC 6749 - The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html#section-2.3)
  * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication)
  */
-export function ClientSecretBasic(clientSecret: string): ClientAuthenticationImplementation {
+export function ClientSecretBasic(clientSecret: string): ClientAuth {
   assertString(clientSecret, '"clientSecret"')
   return (_as, client, _body, headers) => {
     const username = formUrlEncode(client.client_id)
@@ -1766,9 +1764,7 @@ export function ClientSecretBasic(clientSecret: string): ClientAuthenticationImp
  * @see [OAuth Token Endpoint Authentication Methods](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#token-endpoint-auth-method)
  * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication)
  */
-export function PrivateKeyJwt(
-  clientPrivateKey: CryptoKey | PrivateKey,
-): ClientAuthenticationImplementation {
+export function PrivateKeyJwt(clientPrivateKey: CryptoKey | PrivateKey): ClientAuth {
   const { key, kid, modifyAssertion } = getKeyAndKid(clientPrivateKey)
   assertPrivateKey(key, '"clientPrivateKey.key"')
   return async (as, client, body, _headers) => {
@@ -1810,7 +1806,7 @@ export function ClientSecretJwt(
   options?: {
     [modifyAssertion]?: ModifyAssertionFunction
   },
-): ClientAuthenticationImplementation {
+): ClientAuth {
   assertString(clientSecret, '"clientSecret"')
   const modify = options?.[modifyAssertion]
   let key: CryptoKey
@@ -1857,7 +1853,7 @@ export function ClientSecretJwt(
  * @see [OAuth Token Endpoint Authentication Methods](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#token-endpoint-auth-method)
  * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication)
  */
-export function None(): ClientAuthenticationImplementation {
+export function None(): ClientAuth {
   return (_as, client, body, _headers) => {
     body.set('client_id', client.client_id)
   }
@@ -1873,7 +1869,7 @@ export function None(): ClientAuthenticationImplementation {
  * @see [OAuth Token Endpoint Authentication Methods](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#token-endpoint-auth-method)
  * @see [RFC 8705 - OAuth 2.0 Mutual-TLS Client Authentication (Self-Signed Certificate Mutual-TLS Method)](https://www.rfc-editor.org/rfc/rfc8705.html#name-self-signed-certificate-mut)
  */
-export function SelfSignedTlsClientAuth(): ClientAuthenticationImplementation {
+export function SelfSignedTlsClientAuth(): ClientAuth {
   return None()
 }
 
@@ -1887,7 +1883,7 @@ export function SelfSignedTlsClientAuth(): ClientAuthenticationImplementation {
  * @see [OAuth Token Endpoint Authentication Methods](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#token-endpoint-auth-method)
  * @see [RFC 8705 - OAuth 2.0 Mutual-TLS Client Authentication (PKI Mutual-TLS Method)](https://www.rfc-editor.org/rfc/rfc8705.html#name-pki-mutual-tls-method)
  */
-export function TlsClientAuth(): ClientAuthenticationImplementation {
+export function TlsClientAuth(): ClientAuth {
   return None()
 }
 
@@ -2118,7 +2114,7 @@ export function resolveEndpoint(
 export async function pushedAuthorizationRequest(
   as: AuthorizationServer,
   client: Client,
-  clientAuthentication: ClientAuthenticationImplementation,
+  clientAuthentication: ClientAuth,
   parameters: URLSearchParams | Record<string, string> | string[][],
   options?: PushedAuthorizationRequestOptions,
 ): Promise<Response> {
@@ -3099,7 +3095,7 @@ export async function processUserInfoResponse(
 async function authenticatedRequest(
   as: AuthorizationServer,
   client: Client,
-  clientAuthentication: ClientAuthenticationImplementation,
+  clientAuthentication: ClientAuth,
   url: URL,
   body: URLSearchParams,
   headers: Headers,
@@ -3129,7 +3125,7 @@ export interface TokenEndpointRequestOptions
 async function tokenEndpointRequest(
   as: AuthorizationServer,
   client: Client,
-  clientAuthentication: ClientAuthenticationImplementation,
+  clientAuthentication: ClientAuth,
   grantType: string,
   parameters: URLSearchParams,
   options?: Omit<TokenEndpointRequestOptions, 'additionalParameters'>,
@@ -3181,7 +3177,7 @@ async function tokenEndpointRequest(
 export async function refreshTokenGrantRequest(
   as: AuthorizationServer,
   client: Client,
-  clientAuthentication: ClientAuthenticationImplementation,
+  clientAuthentication: ClientAuth,
   refreshToken: string,
   options?: TokenEndpointRequestOptions,
 ): Promise<Response> {
@@ -3559,7 +3555,7 @@ function brand(searchParams: URLSearchParams) {
 export async function authorizationCodeGrantRequest(
   as: AuthorizationServer,
   client: Client,
-  clientAuthentication: ClientAuthenticationImplementation,
+  clientAuthentication: ClientAuth,
   callbackParameters: URLSearchParams,
   redirectUri: string,
   codeVerifier: string,
@@ -4087,7 +4083,7 @@ export interface ClientCredentialsGrantRequestOptions
 export async function clientCredentialsGrantRequest(
   as: AuthorizationServer,
   client: Client,
-  clientAuthentication: ClientAuthenticationImplementation,
+  clientAuthentication: ClientAuth,
   parameters: URLSearchParams | Record<string, string> | string[][],
   options?: ClientCredentialsGrantRequestOptions,
 ): Promise<Response> {
@@ -4125,7 +4121,7 @@ export async function clientCredentialsGrantRequest(
 export async function genericTokenEndpointRequest(
   as: AuthorizationServer,
   client: Client,
-  clientAuthentication: ClientAuthenticationImplementation,
+  clientAuthentication: ClientAuth,
   grantType: string,
   parameters: URLSearchParams | Record<string, string> | string[][],
   options?: Omit<TokenEndpointRequestOptions, 'additionalParameters'>,
@@ -4217,7 +4213,7 @@ export interface RevocationRequestOptions extends HttpRequestOptions<'POST', URL
 export async function revocationRequest(
   as: AuthorizationServer,
   client: Client,
-  clientAuthentication: ClientAuthenticationImplementation,
+  clientAuthentication: ClientAuth,
   token: string,
   options?: RevocationRequestOptions,
 ): Promise<Response> {
@@ -4328,7 +4324,7 @@ function assertReadableResponse(response: Response): void {
 export async function introspectionRequest(
   as: AuthorizationServer,
   client: Client,
-  clientAuthentication: ClientAuthenticationImplementation,
+  clientAuthentication: ClientAuth,
   token: string,
   options?: IntrospectionRequestOptions,
 ): Promise<Response> {
@@ -4647,9 +4643,7 @@ async function validateJwsSignature(
   }
 }
 
-export interface JweDecryptFunction {
-  (jwe: string): Promise<string>
-}
+export type JweDecryptFunction = (jwe: string) => Promise<string>
 
 /**
  * Minimal JWT validation implementation.
@@ -5346,7 +5340,7 @@ export interface DeviceAuthorizationRequestOptions
 export async function deviceAuthorizationRequest(
   as: AuthorizationServer,
   client: Client,
-  clientAuthentication: ClientAuthenticationImplementation,
+  clientAuthentication: ClientAuth,
   parameters: URLSearchParams | Record<string, string> | string[][],
   options?: DeviceAuthorizationRequestOptions,
 ): Promise<Response> {
@@ -5518,7 +5512,7 @@ export async function processDeviceAuthorizationResponse(
 export async function deviceCodeGrantRequest(
   as: AuthorizationServer,
   client: Client,
-  clientAuthentication: ClientAuthenticationImplementation,
+  clientAuthentication: ClientAuth,
   deviceCode: string,
   options?: TokenEndpointRequestOptions,
 ): Promise<Response> {

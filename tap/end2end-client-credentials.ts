@@ -69,7 +69,7 @@ export default (QUnit: QUnit) => {
         ? lib.DPoP(client, await lib.generateKeyPair(alg as lib.JWSAlgorithm))
         : undefined
 
-      let clientAuth: lib.ClientAuthenticationImplementation
+      let clientAuth: lib.ClientAuth
       switch (authMethod) {
         case 'client_secret_basic':
           clientAuth = lib.ClientSecretBasic(client.client_secret as string)
