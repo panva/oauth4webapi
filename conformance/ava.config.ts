@@ -13,6 +13,7 @@ import { JWS_ALGORITHM, PLAN_NAME, VARIANT } from './env.js'
 
 switch (PLAN_NAME) {
   case 'oidcc-client-basic-certification-test-plan':
+  case 'oidcc-client-hybrid-certification-test-plan':
   case 'oidcc-client-test-plan':
   case 'fapi1-advanced-final-client-test-plan':
   case 'fapi2-security-profile-id2-client-test-plan':
@@ -58,6 +59,10 @@ const DEFAULTS: Record<typeof PLAN_NAME, Record<string, string>> = {
     client_auth_type: 'client_secret_basic', // none, client_secret_basic, client_secret_post, private_key_jwt
   },
   'oidcc-client-basic-certification-test-plan': {
+    request_type: 'plain_http_request',
+    client_registration: 'static_client',
+  },
+  'oidcc-client-hybrid-certification-test-plan': {
     request_type: 'plain_http_request',
     client_registration: 'static_client',
   },
@@ -238,6 +243,13 @@ export default async () => {
       }
       case 'oidcc-client-test-plan':
       case 'oidcc-client-basic-certification-test-plan':
+      case 'oidcc-client-hybrid-certification-test-plan':
+        switch (module.variant?.response_type) {
+          case 'code token':
+          case 'code id_token token':
+            continue
+        }
+
         const name = module.testModule.replace('oidcc-client-test-', '')
         const path = `./conformance/oidc/${name}.ts`
         ensureTestFile(path, name)
@@ -262,7 +274,7 @@ export default async () => {
       ts: 'module',
       mjs: true,
     },
-    files: [...files, './conformance/download_archive.ts'],
+    files: [...new Set([...files].sort()), './conformance/download_archive.ts'],
     workerThreads: false,
     nodeArguments: ['--enable-source-maps'],
   }

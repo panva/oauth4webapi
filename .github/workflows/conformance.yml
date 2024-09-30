@@ -21,11 +21,17 @@ jobs:
       fail-fast: false
       matrix:
         setup:
-          # Core 1.0 Basic
+          # Core 1.0 response_type=code
           - plan: oidcc-client-basic-certification-test-plan
+
+          # Core 1.0 response_type=code id_token
+          - plan: oidcc-client-hybrid-certification-test-plan
 
           # Comprehensive Core 1.0 client test
           - plan: oidcc-client-test-plan
+          - plan: oidcc-client-test-plan
+            variant:
+              response_type: code id_token
 
           # Financial-grade API Security Profile 1.0 - Part 2: Advanced
           - plan: fapi1-advanced-final-client-test-plan

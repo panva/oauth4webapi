@@ -49,6 +49,7 @@ switch (plan.name) {
     break
   case 'oidcc-client-test-plan':
   case 'oidcc-client-basic-certification-test-plan':
+  case 'oidcc-client-hybrid-certification-test-plan':
     prefix = 'oidcc-client-test-'
     break
   default:
@@ -64,13 +65,15 @@ async function importPrivateKey(alg: string, jwk: JWK) {
 }
 
 export function modules(name: string): ModulePrescription[] {
-  if (name === prefix.slice(0, -1)) {
-    return conformance.plan.modules.filter((x: ModulePrescription) => x.testModule === name)
-  }
+  return conformance.plan.modules.filter((x: ModulePrescription) => {
+    switch (x.variant?.response_type) {
+      case 'code token':
+      case 'code id_token token':
+        return false
+    }
 
-  return conformance.plan.modules.filter(
-    (x: ModulePrescription) => x.testModule === `${prefix}${name}`,
-  )
+    return x.testModule === (name === prefix.slice(0, -1) ? name : `${prefix}${name}`)
+  })
 }
 
 function usesJarm(variant: Record<string, string>) {
@@ -109,7 +112,10 @@ function usesRequestObject(planName: string, variant: Record<string, string>) {
 }
 
 function requiresNonce(planName: string, variant: Record<string, string>) {
-  return planName.startsWith('fapi1') && getScope(variant).includes('openid')
+  return (
+    responseType(planName, variant).includes('id_token') ||
+    (planName.startsWith('fapi1') && getScope(variant).includes('openid'))
+  )
 }
 
 function requiresState(planName: string, variant: Record<string, string>) {
@@ -117,6 +123,10 @@ function requiresState(planName: string, variant: Record<string, string>) {
 }
 
 function responseType(planName: string, variant: Record<string, string>) {
+  if (variant.response_type) {
+    return variant.response_type
+  }
+
   if (!planName.startsWith('fapi1')) {
     return 'code'
   }
