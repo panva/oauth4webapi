@@ -2219,7 +2219,7 @@ export class ResponseBodyError extends Error {
    */
   override cause!: Record<string, JsonValue | undefined>
 
-  code: string
+  code: typeof RESPONSE_BODY_ERROR
 
   /**
    * Error code given in the JSON response
@@ -2284,7 +2284,7 @@ export class AuthorizationResponseError extends Error {
    */
   override cause!: URLSearchParams
 
-  code: string
+  code: typeof AUTHORIZATION_RESPONSE_ERROR
 
   /**
    * Error code given in the Authorization Response
@@ -2337,7 +2337,7 @@ export class WWWAuthenticateChallengeError extends Error {
    */
   override cause!: WWWAuthenticateChallenge[]
 
-  code: string
+  code: typeof WWW_AUTHENTICATE_CHALLENGE
 
   /**
    * The {@link !Response} that included a WWW-Authenticate HTTP Header challenges, its
@@ -4837,6 +4837,72 @@ export async function validateDetachedSignatureResponse(
   maxAge?: number | typeof skipAuthTimeCheck,
   options?: ValidateSignatureOptions,
 ): Promise<URLSearchParams> {
+  return validateHybridResponse(
+    as,
+    client,
+    parameters,
+    expectedNonce,
+    expectedState,
+    maxAge,
+    options,
+    true,
+  )
+}
+
+/**
+ * Same as {@link validateAuthResponse} but for `code id_token` authorization responses.
+ *
+ * @param as Authorization Server Metadata.
+ * @param client Client Metadata.
+ * @param parameters Authorization Response parameters as URLSearchParams or an instance of URL with
+ *   parameters in a fragment/hash.
+ * @param expectedNonce Expected ID Token `nonce` claim value.
+ * @param expectedState Expected `state` parameter value. Default is {@link expectNoState}.
+ * @param maxAge ID Token {@link IDToken.auth_time `auth_time`} claim value will be checked to be
+ *   present and conform to the `maxAge` value. Use of this option is required if you sent a
+ *   `max_age` parameter in an authorization request. Default is
+ *   {@link Client.default_max_age `client.default_max_age`} and falls back to
+ *   {@link skipAuthTimeCheck}.
+ *
+ * @returns Validated Authorization Response parameters. Authorization Error Responses are rejected
+ *   using {@link AuthorizationResponseError}.
+ *
+ * @group Authorization Code Grant w/ OpenID Connect (OIDC)
+ *
+ * @see [RFC 6749 - The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html#section-4.1.2)
+ * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#HybridFlowAuth)
+ */
+export async function validateCodeIdTokenResponse(
+  as: AuthorizationServer,
+  client: Client,
+  parameters: URLSearchParams | URL,
+  expectedNonce: string,
+  expectedState?: string | typeof expectNoState,
+  maxAge?: number | typeof skipAuthTimeCheck,
+  options?: ValidateSignatureOptions,
+): Promise<URLSearchParams> {
+  return validateHybridResponse(
+    as,
+    client,
+    parameters,
+    expectedNonce,
+    expectedState,
+    maxAge,
+    options,
+    false,
+  )
+}
+
+async function validateHybridResponse(
+  as: AuthorizationServer,
+  client: Client,
+  parameters: URLSearchParams | URL,
+  expectedNonce: string,
+  expectedState: string | typeof expectNoState | undefined,
+  maxAge: number | typeof skipAuthTimeCheck | undefined,
+  options: ValidateSignatureOptions | undefined,
+  fapi: boolean,
+): Promise<URLSearchParams> {
   assertAs(as)
   assertClient(client)
 
@@ -4899,7 +4965,7 @@ export async function validateDetachedSignatureResponse(
   ]
 
   const state = parameters.get('state')
-  if (typeof expectedState === 'string' || state !== null) {
+  if (fapi && (typeof expectedState === 'string' || state !== null)) {
     requiredClaims.push('s_hash')
   }
 
@@ -5005,7 +5071,7 @@ export async function validateDetachedSignatureResponse(
     })
   }
 
-  if (state !== null || claims.s_hash !== undefined) {
+  if ((fapi && state !== null) || claims.s_hash !== undefined) {
     assertString(claims.s_hash, 'ID Token "s_hash" (state hash) claim value', INVALID_RESPONSE, {
       claims,
     })
@@ -5130,7 +5196,7 @@ export const expectNoState: unique symbol = Symbol()
  * @group Authorization Code Grant w/ OpenID Connect (OIDC)
  *
  * @see [RFC 6749 - The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html#section-4.1.2)
- * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication)
+ * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#CodeFlowAuth)
  * @see [RFC 9207 - OAuth 2.0 Authorization Server Issuer Identification](https://www.rfc-editor.org/rfc/rfc9207.html)
  */
 export function validateAuthResponse(

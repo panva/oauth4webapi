@@ -163,7 +163,7 @@ export default (QUnit: QUnit) => {
 
       let callbackParams: URLSearchParams
       if (hybrid) {
-        callbackParams = await lib.validateDetachedSignatureResponse(
+        callbackParams = await lib.validateCodeIdTokenResponse(
           as,
           client,
           currentUrl,

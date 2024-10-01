@@ -376,13 +376,11 @@ export const flow = (options?: MacroOptions) => {
         if (usesJarm(variant)) {
           params = await oauth.validateJwtAuthResponse(as, client, currentUrl, state)
         } else if (response_type === 'code id_token') {
-          params = await oauth.validateDetachedSignatureResponse(
-            as,
-            client,
-            currentUrl,
-            nonce as string,
-            state,
-          )
+          params = await (
+            plan.name.startsWith('fapi1')
+              ? oauth.validateDetachedSignatureResponse
+              : oauth.validateCodeIdTokenResponse
+          )(as, client, currentUrl, nonce as string, state)
         } else {
           params = oauth.validateAuthResponse(as, client, currentUrl, state)
         }
