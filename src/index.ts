@@ -1068,7 +1068,7 @@ export interface HttpRequestOptions<Method, BodyType = undefined> {
        * Depending on whether {@link HttpRequestOptions.signal} was used, if so, it is the value
        * passed, otherwise undefined
        */
-      signal?: RequestInit['signal']
+      signal?: AbortSignal
     },
   ) => Promise<Response>
 
@@ -1193,7 +1193,7 @@ export async function discoveryRequest(
     headers: Object.fromEntries(headers.entries()),
     method: 'GET',
     redirect: 'manual',
-    signal: options?.signal ? signal(options.signal) : null,
+    signal: options?.signal ? signal(options.signal) : undefined,
   })
 }
 
@@ -2585,7 +2585,7 @@ async function resourceRequest(
     headers: Object.fromEntries(headers.entries()),
     method,
     redirect: 'manual',
-    signal: options?.signal ? signal(options.signal) : null,
+    signal: options?.signal ? signal(options.signal) : undefined,
   })
   options?.DPoP?.cacheNonce(response)
   return response
@@ -3016,7 +3016,7 @@ async function authenticatedRequest(
     headers: Object.fromEntries(headers.entries()),
     method: 'POST',
     redirect: 'manual',
-    signal: options?.signal ? signal(options.signal) : null,
+    signal: options?.signal ? signal(options.signal) : undefined,
   })
 }
 
@@ -4405,7 +4405,7 @@ async function jwksRequest(
     headers: Object.fromEntries(headers.entries()),
     method: 'GET',
     redirect: 'manual',
-    signal: options?.signal ? signal(options.signal) : null,
+    signal: options?.signal ? signal(options.signal) : undefined,
   })
 }
 
