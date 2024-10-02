@@ -95,7 +95,7 @@
     "timekeeper": "^2.3.1",
     "tsx": "^4.19.1",
     "typedoc": "^0.26.7",
-    "typedoc-plugin-markdown": "^4.2.8",
+    "typedoc-plugin-markdown": "^4.2.9",
     "typedoc-plugin-mdn-links": "^3.3.2",
     "typescript": "~5.6.2",
     "undici": "^6.19.8"
