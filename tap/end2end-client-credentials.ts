@@ -79,8 +79,7 @@ export default (QUnit: QUnit) => {
           clientAuth = lib.ClientSecretJwt(client.client_secret as string)
           break
         case 'private_key_jwt':
-          clientAuth = lib.PrivateKeyJwt({
-            ...clientPrivateKey,
+          clientAuth = lib.PrivateKeyJwt(clientPrivateKey, {
             [lib.modifyAssertion](h, p) {
               t.equal(h.alg, 'ES256')
               p.foo = 'bar'

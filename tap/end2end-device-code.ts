@@ -26,8 +26,7 @@ export default (QUnit: QUnit) => {
       )
       const DPoPKeyPair = await lib.generateKeyPair(alg)
       const DPoP = dpop
-        ? lib.DPoP(client, {
-            ...DPoPKeyPair,
+        ? lib.DPoP(client, DPoPKeyPair, {
             [lib.modifyAssertion](h, p) {
               t.equal(h.alg, 'ES256')
               p.foo = 'bar'

@@ -67,8 +67,8 @@ export default (QUnit: QUnit) => {
       {
         foo: 'bar',
       },
+      kp.privateKey,
       {
-        key: kp.privateKey,
         [lib.modifyAssertion](h, p) {
           t.equal(h.alg, 'ES256')
           delete h.typ

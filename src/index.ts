@@ -85,13 +85,6 @@ export interface PrivateKey {
    * ID) will be added to the JOSE Header.
    */
   kid?: string
-
-  /**
-   * Use to modify the JWT signed by this key right before it is signed.
-   *
-   * @see {@link modifyAssertion}
-   */
-  [modifyAssertion]?: ModifyAssertionFunction
 }
 
 const ERR_INVALID_ARG_VALUE = 'ERR_INVALID_ARG_VALUE'
@@ -289,14 +282,12 @@ export const customFetch: unique symbol = Symbol()
  * Changing Private Key JWT client assertion audience issued from an array to a string
  *
  * ```ts
- * // Prerequisites
  * let as!: oauth.AuthorizationServer
  * let client!: oauth.Client
  * let parameters!: URLSearchParams
- * let clientPrivateKey!: oauth.CryptoKey
+ * let clientPrivateKey!: oauth.CryptoKey | oauth.PrivateKey
  *
- * let clientAuth = oauth.PrivateKeyJwt({
- *   key: clientPrivateKey,
+ * let clientAuth = oauth.PrivateKeyJwt(clientPrivateKey, {
  *   [oauth.modifyAssertion](header, payload) {
  *     payload.aud = as.issuer
  *   },
@@ -310,14 +301,12 @@ export const customFetch: unique symbol = Symbol()
  * Changing Request Object issued by {@link issueRequestObject} to have an expiration of 5 minutes
  *
  * ```ts
- * // Prerequisites
  * let as!: oauth.AuthorizationServer
  * let client!: oauth.Client
  * let parameters!: URLSearchParams
- * let jarPrivateKey!: oauth.CryptoKey
+ * let jarPrivateKey!: oauth.CryptoKey | oauth.PrivateKey
  *
- * const request = await oauth.issueRequestObject(as, client, parameters, {
- *   key: jarPrivateKey,
+ * const request = await oauth.issueRequestObject(as, client, parameters, jarPrivateKey, {
  *   [oauth.modifyAssertion](header, payload) {
  *     payload.exp = <number>payload.iat + 300
  *   },
@@ -343,7 +332,6 @@ export const modifyAssertion: unique symbol = Symbol()
  * ```ts
  * import * as jose from 'jose'
  *
- * // Prerequisites
  * let as!: oauth.AuthorizationServer
  * let key!: oauth.CryptoKey
  * let alg!: string
@@ -404,7 +392,6 @@ export const jweDecrypt: unique symbol = Symbol()
  * @example
  *
  * ```ts
- * // Prerequisites
  * let as!: oauth.AuthorizationServer
  * let request!: Request
  * let expectedAudience!: string
@@ -827,7 +814,6 @@ export interface Client {
    * ```ts
    * import * as undici from 'undici'
    *
-   * // Prerequisites
    * let as!: oauth.AuthorizationServer
    * let client!: oauth.Client & { use_mtls_endpoint_aliases: true }
    * let params!: URLSearchParams
@@ -850,7 +836,6 @@ export interface Client {
    * Certificate-Bound Access Tokens support.
    *
    * ```ts
-   * // Prerequisites
    * let as!: oauth.AuthorizationServer
    * let client!: oauth.Client & { use_mtls_endpoint_aliases: true }
    * let params!: URLSearchParams
@@ -1409,7 +1394,6 @@ export async function calculatePKCECodeChallenge(codeVerifier: string): Promise<
 interface NormalizedKeyInput {
   key?: CryptoKey
   kid?: string
-  modifyAssertion?: ModifyAssertionFunction
 }
 
 function getKeyAndKid(input: CryptoKey | PrivateKey | undefined): NormalizedKeyInput {
@@ -1428,29 +1412,7 @@ function getKeyAndKid(input: CryptoKey | PrivateKey | undefined): NormalizedKeyI
   return {
     key: input.key,
     kid: input.kid,
-    modifyAssertion: input[modifyAssertion],
   }
-}
-
-export interface DPoPKeyPair extends CryptoKeyPair {
-  /**
-   * Private CryptoKey instance to sign the DPoP Proof JWT with.
-   *
-   * Its algorithm must be compatible with a supported {@link JWSAlgorithm JWS Algorithm}.
-   */
-  privateKey: CryptoKey
-
-  /**
-   * The public key corresponding to {@link DPoPKeyPair.privateKey}.
-   */
-  publicKey: CryptoKey
-
-  /**
-   * Use to modify the DPoP Proof JWT right before it is signed.
-   *
-   * @see {@link modifyAssertion}
-   */
-  [modifyAssertion]?: ModifyAssertionFunction
 }
 
 export interface DPoPRequestOptions {
@@ -1658,6 +1620,15 @@ export function ClientSecretBasic(clientSecret: string): ClientAuth {
   }
 }
 
+export interface ModifyAssertionOptions {
+  /**
+   * Use to modify a JWT assertion payload or header right before it is signed.
+   *
+   * @see {@link modifyAssertion}
+   */
+  [modifyAssertion]?: ModifyAssertionFunction
+}
+
 /**
  * **`private_key_jwt`** uses the HTTP request body to send `client_id`, `client_assertion_type`,
  * and `client_assertion` as `application/x-www-form-urlencoded` body parameters. Digital signature
@@ -1670,8 +1641,11 @@ export function ClientSecretBasic(clientSecret: string): ClientAuth {
  * @see [OAuth Token Endpoint Authentication Methods](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#token-endpoint-auth-method)
  * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication)
  */
-export function PrivateKeyJwt(clientPrivateKey: CryptoKey | PrivateKey): ClientAuth {
-  const { key, kid, modifyAssertion } = getKeyAndKid(clientPrivateKey)
+export function PrivateKeyJwt(
+  clientPrivateKey: CryptoKey | PrivateKey,
+  options?: ModifyAssertionOptions,
+): ClientAuth {
+  const { key, kid } = getKeyAndKid(clientPrivateKey)
   assertPrivateKey(key, '"clientPrivateKey.key"')
   return async (as, client, body, _headers) => {
     const header = { alg: keyToJws(key), kid }
@@ -1686,7 +1660,7 @@ export function PrivateKeyJwt(clientPrivateKey: CryptoKey | PrivateKey): ClientA
       sub: client.client_id,
     }
 
-    modifyAssertion?.(header, payload)
+    options?.[modifyAssertion]?.(header, payload)
 
     body.set('client_id', client.client_id)
     body.set('client_assertion_type', 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer')
@@ -1709,9 +1683,7 @@ export function PrivateKeyJwt(clientPrivateKey: CryptoKey | PrivateKey): ClientA
  */
 export function ClientSecretJwt(
   clientSecret: string,
-  options?: {
-    [modifyAssertion]?: ModifyAssertionFunction
-  },
+  options?: ModifyAssertionOptions,
 ): ClientAuth {
   assertString(clientSecret, '"clientSecret"')
   const modify = options?.[modifyAssertion]
@@ -1830,13 +1802,14 @@ export async function issueRequestObject(
   client: Client,
   parameters: URLSearchParams | Record<string, string> | string[][],
   privateKey: CryptoKey | PrivateKey,
+  options?: ModifyAssertionOptions,
 ): Promise<string> {
   assertAs(as)
   assertClient(client)
 
   parameters = new URLSearchParams(parameters)
 
-  const { key, kid, modifyAssertion } = getKeyAndKid(privateKey)
+  const { key, kid } = getKeyAndKid(privateKey)
   assertPrivateKey(key, '"privateKey.key"')
 
   parameters.set('client_id', client.client_id)
@@ -1916,7 +1889,7 @@ export async function issueRequestObject(
     kid,
   }
 
-  modifyAssertion?.(header, claims)
+  options?.[modifyAssertion]?.(header, claims)
 
   return signJwt(header, claims, key)
 }
@@ -2092,7 +2065,7 @@ class DPoPHandler implements DPoPHandle {
   #modifyAssertion?: ModifyAssertionFunction
   #map?: Map<string, string>
 
-  constructor(client: Client, keyPair: DPoPKeyPair) {
+  constructor(client: Client, keyPair: CryptoKeyPair, options?: ModifyAssertionOptions) {
     assertPrivateKey(keyPair?.privateKey, '"DPoP.privateKey"')
     assertPublicKey(keyPair?.publicKey, '"DPoP.publicKey"')
 
@@ -2100,7 +2073,7 @@ class DPoPHandler implements DPoPHandle {
       throw CodedTypeError('"DPoP.publicKey.extractable" must be true', ERR_INVALID_ARG_VALUE)
     }
 
-    this.#modifyAssertion = keyPair[modifyAssertion]
+    this.#modifyAssertion = options?.[modifyAssertion]
     this.#clockSkew = getClockSkew(client)
     this.#privateKey = keyPair.privateKey
     this.#publicKey = keyPair.publicKey
@@ -2174,8 +2147,12 @@ class DPoPHandler implements DPoPHandle {
  *
  * @see {@link !DPoP RFC 9449 - OAuth 2.0 Demonstrating Proof of Possession (DPoP)}
  */
-export function DPoP(client: Client, keyPair: DPoPKeyPair): DPoPHandle {
-  return new DPoPHandler(client, keyPair)
+export function DPoP(
+  client: Client,
+  keyPair: CryptoKeyPair,
+  options?: ModifyAssertionOptions,
+): DPoPHandle {
+  return new DPoPHandler(client, keyPair, options)
 }
 
 export interface PushedAuthorizationResponse {
