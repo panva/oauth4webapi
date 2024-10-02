@@ -124,7 +124,7 @@ test('private_key_jwt', async (t) => {
         )
 
         const assertion = jose.decodeJwt(params.get('client_assertion')!)
-        t.deepEqual(assertion.aud, [tIssuer.issuer, tIssuer.token_endpoint])
+        t.is(assertion.aud, tIssuer.issuer)
         t.is(assertion.iss, client.client_id)
         t.is(assertion.sub, client.client_id)
         t.is(typeof assertion.exp, 'number')
@@ -186,7 +186,7 @@ test('private_key_jwt ({ key: CryptoKey, kid: string })', async (t) => {
         )
 
         const assertion = jose.decodeJwt(params.get('client_assertion')!)
-        t.deepEqual(assertion.aud, [tIssuer.issuer, tIssuer.token_endpoint])
+        t.is(assertion.aud, tIssuer.issuer)
         t.is(assertion.iss, client.client_id)
         t.is(assertion.sub, client.client_id)
         t.is(typeof assertion.exp, 'number')

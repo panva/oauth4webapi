@@ -279,7 +279,7 @@ export const customFetch: unique symbol = Symbol()
  *
  * @example
  *
- * Changing Private Key JWT client assertion audience issued from an array to a string
+ * Changing Private Key JWT client assertion audience issued from a string to an array
  *
  * ```ts
  * let as!: oauth.AuthorizationServer
@@ -289,7 +289,7 @@ export const customFetch: unique symbol = Symbol()
  *
  * let clientAuth = oauth.PrivateKeyJwt(key, {
  *   [oauth.modifyAssertion](header, payload) {
- *     payload.aud = as.issuer
+ *     payload.aud = [as.issuer, as.token_endpoint!]
  *   },
  * })
  *
@@ -1644,6 +1644,19 @@ export interface ModifyAssertionOptions {
   [modifyAssertion]?: ModifyAssertionFunction
 }
 
+function clientAssertionPayload(as: AuthorizationServer, client: Client) {
+  const now = epochTime() + getClockSkew(client)
+  return {
+    jti: randomBytes(),
+    aud: as.issuer,
+    exp: now + 60,
+    iat: now,
+    nbf: now,
+    iss: client.client_id,
+    sub: client.client_id,
+  }
+}
+
 /**
  * **`private_key_jwt`** uses the HTTP request body to send `client_id`, `client_assertion_type`,
  * and `client_assertion` as `application/x-www-form-urlencoded` body parameters. Digital signature
@@ -1672,16 +1685,7 @@ export function PrivateKeyJwt(
   assertPrivateKey(key, '"clientPrivateKey.key"')
   return async (as, client, body, _headers) => {
     const header = { alg: keyToJws(key), kid }
-    const now = epochTime() + getClockSkew(client)
-    const payload = {
-      jti: randomBytes(),
-      aud: [as.issuer, as.token_endpoint!],
-      exp: now + 60,
-      iat: now,
-      nbf: now,
-      iss: client.client_id,
-      sub: client.client_id,
-    }
+    const payload = clientAssertionPayload(as, client)
 
     options?.[modifyAssertion]?.(header, payload)
 
@@ -1729,16 +1733,7 @@ export function ClientSecretJwt(
     )
 
     const header = { alg: 'HS256' }
-    const now = epochTime() + getClockSkew(client)
-    const payload = {
-      jti: randomBytes(),
-      aud: [as.issuer, as.token_endpoint!],
-      exp: now + 60,
-      iat: now,
-      nbf: now,
-      iss: client.client_id,
-      sub: client.client_id,
-    }
+    const payload = clientAssertionPayload(as, client)
 
     modify?.(header, payload)
 

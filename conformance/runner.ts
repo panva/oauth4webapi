@@ -196,10 +196,17 @@ export const flow = (options?: MacroOptions) => {
           break
         case 'private_key_jwt':
           const [jwk] = configuration.client.jwks.keys
-          clientAuth = oauth.PrivateKeyJwt({
-            kid: jwk.kid,
-            key: await importPrivateKey(ALG, jwk),
-          })
+          clientAuth = oauth.PrivateKeyJwt(
+            {
+              kid: jwk.kid,
+              key: await importPrivateKey(ALG, jwk),
+            },
+            {
+              [oauth.modifyAssertion]: (_header, payload) => {
+                payload.aud = [as.issuer, as.token_endpoint!]
+              },
+            },
+          )
           break
         case 'client_secret_basic':
           clientAuth = oauth.ClientSecretBasic(configuration.client.client_secret!)
