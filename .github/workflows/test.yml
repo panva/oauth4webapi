@@ -38,7 +38,29 @@ jobs:
       - run: ./examples/.update-diffs.sh
       - run: git diff --quiet
 
+  check-docs:
+    runs-on: ubuntu-latest
+    needs:
+      - build
+      - format
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/iron # 20
+          cache: 'npm'
+      - run: npm clean-install
+      - uses: r-lib/actions/setup-pandoc@v2
+        with:
+          pandoc-version: latest
+      - run: npm run build
+      - run: npm run docs-check
+
   node:
+    needs:
+      - build
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -72,6 +94,8 @@ jobs:
           if-no-files-found: warn
 
   edge-runtime:
+    needs:
+      - build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -94,6 +118,8 @@ jobs:
           if-no-files-found: warn
 
   electron:
+    needs:
+      - build
     runs-on: macos-latest
     steps:
       - name: Checkout
@@ -117,6 +143,8 @@ jobs:
           if-no-files-found: warn
 
   deno:
+    needs:
+      - build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -144,6 +172,8 @@ jobs:
           if-no-files-found: warn
 
   workerd:
+    needs:
+      - build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -159,6 +189,8 @@ jobs:
         run: npm run tap:workerd
 
   bun:
+    needs:
+      - build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -184,6 +216,8 @@ jobs:
           if-no-files-found: warn
 
   browsers:
+    needs:
+      - build
     runs-on: ${{ matrix.runs-on || 'ubuntu-latest' }}
     strategy:
       fail-fast: false

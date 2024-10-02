@@ -61,6 +61,7 @@
     "build": "npm run generate-build && tsc -p test && tsc -p examples && tsc -p conformance && tsc -p tap && npx --yes jsr publish --dry-run --allow-dirty",
     "conformance": "bash -c 'source .node_flags.sh && ava --config conformance/ava.config.ts'",
     "docs": "patch-package && typedoc",
+    "docs-check": "./check-examples.sh",
     "format": "npm run _format -- --check --write",
     "format-check": "npm run _format -- --check",
     "generate-build": "rm -rf build && tsc --sourceMap && tsc --declaration true --emitDeclarationOnly true --removeComments false",
