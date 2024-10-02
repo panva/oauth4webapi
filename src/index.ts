@@ -285,9 +285,9 @@ export const customFetch: unique symbol = Symbol()
  * let as!: oauth.AuthorizationServer
  * let client!: oauth.Client
  * let parameters!: URLSearchParams
- * let clientPrivateKey!: oauth.CryptoKey | oauth.PrivateKey
+ * let key!: oauth.CryptoKey | oauth.PrivateKey
  *
- * let clientAuth = oauth.PrivateKeyJwt(clientPrivateKey, {
+ * let clientAuth = oauth.PrivateKeyJwt(key, {
  *   [oauth.modifyAssertion](header, payload) {
  *     payload.aud = as.issuer
  *   },
@@ -304,9 +304,9 @@ export const customFetch: unique symbol = Symbol()
  * let as!: oauth.AuthorizationServer
  * let client!: oauth.Client
  * let parameters!: URLSearchParams
- * let jarPrivateKey!: oauth.CryptoKey | oauth.PrivateKey
+ * let key!: oauth.CryptoKey | oauth.PrivateKey
  *
- * const request = await oauth.issueRequestObject(as, client, parameters, jarPrivateKey, {
+ * const request = await oauth.issueRequestObject(as, client, parameters, key, {
  *   [oauth.modifyAssertion](header, payload) {
  *     payload.exp = <number>payload.iat + 300
  *   },
@@ -1581,6 +1581,14 @@ export type ClientAuth = (
  * **`client_secret_post`** uses the HTTP request body to send `client_id` and `client_secret` as
  * `application/x-www-form-urlencoded` body parameters
  *
+ * @example
+ *
+ * ```ts
+ * let clientSecret!: string
+ *
+ * let clientAuth = oauth.ClientSecretPost(clientSecret)
+ * ```
+ *
  * @param clientSecret
  *
  * @group Client Authentication
@@ -1600,6 +1608,14 @@ export function ClientSecretPost(clientSecret: string): ClientAuth {
 /**
  * **`client_secret_basic`** uses the HTTP `Basic` authentication scheme to send `client_id` and
  * `client_secret` in an `Authorization` HTTP Header.
+ *
+ * @example
+ *
+ * ```ts
+ * let clientSecret!: string
+ *
+ * let clientAuth = oauth.ClientSecretBasic(clientSecret)
+ * ```
  *
  * @param clientSecret
  *
@@ -1632,6 +1648,14 @@ export interface ModifyAssertionOptions {
  * **`private_key_jwt`** uses the HTTP request body to send `client_id`, `client_assertion_type`,
  * and `client_assertion` as `application/x-www-form-urlencoded` body parameters. Digital signature
  * is used for the assertion's authenticity and integrity.
+ *
+ * @example
+ *
+ * ```ts
+ * let key!: oauth.CryptoKey | oauth.PrivateKey
+ *
+ * let clientAuth = oauth.PrivateKeyJwt(key)
+ * ```
  *
  * @param clientPrivateKey
  *
@@ -1671,6 +1695,14 @@ export function PrivateKeyJwt(
  * **`client_secret_jwt`** uses the HTTP request body to send `client_id`, `client_assertion_type`,
  * and `client_assertion` as `application/x-www-form-urlencoded` body parameters. HMAC is used for
  * the assertion's authenticity and integrity.
+ *
+ * @example
+ *
+ * ```ts
+ * let clientSecret!: string
+ *
+ * let clientAuth = oauth.ClientSecretJwt(clientSecret)
+ * ```
  *
  * @param clientSecret
  * @param options
@@ -1719,11 +1751,13 @@ export function ClientSecretJwt(
   }
 }
 
-// TODO: should the auth methods be getting a client meta in the outer function?
-
 /**
  * **`none`** (public client) uses the HTTP request body to send only `client_id` as
  * `application/x-www-form-urlencoded` body parameter.
+ *
+ * ```ts
+ * let clientAuth = oauth.None()
+ * ```
  *
  * @group Client Authentication
  *
@@ -1740,6 +1774,10 @@ export function None(): ClientAuth {
  * **`tls_client_auth`** uses the HTTP request body to send only `client_id` as
  * `application/x-www-form-urlencoded` body parameter and the mTLS key and certificate is configured
  * through {@link customFetch}.
+ *
+ * ```ts
+ * let clientAuth = oauth.TlsClientAuth()
+ * ```
  *
  * @group Client Authentication
  *
@@ -2125,6 +2163,15 @@ class DPoPHandler implements DPoPHandle {
  *
  * This wrapper / handle also keeps track of server-issued nonces, allowing this module to
  * automatically retry requests with a fresh nonce when the server indicates the need to use one.
+ *
+ * @example
+ *
+ * ```ts
+ * let client!: oauth.Client
+ * let keyPair!: oauth.CryptoKeyPair
+ *
+ * let DPoP = oauth.DPoP(client, keyPair)
+ * ```
  *
  * @param keyPair Public/private key pair to sign the DPoP Proof JWT with
  *
@@ -3071,7 +3118,8 @@ const idTokenClaims = new WeakMap<TokenEndpointResponse, IDToken>()
 const jwtRefs = new WeakMap<Response, string>()
 
 /**
- * Returns ID Token claims validated during {@link processAuthorizationCodeResponse}.
+ * Returns ID Token claims validated during {@link processAuthorizationCodeResponse}. To optionally
+ * validate its JWS Signature use {@link validateApplicationLevelSignature}
  *
  * @param ref Value previously resolved from {@link processAuthorizationCodeResponse}.
  *
@@ -3083,7 +3131,8 @@ export function getValidatedIdTokenClaims(ref: OpenIDTokenEndpointResponse): IDT
 
 /**
  * Returns ID Token claims validated during {@link processRefreshTokenResponse} or
- * {@link processDeviceCodeResponse}.
+ * {@link processDeviceCodeResponse}. To optionally validate its JWS Signature use
+ * {@link validateApplicationLevelSignature}
  *
  * @param ref Value previously resolved from {@link processRefreshTokenResponse} or
  *   {@link processDeviceCodeResponse}.
