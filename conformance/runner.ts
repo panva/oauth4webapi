@@ -189,7 +189,7 @@ export const flow = (options?: MacroOptions) => {
       let clientAuth: oauth.ClientAuth
       switch (variant.client_auth_type) {
         case 'mtls':
-          clientAuth = oauth.SelfSignedTlsClientAuth()
+          clientAuth = oauth.TlsClientAuth()
           break
         case 'none':
           clientAuth = oauth.None()

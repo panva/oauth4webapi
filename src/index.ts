@@ -1568,7 +1568,6 @@ function formUrlEncode(token: string) {
  * @see {@link PrivateKeyJwt}
  * @see {@link None}
  * @see {@link TlsClientAuth}
- * @see {@link SelfSignedTlsClientAuth}
  * @see [OAuth Token Endpoint Authentication Methods](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#token-endpoint-auth-method)
  */
 export type ClientAuth = (
@@ -1735,20 +1734,6 @@ export function None(): ClientAuth {
   return (_as, client, body, _headers) => {
     body.set('client_id', client.client_id)
   }
-}
-
-/**
- * **`self_signed_tls_client_auth`** uses the HTTP request body to send only `client_id` as
- * `application/x-www-form-urlencoded` body parameter and the mTLS key and certificate is configured
- * through {@link customFetch}.
- *
- * @group Client Authentication
- *
- * @see [OAuth Token Endpoint Authentication Methods](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#token-endpoint-auth-method)
- * @see [RFC 8705 - OAuth 2.0 Mutual-TLS Client Authentication (Self-Signed Certificate Mutual-TLS Method)](https://www.rfc-editor.org/rfc/rfc8705.html#name-self-signed-certificate-mut)
- */
-export function SelfSignedTlsClientAuth(): ClientAuth {
-  return None()
 }
 
 /**
