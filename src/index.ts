@@ -1294,7 +1294,7 @@ export async function processDiscoveryResponse(
     throw OPE(
       '"response" body "issuer" property does not match the expected value',
       JSON_ATTRIBUTE_COMPARISON,
-      { expected: expectedIssuerIdentifier.href, body: json },
+      { expected: expectedIssuerIdentifier.href, body: json, attribute: 'issuer' },
     )
   }
 
@@ -1970,6 +1970,7 @@ function validateEndpoint(
     throw OPE(
       `authorization server metadata does not contain a valid ${useMtlsAlias ? `"as.mtls_endpoint_aliases.${endpoint}"` : `"as.${endpoint}"`}`,
       value === undefined ? MISSING_SERVER_METADATA : INVALID_SERVER_METADATA,
+      { attribute: useMtlsAlias ? `mtls_endpoint_aliases.${endpoint}` : endpoint },
     )
   }
 
@@ -3024,6 +3025,7 @@ export async function processUserInfoResponse(
         throw OPE('unexpected "response" body "sub" property value', JSON_ATTRIBUTE_COMPARISON, {
           expected: expectedSubject,
           body: json,
+          attribute: 'sub',
         })
       }
   }
@@ -3363,14 +3365,14 @@ async function processGenericAccessTokenResponse(
         throw OPE(
           'ID Token "aud" (audience) claim includes additional untrusted audiences',
           JWT_CLAIM_COMPARISON,
-          { claims },
+          { claims, claim: 'aud' },
         )
       }
       if (claims.azp !== client.client_id) {
         throw OPE(
           'unexpected ID Token "azp" (authorized party) claim value',
           JWT_CLAIM_COMPARISON,
-          { expected: client.client_id, claims },
+          { expected: client.client_id, claims, claim: 'azp' },
         )
       }
     }
@@ -3433,12 +3435,14 @@ function validateAudience(expected: string, result: Awaited<ReturnType<typeof va
       throw OPE('unexpected JWT "aud" (audience) claim value', JWT_CLAIM_COMPARISON, {
         expected,
         claims: result.claims,
+        claim: 'aud',
       })
     }
   } else if (result.claims.aud !== expected) {
     throw OPE('unexpected JWT "aud" (audience) claim value', JWT_CLAIM_COMPARISON, {
       expected,
       claims: result.claims,
+      claim: 'aud',
     })
   }
 
@@ -3462,6 +3466,7 @@ function validateIssuer(as: AuthorizationServer, result: Awaited<ReturnType<type
     throw OPE('unexpected JWT "iss" (issuer) claim value', JWT_CLAIM_COMPARISON, {
       expected,
       claims: result.claims,
+      claim: 'iss',
     })
   }
   return result
@@ -3811,7 +3816,7 @@ async function processAuthorizationCodeOpenIDResponse(
       throw OPE(
         'too much time has elapsed since the last End-User authentication',
         JWT_TIMESTAMP_CHECK,
-        { claims, now, tolerance },
+        { claims, now, tolerance, claim: 'auth_time' },
       )
     }
   }
@@ -3821,12 +3826,14 @@ async function processAuthorizationCodeOpenIDResponse(
       throw OPE('unexpected ID Token "nonce" claim value', JWT_CLAIM_COMPARISON, {
         expected: undefined,
         claims,
+        claim: 'nonce',
       })
     }
   } else if (claims.nonce !== expectedNonce) {
     throw OPE('unexpected ID Token "nonce" claim value', JWT_CLAIM_COMPARISON, {
       expected: expectedNonce,
       claims,
+      claim: 'nonce',
     })
   }
 
@@ -3850,7 +3857,7 @@ async function processAuthorizationCodeOAuth2Response(
         throw OPE(
           'too much time has elapsed since the last End-User authentication',
           JWT_TIMESTAMP_CHECK,
-          { claims, now, tolerance },
+          { claims, now, tolerance, claim: 'auth_time' },
         )
       }
     }
@@ -3859,6 +3866,7 @@ async function processAuthorizationCodeOAuth2Response(
       throw OPE('unexpected ID Token "nonce" claim value', JWT_CLAIM_COMPARISON, {
         expected: undefined,
         claims,
+        claim: 'nonce',
       })
     }
   }
@@ -4669,7 +4677,7 @@ async function validateJwt(
       throw OPE(
         'unexpected JWT "exp" (expiration time) claim value, expiration is past current timestamp',
         JWT_TIMESTAMP_CHECK,
-        { claims, now, tolerance: clockTolerance },
+        { claims, now, tolerance: clockTolerance, claim: 'exp' },
       )
     }
   }
@@ -4695,6 +4703,7 @@ async function validateJwt(
         claims,
         now,
         tolerance: clockTolerance,
+        claim: 'nbf',
       })
     }
   }
@@ -5036,7 +5045,7 @@ async function validateHybridResponse(
     throw OPE(
       'unexpected JWT "iat" (issued at) claim value, it is too far in the past',
       JWT_TIMESTAMP_CHECK,
-      { now, claims },
+      { now, claims, claim: 'iat' },
     )
   }
 
@@ -5061,7 +5070,7 @@ async function validateHybridResponse(
       throw OPE(
         'too much time has elapsed since the last End-User authentication',
         JWT_TIMESTAMP_CHECK,
-        { claims, now, tolerance },
+        { claims, now, tolerance, claim: 'auth_time' },
       )
     }
   }
@@ -5072,6 +5081,7 @@ async function validateHybridResponse(
     throw OPE('unexpected ID Token "nonce" claim value', JWT_CLAIM_COMPARISON, {
       expected: expectedNonce,
       claims,
+      claim: 'nonce',
     })
   }
 
@@ -5080,13 +5090,14 @@ async function validateHybridResponse(
       throw OPE(
         'ID Token "aud" (audience) claim includes additional untrusted audiences',
         JWT_CLAIM_COMPARISON,
-        { claims },
+        { claims, claim: 'aud' },
       )
     }
     if (claims.azp !== client.client_id) {
       throw OPE('unexpected ID Token "azp" (authorized party) claim value', JWT_CLAIM_COMPARISON, {
         expected: client.client_id,
         claims,
+        claim: 'azp',
       })
     }
   }
@@ -5100,8 +5111,9 @@ async function validateHybridResponse(
   if ((await idTokenHashMatches(code, claims.c_hash, key!, header, 'c_hash')) !== true) {
     throw OPE('invalid ID Token "c_hash" (code hash) claim value', JWT_CLAIM_COMPARISON, {
       code,
-      c_hash: claims.c_hash,
       alg: header.alg,
+      claim: 'c_hash',
+      claims,
     })
   }
 
@@ -5114,8 +5126,9 @@ async function validateHybridResponse(
     if ((await idTokenHashMatches(state, claims.s_hash, key!, header, 's_hash')) !== true) {
       throw OPE('invalid ID Token "s_hash" (state hash) claim value', JWT_CLAIM_COMPARISON, {
         state,
-        s_hash: claims.s_hash,
         alg: header.alg,
+        claim: 's_hash',
+        claims,
       })
     }
   }
@@ -5739,6 +5752,7 @@ async function validateDPoP(
     throw OPE('DPoP Proof iat is not recent enough', JWT_TIMESTAMP_CHECK, {
       now,
       claims: proof.claims,
+      claim: 'iat',
     }) // TODO: add a symbol skip here for when the RS uses nonces
   }
 
@@ -5746,6 +5760,7 @@ async function validateDPoP(
     throw OPE('DPoP Proof htm mismatch', JWT_CLAIM_COMPARISON, {
       expected: request.method,
       claims: proof.claims,
+      claim: 'htm',
     })
   }
 
@@ -5756,6 +5771,7 @@ async function validateDPoP(
     throw OPE('DPoP Proof htu mismatch', JWT_CLAIM_COMPARISON, {
       expected: normalizeHtu(request.url),
       claims: proof.claims,
+      claim: 'htu',
     })
   }
 
@@ -5763,7 +5779,11 @@ async function validateDPoP(
     const expected = b64u(await crypto.subtle.digest('SHA-256', buf(accessToken)))
 
     if (proof.claims.ath !== expected) {
-      throw OPE('DPoP Proof ath mismatch', JWT_CLAIM_COMPARISON, { expected, claims: proof.claims })
+      throw OPE('DPoP Proof ath mismatch', JWT_CLAIM_COMPARISON, {
+        expected,
+        claims: proof.claims,
+        claim: 'ath',
+      })
     }
   }
 
@@ -5801,6 +5821,7 @@ async function validateDPoP(
       throw OPE('JWT Access Token confirmation mismatch', JWT_CLAIM_COMPARISON, {
         expected,
         claims: accessTokenClaims,
+        claim: 'cnf.jkt',
       })
     }
   }
