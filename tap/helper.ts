@@ -4,18 +4,13 @@ import * as jose from 'jose'
 export function isDpopNonceError(t: Assert, err: unknown) {
   if (err instanceof lib.ResponseBodyError) {
     t.true(err.response.bodyUsed)
-    return err.error === 'use_dpop_nonce'
   }
 
   if (err instanceof lib.WWWAuthenticateChallengeError) {
     t.false(err.response.bodyUsed)
-    const { 0: challenge, length } = err.cause
-    return (
-      length === 1 && challenge.scheme === 'dpop' && challenge.parameters.error === 'use_dpop_nonce'
-    )
   }
 
-  return false
+  return lib.isDPoPNonceError(err)
 }
 
 export function random() {

@@ -337,11 +337,7 @@ export const flow = (options?: MacroOptions) => {
         try {
           result = await oauth.processPushedAuthorizationResponse(as, client, par)
         } catch (err) {
-          if (
-            DPoPKeyPair &&
-            err instanceof oauth.ResponseBodyError &&
-            err.error === 'use_dpop_nonce'
-          ) {
+          if (DPoPKeyPair && oauth.isDPoPNonceError(err)) {
             t.log('error', inspect(err, { depth: Infinity }))
             t.log('retrying with a newly obtained dpop nonce')
             par = await request()
@@ -413,11 +409,7 @@ export const flow = (options?: MacroOptions) => {
             result = await oauth.processAuthorizationCodeResponse(as, client, response)
           }
         } catch (err) {
-          if (
-            DPoPKeyPair &&
-            err instanceof oauth.ResponseBodyError &&
-            err.error === 'use_dpop_nonce'
-          ) {
+          if (DPoPKeyPair && oauth.isDPoPNonceError(err)) {
             t.log('error', inspect(err, { depth: Infinity }))
             t.log('retrying with a newly obtained dpop nonce')
             response = await request()
@@ -461,18 +453,9 @@ export const flow = (options?: MacroOptions) => {
           t.log('userinfo endpoint response', { ...result })
         } catch (err) {
           t.log('error', inspect(err, { depth: Infinity }))
-          if (DPoPKeyPair && err instanceof oauth.WWWAuthenticateChallengeError) {
-            const { 0: challenge, length } = err.cause
-            if (
-              length === 1 &&
-              challenge.scheme === 'dpop' &&
-              challenge.parameters.error === 'use_dpop_nonce'
-            ) {
-              t.log('retrying with a newly obtained dpop nonce')
-              response = await request()
-            } else {
-              throw err
-            }
+          if (DPoPKeyPair && oauth.isDPoPNonceError(err)) {
+            t.log('retrying with a newly obtained dpop nonce')
+            response = await request()
           } else {
             throw err
           }
@@ -501,18 +484,9 @@ export const flow = (options?: MacroOptions) => {
           accounts = await request()
         } catch (err) {
           t.log('error', inspect(err, { depth: Infinity }))
-          if (DPoPKeyPair && err instanceof oauth.WWWAuthenticateChallengeError) {
-            const { 0: challenge, length } = err.cause
-            if (
-              length === 1 &&
-              challenge.scheme === 'dpop' &&
-              challenge.parameters.error === 'use_dpop_nonce'
-            ) {
-              t.log('retrying with a newly obtained dpop nonce')
-              accounts = await request()
-            } else {
-              throw err
-            }
+          if (DPoPKeyPair && oauth.isDPoPNonceError(err)) {
+            t.log('retrying with a newly obtained dpop nonce')
+            accounts = await request()
           } else {
             throw err
           }

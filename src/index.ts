@@ -2157,12 +2157,35 @@ class DPoPHandler implements DPoPHandle {
 }
 
 /**
+ * Used to determine if a rejected error indicates the need to retry the request due to an
+ * expired/missing nonce.
+ *
+ * @group DPoP
+ */
+export function isDPoPNonceError(err: unknown): boolean {
+  if (err instanceof WWWAuthenticateChallengeError) {
+    const { 0: challenge, length } = err.cause
+    return (
+      length === 1 && challenge.scheme === 'dpop' && challenge.parameters.error === 'use_dpop_nonce'
+    )
+  }
+
+  if (err instanceof ResponseBodyError) {
+    return err.error === 'use_dpop_nonce'
+  }
+
+  return false
+}
+
+/**
  * Returns a wrapper / handle around a {@link !CryptoKeyPair} that is used for negotiating and
  * proving proof-of-possession to sender-constrain OAuth 2.0 tokens via DPoP at the Authorization
  * Server and Resource Server.
  *
- * This wrapper / handle also keeps track of server-issued nonces, allowing this module to
- * automatically retry requests with a fresh nonce when the server indicates the need to use one.
+ * This wrapper / handle also keeps track of server-issued nonces, allowing requests to be retried
+ * with a fresh nonce when the server indicates the need to use one. {@link isDPoPNonceError} can be
+ * used to determine if a rejected error indicates the need to retry the request due to an
+ * expired/missing nonce.
  *
  * @example
  *

@@ -81,12 +81,10 @@ let request_uri: string
   const processPushedAuthorizationResponse = () =>
     oauth.processPushedAuthorizationResponse(as, client, response)
   let result = await processPushedAuthorizationResponse().catch(async (err) => {
-    if (err instanceof oauth.ResponseBodyError) {
-      if (result.error === 'use_dpop_nonce') {
-        // the AS-signalled nonce is now cached, retrying
-        response = await pushedAuthorizationRequest()
-        return processPushedAuthorizationResponse()
-      }
+    if (oauth.isDPoPNonceError(err)) {
+      // the AS-signalled nonce is now cached, retrying
+      response = await pushedAuthorizationRequest()
+      return processPushedAuthorizationResponse()
     }
     throw err
   })
@@ -127,12 +125,10 @@ let access_token: string
     oauth.processAuthorizationCodeResponse(as, client, response, true)
 
   let result = await processAuthorizationCodeResponse().catch(async (err) => {
-    if (err instanceof oauth.ResponseBodyError) {
-      if (result.error === 'use_dpop_nonce') {
-        // the AS-signalled nonce is now cached, retrying
-        response = await authorizationCodeGrantRequest()
-        return processAuthorizationCodeResponse()
-      }
+    if (oauth.isDPoPNonceError(err)) {
+      // the AS-signalled nonce is now cached, retrying
+      response = await authorizationCodeGrantRequest()
+      return processAuthorizationCodeResponse()
     }
     throw err
   })
@@ -156,16 +152,9 @@ let access_token: string
       { DPoP },
     )
   let response = await protectedResourceRequest().catch((err) => {
-    if (err instanceof oauth.WWWAuthenticateChallengeError) {
-      const { 0: challenge, length } = err.cause
-      if (
-        length === 1 &&
-        challenge.scheme === 'dpop' &&
-        challenge.parameters.error === 'use_dpop_nonce'
-      ) {
-        // the AS-signalled nonce is now cached, retrying
-        return protectedResourceRequest()
-      }
+    if (oauth.isDPoPNonceError(err)) {
+      // the RS-signalled nonce is now cached, retrying
+      return protectedResourceRequest()
     }
     throw err
   })
