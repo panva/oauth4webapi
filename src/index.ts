@@ -3171,18 +3171,6 @@ const idTokenClaims = new WeakMap<TokenEndpointResponse, IDToken>()
 const jwtRefs = new WeakMap<Response, string>()
 
 /**
- * Returns ID Token claims validated during {@link processAuthorizationCodeResponse}. To optionally
- * validate its JWS Signature use {@link validateApplicationLevelSignature}
- *
- * @param ref Value previously resolved from {@link processAuthorizationCodeResponse}.
- *
- * @returns JWT Claims Set from an ID Token.
- *
- * @group Authorization Code Grant w/ OpenID Connect (OIDC)
- */
-export function getValidatedIdTokenClaims(ref: OpenIDTokenEndpointResponse): IDToken
-
-/**
  * Returns ID Token claims validated during {@link processRefreshTokenResponse} or
  * {@link processDeviceCodeResponse}. To optionally validate its JWS Signature use
  * {@link validateApplicationLevelSignature}
@@ -3192,10 +3180,7 @@ export function getValidatedIdTokenClaims(ref: OpenIDTokenEndpointResponse): IDT
  *
  * @returns JWT Claims Set from an ID Token, or undefined if there is no ID Token in `ref`.
  */
-export function getValidatedIdTokenClaims(ref: TokenEndpointResponse): IDToken | undefined
-export function getValidatedIdTokenClaims(
-  ref: OpenIDTokenEndpointResponse | TokenEndpointResponse,
-): IDToken | undefined {
+export function getValidatedIdTokenClaims(ref: TokenEndpointResponse): IDToken | undefined {
   if (!ref.id_token) {
     return undefined
   }
@@ -3674,21 +3659,6 @@ export interface TokenEndpointResponse {
   readonly [parameter: string]: JsonValue | undefined
 }
 
-export interface OpenIDTokenEndpointResponse {
-  readonly access_token: string
-  readonly expires_in?: number
-  readonly id_token: string
-  readonly refresh_token?: string
-  readonly scope?: string
-  readonly authorization_details?: AuthorizationDetails[]
-  /**
-   * NOTE: because the value is case insensitive it is always returned lowercased
-   */
-  readonly token_type: 'bearer' | 'dpop' | Lowercase<string>
-
-  readonly [parameter: string]: JsonValue | undefined
-}
-
 /**
  * Use this as a value to {@link processAuthorizationCodeResponse} `oidc.expectedNonce` parameter to
  * indicate no `nonce` ID Token claim value is expected, i.e. no `nonce` parameter value was sent
@@ -3720,54 +3690,6 @@ export interface ProcessAuthorizationCodeResponseOptions extends JWEDecryptOptio
   requireIdToken?: boolean
 }
 
-export interface ExpectedNonce {
-  /**
-   * Expected ID Token `nonce` claim value.
-   */
-  expectedNonce: string
-}
-
-export interface ExpectedMaxAge {
-  /**
-   * ID Token {@link IDToken.auth_time `auth_time`} claim value will be checked to be present and
-   * conform to the `maxAge` value. Use of this option is required if you sent a `max_age` parameter
-   * in an authorization request.
-   */
-  maxAge: number
-}
-
-export interface RequireIdToken {
-  /**
-   * This requires {@link TokenEndpointResponse.id_token} to be present
-   */
-  requireIdToken: true
-}
-
-/**
- * Validates Authorization Code Grant {@link !Response} instance to be one coming from the
- * {@link AuthorizationServer.token_endpoint `as.token_endpoint`}.
- *
- * @param as Authorization Server Metadata.
- * @param client Client Metadata.
- * @param response Resolved value from {@link authorizationCodeGrantRequest}.
- *
- * @returns Resolves with an object representing the parsed successful response. OAuth 2.0 protocol
- *   style errors are rejected using {@link ResponseBodyError}. WWW-Authenticate HTTP Header
- *   challenges are rejected with {@link WWWAuthenticateChallengeError}.
- *
- * @group Authorization Code Grant
- * @group Authorization Code Grant w/ OpenID Connect (OIDC)
- *
- * @see [RFC 6749 - The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html#section-4.1)
- * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#CodeFlowAuth)
- */
-export async function processAuthorizationCodeResponse(
-  as: AuthorizationServer,
-  client: Client,
-  response: Response,
-  options: ProcessAuthorizationCodeResponseOptions &
-    (ExpectedNonce | ExpectedMaxAge | RequireIdToken),
-): Promise<OpenIDTokenEndpointResponse>
 /**
  * Validates Authorization Code Grant {@link !Response} instance to be one coming from the
  * {@link AuthorizationServer.token_endpoint `as.token_endpoint`}.
@@ -3825,7 +3747,7 @@ async function processAuthorizationCodeOpenIDResponse(
   expectedNonce: string | typeof expectNoNonce | undefined,
   maxAge: number | typeof skipAuthTimeCheck | undefined,
   options: JWEDecryptOptions | undefined,
-): Promise<OpenIDTokenEndpointResponse> {
+): Promise<TokenEndpointResponse> {
   const additionalRequiredClaims: (keyof typeof jwtClaimNames)[] = []
 
   switch (expectedNonce) {
@@ -3892,7 +3814,7 @@ async function processAuthorizationCodeOpenIDResponse(
     })
   }
 
-  return result as OpenIDTokenEndpointResponse
+  return result
 }
 
 async function processAuthorizationCodeOAuth2Response(

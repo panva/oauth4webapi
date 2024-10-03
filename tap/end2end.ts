@@ -219,7 +219,7 @@ export default (QUnit: QUnit) => {
           t.ok(0, 'expected a refresh token to be returned')
           throw new Error()
         }
-        const { sub } = lib.getValidatedIdTokenClaims(result)
+        const { sub } = lib.getValidatedIdTokenClaims(result)!
         await lib.validateApplicationLevelSignature(as, response, {
           [lib.allowInsecureRequests]: true,
         })
