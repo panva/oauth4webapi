@@ -8,5 +8,5 @@ Support from the community to continue maintaining and improving this module is 
 
 • `const` **skipAuthTimeCheck**: unique `symbol`
 
-Use this as a value to [processAuthorizationCodeOpenIDResponse](../functions/processAuthorizationCodeOpenIDResponse.md) `maxAge` parameter to
+Use this as a value to [processAuthorizationCodeResponse](../functions/processAuthorizationCodeResponse.md) `oidc.maxAge` parameter to
 indicate no `auth_time` ID Token claim value check should be performed.

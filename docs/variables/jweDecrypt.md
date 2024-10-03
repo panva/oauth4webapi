@@ -22,30 +22,31 @@ Use to add support for decrypting JWEs the client encounters, namely
 Decrypting JARM responses
 
 ```ts
-import * as oauth from 'oauth4webapi'
 import * as jose from 'jose'
 
-// Prerequisites
 let as!: oauth.AuthorizationServer
-let key!: CryptoKey
+let client!: oauth.Client
+let key!: oauth.CryptoKey
 let alg!: string
 let enc!: string
+let currentUrl!: URL
+let state!: string | undefined
 
-const decoder = new TextDecoder()
-
-const client: oauth.Client = {
-  client_id: 'urn:example:client_id',
-  async [oauth.jweDecrypt](jwe) {
-    const { plaintext } = await compactDecrypt(jwe, key, {
+let decoder = new TextDecoder()
+let jweDecrypt: oauth.JweDecryptFunction = async (jwe) => {
+  const { plaintext } = await jose
+    .compactDecrypt(jwe, key, {
       keyManagementAlgorithms: [alg],
       contentEncryptionAlgorithms: [enc],
-    }).catch((cause) => {
+    })
+    .catch((cause: unknown) => {
       throw new oauth.OperationProcessingError('decryption failed', { cause })
     })
 
-    return decoder.decode(plaintext)
-  },
+  return decoder.decode(plaintext)
 }
 
-const params = await oauth.validateJwtAuthResponse(as, client, currentUrl)
+let params = await oauth.validateJwtAuthResponse(as, client, currentUrl, state, {
+  [oauth.jweDecrypt]: jweDecrypt,
+})
 ```

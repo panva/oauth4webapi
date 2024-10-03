@@ -16,11 +16,15 @@ Support from the community to continue maintaining and improving this module is 
 
 • `readonly` **device\_code**: `string`
 
+The device verification code
+
 ***
 
 ### expires\_in
 
 • `readonly` **expires\_in**: `number`
+
+The lifetime in seconds of the "device_code" and "user_code"
 
 ***
 
@@ -28,11 +32,16 @@ Support from the community to continue maintaining and improving this module is 
 
 • `readonly` **user\_code**: `string`
 
+The end-user verification code
+
 ***
 
 ### verification\_uri
 
 • `readonly` **verification\_uri**: `string`
+
+The end-user verification URI on the authorization server. The URI should be short and easy to
+remember as end users will be asked to manually type it into their user agent.
 
 ***
 
@@ -40,8 +49,14 @@ Support from the community to continue maintaining and improving this module is 
 
 • `readonly` `optional` **interval**: `number`
 
+The minimum amount of time in seconds that the client should wait between polling requests to
+the token endpoint.
+
 ***
 
 ### verification\_uri\_complete?
 
 • `readonly` `optional` **verification\_uri\_complete**: `string`
+
+A verification URI that includes the "user_code" (or other information with the same function
+as the "user_code"), which is designed for non-textual transmission

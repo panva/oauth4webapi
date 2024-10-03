@@ -6,7 +6,7 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
-▸ **validateDetachedSignatureResponse**(`as`, `client`, `parameters`, `expectedNonce`, `expectedState`?, `maxAge`?, `options`?): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`URLSearchParams`](https://developer.mozilla.org/docs/Web/API/URLSearchParams) \| [`OAuth2Error`](../interfaces/OAuth2Error.md)\>
+▸ **validateDetachedSignatureResponse**(`as`, `client`, `parameters`, `expectedNonce`, `expectedState`?, `maxAge`?, `options`?): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`URLSearchParams`](https://developer.mozilla.org/docs/Web/API/URLSearchParams)\>
 
 Same as [validateAuthResponse](validateAuthResponse.md) but for FAPI 1.0 Advanced Detached Signature authorization
 responses.
@@ -21,13 +21,14 @@ responses.
 | `expectedNonce` | `string` | Expected ID Token `nonce` claim value. |
 | `expectedState`? | `string` \| *typeof* [`expectNoState`](../variables/expectNoState.md) | Expected `state` parameter value. Default is [expectNoState](../variables/expectNoState.md). |
 | `maxAge`? | `number` \| *typeof* [`skipAuthTimeCheck`](../variables/skipAuthTimeCheck.md) | ID Token [`auth_time`](../interfaces/IDToken.md#auth_time) claim value will be checked to be present and conform to the `maxAge` value. Use of this option is required if you sent a `max_age` parameter in an authorization request. Default is [`client.default_max_age`](../interfaces/Client.md#default_max_age) and falls back to [skipAuthTimeCheck](../variables/skipAuthTimeCheck.md). |
-| `options`? | [`ValidateSignatureOptions`](../interfaces/ValidateSignatureOptions.md) | - |
+| `options`? | [`ValidateSignatureOptions`](../interfaces/ValidateSignatureOptions.md) & [`JWEDecryptOptions`](../interfaces/JWEDecryptOptions.md) | - |
 
 ## Returns
 
-[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`URLSearchParams`](https://developer.mozilla.org/docs/Web/API/URLSearchParams) \| [`OAuth2Error`](../interfaces/OAuth2Error.md)\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`URLSearchParams`](https://developer.mozilla.org/docs/Web/API/URLSearchParams)\>
 
-Validated Authorization Response parameters or Authorization Error Response.
+Validated Authorization Response parameters. Authorization Error Responses are rejected
+  using [AuthorizationResponseError](../classes/AuthorizationResponseError.md).
 
 ## See
 

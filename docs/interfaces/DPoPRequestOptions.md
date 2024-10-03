@@ -10,6 +10,6 @@ Support from the community to continue maintaining and improving this module is 
 
 ### DPoP?
 
-• `optional` **DPoP**: [`DPoPOptions`](DPoPOptions.md)
+• `optional` **DPoP**: [`DPoPHandle`](DPoPHandle.md)
 
-DPoP-related options.
+DPoP handle, obtained from [DPoP](../functions/DPoP.md)

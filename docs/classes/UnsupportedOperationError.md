@@ -6,18 +6,8 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
-## Constructors
+## Properties
 
-### new UnsupportedOperationError()
+### code
 
-▸ **new UnsupportedOperationError**(`message`?): [`UnsupportedOperationError`](UnsupportedOperationError.md)
-
-#### Parameters
-
-| Parameter | Type |
-| ------ | ------ |
-| `message`? | `string` |
-
-#### Returns
-
-[`UnsupportedOperationError`](UnsupportedOperationError.md)
+• **code**: `string`

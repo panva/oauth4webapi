@@ -17,19 +17,7 @@ added as a `kid` JOSE Header Parameter.
 
 An asymmetric private CryptoKey.
 
-Its algorithm must be compatible with a supported [JWS `alg` Algorithm](../type-aliases/JWSAlgorithm.md).
-
-***
-
-### \[modifyAssertion\]?
-
-• `optional` **\[modifyAssertion\]**: [`ModifyAssertionFunction`](ModifyAssertionFunction.md)
-
-Use to modify the JWT signed by this key right before it is signed.
-
-#### See
-
-[modifyAssertion](../variables/modifyAssertion.md)
+Its algorithm must be compatible with a supported [JWS Algorithm](../type-aliases/JWSAlgorithm.md).
 
 ***
 

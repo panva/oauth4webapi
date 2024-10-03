@@ -6,7 +6,7 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
-▸ **validateJwtAuthResponse**(`as`, `client`, `parameters`, `expectedState`?, `options`?): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`URLSearchParams`](https://developer.mozilla.org/docs/Web/API/URLSearchParams) \| [`OAuth2Error`](../interfaces/OAuth2Error.md)\>
+▸ **validateJwtAuthResponse**(`as`, `client`, `parameters`, `expectedState`?, `options`?): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`URLSearchParams`](https://developer.mozilla.org/docs/Web/API/URLSearchParams)\>
 
 Same as [validateAuthResponse](validateAuthResponse.md) but for signed JARM responses.
 
@@ -18,13 +18,14 @@ Same as [validateAuthResponse](validateAuthResponse.md) but for signed JARM resp
 | `client` | [`Client`](../interfaces/Client.md) | Client Metadata. |
 | `parameters` | [`URLSearchParams`](https://developer.mozilla.org/docs/Web/API/URLSearchParams) \| [`URL`](https://developer.mozilla.org/docs/Web/API/URL) | JARM authorization response. |
 | `expectedState`? | `string` \| *typeof* [`expectNoState`](../variables/expectNoState.md) \| *typeof* [`skipStateCheck`](../variables/skipStateCheck.md) | Expected `state` parameter value. Default is [expectNoState](../variables/expectNoState.md). |
-| `options`? | [`ValidateSignatureOptions`](../interfaces/ValidateSignatureOptions.md) | - |
+| `options`? | [`ValidateSignatureOptions`](../interfaces/ValidateSignatureOptions.md) & [`JWEDecryptOptions`](../interfaces/JWEDecryptOptions.md) | - |
 
 ## Returns
 
-[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`URLSearchParams`](https://developer.mozilla.org/docs/Web/API/URLSearchParams) \| [`OAuth2Error`](../interfaces/OAuth2Error.md)\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`URLSearchParams`](https://developer.mozilla.org/docs/Web/API/URLSearchParams)\>
 
-Validated Authorization Response parameters or Authorization Error Response.
+Validated Authorization Response parameters. Authorization Error Responses are rejected
+  using [AuthorizationResponseError](../classes/AuthorizationResponseError.md).
 
 ## See
 

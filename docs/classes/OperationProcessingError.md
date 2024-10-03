@@ -6,20 +6,8 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
-## Constructors
+## Properties
 
-### new OperationProcessingError()
+### code?
 
-▸ **new OperationProcessingError**(`message`, `options`?): [`OperationProcessingError`](OperationProcessingError.md)
-
-#### Parameters
-
-| Parameter | Type |
-| ------ | ------ |
-| `message` | `string` |
-| `options`? | `object` |
-| `options.cause`? | `unknown` |
-
-#### Returns
-
-[`OperationProcessingError`](OperationProcessingError.md)
+• `optional` **code**: `string`

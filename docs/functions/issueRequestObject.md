@@ -6,7 +6,7 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
-▸ **issueRequestObject**(`as`, `client`, `parameters`, `privateKey`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`string`\>
+▸ **issueRequestObject**(`as`, `client`, `parameters`, `privateKey`, `options`?): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`string`\>
 
 Generates a signed JWT-Secured Authorization Request (JAR).
 
@@ -18,6 +18,7 @@ Generates a signed JWT-Secured Authorization Request (JAR).
 | `client` | [`Client`](../interfaces/Client.md) | Client Metadata. |
 | `parameters` | [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `string`\> \| [`URLSearchParams`](https://developer.mozilla.org/docs/Web/API/URLSearchParams) \| `string`[][] | - |
 | `privateKey` | [`CryptoKey`](https://developer.mozilla.org/docs/Web/API/CryptoKey) \| [`PrivateKey`](../interfaces/PrivateKey.md) | Private key to sign the Request Object with. |
+| `options`? | [`ModifyAssertionOptions`](../interfaces/ModifyAssertionOptions.md) | - |
 
 ## Returns
 

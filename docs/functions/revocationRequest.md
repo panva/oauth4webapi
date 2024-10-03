@@ -6,7 +6,7 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
-▸ **revocationRequest**(`as`, `client`, `token`, `options`?): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Response`](https://developer.mozilla.org/docs/Web/API/Response)\>
+▸ **revocationRequest**(`as`, `client`, `clientAuthentication`, `token`, `options`?): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Response`](https://developer.mozilla.org/docs/Web/API/Response)\>
 
 Performs a Revocation Request at the
 [`as.revocation_endpoint`](../interfaces/AuthorizationServer.md#revocation_endpoint).
@@ -17,6 +17,7 @@ Performs a Revocation Request at the
 | ------ | ------ | ------ |
 | `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata. |
 | `client` | [`Client`](../interfaces/Client.md) | Client Metadata. |
+| `clientAuthentication` | [`ClientAuth`](../type-aliases/ClientAuth.md) | Client Authentication Method. |
 | `token` | `string` | Token to revoke. You can provide the `token_type_hint` parameter via [options](../interfaces/RevocationRequestOptions.md#additionalparameters). |
 | `options`? | [`RevocationRequestOptions`](../interfaces/RevocationRequestOptions.md) | - |
 

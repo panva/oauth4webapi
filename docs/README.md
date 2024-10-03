@@ -4,20 +4,23 @@
 
 Support from the community to continue maintaining and improving this module is welcome. If you find the module useful, please consider supporting the project by [becoming a sponsor](https://github.com/sponsors/panva).
 
+## Functions
+
+- [getValidatedIdTokenClaims](functions/getValidatedIdTokenClaims.md)
+
 ## Accessing Protected Resources
 
-- [parseWwwAuthenticateChallenges](functions/parseWwwAuthenticateChallenges.md)
+- [processUserInfoResponse](functions/processUserInfoResponse.md)
 - [protectedResourceRequest](functions/protectedResourceRequest.md)
+- [userInfoRequest](functions/userInfoRequest.md)
 
 ## Authorization Code Grant
 
 - [authorizationCodeGrantRequest](functions/authorizationCodeGrantRequest.md)
 - [calculatePKCECodeChallenge](functions/calculatePKCECodeChallenge.md)
 - [generateRandomCodeVerifier](functions/generateRandomCodeVerifier.md)
-- [isOAuth2Error](functions/isOAuth2Error.md)
 - [issueRequestObject](functions/issueRequestObject.md)
-- [parseWwwAuthenticateChallenges](functions/parseWwwAuthenticateChallenges.md)
-- [processAuthorizationCodeOAuth2Response](functions/processAuthorizationCodeOAuth2Response.md)
+- [processAuthorizationCodeResponse](functions/processAuthorizationCodeResponse.md)
 - [validateAuthResponse](functions/validateAuthResponse.md)
 - [validateJwtAuthResponse](functions/validateJwtAuthResponse.md)
 
@@ -26,48 +29,85 @@ Support from the community to continue maintaining and improving this module is 
 - [authorizationCodeGrantRequest](functions/authorizationCodeGrantRequest.md)
 - [calculatePKCECodeChallenge](functions/calculatePKCECodeChallenge.md)
 - [generateRandomCodeVerifier](functions/generateRandomCodeVerifier.md)
-- [getValidatedIdTokenClaims](functions/getValidatedIdTokenClaims.md)
-- [isOAuth2Error](functions/isOAuth2Error.md)
 - [issueRequestObject](functions/issueRequestObject.md)
-- [parseWwwAuthenticateChallenges](functions/parseWwwAuthenticateChallenges.md)
-- [processAuthorizationCodeOpenIDResponse](functions/processAuthorizationCodeOpenIDResponse.md)
+- [processAuthorizationCodeResponse](functions/processAuthorizationCodeResponse.md)
 - [processUserInfoResponse](functions/processUserInfoResponse.md)
 - [userInfoRequest](functions/userInfoRequest.md)
+- [validateApplicationLevelSignature](functions/validateApplicationLevelSignature.md)
 - [validateAuthResponse](functions/validateAuthResponse.md)
-- [validateIdTokenSignature](functions/validateIdTokenSignature.md)
+- [validateCodeIdTokenResponse](functions/validateCodeIdTokenResponse.md)
 - [validateJwtAuthResponse](functions/validateJwtAuthResponse.md)
-- [validateJwtUserInfoSignature](functions/validateJwtUserInfoSignature.md)
 
 ## Authorization Server Metadata
 
 - [discoveryRequest](functions/discoveryRequest.md)
 - [processDiscoveryResponse](functions/processDiscoveryResponse.md)
 
+## Client Authentication
+
+- [ClientSecretBasic](functions/ClientSecretBasic.md)
+- [ClientSecretJwt](functions/ClientSecretJwt.md)
+- [ClientSecretPost](functions/ClientSecretPost.md)
+- [None](functions/None.md)
+- [PrivateKeyJwt](functions/PrivateKeyJwt.md)
+- [TlsClientAuth](functions/TlsClientAuth.md)
+
 ## Client Credentials Grant
 
 - [clientCredentialsGrantRequest](functions/clientCredentialsGrantRequest.md)
-- [isOAuth2Error](functions/isOAuth2Error.md)
-- [parseWwwAuthenticateChallenges](functions/parseWwwAuthenticateChallenges.md)
 - [processClientCredentialsResponse](functions/processClientCredentialsResponse.md)
+
+## DPoP
+
+- [DPoP](functions/DPoP.md)
+- [isDPoPNonceError](functions/isDPoPNonceError.md)
 
 ## Device Authorization Grant
 
 - [deviceAuthorizationRequest](functions/deviceAuthorizationRequest.md)
 - [deviceCodeGrantRequest](functions/deviceCodeGrantRequest.md)
-- [isOAuth2Error](functions/isOAuth2Error.md)
-- [parseWwwAuthenticateChallenges](functions/parseWwwAuthenticateChallenges.md)
 - [processDeviceAuthorizationResponse](functions/processDeviceAuthorizationResponse.md)
 - [processDeviceCodeResponse](functions/processDeviceCodeResponse.md)
 
+## Error Codes
+
+- [AUTHORIZATION\_RESPONSE\_ERROR](variables/AUTHORIZATION_RESPONSE_ERROR.md)
+- [HTTP\_REQUEST\_FORBIDDEN](variables/HTTP_REQUEST_FORBIDDEN.md)
+- [INVALID\_REQUEST](variables/INVALID_REQUEST.md)
+- [INVALID\_RESPONSE](variables/INVALID_RESPONSE.md)
+- [INVALID\_SERVER\_METADATA](variables/INVALID_SERVER_METADATA.md)
+- [JSON\_ATTRIBUTE\_COMPARISON](variables/JSON_ATTRIBUTE_COMPARISON.md)
+- [JWT\_CLAIM\_COMPARISON](variables/JWT_CLAIM_COMPARISON.md)
+- [JWT\_TIMESTAMP\_CHECK](variables/JWT_TIMESTAMP_CHECK.md)
+- [JWT\_USERINFO\_EXPECTED](variables/JWT_USERINFO_EXPECTED.md)
+- [KEY\_SELECTION](variables/KEY_SELECTION.md)
+- [MISSING\_SERVER\_METADATA](variables/MISSING_SERVER_METADATA.md)
+- [PARSE\_ERROR](variables/PARSE_ERROR.md)
+- [REQUEST\_PROTOCOL\_FORBIDDEN](variables/REQUEST_PROTOCOL_FORBIDDEN.md)
+- [RESPONSE\_BODY\_ERROR](variables/RESPONSE_BODY_ERROR.md)
+- [RESPONSE\_IS\_NOT\_CONFORM](variables/RESPONSE_IS_NOT_CONFORM.md)
+- [RESPONSE\_IS\_NOT\_JSON](variables/RESPONSE_IS_NOT_JSON.md)
+- [UNSUPPORTED\_OPERATION](variables/UNSUPPORTED_OPERATION.md)
+- [WWW\_AUTHENTICATE\_CHALLENGE](variables/WWW_AUTHENTICATE_CHALLENGE.md)
+
 ## Errors
 
+- [AuthorizationResponseError](classes/AuthorizationResponseError.md)
 - [OperationProcessingError](classes/OperationProcessingError.md)
+- [ResponseBodyError](classes/ResponseBodyError.md)
 - [UnsupportedOperationError](classes/UnsupportedOperationError.md)
+- [WWWAuthenticateChallengeError](classes/WWWAuthenticateChallengeError.md)
 
 ## FAPI 1.0 Advanced
 
+- [validateApplicationLevelSignature](functions/validateApplicationLevelSignature.md)
 - [validateDetachedSignatureResponse](functions/validateDetachedSignatureResponse.md)
-- [validateIdTokenSignature](functions/validateIdTokenSignature.md)
+- [validateJwtAuthResponse](functions/validateJwtAuthResponse.md)
+
+## FAPI 2.0 Message Signing
+
+- [validateApplicationLevelSignature](functions/validateApplicationLevelSignature.md)
+- [validateJwtAuthResponse](functions/validateJwtAuthResponse.md)
 
 ## JWT Access Tokens
 
@@ -76,8 +116,7 @@ Support from the community to continue maintaining and improving this module is 
 ## JWT Bearer Token Grant Type
 
 - [genericTokenEndpointRequest](functions/genericTokenEndpointRequest.md)
-- [isOAuth2Error](functions/isOAuth2Error.md)
-- [parseWwwAuthenticateChallenges](functions/parseWwwAuthenticateChallenges.md)
+- [processGenericTokenEndpointResponse](functions/processGenericTokenEndpointResponse.md)
 
 ## JWT Secured Authorization Response Mode for OAuth 2.0 (JARM)
 
@@ -96,7 +135,7 @@ Support from the community to continue maintaining and improving this module is 
 
 - [processUserInfoResponse](functions/processUserInfoResponse.md)
 - [userInfoRequest](functions/userInfoRequest.md)
-- [validateJwtUserInfoSignature](functions/validateJwtUserInfoSignature.md)
+- [validateApplicationLevelSignature](functions/validateApplicationLevelSignature.md)
 
 ## Proof Key for Code Exchange (PKCE)
 
@@ -105,42 +144,32 @@ Support from the community to continue maintaining and improving this module is 
 
 ## Pushed Authorization Requests (PAR)
 
-- [isOAuth2Error](functions/isOAuth2Error.md)
-- [parseWwwAuthenticateChallenges](functions/parseWwwAuthenticateChallenges.md)
 - [processPushedAuthorizationResponse](functions/processPushedAuthorizationResponse.md)
 - [pushedAuthorizationRequest](functions/pushedAuthorizationRequest.md)
 
 ## Refreshing an Access Token
 
-- [isOAuth2Error](functions/isOAuth2Error.md)
-- [parseWwwAuthenticateChallenges](functions/parseWwwAuthenticateChallenges.md)
 - [processRefreshTokenResponse](functions/processRefreshTokenResponse.md)
 - [refreshTokenGrantRequest](functions/refreshTokenGrantRequest.md)
 
 ## SAML 2.0 Bearer Assertion Grant Type
 
 - [genericTokenEndpointRequest](functions/genericTokenEndpointRequest.md)
-- [isOAuth2Error](functions/isOAuth2Error.md)
-- [parseWwwAuthenticateChallenges](functions/parseWwwAuthenticateChallenges.md)
+- [processGenericTokenEndpointResponse](functions/processGenericTokenEndpointResponse.md)
 
 ## Token Exchange Grant Type
 
 - [genericTokenEndpointRequest](functions/genericTokenEndpointRequest.md)
-- [isOAuth2Error](functions/isOAuth2Error.md)
-- [parseWwwAuthenticateChallenges](functions/parseWwwAuthenticateChallenges.md)
+- [processGenericTokenEndpointResponse](functions/processGenericTokenEndpointResponse.md)
 
 ## Token Introspection
 
 - [introspectionRequest](functions/introspectionRequest.md)
-- [isOAuth2Error](functions/isOAuth2Error.md)
-- [parseWwwAuthenticateChallenges](functions/parseWwwAuthenticateChallenges.md)
 - [processIntrospectionResponse](functions/processIntrospectionResponse.md)
-- [validateJwtIntrospectionSignature](functions/validateJwtIntrospectionSignature.md)
+- [validateApplicationLevelSignature](functions/validateApplicationLevelSignature.md)
 
 ## Token Revocation
 
-- [isOAuth2Error](functions/isOAuth2Error.md)
-- [parseWwwAuthenticateChallenges](functions/parseWwwAuthenticateChallenges.md)
 - [processRevocationResponse](functions/processRevocationResponse.md)
 - [revocationRequest](functions/revocationRequest.md)
 
@@ -150,22 +179,19 @@ Support from the community to continue maintaining and improving this module is 
 - [generateRandomCodeVerifier](functions/generateRandomCodeVerifier.md)
 - [generateRandomNonce](functions/generateRandomNonce.md)
 - [generateRandomState](functions/generateRandomState.md)
-- [isOAuth2Error](functions/isOAuth2Error.md)
-- [parseWwwAuthenticateChallenges](functions/parseWwwAuthenticateChallenges.md)
 
 ## Interfaces
 
-- [AuthenticatedRequestOptions](interfaces/AuthenticatedRequestOptions.md)
 - [AuthorizationDetails](interfaces/AuthorizationDetails.md)
 - [AuthorizationServer](interfaces/AuthorizationServer.md)
 - [Client](interfaces/Client.md)
 - [ClientCredentialsGrantRequestOptions](interfaces/ClientCredentialsGrantRequestOptions.md)
-- [ClientCredentialsGrantResponse](interfaces/ClientCredentialsGrantResponse.md)
 - [ConfirmationClaims](interfaces/ConfirmationClaims.md)
+- [CryptoKeyPair](interfaces/CryptoKeyPair.md)
 - [DeviceAuthorizationRequestOptions](interfaces/DeviceAuthorizationRequestOptions.md)
 - [DeviceAuthorizationResponse](interfaces/DeviceAuthorizationResponse.md)
 - [DiscoveryRequestOptions](interfaces/DiscoveryRequestOptions.md)
-- [DPoPOptions](interfaces/DPoPOptions.md)
+- [DPoPHandle](interfaces/DPoPHandle.md)
 - [DPoPRequestOptions](interfaces/DPoPRequestOptions.md)
 - [ExportedJWKSCache](interfaces/ExportedJWKSCache.md)
 - [GenerateKeyPairOptions](interfaces/GenerateKeyPairOptions.md)
@@ -173,17 +199,17 @@ Support from the community to continue maintaining and improving this module is 
 - [IDToken](interfaces/IDToken.md)
 - [IntrospectionRequestOptions](interfaces/IntrospectionRequestOptions.md)
 - [IntrospectionResponse](interfaces/IntrospectionResponse.md)
-- [JweDecryptFunction](interfaces/JweDecryptFunction.md)
+- [JWEDecryptOptions](interfaces/JWEDecryptOptions.md)
 - [JWK](interfaces/JWK.md)
 - [JWKS](interfaces/JWKS.md)
 - [JWKSCacheOptions](interfaces/JWKSCacheOptions.md)
 - [JWTAccessTokenClaims](interfaces/JWTAccessTokenClaims.md)
 - [ModifyAssertionFunction](interfaces/ModifyAssertionFunction.md)
+- [ModifyAssertionOptions](interfaces/ModifyAssertionOptions.md)
 - [MTLSEndpointAliases](interfaces/MTLSEndpointAliases.md)
 - [OAuth2Error](interfaces/OAuth2Error.md)
-- [OAuth2TokenEndpointResponse](interfaces/OAuth2TokenEndpointResponse.md)
-- [OpenIDTokenEndpointResponse](interfaces/OpenIDTokenEndpointResponse.md)
 - [PrivateKey](interfaces/PrivateKey.md)
+- [ProcessAuthorizationCodeResponseOptions](interfaces/ProcessAuthorizationCodeResponseOptions.md)
 - [ProtectedResourceRequestOptions](interfaces/ProtectedResourceRequestOptions.md)
 - [PushedAuthorizationRequestOptions](interfaces/PushedAuthorizationRequestOptions.md)
 - [PushedAuthorizationResponse](interfaces/PushedAuthorizationResponse.md)
@@ -200,16 +226,19 @@ Support from the community to continue maintaining and improving this module is 
 
 ## Type Aliases
 
-- [ClientAuthenticationMethod](type-aliases/ClientAuthenticationMethod.md)
+- [ClientAuth](type-aliases/ClientAuth.md)
 - [JsonArray](type-aliases/JsonArray.md)
 - [JsonObject](type-aliases/JsonObject.md)
 - [JsonPrimitive](type-aliases/JsonPrimitive.md)
 - [JsonValue](type-aliases/JsonValue.md)
+- [JweDecryptFunction](type-aliases/JweDecryptFunction.md)
 - [JWKSCacheInput](type-aliases/JWKSCacheInput.md)
 - [JWSAlgorithm](type-aliases/JWSAlgorithm.md)
+- [ProtectedResourceRequestBody](type-aliases/ProtectedResourceRequestBody.md)
 
 ## Variables
 
+- [allowInsecureRequests](variables/allowInsecureRequests.md)
 - [clockSkew](variables/clockSkew.md)
 - [clockTolerance](variables/clockTolerance.md)
 - [customFetch](variables/customFetch.md)

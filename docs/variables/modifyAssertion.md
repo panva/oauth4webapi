@@ -14,42 +14,61 @@ changing fixed claims used by this library.
 
 ## Examples
 
-Changing Private Key JWT client assertion audience issued from an array to a string
+Changing Private Key JWT client assertion audience issued from a string to an array
 
 ```ts
-import * as oauth from 'oauth4webapi'
-
-// Prerequisites
 let as!: oauth.AuthorizationServer
 let client!: oauth.Client
 let parameters!: URLSearchParams
-let clientPrivateKey!: CryptoKey
+let key!: oauth.CryptoKey | oauth.PrivateKey
 
-const response = await oauth.pushedAuthorizationRequest(as, client, parameters, {
-  clientPrivateKey: {
-    key: clientPrivateKey,
-    [oauth.modifyAssertion](header, payload) {
-      payload.aud = as.issuer
-    },
+let clientAuth = oauth.PrivateKeyJwt(key, {
+  [oauth.modifyAssertion](header, payload) {
+    payload.aud = [as.issuer, as.token_endpoint!]
   },
 })
+
+let response = await oauth.pushedAuthorizationRequest(as, client, clientAuth, parameters)
 ```
 
 Changing Request Object issued by [issueRequestObject](../functions/issueRequestObject.md) to have an expiration of 5 minutes
 
 ```ts
-import * as oauth from 'oauth4webapi'
-
-// Prerequisites
 let as!: oauth.AuthorizationServer
 let client!: oauth.Client
 let parameters!: URLSearchParams
-let jarPrivateKey!: CryptoKey
+let key!: oauth.CryptoKey | oauth.PrivateKey
 
-const request = await oauth.issueRequestObject(as, client, parameters, {
-  key: jarPrivateKey,
+let request = await oauth.issueRequestObject(as, client, parameters, key, {
   [oauth.modifyAssertion](header, payload) {
     payload.exp = <number>payload.iat + 300
   },
 })
+```
+
+Changing the `alg: "Ed25519"` back to `alg: "EdDSA"`
+
+```ts
+let as!: oauth.AuthorizationServer
+let client!: oauth.Client
+let parameters!: URLSearchParams
+let key!: oauth.CryptoKey | oauth.PrivateKey
+let keyPair!: oauth.CryptoKeyPair
+
+let remapEd25519: oauth.ModifyAssertionOptions = {
+  [oauth.modifyAssertion]: (header) => {
+    if (header.alg === 'Ed25519') {
+      header.alg = 'EdDSA'
+    }
+  },
+}
+
+// For JAR
+oauth.issueRequestObject(as, client, parameters, key, remapEd25519)
+
+// For Private Key JWT
+oauth.PrivateKeyJwt(key, remapEd25519)
+
+// For DPoP
+oauth.DPoP(client, keyPair, remapEd25519)
 ```

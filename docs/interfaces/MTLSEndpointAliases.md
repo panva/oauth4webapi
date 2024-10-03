@@ -12,6 +12,14 @@ Support from the community to continue maintaining and improving this module is 
 
 ## Properties
 
+### backchannel\_authentication\_endpoint?
+
+• `readonly` `optional` **backchannel\_authentication\_endpoint**: `string`
+
+CIBA Backchannel Authentication Endpoint.
+
+***
+
 ### device\_authorization\_endpoint?
 
 • `readonly` `optional` **device\_authorization\_endpoint**: `string`

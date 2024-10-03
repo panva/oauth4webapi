@@ -16,7 +16,7 @@ are allowed. Default is `0` (Date.now() + 0 seconds is used).
 When the local clock is mistakenly 1 hour in the past
 
 ```ts
-const client: oauth.Client = {
+let client: oauth.Client = {
   client_id: 'abc4ba37-4ab8-49b5-99d4-9441ba35d428',
   // ... other metadata
   [oauth.clockSkew]: +(60 * 60),
@@ -26,7 +26,7 @@ const client: oauth.Client = {
 When the local clock is mistakenly 1 hour in the future
 
 ```ts
-const client: oauth.Client = {
+let client: oauth.Client = {
   client_id: 'abc4ba37-4ab8-49b5-99d4-9441ba35d428',
   // ... other metadata
   [oauth.clockSkew]: -(60 * 60),

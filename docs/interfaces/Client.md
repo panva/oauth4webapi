@@ -42,30 +42,14 @@ See [clockTolerance](../variables/clockTolerance.md).
 
 ***
 
-### \[jweDecrypt\]?
-
-• `optional` **\[jweDecrypt\]**: [`JweDecryptFunction`](JweDecryptFunction.md)
-
-See [jweDecrypt](../variables/jweDecrypt.md).
-
-***
-
 ### authorization\_signed\_response\_alg?
 
-• `optional` **authorization\_signed\_response\_alg**: [`JWSAlgorithm`](../type-aliases/JWSAlgorithm.md)
+• `optional` **authorization\_signed\_response\_alg**: `string`
 
 JWS `alg` algorithm required for signing authorization responses. When not configured the
-default is to allow only [supported algorithms](../type-aliases/JWSAlgorithm.md) listed in
+default is to allow only algorithms listed in
 [`as.authorization_signing_alg_values_supported`](AuthorizationServer.md#authorization_signing_alg_values_supported)
 and fall back to `RS256` when the authorization server metadata is not set.
-
-***
-
-### client\_secret?
-
-• `optional` **client\_secret**: `string`
-
-Client secret.
 
 ***
 
@@ -108,15 +92,6 @@ is REQUIRED. Default is `false`.
 
 ***
 
-### token\_endpoint\_auth\_method?
-
-• `optional` **token\_endpoint\_auth\_method**: [`ClientAuthenticationMethod`](../type-aliases/ClientAuthenticationMethod.md)
-
-Client [authentication method](../type-aliases/ClientAuthenticationMethod.md) for the client's authenticated
-requests. Default is `client_secret_basic`.
-
-***
-
 ### use\_mtls\_endpoint\_aliases?
 
 • `optional` **use\_mtls\_endpoint\_aliases**: `boolean`
@@ -125,9 +100,8 @@ Indicates the requirement for a client to use mutual TLS endpoint aliases define
 where present. Default is `false`.
 
 When combined with [customFetch](../variables/customFetch.md) (to use a Fetch API implementation that supports client
-certificates) this can be used to target FAPI 2.0 profiles that utilize Mutual-TLS for either
-client authentication or sender constraining. FAPI 1.0 Advanced profiles that use PAR and JARM
-can also be targetted.
+certificates) this can be used to target security profiles that utilize Mutual-TLS for either
+client authentication or sender constraining.
 
 #### Examples
 
@@ -136,18 +110,18 @@ Authentication and Certificate-Bound Access Tokens support.
 
 ```ts
 import * as undici from 'undici'
-import * as oauth from 'oauth4webapi'
 
-// Prerequisites
 let as!: oauth.AuthorizationServer
 let client!: oauth.Client & { use_mtls_endpoint_aliases: true }
 let params!: URLSearchParams
 let key!: string // PEM-encoded key
 let cert!: string // PEM-encoded certificate
 
-const agent = new undici.Agent({ connect: { key, cert } })
+let clientAuth = oauth.TlsClientAuth()
+let agent = new undici.Agent({ connect: { key, cert } })
 
-const response = await oauth.pushedAuthorizationRequest(as, client, params, {
+let response = await oauth.pushedAuthorizationRequest(as, client, clientAuth, params, {
+  // @ts-ignore
   [oauth.customFetch]: (...args) =>
     undici.fetch(args[0], { ...args[1], dispatcher: agent }),
 })
@@ -157,18 +131,18 @@ const response = await oauth.pushedAuthorizationRequest(as, client, params, {
 Certificate-Bound Access Tokens support.
 
 ```ts
-import * as oauth from 'oauth4webapi'
-
-// Prerequisites
 let as!: oauth.AuthorizationServer
 let client!: oauth.Client & { use_mtls_endpoint_aliases: true }
 let params!: URLSearchParams
 let key!: string // PEM-encoded key
 let cert!: string // PEM-encoded certificate
 
-const agent = Deno.createHttpClient({ key, cert })
+let clientAuth = oauth.TlsClientAuth()
+// @ts-ignore
+let agent = Deno.createHttpClient({ key, cert })
 
-const response = await oauth.pushedAuthorizationRequest(as, client, params, {
+let response = await oauth.pushedAuthorizationRequest(as, client, clientAuth, params, {
+  // @ts-ignore
   [oauth.customFetch]: (...args) => fetch(args[0], { ...args[1], client: agent }),
 })
 ```
@@ -186,4 +160,4 @@ const response = await oauth.pushedAuthorizationRequest(as, client, params, {
 JWS `alg` algorithm REQUIRED for signing UserInfo Responses. When not configured the default is
 to allow only algorithms listed in
 [`as.userinfo_signing_alg_values_supported`](AuthorizationServer.md#userinfo_signing_alg_values_supported)
-and fall back to `RS256` when the authorization server metadata is not set.
+and fail otherwise.

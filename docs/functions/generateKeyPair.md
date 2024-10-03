@@ -6,17 +6,17 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
-▸ **generateKeyPair**(`alg`, `options`?): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`CryptoKeyPair`](https://developer.mozilla.org/docs/Web/API/CryptoKeyPair)\>
+▸ **generateKeyPair**(`alg`, `options`?): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`CryptoKeyPair`](../interfaces/CryptoKeyPair.md)\>
 
-Generates a [CryptoKeyPair](https://developer.mozilla.org/docs/Web/API/CryptoKeyPair) for a given JWS `alg` Algorithm identifier.
+Generates a [CryptoKeyPair](../interfaces/CryptoKeyPair.md) for a given JWS `alg` Algorithm identifier.
 
 ## Parameters
 
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
-| `alg` | [`JWSAlgorithm`](../type-aliases/JWSAlgorithm.md) | Supported JWS `alg` Algorithm identifier. |
+| `alg` | `string` | Supported JWS `alg` Algorithm identifier. Must be a [supported JWS Algorithm](../type-aliases/JWSAlgorithm.md). |
 | `options`? | [`GenerateKeyPairOptions`](../interfaces/GenerateKeyPairOptions.md) | - |
 
 ## Returns
 
-[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`CryptoKeyPair`](https://developer.mozilla.org/docs/Web/API/CryptoKeyPair)\>
+[`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`CryptoKeyPair`](../interfaces/CryptoKeyPair.md)\>

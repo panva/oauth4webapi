@@ -6,38 +6,19 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
-## getValidatedIdTokenClaims(ref)
-
-▸ **getValidatedIdTokenClaims**(`ref`): [`IDToken`](../interfaces/IDToken.md)
-
-Returns ID Token claims validated during [processAuthorizationCodeOpenIDResponse](processAuthorizationCodeOpenIDResponse.md).
-
-### Parameters
-
-| Parameter | Type | Description |
-| ------ | ------ | ------ |
-| `ref` | [`OpenIDTokenEndpointResponse`](../interfaces/OpenIDTokenEndpointResponse.md) | Value previously resolved from [processAuthorizationCodeOpenIDResponse](processAuthorizationCodeOpenIDResponse.md). |
-
-### Returns
-
-[`IDToken`](../interfaces/IDToken.md)
-
-JWT Claims Set from an ID Token.
-
-## getValidatedIdTokenClaims(ref)
-
 ▸ **getValidatedIdTokenClaims**(`ref`): [`IDToken`](../interfaces/IDToken.md) \| `undefined`
 
 Returns ID Token claims validated during [processRefreshTokenResponse](processRefreshTokenResponse.md) or
-[processDeviceCodeResponse](processDeviceCodeResponse.md).
+[processDeviceCodeResponse](processDeviceCodeResponse.md). To optionally validate its JWS Signature use
+[validateApplicationLevelSignature](validateApplicationLevelSignature.md)
 
-### Parameters
+## Parameters
 
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
 | `ref` | [`TokenEndpointResponse`](../interfaces/TokenEndpointResponse.md) | Value previously resolved from [processRefreshTokenResponse](processRefreshTokenResponse.md) or [processDeviceCodeResponse](processDeviceCodeResponse.md). |
 
-### Returns
+## Returns
 
 [`IDToken`](../interfaces/IDToken.md) \| `undefined`
 

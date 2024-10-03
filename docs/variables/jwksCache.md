@@ -38,19 +38,18 @@ The intended use pattern is:
 ## Example
 
 ```ts
-import * as oauth from 'oauth4webapi'
-
-// Prerequisites
 let as!: oauth.AuthorizationServer
 let request!: Request
 let expectedAudience!: string
+let getPreviouslyCachedJWKS!: () => Promise<oauth.ExportedJWKSCache>
+let storeNewJWKScache!: (cache: oauth.ExportedJWKSCache) => Promise<void>
 
 // Load JSON Web Key Set cache
-const jwksCache: oauth.JWKSCacheInput = (await getPreviouslyCachedJWKS()) || {}
-const { uat } = jwksCache
+let jwksCache: oauth.JWKSCacheInput = (await getPreviouslyCachedJWKS()) || {}
+let { uat } = jwksCache
 
 // Use JSON Web Key Set cache
-const accessTokenClaims = await validateJwtAccessToken(as, request, expectedAudience, {
+let accessTokenClaims = await oauth.validateJwtAccessToken(as, request, expectedAudience, {
   [oauth.jwksCache]: jwksCache,
 })
 

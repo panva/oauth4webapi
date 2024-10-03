@@ -16,7 +16,7 @@ representing seconds are allowed. Default is `30` (30 seconds).
 Tolerate 30 seconds clock skew when validating JWT claims like exp or nbf.
 
 ```ts
-const client: oauth.Client = {
+let client: oauth.Client = {
   client_id: 'abc4ba37-4ab8-49b5-99d4-9441ba35d428',
   // ... other metadata
   [oauth.clockTolerance]: 30,

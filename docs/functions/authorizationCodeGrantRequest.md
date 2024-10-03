@@ -6,7 +6,7 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
-▸ **authorizationCodeGrantRequest**(`as`, `client`, `callbackParameters`, `redirectUri`, `codeVerifier`, `options`?): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Response`](https://developer.mozilla.org/docs/Web/API/Response)\>
+▸ **authorizationCodeGrantRequest**(`as`, `client`, `clientAuthentication`, `callbackParameters`, `redirectUri`, `codeVerifier`, `options`?): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Response`](https://developer.mozilla.org/docs/Web/API/Response)\>
 
 Performs an Authorization Code grant request at the
 [`as.token_endpoint`](../interfaces/AuthorizationServer.md#token_endpoint).
@@ -17,6 +17,7 @@ Performs an Authorization Code grant request at the
 | ------ | ------ | ------ |
 | `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata. |
 | `client` | [`Client`](../interfaces/Client.md) | Client Metadata. |
+| `clientAuthentication` | [`ClientAuth`](../type-aliases/ClientAuth.md) | Client Authentication Method. |
 | `callbackParameters` | [`URLSearchParams`](https://developer.mozilla.org/docs/Web/API/URLSearchParams) | Parameters obtained from the callback to redirect_uri, this is returned from [validateAuthResponse](validateAuthResponse.md), or [validateJwtAuthResponse](validateJwtAuthResponse.md). |
 | `redirectUri` | `string` | `redirect_uri` value used in the authorization request. |
 | `codeVerifier` | `string` | PKCE `code_verifier` to send to the token endpoint. |

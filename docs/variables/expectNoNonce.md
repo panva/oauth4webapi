@@ -8,6 +8,6 @@ Support from the community to continue maintaining and improving this module is 
 
 • `const` **expectNoNonce**: unique `symbol`
 
-Use this as a value to [processAuthorizationCodeOpenIDResponse](../functions/processAuthorizationCodeOpenIDResponse.md) `expectedNonce` parameter to
+Use this as a value to [processAuthorizationCodeResponse](../functions/processAuthorizationCodeResponse.md) `oidc.expectedNonce` parameter to
 indicate no `nonce` ID Token claim value is expected, i.e. no `nonce` parameter value was sent
 with the authorization request.

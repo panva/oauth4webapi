@@ -8,6 +8,16 @@ Support from the community to continue maintaining and improving this module is 
 
 ## Properties
 
+### ~~\[allowInsecureRequests\]?~~
+
+• `optional` **\[allowInsecureRequests\]**: `boolean`
+
+See [allowInsecureRequests](../variables/allowInsecureRequests.md).
+
+#### Deprecated
+
+***
+
 ### \[clockSkew\]?
 
 • `optional` **\[clockSkew\]**: `number`
@@ -26,16 +36,21 @@ See [clockTolerance](../variables/clockTolerance.md).
 
 ### \[customFetch\]()?
 
-• `optional` **\[customFetch\]**: (`input`, `init`?) => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Response`](https://developer.mozilla.org/docs/Web/API/Response)\>
+• `optional` **\[customFetch\]**: (`url`, `options`) => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Response`](https://developer.mozilla.org/docs/Web/API/Response)\>
 
 See [customFetch](../variables/customFetch.md).
 
 #### Parameters
 
-| Parameter | Type |
-| ------ | ------ |
-| `input` | `RequestInfo` \| [`URL`](https://developer.mozilla.org/docs/Web/API/URL) |
-| `init`? | `RequestInit` |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `url` | `string` | URL the request is being made sent to [fetch](https://developer.mozilla.org/docs/Web/API/Window/fetch) as the `resource` argument |
+| `options` | `object` | Options otherwise sent to [fetch](https://developer.mozilla.org/docs/Web/API/Window/fetch) as the `options` argument |
+| `options.body` | `undefined` | The request body content to send to the server |
+| `options.headers` | [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `string`\> | HTTP Headers |
+| `options.method` | `"GET"` | The [request method](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods) |
+| `options.redirect` | `"manual"` | See [Request.redirect](https://developer.mozilla.org/docs/Web/API/Request/redirect) |
+| `options.signal`? | [`AbortSignal`](https://developer.mozilla.org/docs/Web/API/AbortSignal) | Depending on whether [HttpRequestOptions.signal](HttpRequestOptions.md#signal) was used, if so, it is the value passed, otherwise undefined |
 
 #### Returns
 
@@ -79,5 +94,14 @@ this function's invocation.
 A 5000ms timeout AbortSignal for every request
 
 ```js
-const signal = () => AbortSignal.timeout(5_000) // Note: AbortSignal.timeout may not yet be available in all runtimes.
+let signal = () => AbortSignal.timeout(5_000) // Note: AbortSignal.timeout may not yet be available in all runtimes.
 ```
+
+***
+
+### signingAlgorithms?
+
+• `optional` **signingAlgorithms**: `string`[]
+
+Supported (or expected) JWT "alg" header parameter values for the JWT Access Token (and DPoP
+Proof JWTs). Default is all [supported JWS Algorithms](../type-aliases/JWSAlgorithm.md).
