@@ -57,7 +57,7 @@ export default (QUnit: QUnit) => {
 
     test(`end-to-end ${label(config)}`, async (t) => {
       const kp = await keys[alg]
-      const { client, issuerIdentifier, clientPrivateKey } = await setup(
+      const { client, issuerIdentifier, clientPrivateKey, decrypt } = await setup(
         alg,
         kp,
         'client_secret_post',
@@ -170,7 +170,7 @@ export default (QUnit: QUnit) => {
           nonce!,
           lib.expectNoState,
           maxAge,
-          { [lib.allowInsecureRequests]: true },
+          { [lib.allowInsecureRequests]: true, [lib.jweDecrypt]: decrypt },
         )
       } else if (jarm) {
         callbackParams = await lib.validateJwtAuthResponse(
@@ -178,7 +178,7 @@ export default (QUnit: QUnit) => {
           client,
           currentUrl,
           lib.expectNoState,
-          { [lib.allowInsecureRequests]: true },
+          { [lib.allowInsecureRequests]: true, [lib.jweDecrypt]: decrypt },
         )
       } else {
         callbackParams = lib.validateAuthResponse(as, client, currentUrl, lib.expectNoState)
@@ -199,8 +199,10 @@ export default (QUnit: QUnit) => {
 
         const processAuthorizationCodeResponse = () =>
           lib.processAuthorizationCodeResponse(as, client, response, {
+            requireIdToken: true,
             expectedNonce: nonce,
             maxAge,
+            [lib.jweDecrypt]: decrypt,
           })
         let result = await processAuthorizationCodeResponse().catch(async (err) => {
           if (isDpopNonceError(t, err)) {
@@ -228,15 +230,20 @@ export default (QUnit: QUnit) => {
               DPoP,
               [lib.allowInsecureRequests]: true,
             })
-          let response = await userInfoRequest().catch(async (err) => {
-            if (isDpopNonceError(t, err)) {
-              return userInfoRequest()
-            }
+          let response = await userInfoRequest()
 
-            throw err
-          })
+          await lib
+            .processUserInfoResponse(as, client, sub, response, { [lib.jweDecrypt]: decrypt })
+            .catch(async (err) => {
+              if (isDpopNonceError(t, err)) {
+                response = await userInfoRequest()
+                await lib.processUserInfoResponse(as, client, sub, response, {
+                  [lib.jweDecrypt]: decrypt,
+                })
+              }
 
-          await lib.processUserInfoResponse(as, client, sub, response)
+              throw err
+            })
 
           if (jwtUserinfo) {
             await lib.validateApplicationLevelSignature(as, response, {
@@ -259,7 +266,7 @@ export default (QUnit: QUnit) => {
             throw err
           })
 
-          await lib.processRefreshTokenResponse(as, client, response)
+          await lib.processRefreshTokenResponse(as, client, response, { [lib.jweDecrypt]: decrypt })
         }
       }
 

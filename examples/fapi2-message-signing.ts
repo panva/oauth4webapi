@@ -122,7 +122,7 @@ let access_token: string
   let response = await authorizationCodeGrantRequest()
 
   const processAuthorizationCodeResponse = () =>
-    oauth.processAuthorizationCodeResponse(as, client, response, true)
+    oauth.processAuthorizationCodeResponse(as, client, response, { requireIdToken: true })
 
   let result = await processAuthorizationCodeResponse().catch(async (err) => {
     if (oauth.isDPoPNonceError(err)) {

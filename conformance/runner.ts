@@ -171,18 +171,18 @@ export const flow = (options?: MacroOptions) => {
       t.log('AS Metadata discovered for', as.issuer)
 
       const decoder = new TextDecoder()
+      const decrypt: oauth.JweDecryptFunction = async (jwe) => {
+        const { plaintext } = await compactDecrypt(
+          jwe,
+          await importPrivateKey('RSA-OAEP', configuration.client.jwks.keys[0]),
+          { keyManagementAlgorithms: ['RSA-OAEP'] },
+        ).catch((cause) => {
+          throw new oauth.OperationProcessingError('failed to decrypt', { cause })
+        })
+        return decoder.decode(plaintext)
+      }
       const client: oauth.Client = {
         client_id: configuration.client.client_id,
-        async [oauth.jweDecrypt](jwe) {
-          const { plaintext } = await compactDecrypt(
-            jwe,
-            await importPrivateKey('RSA-OAEP', configuration.client.jwks.keys[0]),
-            { keyManagementAlgorithms: ['RSA-OAEP'] },
-          ).catch((cause) => {
-            throw new oauth.OperationProcessingError('failed to decrypt', { cause })
-          })
-          return decoder.decode(plaintext)
-        },
         use_mtls_endpoint_aliases: configuration.client.use_mtls_endpoint_aliases,
       }
 
@@ -377,13 +377,17 @@ export const flow = (options?: MacroOptions) => {
         let params: ReturnType<typeof oauth.validateAuthResponse>
 
         if (usesJarm(variant)) {
-          params = await oauth.validateJwtAuthResponse(as, client, currentUrl, state)
+          params = await oauth.validateJwtAuthResponse(as, client, currentUrl, state, {
+            [oauth.jweDecrypt]: decrypt,
+          })
         } else if (response_type === 'code id_token') {
           params = await (
             plan.name.startsWith('fapi1')
               ? oauth.validateDetachedSignatureResponse
               : oauth.validateCodeIdTokenResponse
-          )(as, client, currentUrl, nonce as string, state)
+          )(as, client, currentUrl, nonce as string, state, undefined, {
+            [oauth.jweDecrypt]: decrypt,
+          })
         } else {
           params = oauth.validateAuthResponse(as, client, currentUrl, state)
         }
@@ -408,25 +412,21 @@ export const flow = (options?: MacroOptions) => {
         let result: oauth.TokenEndpointResponse
 
         try {
-          if (scope.includes('openid')) {
-            result = await oauth.processAuthorizationCodeResponse(as, client, response, {
-              expectedNonce: nonce,
-            })
-          } else {
-            result = await oauth.processAuthorizationCodeResponse(as, client, response)
-          }
+          result = await oauth.processAuthorizationCodeResponse(as, client, response, {
+            [oauth.jweDecrypt]: decrypt,
+            expectedNonce: nonce,
+            requireIdToken: scope.includes('openid'),
+          })
         } catch (err) {
           if (DPoPKeyPair && oauth.isDPoPNonceError(err)) {
             t.log('error', inspect(err, { depth: Infinity }))
             t.log('retrying with a newly obtained dpop nonce')
             response = await request()
-            if (scope.includes('openid')) {
-              result = await oauth.processAuthorizationCodeResponse(as, client, response, {
-                expectedNonce: nonce,
-              })
-            } else {
-              result = await oauth.processAuthorizationCodeResponse(as, client, response)
-            }
+            result = await oauth.processAuthorizationCodeResponse(as, client, response, {
+              [oauth.jweDecrypt]: decrypt,
+              expectedNonce: nonce,
+              requireIdToken: scope.includes('openid'),
+            })
           } else {
             throw err
           }
@@ -455,14 +455,21 @@ export const flow = (options?: MacroOptions) => {
           })
         }
         let response = await request()
+        let result: oauth.UserInfoResponse
         try {
-          let result = await oauth.processUserInfoResponse(as, client, sub!, response)
+          result = await oauth.processUserInfoResponse(as, client, sub!, response, {
+            [oauth.jweDecrypt]: decrypt,
+          })
           t.log('userinfo endpoint response', { ...result })
         } catch (err) {
           t.log('error', inspect(err, { depth: Infinity }))
           if (DPoPKeyPair && oauth.isDPoPNonceError(err)) {
             t.log('retrying with a newly obtained dpop nonce')
             response = await request()
+            result = await oauth.processUserInfoResponse(as, client, sub!, response, {
+              [oauth.jweDecrypt]: decrypt,
+            })
+            t.log('userinfo endpoint response', { ...result })
           } else {
             throw err
           }

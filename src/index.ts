@@ -362,30 +362,30 @@ export const modifyAssertion: unique symbol = Symbol()
  * import * as jose from 'jose'
  *
  * let as!: oauth.AuthorizationServer
+ * let client!: oauth.Client
  * let key!: oauth.CryptoKey
  * let alg!: string
  * let enc!: string
  * let currentUrl!: URL
+ * let state!: string | undefined
  *
  * const decoder = new TextDecoder()
+ * let jweDecrypt: oauth.JweDecryptFunction = async (jwe) => {
+ *   const { plaintext } = await jose
+ *     .compactDecrypt(jwe, key, {
+ *       keyManagementAlgorithms: [alg],
+ *       contentEncryptionAlgorithms: [enc],
+ *     })
+ *     .catch((cause: unknown) => {
+ *       throw new oauth.OperationProcessingError('decryption failed', { cause })
+ *     })
  *
- * const client: oauth.Client = {
- *   client_id: 'urn:example:client_id',
- *   async [oauth.jweDecrypt](jwe) {
- *     const { plaintext } = await jose
- *       .compactDecrypt(jwe, key, {
- *         keyManagementAlgorithms: [alg],
- *         contentEncryptionAlgorithms: [enc],
- *       })
- *       .catch((cause: unknown) => {
- *         throw new oauth.OperationProcessingError('decryption failed', { cause })
- *       })
- *
- *     return decoder.decode(plaintext)
- *   },
+ *   return decoder.decode(plaintext)
  * }
  *
- * const params = await oauth.validateJwtAuthResponse(as, client, currentUrl)
+ * const params = await oauth.validateJwtAuthResponse(as, client, currentUrl, state, {
+ *   [oauth.jweDecrypt]: jweDecrypt,
+ * })
  * ```
  */
 export const jweDecrypt: unique symbol = Symbol()
@@ -894,11 +894,6 @@ export interface Client {
    * See {@link clockTolerance}.
    */
   [clockTolerance]?: number
-
-  /**
-   * See {@link jweDecrypt}.
-   */
-  [jweDecrypt]?: JweDecryptFunction
 
   [metadata: string]: JsonValue | undefined
 }
@@ -2951,6 +2946,13 @@ function getContentType(response: Response) {
   return response.headers.get('content-type')?.split(';')[0]
 }
 
+export interface JWEDecryptOptions {
+  /**
+   * See {@link jweDecrypt}.
+   */
+  [jweDecrypt]?: JweDecryptFunction
+}
+
 /**
  * Validates {@link !Response} instance to be one coming from the
  * {@link AuthorizationServer.userinfo_endpoint `as.userinfo_endpoint`}.
@@ -2976,6 +2978,7 @@ export async function processUserInfoResponse(
   client: Client,
   expectedSubject: string | typeof skipSubjectCheck,
   response: Response,
+  options?: JWEDecryptOptions,
 ): Promise<UserInfoResponse> {
   assertAs(as)
   assertClient(client)
@@ -3014,7 +3017,7 @@ export async function processUserInfoResponse(
       ),
       getClockSkew(client),
       getClockTolerance(client),
-      client[jweDecrypt],
+      options?.[jweDecrypt],
     )
       .then(validateOptionalAudience.bind(undefined, client.client_id))
       .then(validateOptionalIssuer.bind(undefined, as))
@@ -3267,7 +3270,8 @@ async function processGenericAccessTokenResponse(
   as: AuthorizationServer,
   client: Client,
   response: Response,
-  additionalRequiredIdTokenClaims?: (keyof typeof jwtClaimNames)[],
+  additionalRequiredIdTokenClaims: (keyof typeof jwtClaimNames)[] | undefined,
+  options: JWEDecryptOptions | undefined,
 ): Promise<TokenEndpointResponse> {
   assertAs(as)
   assertClient(client)
@@ -3379,7 +3383,7 @@ async function processGenericAccessTokenResponse(
       ),
       getClockSkew(client),
       getClockTolerance(client),
-      client[jweDecrypt],
+      options?.[jweDecrypt],
     )
       .then(validatePresence.bind(undefined, requiredClaims))
       .then(validateIssuer.bind(undefined, as))
@@ -3440,8 +3444,9 @@ export async function processRefreshTokenResponse(
   as: AuthorizationServer,
   client: Client,
   response: Response,
+  options?: JWEDecryptOptions,
 ): Promise<TokenEndpointResponse> {
-  return processGenericAccessTokenResponse(as, client, response)
+  return processGenericAccessTokenResponse(as, client, response, undefined, options)
 }
 
 function validateOptionalAudience(
@@ -3697,9 +3702,50 @@ export const expectNoNonce: unique symbol = Symbol()
  */
 export const skipAuthTimeCheck: unique symbol = Symbol()
 
+export interface ProcessAuthorizationCodeResponseOptions extends JWEDecryptOptions {
+  /**
+   * Expected ID Token `nonce` claim value. Default is {@link expectNoNonce}.
+   */
+  expectedNonce?: string | typeof expectNoNonce
+  /**
+   * ID Token {@link IDToken.auth_time `auth_time`} claim value will be checked to be present and
+   * conform to the `maxAge` value. Use of this option is required if you sent a `max_age` parameter
+   * in an authorization request. Default is {@link Client.default_max_age `client.default_max_age`}
+   * and falls back to {@link skipAuthTimeCheck}.
+   */
+  maxAge?: number | typeof skipAuthTimeCheck
+  /**
+   * When true this requires {@link TokenEndpointResponse.id_token} to be present
+   */
+  requireIdToken?: boolean
+}
+
+export interface ExpectedNonce {
+  /**
+   * Expected ID Token `nonce` claim value.
+   */
+  expectedNonce: string
+}
+
+export interface ExpectedMaxAge {
+  /**
+   * ID Token {@link IDToken.auth_time `auth_time`} claim value will be checked to be present and
+   * conform to the `maxAge` value. Use of this option is required if you sent a `max_age` parameter
+   * in an authorization request.
+   */
+  maxAge: number
+}
+
+export interface RequireIdToken {
+  /**
+   * This requires {@link TokenEndpointResponse.id_token} to be present
+   */
+  requireIdToken: true
+}
+
 /**
- * (OAuth 2.0) Validates Authorization Code Grant {@link !Response} instance to be one coming from
- * the {@link AuthorizationServer.token_endpoint `as.token_endpoint`}.
+ * Validates Authorization Code Grant {@link !Response} instance to be one coming from the
+ * {@link AuthorizationServer.token_endpoint `as.token_endpoint`}.
  *
  * @param as Authorization Server Metadata.
  * @param client Client Metadata.
@@ -3710,28 +3756,6 @@ export const skipAuthTimeCheck: unique symbol = Symbol()
  *   challenges are rejected with {@link WWWAuthenticateChallengeError}.
  *
  * @group Authorization Code Grant
- *
- * @see [RFC 6749 - The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html#section-4.1)
- */
-export async function processAuthorizationCodeResponse(
-  as: AuthorizationServer,
-  client: Client,
-  response: Response,
-): Promise<TokenEndpointResponse>
-/**
- * (OpenID Connect only) Validates Authorization Code Grant {@link !Response} instance to be one
- * coming from the {@link AuthorizationServer.token_endpoint `as.token_endpoint`}.
- *
- * @param as Authorization Server Metadata.
- * @param client Client Metadata.
- * @param response Resolved value from {@link authorizationCodeGrantRequest}.
- * @param oidc Indicates that the response must be an OpenID Connect response including an ID Token.
- *   Can also be `true` to use its default options.
- *
- * @returns Resolves with an object representing the parsed successful response. OAuth 2.0 protocol
- *   style errors are rejected using {@link ResponseBodyError}. WWW-Authenticate HTTP Header
- *   challenges are rejected with {@link WWWAuthenticateChallengeError}.
- *
  * @group Authorization Code Grant w/ OpenID Connect (OIDC)
  *
  * @see [RFC 6749 - The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html#section-4.1)
@@ -3741,53 +3765,57 @@ export async function processAuthorizationCodeResponse(
   as: AuthorizationServer,
   client: Client,
   response: Response,
-  oidc: {
-    /**
-     * Expected ID Token `nonce` claim value. Default is {@link expectNoNonce}.
-     */
-    expectedNonce?: string | typeof expectNoNonce
-    /**
-     * ID Token {@link IDToken.auth_time `auth_time`} claim value will be checked to be present and
-     * conform to the `maxAge` value. Use of this option is required if you sent a `max_age`
-     * parameter in an authorization request. Default is
-     * {@link Client.default_max_age `client.default_max_age`} and falls back to
-     * {@link skipAuthTimeCheck}.
-     */
-    maxAge?: number | typeof skipAuthTimeCheck
-  },
+  options: ProcessAuthorizationCodeResponseOptions &
+    (ExpectedNonce | ExpectedMaxAge | RequireIdToken),
 ): Promise<OpenIDTokenEndpointResponse>
 /**
- * @ignore
+ * Validates Authorization Code Grant {@link !Response} instance to be one coming from the
+ * {@link AuthorizationServer.token_endpoint `as.token_endpoint`}.
+ *
+ * @param as Authorization Server Metadata.
+ * @param client Client Metadata.
+ * @param response Resolved value from {@link authorizationCodeGrantRequest}.
+ *
+ * @returns Resolves with an object representing the parsed successful response. OAuth 2.0 protocol
+ *   style errors are rejected using {@link ResponseBodyError}. WWW-Authenticate HTTP Header
+ *   challenges are rejected with {@link WWWAuthenticateChallengeError}.
+ *
+ * @group Authorization Code Grant
+ * @group Authorization Code Grant w/ OpenID Connect (OIDC)
+ *
+ * @see [RFC 6749 - The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html#section-4.1)
+ * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#CodeFlowAuth)
  */
 export async function processAuthorizationCodeResponse(
   as: AuthorizationServer,
   client: Client,
   response: Response,
-  oidc: true,
-): Promise<OpenIDTokenEndpointResponse>
+  options?: ProcessAuthorizationCodeResponseOptions,
+): Promise<TokenEndpointResponse>
 export async function processAuthorizationCodeResponse(
   as: AuthorizationServer,
   client: Client,
   response: Response,
-  oidc?:
-    | {
-        expectedNonce?: string | typeof expectNoNonce
-        maxAge?: number | typeof skipAuthTimeCheck
-      }
-    | true,
+  options?: ProcessAuthorizationCodeResponseOptions,
 ): Promise<TokenEndpointResponse> {
-  if (oidc) {
-    if (oidc === true) oidc = {}
+  if (
+    typeof options?.expectedNonce === 'string' ||
+    typeof options?.maxAge === 'number' ||
+    options?.requireIdToken
+  ) {
     return processAuthorizationCodeOpenIDResponse(
       as,
       client,
       response,
-      oidc.expectedNonce,
-      oidc.maxAge,
+      options.expectedNonce,
+      options.maxAge,
+      {
+        [jweDecrypt]: options[jweDecrypt],
+      },
     )
   }
 
-  return processAuthorizationCodeOAuth2Response(as, client, response)
+  return processAuthorizationCodeOAuth2Response(as, client, response, options)
 }
 
 async function processAuthorizationCodeOpenIDResponse(
@@ -3796,6 +3824,7 @@ async function processAuthorizationCodeOpenIDResponse(
   response: Response,
   expectedNonce: string | typeof expectNoNonce | undefined,
   maxAge: number | typeof skipAuthTimeCheck | undefined,
+  options: JWEDecryptOptions | undefined,
 ): Promise<OpenIDTokenEndpointResponse> {
   const additionalRequiredClaims: (keyof typeof jwtClaimNames)[] = []
 
@@ -3827,6 +3856,7 @@ async function processAuthorizationCodeOpenIDResponse(
     client,
     response,
     additionalRequiredClaims,
+    options,
   )
 
   assertString(result.id_token, '"response" body "id_token" property', INVALID_RESPONSE, {
@@ -3869,8 +3899,9 @@ async function processAuthorizationCodeOAuth2Response(
   as: AuthorizationServer,
   client: Client,
   response: Response,
+  options?: JWEDecryptOptions,
 ): Promise<TokenEndpointResponse> {
-  const result = await processGenericAccessTokenResponse(as, client, response)
+  const result = await processGenericAccessTokenResponse(as, client, response, undefined, options)
 
   const claims = getValidatedIdTokenClaims(result)
   if (claims) {
@@ -4135,8 +4166,9 @@ export async function processGenericTokenEndpointResponse(
   as: AuthorizationServer,
   client: Client,
   response: Response,
+  options?: JWEDecryptOptions,
 ): Promise<TokenEndpointResponse> {
-  return processGenericAccessTokenResponse(as, client, response)
+  return processGenericAccessTokenResponse(as, client, response, undefined, options)
 }
 
 /**
@@ -4159,8 +4191,9 @@ export async function processClientCredentialsResponse(
   as: AuthorizationServer,
   client: Client,
   response: Response,
+  options?: JWEDecryptOptions,
 ): Promise<TokenEndpointResponse> {
-  return processGenericAccessTokenResponse(as, client, response)
+  return processGenericAccessTokenResponse(as, client, response, undefined, options)
 }
 
 export interface RevocationRequestOptions extends HttpRequestOptions<'POST', URLSearchParams> {
@@ -4374,6 +4407,7 @@ export async function processIntrospectionResponse(
   as: AuthorizationServer,
   client: Client,
   response: Response,
+  options?: JWEDecryptOptions,
 ): Promise<IntrospectionResponse> {
   assertAs(as)
   assertClient(client)
@@ -4419,7 +4453,7 @@ export async function processIntrospectionResponse(
       ),
       getClockSkew(client),
       getClockTolerance(client),
-      client[jweDecrypt],
+      options?.[jweDecrypt],
     )
       .then(checkJwtType.bind(undefined, 'token-introspection+jwt'))
       .then(validatePresence.bind(undefined, ['aud', 'iat', 'iss']))
@@ -4767,7 +4801,7 @@ export async function validateJwtAuthResponse(
   client: Client,
   parameters: URLSearchParams | URL,
   expectedState?: string | typeof expectNoState | typeof skipStateCheck,
-  options?: ValidateSignatureOptions,
+  options?: ValidateSignatureOptions & JWEDecryptOptions,
 ): Promise<URLSearchParams> {
   assertAs(as)
   assertClient(client)
@@ -4798,7 +4832,7 @@ export async function validateJwtAuthResponse(
     ),
     getClockSkew(client),
     getClockTolerance(client),
-    client[jweDecrypt],
+    options?.[jweDecrypt],
   )
     .then(validatePresence.bind(undefined, ['aud', 'exp', 'iss']))
     .then(validateIssuer.bind(undefined, as))
@@ -4892,7 +4926,7 @@ export async function validateDetachedSignatureResponse(
   expectedNonce: string,
   expectedState?: string | typeof expectNoState,
   maxAge?: number | typeof skipAuthTimeCheck,
-  options?: ValidateSignatureOptions,
+  options?: ValidateSignatureOptions & JWEDecryptOptions,
 ): Promise<URLSearchParams> {
   return validateHybridResponse(
     as,
@@ -4936,7 +4970,7 @@ export async function validateCodeIdTokenResponse(
   expectedNonce: string,
   expectedState?: string | typeof expectNoState,
   maxAge?: number | typeof skipAuthTimeCheck,
-  options?: ValidateSignatureOptions,
+  options?: ValidateSignatureOptions & JWEDecryptOptions,
 ): Promise<URLSearchParams> {
   return validateHybridResponse(
     as,
@@ -4957,7 +4991,7 @@ async function validateHybridResponse(
   expectedNonce: string,
   expectedState: string | typeof expectNoState | undefined,
   maxAge: number | typeof skipAuthTimeCheck | undefined,
-  options: ValidateSignatureOptions | undefined,
+  options: (ValidateSignatureOptions & JWEDecryptOptions) | undefined,
   fapi: boolean,
 ): Promise<URLSearchParams> {
   assertAs(as)
@@ -5047,7 +5081,7 @@ async function validateHybridResponse(
     ),
     getClockSkew(client),
     getClockTolerance(client),
-    client[jweDecrypt],
+    options?.[jweDecrypt],
   )
     .then(validatePresence.bind(undefined, requiredClaims))
     .then(validateIssuer.bind(undefined, as))
@@ -5604,8 +5638,9 @@ export async function processDeviceCodeResponse(
   as: AuthorizationServer,
   client: Client,
   response: Response,
+  options?: JWEDecryptOptions,
 ): Promise<TokenEndpointResponse> {
-  return processGenericAccessTokenResponse(as, client, response)
+  return processGenericAccessTokenResponse(as, client, response, undefined, options)
 }
 
 export interface GenerateKeyPairOptions {

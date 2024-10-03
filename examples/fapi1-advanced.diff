@@ -1,5 +1,5 @@
 diff --git a/examples/oauth.ts b/examples/fapi1-advanced.ts
-index d55e62d..cfcd4d7 100644
+index d55e62d..a8d1d32 100644
 --- a/examples/oauth.ts
 +++ b/examples/fapi1-advanced.ts
 @@ -1,20 +1,39 @@
@@ -116,7 +116,7 @@ index d55e62d..cfcd4d7 100644
  
    const response = await oauth.authorizationCodeGrantRequest(
      as,
-@@ -71,9 +97,25 @@ let access_token: string
+@@ -71,9 +97,27 @@ let access_token: string
      params,
      redirect_uri,
      code_verifier,
@@ -136,14 +136,16 @@ index d55e62d..cfcd4d7 100644
    )
  
 -  const result = await oauth.processAuthorizationCodeResponse(as, client, response)
-+  const result = await oauth.processAuthorizationCodeResponse(as, client, response, true)
++  const result = await oauth.processAuthorizationCodeResponse(as, client, response, {
++    expectedNonce: nonce,
++  })
 +
 +  // Check ID Token signature for non-repudiation purposes
 +  await oauth.validateApplicationLevelSignature(as, response)
  
    console.log('Access Token Response', result)
    ;({ access_token } = result)
-@@ -85,6 +127,21 @@ let access_token: string
+@@ -85,6 +129,21 @@ let access_token: string
      access_token,
      'GET',
      new URL('https://rs.example.com/api'),

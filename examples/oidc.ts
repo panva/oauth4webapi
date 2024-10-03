@@ -76,6 +76,7 @@ let access_token: string
 
   const result = await oauth.processAuthorizationCodeResponse(as, client, response, {
     expectedNonce: nonce,
+    requireIdToken: true,
   })
 
   console.log('Access Token Response', result)

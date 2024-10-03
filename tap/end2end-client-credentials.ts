@@ -55,7 +55,7 @@ export default (QUnit: QUnit) => {
       config,
     )}`, async (t) => {
       const kp = await keys[alg]
-      const { client, issuerIdentifier, clientPrivateKey } = await setup(
+      const { client, issuerIdentifier, clientPrivateKey, decrypt } = await setup(
         alg,
         kp,
         authMethod,
@@ -164,7 +164,9 @@ export default (QUnit: QUnit) => {
             },
           })
 
-          const result = await lib.processIntrospectionResponse(as, client, response)
+          const result = await lib.processIntrospectionResponse(as, client, response, {
+            [lib.jweDecrypt]: decrypt,
+          })
 
           if (jwtIntrospection) {
             await lib.validateApplicationLevelSignature(as, response, {

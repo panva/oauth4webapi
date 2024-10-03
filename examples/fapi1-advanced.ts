@@ -112,7 +112,9 @@ let access_token: string
     },
   )
 
-  const result = await oauth.processAuthorizationCodeResponse(as, client, response, true)
+  const result = await oauth.processAuthorizationCodeResponse(as, client, response, {
+    expectedNonce: nonce,
+  })
 
   // Check ID Token signature for non-repudiation purposes
   await oauth.validateApplicationLevelSignature(as, response)

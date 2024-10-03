@@ -30,6 +30,7 @@ export async function setup(
   client: lib.Client
   issuerIdentifier: URL
   clientPrivateKey: lib.PrivateKey
+  decrypt: lib.JweDecryptFunction
 }> {
   const clientKeyPair = kp
   const jwk = await jose.exportJWK(clientKeyPair.publicKey)
@@ -118,22 +119,22 @@ export async function setup(
     client: {
       ...(await response.json()),
       introspection_signed_response_alg: jwtIntrospection ? alg : undefined,
-      async [lib.jweDecrypt](jwe) {
-        const { plaintext } = await jose
-          .compactDecrypt(jwe, encKp.privateKey, {
-            keyManagementAlgorithms: ['ECDH-ES'],
-            contentEncryptionAlgorithms: ['A128CBC-HS256'],
-          })
-          .catch((cause) => {
-            throw new lib.OperationProcessingError('decryption failed', { cause })
-          })
-        return new TextDecoder().decode(plaintext)
-      },
     },
     clientPrivateKey: {
       kid: clientJwk.kid,
       key: clientKeyPair.privateKey,
     },
     issuerIdentifier: new URL('http://localhost:3000'),
+    decrypt: async (jwe) => {
+      const { plaintext } = await jose
+        .compactDecrypt(jwe, encKp.privateKey, {
+          keyManagementAlgorithms: ['ECDH-ES'],
+          contentEncryptionAlgorithms: ['A128CBC-HS256'],
+        })
+        .catch((cause) => {
+          throw new lib.OperationProcessingError('decryption failed', { cause })
+        })
+      return new TextDecoder().decode(plaintext)
+    },
   }
 }

@@ -1,5 +1,5 @@
 diff --git a/examples/fapi2.ts b/examples/fapi2-message-signing.ts
-index bba1f24..b16f16f 100644
+index bba1f24..e08d049 100644
 --- a/examples/fapi2.ts
 +++ b/examples/fapi2-message-signing.ts
 @@ -25,6 +25,11 @@ let DPoPKeys!: oauth.CryptoKeyPair
@@ -59,7 +59,7 @@ index bba1f24..b16f16f 100644
  
    const processAuthorizationCodeResponse = () =>
 -    oauth.processAuthorizationCodeResponse(as, client, response)
-+    oauth.processAuthorizationCodeResponse(as, client, response, true)
++    oauth.processAuthorizationCodeResponse(as, client, response, { requireIdToken: true })
  
    let result = await processAuthorizationCodeResponse().catch(async (err) => {
      if (oauth.isDPoPNonceError(err)) {
