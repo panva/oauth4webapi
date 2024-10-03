@@ -1,7 +1,6 @@
 import type QUnit from 'qunit'
 import * as lib from '../src/index.js'
 import { fails, keys } from './keys.js'
-import * as env from './env.js'
 
 function isRSA(alg: string) {
   return alg.startsWith('RS') || alg.startsWith('PS')
@@ -30,21 +29,6 @@ export default (QUnit: QUnit) => {
   for (const alg of fails) {
     test(`[not supported] ${alg} fails to generate`, async (t) => {
       await t.rejects(lib.generateKeyPair(alg))
-    })
-  }
-
-  if (env.isNode || env.isEdgeRuntime) {
-    test('EdDSA w/ Ed448', async (t) => {
-      const { publicKey, privateKey } = await lib.generateKeyPair('EdDSA', { crv: 'Ed448' })
-      testGeneratedCryptoKeyPair(t, privateKey, publicKey)
-
-      for (const key of [privateKey, publicKey]) {
-        t.equal(key.algorithm.name, 'Ed448')
-      }
-    })
-  } else {
-    test(`[not supported] EdDSA w/ Ed448 fails to generate`, async (t) => {
-      await t.rejects(lib.generateKeyPair('EdDSA', { crv: 'Ed448' }))
     })
   }
 

@@ -104,18 +104,18 @@ function CodedTypeError(message: string, code: codes, cause?: unknown) {
  * for which Digital Signature validation is implemented.
  */
 export type JWSAlgorithm =
-  // widely used
   | 'PS256'
   | 'ES256'
   | 'RS256'
-  | 'EdDSA'
-  // less used
+  | 'Ed25519'
   | 'ES384'
   | 'PS384'
   | 'RS384'
   | 'ES512'
   | 'PS512'
   | 'RS512'
+  // Deprecated
+  | 'EdDSA'
 
 export interface JWK {
   readonly kty?: string
@@ -311,6 +311,35 @@ export const customFetch: unique symbol = Symbol()
  *     payload.exp = <number>payload.iat + 300
  *   },
  * })
+ * ```
+ *
+ * @example
+ *
+ * Changing the `alg: "Ed25519"` back to `alg: "EdDSA"`
+ *
+ * ```ts
+ * let as!: oauth.AuthorizationServer
+ * let client!: oauth.Client
+ * let parameters!: URLSearchParams
+ * let key!: oauth.CryptoKey | oauth.PrivateKey
+ * let keyPair!: oauth.CryptoKeyPair
+ *
+ * let remapEd25519: oauth.ModifyAssertionOptions = {
+ *   [oauth.modifyAssertion]: (header) => {
+ *     if (header.alg === 'Ed25519') {
+ *       header.alg = 'EdDSA'
+ *     }
+ *   },
+ * }
+ *
+ * // For JAR
+ * oauth.issueRequestObject(as, client, parameters, key, remapEd25519)
+ *
+ * // For Private Key JWT
+ * oauth.PrivateKeyJwt(key, remapEd25519)
+ *
+ * // For DPoP
+ * oauth.DPoP(client, keyPair, remapEd25519)
  * ```
  */
 export const modifyAssertion: unique symbol = Symbol()
@@ -1490,8 +1519,8 @@ function keyToJws(key: CryptoKey) {
     case 'ECDSA':
       return esAlg(key)
     case 'Ed25519': // Fall through
-    case 'Ed448':
-      return 'EdDSA'
+    case 'EdDSA':
+      return 'Ed25519'
     default:
       throw new UnsupportedOperationError('unsupported CryptoKey algorithm name', { cause: key })
   }
@@ -2873,7 +2902,8 @@ async function getPublicSigKeyFromIssuerJwksUri(
       case alg === 'ES256' && jwk.crv !== 'P-256': // Fall through
       case alg === 'ES384' && jwk.crv !== 'P-384': // Fall through
       case alg === 'ES512' && jwk.crv !== 'P-521': // Fall through
-      case alg === 'EdDSA' && !(jwk.crv === 'Ed25519' || jwk.crv === 'Ed448'):
+      case alg === 'Ed25519' && jwk.crv !== 'Ed25519': // Fall through
+      case alg === 'EdDSA' && jwk.crv !== 'Ed25519': // Fall through
         return false
     }
 
@@ -4516,6 +4546,7 @@ function supported(alg: string) {
     case 'PS512':
     case 'ES512':
     case 'RS512':
+    case 'Ed25519':
     case 'EdDSA':
       return true
     default:
@@ -4579,8 +4610,8 @@ function keyToSubtle(key: CryptoKey): AlgorithmIdentifier | RsaPssParams | Ecdsa
     case 'RSASSA-PKCS1-v1_5':
       checkRsaKeyAlgorithm(key)
       return key.algorithm.name
-    case 'Ed448': // Fall through
-    case 'Ed25519':
+    case 'Ed25519': // Fall through
+    case 'EdDSA':
       return key.algorithm.name
   }
   throw new UnsupportedOperationError('unsupported CryptoKey algorithm name', { cause: key })
@@ -4790,12 +4821,7 @@ export async function validateJwtAuthResponse(
   return validateAuthResponse(as, client, result, expectedState)
 }
 
-async function idTokenHash(
-  data: string,
-  key: CryptoKey,
-  header: CompactJWSHeaderParameters,
-  claimName: string,
-) {
+async function idTokenHash(data: string, header: CompactJWSHeaderParameters, claimName: string) {
   let algorithm: string
   switch (header.alg) {
     case 'RS256': // Fall through
@@ -4810,17 +4836,11 @@ async function idTokenHash(
       break
     case 'RS512': // Fall through
     case 'PS512': // Fall through
-    case 'ES512':
+    case 'ES512': // Fall through
+    case 'Ed25519': // Fall through
+    case 'EdDSA':
       algorithm = 'SHA-512'
       break
-    case 'EdDSA':
-      if (key.algorithm.name === 'Ed25519') {
-        algorithm = 'SHA-512'
-        break
-      }
-      throw new UnsupportedOperationError(`unsupported EdDSA curve for ${claimName} calculation`, {
-        cause: key,
-      })
     default:
       throw new UnsupportedOperationError(
         `unsupported JWS algorithm for ${claimName} calculation`,
@@ -4835,11 +4855,10 @@ async function idTokenHash(
 async function idTokenHashMatches(
   data: string,
   actual: string,
-  key: CryptoKey,
   header: CompactJWSHeaderParameters,
   claimName: string,
 ) {
-  const expected = await idTokenHash(data, key, header, claimName)
+  const expected = await idTokenHash(data, header, claimName)
   return actual === expected
 }
 
@@ -5103,7 +5122,7 @@ async function validateHybridResponse(
   const key = await getPublicSigKeyFromIssuerJwksUri(as, options, header)
   await validateJwsSignature(protectedHeader, payload, key, signature)
 
-  if ((await idTokenHashMatches(code, claims.c_hash, key!, header, 'c_hash')) !== true) {
+  if ((await idTokenHashMatches(code, claims.c_hash, header, 'c_hash')) !== true) {
     throw OPE('invalid ID Token "c_hash" (code hash) claim value', JWT_CLAIM_COMPARISON, {
       code,
       alg: header.alg,
@@ -5118,7 +5137,7 @@ async function validateHybridResponse(
     })
     assertString(state, '"state" response parameter', INVALID_RESPONSE, { parameters })
 
-    if ((await idTokenHashMatches(state, claims.s_hash, key!, header, 's_hash')) !== true) {
+    if ((await idTokenHashMatches(state, claims.s_hash, header, 's_hash')) !== true) {
       throw OPE('invalid ID Token "s_hash" (state hash) claim value', JWT_CLAIM_COMPARISON, {
         state,
         alg: header.alg,
@@ -5325,10 +5344,7 @@ export function validateAuthResponse(
   return brand(new URLSearchParams(parameters))
 }
 
-function algToSubtle(
-  alg: string,
-  crv?: string,
-): RsaHashedImportParams | EcKeyImportParams | AlgorithmIdentifier {
+function algToSubtle(alg: string): RsaHashedImportParams | EcKeyImportParams | AlgorithmIdentifier {
   switch (alg) {
     case 'PS256': // Fall through
     case 'PS384': // Fall through
@@ -5343,15 +5359,9 @@ function algToSubtle(
       return { name: 'ECDSA', namedCurve: `P-${alg.slice(-3)}` }
     case 'ES512':
       return { name: 'ECDSA', namedCurve: 'P-521' }
-    case 'EdDSA': {
-      switch (crv) {
-        case 'Ed25519': // Fall through
-        case 'Ed448':
-          return crv
-        default:
-          throw new UnsupportedOperationError('unsupported EdDSA curve', { cause: { alg, crv } })
-      }
-    }
+    case 'Ed25519':
+    case 'EdDSA':
+      return 'Ed25519'
     default:
       throw new UnsupportedOperationError('unsupported JWS algorithm', { cause: { alg } })
   }
@@ -5359,7 +5369,7 @@ function algToSubtle(
 
 async function importJwk(alg: string, jwk: JWK) {
   const { ext, key_ops, use, ...key } = jwk
-  return crypto.subtle.importKey('jwk', key, algToSubtle(alg, jwk.crv), true, ['verify'])
+  return crypto.subtle.importKey('jwk', key, algToSubtle(alg), true, ['verify'])
 }
 
 export interface DeviceAuthorizationRequestOptions
@@ -5608,11 +5618,6 @@ export interface GenerateKeyPairOptions {
    * (RSA algorithms only) The length, in bits, of the RSA modulus. Default is `2048`.
    */
   modulusLength?: number
-
-  /**
-   * (EdDSA algorithm only) The EdDSA sub-type. Default is `Ed25519`.
-   */
-  crv?: 'Ed25519' | 'Ed448'
 }
 
 /**
@@ -5629,10 +5634,7 @@ export async function generateKeyPair(
 ): Promise<CryptoKeyPair> {
   assertString(alg, '"alg"')
 
-  const algorithm: RsaHashedKeyGenParams | EcKeyGenParams | AlgorithmIdentifier = algToSubtle(
-    alg,
-    alg === 'EdDSA' ? (options?.crv ?? 'Ed25519') : undefined,
-  )
+  const algorithm: RsaHashedKeyGenParams | EcKeyGenParams | AlgorithmIdentifier = algToSubtle(alg)
 
   if (alg.startsWith('PS') || alg.startsWith('RS')) {
     Object.assign(algorithm, {

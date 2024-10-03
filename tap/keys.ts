@@ -7,7 +7,7 @@ export const fails: string[] = []
 if (!env.isDeno) {
   algs.push('ES512')
 }
-;(env.isBlink ? fails : algs).push('EdDSA')
+;(env.isBlink ? fails : algs).push('EdDSA', 'Ed25519')
 
 export const keys = algs.reduce(
   (acc, alg) => {

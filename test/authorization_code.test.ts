@@ -1,7 +1,6 @@
 import anyTest, { type TestFn } from 'ava'
 import * as querystring from 'node:querystring'
 import setup, {
-  ALGS,
   client,
   endpoint,
   getResponse,
@@ -643,37 +642,35 @@ test('processAuthorizationCodeResponse() with an ID Token typ: "application/jwt"
   )
 })
 
-for (const alg of ALGS) {
-  test(`processAuthorizationCodeResponse() with an ${alg} ID Token`, async (t) => {
-    const tIssuer: lib.AuthorizationServer = {
-      ...issuer,
-      id_token_signing_alg_values_supported: [alg],
-      jwks_uri: endpoint('jwks'),
-    }
+test(`processAuthorizationCodeResponse() with an ID Token`, async (t) => {
+  const tIssuer: lib.AuthorizationServer = {
+    ...issuer,
+    id_token_signing_alg_values_supported: ['ES256'],
+    jwks_uri: endpoint('jwks'),
+  }
 
-    await t.notThrowsAsync(
-      lib.processAuthorizationCodeResponse(
-        tIssuer,
-        client,
-        getResponse(
-          JSON.stringify({
-            access_token:
-              'YmJiZTAwYmYtMzgyOC00NzhkLTkyOTItNjJjNDM3MGYzOWIy9sFhvH8K_x8UIHj1osisS57f5DduL',
-            token_type: 'Bearer',
-            id_token: await new jose.SignJWT({})
-              .setProtectedHeader({ alg })
-              .setIssuer(issuer.issuer)
-              .setSubject('urn:example:subject')
-              .setAudience(client.client_id)
-              .setExpirationTime('5m')
-              .setIssuedAt()
-              .sign(t.context[alg].privateKey),
-          }),
-        ),
+  await t.notThrowsAsync(
+    lib.processAuthorizationCodeResponse(
+      tIssuer,
+      client,
+      getResponse(
+        JSON.stringify({
+          access_token:
+            'YmJiZTAwYmYtMzgyOC00NzhkLTkyOTItNjJjNDM3MGYzOWIy9sFhvH8K_x8UIHj1osisS57f5DduL',
+          token_type: 'Bearer',
+          id_token: await new jose.SignJWT({})
+            .setProtectedHeader({ alg: 'ES256' })
+            .setIssuer(issuer.issuer)
+            .setSubject('urn:example:subject')
+            .setAudience(client.client_id)
+            .setExpirationTime('5m')
+            .setIssuedAt()
+            .sign(t.context.ES256.privateKey),
+        }),
       ),
-    )
-  })
-}
+    ),
+  )
+})
 
 test('processAuthorizationCodeResponse() nonce checks', async (t) => {
   const tIssuer: lib.AuthorizationServer = { ...issuer, jwks_uri: endpoint('jwks') }

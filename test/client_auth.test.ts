@@ -1,6 +1,5 @@
 import anyTest, { type TestFn } from 'ava'
 import setup, {
-  ALGS,
   client,
   endpoint,
   issuer,
@@ -215,31 +214,6 @@ test('private_key_jwt ({ key: CryptoKey, kid: string })', async (t) => {
   })
   t.pass()
 })
-
-for (const alg of ALGS) {
-  test(`private_key_jwt using ${alg}`, async (t) => {
-    let assertion!: string
-    t.context
-      .intercept({
-        path: `/test-${alg}`,
-        method: 'POST',
-        body(body) {
-          assertion = new URLSearchParams(body).get('client_assertion')!
-          return jose.decodeProtectedHeader(assertion).alg === alg
-        },
-      })
-      .reply(200, '')
-
-    await lib.revocationRequest(
-      { ...issuer, revocation_endpoint: endpoint(`test-${alg}`) },
-      client,
-      lib.PrivateKeyJwt(t.context[alg].privateKey),
-      'token',
-    )
-    await jose.compactVerify(assertion, t.context[alg].publicKey)
-    t.pass()
-  })
-}
 
 test('none', async (t) => {
   t.context

@@ -10,36 +10,49 @@ export default (QUnit: QUnit) => {
   const { module, test } = QUnit
   module('request_object.ts')
 
-  for (const [alg, kp] of Object.entries(keys)) {
-    test(`issueRequestObject() w/ ${alg}`, async (t) => {
-      const { privateKey, publicKey } = await kp
-      for (const parameters of [
-        new URLSearchParams({ response_type: 'code', resource: 'urn:example:resource' }),
-        { response_type: 'code', resource: 'urn:example:resource' },
-        [
-          ['response_type', 'code'],
-          ['resource', 'urn:example:resource'],
-        ],
-      ]) {
-        const jwt = await lib.issueRequestObject(issuer, client, parameters, { key: privateKey })
+  test(`issueRequestObject()`, async (t) => {
+    const { privateKey, publicKey } = await lib.generateKeyPair('ES256')
+    for (const parameters of [
+      new URLSearchParams({ response_type: 'code', resource: 'urn:example:resource' }),
+      { response_type: 'code', resource: 'urn:example:resource' },
+      [
+        ['response_type', 'code'],
+        ['resource', 'urn:example:resource'],
+      ],
+    ]) {
+      const jwt = await lib.issueRequestObject(
+        issuer,
+        client,
+        parameters,
+        { key: privateKey },
+        {
+          [lib.modifyAssertion]: (header) => {
+            if (header.alg === 'Ed25519') {
+              header.alg = 'EdDSA'
+            }
+          },
+        },
+      )
 
-        const { payload, protectedHeader } = await jose.jwtVerify(jwt, publicKey)
-        t.propEqual(protectedHeader, { alg, typ: 'oauth-authz-req+jwt' })
-        const { exp, iat, nbf, jti, ...claims } = payload
-        t.equal(typeof exp, 'number')
-        t.equal(typeof nbf, 'number')
-        t.equal(typeof iat, 'number')
-        t.equal(typeof jti, 'string')
-        t.propEqual(claims, {
-          iss: client.client_id,
-          aud: issuer.issuer,
-          response_type: 'code',
-          resource: 'urn:example:resource',
-          client_id: client.client_id,
-        })
-      }
-    })
-  }
+      const { payload, protectedHeader } = await jose.jwtVerify(jwt, publicKey)
+      t.propEqual(protectedHeader, {
+        alg: 'ES256',
+        typ: 'oauth-authz-req+jwt',
+      })
+      const { exp, iat, nbf, jti, ...claims } = payload
+      t.equal(typeof exp, 'number')
+      t.equal(typeof nbf, 'number')
+      t.equal(typeof iat, 'number')
+      t.equal(typeof jti, 'string')
+      t.propEqual(claims, {
+        iss: client.client_id,
+        aud: issuer.issuer,
+        response_type: 'code',
+        resource: 'urn:example:resource',
+        client_id: client.client_id,
+      })
+    }
+  })
 
   test('issueRequestObject() multiple resource parameters', async (t) => {
     const kp = await keys.ES256

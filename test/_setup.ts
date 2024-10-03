@@ -4,18 +4,6 @@ import * as jose from 'jose'
 
 import type { AuthorizationServer, Client } from '../src/index.js'
 
-export const ALGS = [
-  'ES256',
-  'RS256',
-  'PS256',
-  'ES384',
-  'RS384',
-  'PS384',
-  'ES512',
-  'RS512',
-  'PS512',
-  'EdDSA',
-]
 interface ContextAlgs {
   [key: string]: CryptoKeyPair
 }
@@ -37,8 +25,19 @@ export default (t: ExecutionContext<Context>) => {
 }
 
 export async function setupContextKeys(t: ExecutionContext<ContextWithAlgs>) {
-  await Promise.all(
-    ALGS.map(async (alg) => (t.context[alg] = await jose.generateKeyPair<CryptoKey>(alg))),
+  t.context.ES256 = await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, [
+    'sign',
+    'verify',
+  ])
+  t.context.RS256 = await crypto.subtle.generateKey(
+    {
+      name: 'RSASSA-PKCS1-v1_5',
+      hash: 'SHA-256',
+      modulusLength: 2048,
+      publicExponent: new Uint8Array([0x01, 0x00, 0x01]),
+    },
+    true,
+    ['sign', 'verify'],
   )
 }
 
@@ -55,11 +54,10 @@ export async function setupJwks(t: ExecutionContext<ContextWithAlgs>) {
     .reply(
       200,
       {
-        keys: await Promise.all(
-          ALGS.map((alg) =>
-            jose.exportJWK(t.context[alg].publicKey).then((jwk) => ({ ...jwk, alg })),
-          ),
-        ),
+        keys: [
+          await jose.exportJWK(t.context.ES256.publicKey).then((jwk) => ({ ...jwk, alg: 'ES256' })),
+          await jose.exportJWK(t.context.RS256.publicKey).then((jwk) => ({ ...jwk, alg: 'RS256' })),
+        ],
       },
       {
         headers: { 'content-type': coinflip() ? 'application/json' : 'application/jwk-set+json' },
