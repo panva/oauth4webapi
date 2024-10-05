@@ -252,21 +252,70 @@ export const clockTolerance: unique symbol = Symbol()
  *
  * @example
  *
- * Using [nodejs/undici](https://github.com/nodejs/undici) to mock responses in tests.
+ * Using [nodejs/undici](https://github.com/nodejs/undici) to detect and use HTTP proxies.
  *
- * ```js
+ * ```ts
  * import * as undici from 'undici'
  *
- * const mockAgent = new undici.MockAgent()
- * mockAgent.disableNetConnect()
- * undici.setGlobalDispatcher(mockAgent)
- *
- * // continue as per undici documentation
- * // https://github.com/nodejs/undici/blob/v6.2.1/docs/api/MockAgent.md#example---basic-mocked-request
+ * // see https://undici.nodejs.org/#/docs/api/EnvHttpProxyAgent
+ * const envHttpProxyAgent = new undici.EnvHttpProxyAgent()
  *
  * // example use
  * await oauth.discoveryRequest(new URL('https://as.example.com'), {
- *   [oauth.customFetch]: undici.fetch,
+ *   // @ts-ignore
+ *   [oauth.customFetch](...args) {
+ *     return undici.fetch(args[0], { ...args[1], dispatcher: envHttpProxyAgent }) // prettier-ignore
+ *   },
+ * })
+ * ```
+ *
+ * @example
+ *
+ * Using [nodejs/undici](https://github.com/nodejs/undici) to automatically retry network errors.
+ *
+ * ```ts
+ * import * as undici from 'undici'
+ *
+ * // see https://undici.nodejs.org/#/docs/api/RetryAgent
+ * const retryAgent = new undici.RetryAgent(new undici.Agent(), {
+ *   statusCodes: [],
+ *   errorCodes: [
+ *     'ECONNRESET',
+ *     'ECONNREFUSED',
+ *     'ENOTFOUND',
+ *     'ENETDOWN',
+ *     'ENETUNREACH',
+ *     'EHOSTDOWN',
+ *     'UND_ERR_SOCKET',
+ *   ],
+ * })
+ *
+ * // example use
+ * await oauth.discoveryRequest(new URL('https://as.example.com'), {
+ *   // @ts-ignore
+ *   [oauth.customFetch](...args) {
+ *     return undici.fetch(args[0], { ...args[1], dispatcher: retryAgent }) // prettier-ignore
+ *   },
+ * })
+ * ```
+ *
+ * @example
+ *
+ * Using [nodejs/undici](https://github.com/nodejs/undici) to mock responses in tests.
+ *
+ * ```ts
+ * import * as undici from 'undici'
+ *
+ * // see https://undici.nodejs.org/#/docs/api/MockAgent
+ * const mockAgent = new undici.MockAgent()
+ * mockAgent.disableNetConnect()
+ *
+ * // example use
+ * await oauth.discoveryRequest(new URL('https://as.example.com'), {
+ *   // @ts-ignore
+ *   [oauth.customFetch](...args) {
+ *     return undici.fetch(args[0], { ...args[1], dispatcher: mockAgent }) // prettier-ignore
+ *   },
  * })
  * ```
  */
