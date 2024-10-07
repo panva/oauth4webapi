@@ -13,10 +13,8 @@ export type CryptoKey = Extract<
   Awaited<ReturnType<typeof crypto.subtle.generateKey>>,
   { type: string }
 >
-/**
- * @ignore
- */
-export type CryptoKeyPair = {
+
+export interface CryptoKeyPair {
   privateKey: CryptoKey
   publicKey: CryptoKey
 }
@@ -2248,9 +2246,9 @@ export function isDPoPNonceError(err: unknown): boolean {
 }
 
 /**
- * Returns a wrapper / handle around a {@link !CryptoKeyPair} that is used for negotiating and
- * proving proof-of-possession to sender-constrain OAuth 2.0 tokens via DPoP at the Authorization
- * Server and Resource Server.
+ * Returns a wrapper / handle around a {@link CryptoKeyPair} that is used for negotiating and proving
+ * proof-of-possession to sender-constrain OAuth 2.0 tokens via DPoP at the Authorization Server and
+ * Resource Server.
  *
  * This wrapper / handle also keeps track of server-issued nonces, allowing requests to be retried
  * with a fresh nonce when the server indicates the need to use one. {@link isDPoPNonceError} can be
@@ -5628,7 +5626,7 @@ export interface GenerateKeyPairOptions {
 }
 
 /**
- * Generates a {@link !CryptoKeyPair} for a given JWS `alg` Algorithm identifier.
+ * Generates a {@link CryptoKeyPair} for a given JWS `alg` Algorithm identifier.
  *
  * @param alg Supported JWS `alg` Algorithm identifier. Must be a
  *   {@link JWSAlgorithm supported JWS Algorithm}.
