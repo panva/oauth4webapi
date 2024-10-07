@@ -3764,12 +3764,6 @@ export async function processAuthorizationCodeResponse(
   client: Client,
   response: Response,
   options?: ProcessAuthorizationCodeResponseOptions,
-): Promise<TokenEndpointResponse>
-export async function processAuthorizationCodeResponse(
-  as: AuthorizationServer,
-  client: Client,
-  response: Response,
-  options?: ProcessAuthorizationCodeResponseOptions,
 ): Promise<TokenEndpointResponse> {
   if (
     typeof options?.expectedNonce === 'string' ||
