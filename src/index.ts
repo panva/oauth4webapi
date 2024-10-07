@@ -818,12 +818,13 @@ export interface AuthorizationServer {
 export interface MTLSEndpointAliases
   extends Pick<
     AuthorizationServer,
-    | 'token_endpoint'
-    | 'revocation_endpoint'
-    | 'introspection_endpoint'
+    | 'backchannel_authentication_endpoint'
     | 'device_authorization_endpoint'
-    | 'userinfo_endpoint'
+    | 'introspection_endpoint'
     | 'pushed_authorization_request_endpoint'
+    | 'revocation_endpoint'
+    | 'token_endpoint'
+    | 'userinfo_endpoint'
   > {
   readonly [metadata: string]: JsonValue | undefined
 }
