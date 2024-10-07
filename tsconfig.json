@@ -2,9 +2,9 @@
   "files": ["src/index.ts"],
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
-    "target": "ES2020",
-    "module": "ES2020",
-    "lib": ["ES2020", "DOM", "DOM.Iterable", "ES2022.Error", "ES2021.Promise"],
+    "target": "ES2022",
+    "module": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "strict": true,
     "removeComments": true,
     "outDir": "build",
