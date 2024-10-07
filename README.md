@@ -23,7 +23,7 @@ The following features are currently in scope and implemented in this software:
   <source media="(prefers-color-scheme: dark)" srcset="./sponsor/Auth0byOkta_dark.png">
   <source media="(prefers-color-scheme: light)" srcset="./sponsor/Auth0byOkta_light.png">
   <img height="65" align="left" alt="Auth0 by Okta" src="./sponsor/Auth0byOkta_light.png">
-</picture> 
+</picture>
 
 If you want to quickly add authentication to JavaScript apps, feel free to check out Auth0's JavaScript SDK and free plan. [Create an Auth0 account; it's free!][sponsor-auth0]<br><br>
 
@@ -47,7 +47,7 @@ Support from the community to continue maintaining and improving this module is 
 
 ## [Examples](examples/README.md)
 
-**`example`** ESM import
+**`example`** ESM import[^cjs]
 
 ```js
 import * as oauth from 'oauth4webapi'
@@ -74,7 +74,6 @@ import * as oauth from 'oauth4webapi'
   - FAPI 2.0 Security Profile - [source](examples/fapi2.ts) | [diff](examples/fapi2.diff)
   - FAPI 2.0 Message Signing - [source](examples/fapi2-message-signing.ts) | [diff](examples/fapi2-message-signing.diff)
 
-
 ## Supported Runtimes
 
 The supported JavaScript runtimes include those that support the utilized Web API globals and standard built-in objects. These are _(but are not limited to)_:
@@ -84,16 +83,17 @@ The supported JavaScript runtimes include those that support the utilized Web AP
 - Cloudflare Workers
 - Deno
 - Electron
-- Node.js ([runtime flags may be needed](https://github.com/panva/oauth4webapi/issues/8))
+- Node.js
 - Vercel's Edge Runtime
 
-## Out of scope
+## Supported Versions
 
-The following features are currently out of scope:
-
-- CommonJS
-- Implicit, Hybrid, and Resource Owner Password Credentials Flows
-- JSON Web Encryption (JWE)
-- Automatic polyfills of any kind
+| Version                                                 | Security Fixes 🔑 | Other Bug Fixes 🐞 | New Features ⭐ |
+| ------------------------------------------------------- | ----------------- | ------------------ | --------------- |
+| [v3.x](https://github.com/panva/oauth4webapi/tree/v3.x) | ✅                | ✅                 | ✅              |
+| [v2.x](https://github.com/panva/oauth4webapi/tree/v2.x) | ❌                | ❌                 | ❌              |
+| [v1.x](https://github.com/panva/oauth4webapi/tree/v1.x) | ❌                | ❌                 | ❌              |
 
 [sponsor-auth0]: https://auth0.com/signup?utm_source=external_sites&utm_medium=panva&utm_campaign=devn_signup
+
+[^cjs]: CJS style `let oauth = require('oauth4webapi')` is possible in Node.js versions where `process.features.require_module` is `true` or with the `--experimental-require-module` Node.js CLI flag.
