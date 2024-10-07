@@ -150,7 +150,7 @@ export const allowInsecureRequests: unique symbol = Symbol()
  * When the local clock is mistakenly 1 hour in the past
  *
  * ```ts
- * const client: oauth.Client = {
+ * let client: oauth.Client = {
  *   client_id: 'abc4ba37-4ab8-49b5-99d4-9441ba35d428',
  *   // ... other metadata
  *   [oauth.clockSkew]: +(60 * 60),
@@ -162,7 +162,7 @@ export const allowInsecureRequests: unique symbol = Symbol()
  * When the local clock is mistakenly 1 hour in the future
  *
  * ```ts
- * const client: oauth.Client = {
+ * let client: oauth.Client = {
  *   client_id: 'abc4ba37-4ab8-49b5-99d4-9441ba35d428',
  *   // ... other metadata
  *   [oauth.clockSkew]: -(60 * 60),
@@ -180,7 +180,7 @@ export const clockSkew: unique symbol = Symbol()
  * Tolerate 30 seconds clock skew when validating JWT claims like exp or nbf.
  *
  * ```ts
- * const client: oauth.Client = {
+ * let client: oauth.Client = {
  *   client_id: 'abc4ba37-4ab8-49b5-99d4-9441ba35d428',
  *   // ... other metadata
  *   [oauth.clockTolerance]: 30,
@@ -258,7 +258,7 @@ export const clockTolerance: unique symbol = Symbol()
  * import * as undici from 'undici'
  *
  * // see https://undici.nodejs.org/#/docs/api/EnvHttpProxyAgent
- * const envHttpProxyAgent = new undici.EnvHttpProxyAgent()
+ * let envHttpProxyAgent = new undici.EnvHttpProxyAgent()
  *
  * // example use
  * await oauth.discoveryRequest(new URL('https://as.example.com'), {
@@ -277,7 +277,7 @@ export const clockTolerance: unique symbol = Symbol()
  * import * as undici from 'undici'
  *
  * // see https://undici.nodejs.org/#/docs/api/RetryAgent
- * const retryAgent = new undici.RetryAgent(new undici.Agent(), {
+ * let retryAgent = new undici.RetryAgent(new undici.Agent(), {
  *   statusCodes: [],
  *   errorCodes: [
  *     'ECONNRESET',
@@ -307,7 +307,7 @@ export const clockTolerance: unique symbol = Symbol()
  * import * as undici from 'undici'
  *
  * // see https://undici.nodejs.org/#/docs/api/MockAgent
- * const mockAgent = new undici.MockAgent()
+ * let mockAgent = new undici.MockAgent()
  * mockAgent.disableNetConnect()
  *
  * // example use
@@ -342,7 +342,7 @@ export const customFetch: unique symbol = Symbol()
  *   },
  * })
  *
- * const response = await oauth.pushedAuthorizationRequest(as, client, clientAuth, parameters)
+ * let response = await oauth.pushedAuthorizationRequest(as, client, clientAuth, parameters)
  * ```
  *
  * @example
@@ -355,7 +355,7 @@ export const customFetch: unique symbol = Symbol()
  * let parameters!: URLSearchParams
  * let key!: oauth.CryptoKey | oauth.PrivateKey
  *
- * const request = await oauth.issueRequestObject(as, client, parameters, key, {
+ * let request = await oauth.issueRequestObject(as, client, parameters, key, {
  *   [oauth.modifyAssertion](header, payload) {
  *     payload.exp = <number>payload.iat + 300
  *   },
@@ -418,7 +418,7 @@ export const modifyAssertion: unique symbol = Symbol()
  * let currentUrl!: URL
  * let state!: string | undefined
  *
- * const decoder = new TextDecoder()
+ * let decoder = new TextDecoder()
  * let jweDecrypt: oauth.JweDecryptFunction = async (jwe) => {
  *   const { plaintext } = await jose
  *     .compactDecrypt(jwe, key, {
@@ -432,7 +432,7 @@ export const modifyAssertion: unique symbol = Symbol()
  *   return decoder.decode(plaintext)
  * }
  *
- * const params = await oauth.validateJwtAuthResponse(as, client, currentUrl, state, {
+ * let params = await oauth.validateJwtAuthResponse(as, client, currentUrl, state, {
  *   [oauth.jweDecrypt]: jweDecrypt,
  * })
  * ```
@@ -477,11 +477,11 @@ export const jweDecrypt: unique symbol = Symbol()
  * let storeNewJWKScache!: (cache: oauth.ExportedJWKSCache) => Promise<void>
  *
  * // Load JSON Web Key Set cache
- * const jwksCache: oauth.JWKSCacheInput = (await getPreviouslyCachedJWKS()) || {}
- * const { uat } = jwksCache
+ * let jwksCache: oauth.JWKSCacheInput = (await getPreviouslyCachedJWKS()) || {}
+ * let { uat } = jwksCache
  *
  * // Use JSON Web Key Set cache
- * const accessTokenClaims = await oauth.validateJwtAccessToken(as, request, expectedAudience, {
+ * let accessTokenClaims = await oauth.validateJwtAccessToken(as, request, expectedAudience, {
  *   [oauth.jwksCache]: jwksCache,
  * })
  *
@@ -900,9 +900,9 @@ export interface Client {
    * let cert!: string // PEM-encoded certificate
    *
    * let clientAuth = oauth.TlsClientAuth()
-   * const agent = new undici.Agent({ connect: { key, cert } })
+   * let agent = new undici.Agent({ connect: { key, cert } })
    *
-   * const response = await oauth.pushedAuthorizationRequest(as, client, clientAuth, params, {
+   * let response = await oauth.pushedAuthorizationRequest(as, client, clientAuth, params, {
    *   // @ts-ignore
    *   [oauth.customFetch]: (...args) =>
    *     undici.fetch(args[0], { ...args[1], dispatcher: agent }),
@@ -923,9 +923,9 @@ export interface Client {
    *
    * let clientAuth = oauth.TlsClientAuth()
    * // @ts-ignore
-   * const agent = Deno.createHttpClient({ key, cert })
+   * let agent = Deno.createHttpClient({ key, cert })
    *
-   * const response = await oauth.pushedAuthorizationRequest(as, client, clientAuth, params, {
+   * let response = await oauth.pushedAuthorizationRequest(as, client, clientAuth, params, {
    *   // @ts-ignore
    *   [oauth.customFetch]: (...args) => fetch(args[0], { ...args[1], client: agent }),
    * })
@@ -1085,7 +1085,7 @@ export interface HttpRequestOptions<Method, BodyType = undefined> {
    * A 5000ms timeout AbortSignal for every request
    *
    * ```js
-   * const signal = () => AbortSignal.timeout(5_000) // Note: AbortSignal.timeout may not yet be available in all runtimes.
+   * let signal = () => AbortSignal.timeout(5_000) // Note: AbortSignal.timeout may not yet be available in all runtimes.
    * ```
    */
   signal?: (() => AbortSignal) | AbortSignal
