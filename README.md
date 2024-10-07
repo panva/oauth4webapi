@@ -17,6 +17,16 @@ The following features are currently in scope and implemented in this software:
 - JWT Secured Introspection, Response Mode (JARM), Authorization Request (JAR), and UserInfo
 - Validating incoming JWT Access Tokens
 
+## Sponsor
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./sponsor/Auth0byOkta_dark.png">
+  <source media="(prefers-color-scheme: light)" srcset="./sponsor/Auth0byOkta_light.png">
+  <img height="65" align="left" alt="Auth0 by Okta" src="./sponsor/Auth0byOkta_light.png">
+</picture> 
+
+If you want to quickly add authentication to JavaScript apps, feel free to check out Auth0's JavaScript SDK and free plan. [Create an Auth0 account; it's free!][sponsor-auth0]<br><br>
+
 ## [Certification](https://openid.net/certification/faq/)
 
 [<img width="96" height="50" align="right" src="https://user-images.githubusercontent.com/241506/166977513-7cd710a9-7f60-4944-aebe-a658e9f36375.png" alt="OpenID Certification">](#certification)
@@ -85,3 +95,5 @@ The following features are currently out of scope:
 - Implicit, Hybrid, and Resource Owner Password Credentials Flows
 - JSON Web Encryption (JWE)
 - Automatic polyfills of any kind
+
+[sponsor-auth0]: https://auth0.com/signup?utm_source=external_sites&utm_medium=panva&utm_campaign=devn_signup
