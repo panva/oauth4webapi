@@ -2,6 +2,124 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.0.0](https://github.com/panva/oauth4webapi/compare/v2.17.0...v3.0.0) (2024-10-07)
+
+
+### ⚠ BREAKING CHANGES
+
+* build target is now ES2022
+* jweDecrypt is no longer an allowed symbol on the Client
+interface, it is instead an option passed to functions that may
+encounter encrypted assertions
+* specifying Ed448 curve for EdDSA is no longer
+supported, EdDSA is now just an alias for the fully-specified Ed25519
+JWS algorithm
+* assertions signed with an Ed25519 CryptoKey will now
+use the Ed25519 JWS alg value instead of EdDSA. This can be reverted
+using the modifyAssertion symbol export
+* the audience of a Private Key JWT and Client Secret JWT
+client assertions is now just the issuer identifier
+* remove modifyAssertion from the PrivateKey interface
+* optional (non-repudiation) signature validation of
+ID Token JWS Signatures is now done the same way as JWT UserInfo and
+JWT Introspection is done, with a Response instance rather than a
+TokenEndpointResponse object
+* validateJwtIntrospectionSignature is now validateApplicationLevelSignature
+* validateJwtUserInfoSignature is now validateApplicationLevelSignature
+* validateIdTokenSignature is now validateApplicationLevelSignature
+* DPoP request options are now obtained by calling the
+`DPoP()` exported function. This returns a handle that also maintains
+its own LRU nonce caches
+* client authentication is now an explicit argument to authenticated functions
+* `processAuthorizationCodeOpenIDResponse()` method was
+removed in favour of `processAuthorizationCodeResponse()`
+* `processAuthorizationCodeOAuth2Response()` method was
+removed in favour of `processAuthorizationCodeResponse()`
+* All grant functions that execute against the Token
+Endpoint will now validate ID Token when there is one in the response.
+This has already been the behaviour of functions such as `processRefreshTokenResponse()`
+or `processDeviceCodeResponse()`
+* Presence of `auth_time` is now required in all
+ID Tokens if client.default_auth_time is set
+* encode client_secret_basic - _ . ! ~ * ' ( ) characters
+* remove all deprecated options
+* remove the useMtlsAlias symbol and options
+* all functions now reject interacting with non-TLS HTTP
+endpoints. You can use the `allowInsecureRequests` in the
+`HttpRequestOptions` interface to revert this behaviour.
+* removed the `isOAuth2Error()` helper, all functions that
+used to possibly return an OAuth2Error now reject with
+ResponseBodyError or AuthorizationResponseError instead
+* removed `parseWwwAuthenticateChallenges()`, all
+functions verify process `Response` now reject with
+`WWWAuthenticateChallengeError` instead
+* removed `protectedResourceRequest()` now rejects with
+`WWWAuthenticateChallengeError` when the Response has one
+
+### Features
+
+* add a counterpart process method to genericTokenEndpointRequest ([848f3f6](https://github.com/panva/oauth4webapi/commit/848f3f62a2bd679f5bb1dce074b0ec9aec410950))
+* add a helper function for DPoP retry management ([06493e3](https://github.com/panva/oauth4webapi/commit/06493e366c423fc5e8957199c09d06d40d0fdd6d))
+* add support for client_secret_jwt ([cf85fd6](https://github.com/panva/oauth4webapi/commit/cf85fd6c23dea46d6e48f973fe7bb8601f034d6b))
+* add support for code id_token response without FAPI 1.0 s_hash ([eebb4f1](https://github.com/panva/oauth4webapi/commit/eebb4f1e884bf229975729f6d7cc96441331e3bb))
+* add unified authorization code method ([07d4ff9](https://github.com/panva/oauth4webapi/commit/07d4ff963fdd8c479fbfea30ce2cd1c70c9669f5))
+* allow setting expected JWT algorithms in validateJwtAccessToken ([8f20f91](https://github.com/panva/oauth4webapi/commit/8f20f9158074bca540a407bbcadd7b1815411a94))
+
+
+### Fixes
+
+* encode client_secret_basic - _ . ! ~ * ' ( ) characters ([cd5bbc1](https://github.com/panva/oauth4webapi/commit/cd5bbc1efce400ef70b26c660d10440b6bdbb268))
+* **types:** infer CryptoKey type for @types/node types' sake ([d126f1f](https://github.com/panva/oauth4webapi/commit/d126f1f825185aec1118a7e80479d0489c5f0bcc))
+
+
+### Documentation
+
+* add more examples ([dcaf056](https://github.com/panva/oauth4webapi/commit/dcaf056d4e7f20c2df06d96ede3a74c64fec833b))
+* export and document error codes ([364cbd8](https://github.com/panva/oauth4webapi/commit/364cbd894a7c38552204ba98787b1d3bac2ad610))
+* hide the error constructors ([a1cb7f8](https://github.com/panva/oauth4webapi/commit/a1cb7f8f0704455f7890f95e9f058b6834fe1399))
+* minor touch ups ([fee6790](https://github.com/panva/oauth4webapi/commit/fee6790014a65a09269089f8ef40bb7f68e1f3e5))
+* re-generate API reference docs ([c4a7f64](https://github.com/panva/oauth4webapi/commit/c4a7f64abaa508eb3ab0f9c0f50d977899c4f95f))
+* update client auth method docs ([ef8fe9f](https://github.com/panva/oauth4webapi/commit/ef8fe9f4d51b178d86f1fecf7c727e5542ee5052))
+* update examples due to changes ([f24b39d](https://github.com/panva/oauth4webapi/commit/f24b39d945087ed9d9753cd1b801fd3ad541e7c5))
+* update examples due to changes ([fcd3c3e](https://github.com/panva/oauth4webapi/commit/fcd3c3e57e45d95b5c5b59f300003f6f1a1bb3a4))
+* update groups, properties ([329876a](https://github.com/panva/oauth4webapi/commit/329876a61c2751a9f36ac10884983fc56c2fa2fb))
+* update inline examples ([33ee2b0](https://github.com/panva/oauth4webapi/commit/33ee2b0e56a50f3464ee70f9bde2d2e9b8a1fd40))
+* update README.md ([0bd2e56](https://github.com/panva/oauth4webapi/commit/0bd2e569940491fb66263ce8058e8a79e297c190))
+* update several examples and add descriptions to DAG ([dd99b9a](https://github.com/panva/oauth4webapi/commit/dd99b9a2a676cc5b93c1fddde28f3c3df26099bd))
+
+
+### Refactor
+
+* add a source map, update pkg exports ([0232cf2](https://github.com/panva/oauth4webapi/commit/0232cf29f2a62a1ef4e59b46726160ef4c0c471b))
+* add causes and codes to "is not a conform" errors ([a0b19c5](https://github.com/panva/oauth4webapi/commit/a0b19c5e9601d3c55630068c6f52ddd019c20097))
+* add claim/attribute names to error reasons ([fe11bdc](https://github.com/panva/oauth4webapi/commit/fe11bdcea1b8398342bcbbbc52401fc609128eb5))
+* add more error messages and update codes ([038b44a](https://github.com/panva/oauth4webapi/commit/038b44aa27a25a6869d3d25cff767b29d8b9724f))
+* add OperationProcessingError code and cause when wrong callback method is used ([9d4c546](https://github.com/panva/oauth4webapi/commit/9d4c546da4fee17e732507ed8dc25901919767b1))
+* added codes and reasons to as many errors as possible ([bce81b4](https://github.com/panva/oauth4webapi/commit/bce81b423c85746ff5a18a0abd6d2d85aeb2088e))
+* allow and document tls client auth methods ([f0e7919](https://github.com/panva/oauth4webapi/commit/f0e791936f7e4b2bc235e956451a467abf41ac45))
+* better type for oauth.customFetch implementations, updated examples ([a06efb5](https://github.com/panva/oauth4webapi/commit/a06efb558db60a714737887e3eb62898db08d1ed))
+* build target is now ES2022 ([8af3e9f](https://github.com/panva/oauth4webapi/commit/8af3e9f30a5e01ce25dad5e310830b04fb0a5d24))
+* changed the default client authentication ([4fe3f2c](https://github.com/panva/oauth4webapi/commit/4fe3f2cf08ab0a3a6a2f1c32deb332dbfca9eded))
+* client authentication is now an explicit argument to authenticated functions ([cefcf32](https://github.com/panva/oauth4webapi/commit/cefcf32eb26ca135b35ef39267e4e57da2fee2cd))
+* future proof Ed25519 ([ac0550d](https://github.com/panva/oauth4webapi/commit/ac0550de0ca589f04edffa864b6bdb9cf7a102ba))
+* improve tree-shaking of JWT claims verification ([60b7dcf](https://github.com/panva/oauth4webapi/commit/60b7dcf204e4fbb42e2851e94275f46a8573e394))
+* jweDecrypt is now an option on the functions that support it ([d7e8482](https://github.com/panva/oauth4webapi/commit/d7e84822d58cb2581db87a9d950bc8f1701cc81c))
+* keep all OAuthError properties ([fce528e](https://github.com/panva/oauth4webapi/commit/fce528eedbef9f0e0482ed4f0791f2c6398bbb4e))
+* make DPoP implementation tree-shakeable ([1fca2a3](https://github.com/panva/oauth4webapi/commit/1fca2a30ea8a20e48f3a7f64f6917cb4c7502753))
+* private_key_jwt audience is now only the issuer identifier ([f388ba8](https://github.com/panva/oauth4webapi/commit/f388ba8c890f6227ef0b7d7fc42a4e0ba35c6bf9))
+* push id token required claims straight to jwt validation ([ec45b61](https://github.com/panva/oauth4webapi/commit/ec45b61d8ada300845b56c0b9c413fb76a7b48a2))
+* reject requests to non-HTTPS endpoints by default ([4829da6](https://github.com/panva/oauth4webapi/commit/4829da646e930f225732ec6a8e57721c103299b3))
+* remove all deprecated options ([137a547](https://github.com/panva/oauth4webapi/commit/137a5478a5e9e1b12cf9db81df4b6fccdf219481))
+* remove modifyAssertion from the PrivateKey interface ([4d8b9e8](https://github.com/panva/oauth4webapi/commit/4d8b9e8929faa44ca44bb41a80573ac6599c706a))
+* remove the useMtlsAlias symbol and options ([cd5ed0d](https://github.com/panva/oauth4webapi/commit/cd5ed0d6af36dc470c692029b8f9d0e87f85cc36))
+* remove the weird use of JWSAlgorithm type ([970e3b6](https://github.com/panva/oauth4webapi/commit/970e3b6fc5bfc624e569a1c782b05d6d845220d7))
+* removed the parseWwwAuthenticateChallenges export ([5fa774d](https://github.com/panva/oauth4webapi/commit/5fa774dac7c19bdf1af512de887423738e0ee39a))
+* resolve only successful responses ([0f8bcc3](https://github.com/panva/oauth4webapi/commit/0f8bcc30bec35b6fc9cdb4639448d3bfc18888be))
+* unify validating endpoints and checking their protocols ([e16254f](https://github.com/panva/oauth4webapi/commit/e16254f154a64ecf9e78f94bc6285b6f630b3b84))
+* update the CryptoKey workarounds without affecting docs ([0d3b05a](https://github.com/panva/oauth4webapi/commit/0d3b05a01d994507a82c703d27401bf1b428ec09))
+* userInfoRequest should not reject www-authenticate ([e373ec3](https://github.com/panva/oauth4webapi/commit/e373ec3a9616f5ce5c5264293cc398b2537b676b))
+* validating ID Token signatures is now done with a Response ([d71bc2c](https://github.com/panva/oauth4webapi/commit/d71bc2cc5777c5b261164ee23e9a04854daf5996))
+
 ## [2.17.0](https://github.com/panva/oauth4webapi/compare/v2.16.0...v2.17.0) (2024-09-22)
 
 
