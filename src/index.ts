@@ -2317,7 +2317,7 @@ export class ResponseBodyError extends Error {
   /**
    * The parsed JSON response body
    */
-  override cause!: Record<string, JsonValue | undefined>
+  override cause: Record<string, JsonValue | undefined>
 
   code: typeof RESPONSE_BODY_ERROR
 
@@ -2356,6 +2356,7 @@ export class ResponseBodyError extends Error {
     super(message, options)
     this.name = this.constructor.name
     this.code = RESPONSE_BODY_ERROR
+    this.cause = options.cause
     this.error = options.cause.error
     this.status = options.response.status
     this.error_description = options.cause.error_description
@@ -2382,7 +2383,7 @@ export class AuthorizationResponseError extends Error {
   /**
    * Authorization Response parameters as {@link !URLSearchParams}
    */
-  override cause!: URLSearchParams
+  override cause: URLSearchParams
 
   code: typeof AUTHORIZATION_RESPONSE_ERROR
 
@@ -2409,6 +2410,7 @@ export class AuthorizationResponseError extends Error {
     super(message, options)
     this.name = this.constructor.name
     this.code = AUTHORIZATION_RESPONSE_ERROR
+    this.cause = options.cause
     this.error = options.cause.get('error')!
     this.error_description = options.cause.get('error_description') ?? undefined
 
@@ -2435,7 +2437,7 @@ export class WWWAuthenticateChallengeError extends Error {
   /**
    * The parsed WWW-Authenticate HTTP Header challenges
    */
-  override cause!: WWWAuthenticateChallenge[]
+  override cause: WWWAuthenticateChallenge[]
 
   code: typeof WWW_AUTHENTICATE_CHALLENGE
 
@@ -2457,6 +2459,7 @@ export class WWWAuthenticateChallengeError extends Error {
     super(message, options)
     this.name = this.constructor.name
     this.code = WWW_AUTHENTICATE_CHALLENGE
+    this.cause = options.cause
     this.status = options.response.status
     this.response = options.response
     Object.defineProperty(this, 'response', { enumerable: false })
