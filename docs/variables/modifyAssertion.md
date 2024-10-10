@@ -12,39 +12,7 @@ Use to mutate JWT header and payload before they are signed. Its intended use is
 non-conform server behaviours, such as modifying JWT "aud" (audience) claims, or otherwise
 changing fixed claims used by this library.
 
-## Examples
-
-Changing Private Key JWT client assertion audience issued from a string to an array
-
-```ts
-let as!: oauth.AuthorizationServer
-let client!: oauth.Client
-let parameters!: URLSearchParams
-let key!: oauth.CryptoKey | oauth.PrivateKey
-
-let clientAuth = oauth.PrivateKeyJwt(key, {
-  [oauth.modifyAssertion](header, payload) {
-    payload.aud = [as.issuer, as.token_endpoint!]
-  },
-})
-
-let response = await oauth.pushedAuthorizationRequest(as, client, clientAuth, parameters)
-```
-
-Changing Request Object issued by [issueRequestObject](../functions/issueRequestObject.md) to have an expiration of 5 minutes
-
-```ts
-let as!: oauth.AuthorizationServer
-let client!: oauth.Client
-let parameters!: URLSearchParams
-let key!: oauth.CryptoKey | oauth.PrivateKey
-
-let request = await oauth.issueRequestObject(as, client, parameters, key, {
-  [oauth.modifyAssertion](header, payload) {
-    payload.exp = <number>payload.iat + 300
-  },
-})
-```
+## Example
 
 Changing the `alg: "Ed25519"` back to `alg: "EdDSA"`
 
@@ -56,7 +24,7 @@ let key!: oauth.CryptoKey | oauth.PrivateKey
 let keyPair!: oauth.CryptoKeyPair
 
 let remapEd25519: oauth.ModifyAssertionOptions = {
-  [oauth.modifyAssertion]: (header) => {
+  [oauth.modifyAssertion]: (header, _payload) => {
     if (header.alg === 'Ed25519') {
       header.alg = 'EdDSA'
     }

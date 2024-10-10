@@ -326,42 +326,6 @@ export const customFetch: unique symbol = Symbol()
  *
  * @example
  *
- * Changing Private Key JWT client assertion audience issued from a string to an array
- *
- * ```ts
- * let as!: oauth.AuthorizationServer
- * let client!: oauth.Client
- * let parameters!: URLSearchParams
- * let key!: oauth.CryptoKey | oauth.PrivateKey
- *
- * let clientAuth = oauth.PrivateKeyJwt(key, {
- *   [oauth.modifyAssertion](header, payload) {
- *     payload.aud = [as.issuer, as.token_endpoint!]
- *   },
- * })
- *
- * let response = await oauth.pushedAuthorizationRequest(as, client, clientAuth, parameters)
- * ```
- *
- * @example
- *
- * Changing Request Object issued by {@link issueRequestObject} to have an expiration of 5 minutes
- *
- * ```ts
- * let as!: oauth.AuthorizationServer
- * let client!: oauth.Client
- * let parameters!: URLSearchParams
- * let key!: oauth.CryptoKey | oauth.PrivateKey
- *
- * let request = await oauth.issueRequestObject(as, client, parameters, key, {
- *   [oauth.modifyAssertion](header, payload) {
- *     payload.exp = <number>payload.iat + 300
- *   },
- * })
- * ```
- *
- * @example
- *
  * Changing the `alg: "Ed25519"` back to `alg: "EdDSA"`
  *
  * ```ts
@@ -372,7 +336,7 @@ export const customFetch: unique symbol = Symbol()
  * let keyPair!: oauth.CryptoKeyPair
  *
  * let remapEd25519: oauth.ModifyAssertionOptions = {
- *   [oauth.modifyAssertion]: (header) => {
+ *   [oauth.modifyAssertion]: (header, _payload) => {
  *     if (header.alg === 'Ed25519') {
  *       header.alg = 'EdDSA'
  *     }
