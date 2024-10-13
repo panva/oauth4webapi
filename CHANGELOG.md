@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.0.1](https://github.com/panva/oauth4webapi/compare/v3.0.0...v3.0.1) (2024-10-13)
+
+
+### Refactor
+
+* gracefully handle non-number expires_in ([c7cc858](https://github.com/panva/oauth4webapi/commit/c7cc8588bd77cffc70b25c91b1f2d3c2cc006aa2)), closes [#47](https://github.com/panva/oauth4webapi/issues/47) [#71](https://github.com/panva/oauth4webapi/issues/71) [#77](https://github.com/panva/oauth4webapi/issues/77) [#112](https://github.com/panva/oauth4webapi/issues/112)
+* update assertCryptoKey error message ([999a373](https://github.com/panva/oauth4webapi/commit/999a373c7ac2fd5c325f44156f0b23853542daec))
+
 ## [3.0.0](https://github.com/panva/oauth4webapi/compare/v2.17.0...v3.0.0) (2024-10-07)
 
 
