@@ -2587,7 +2587,7 @@ export async function processPushedAuthorizationResponse(
     throw OPE('failed to parse "response" body as JSON', PARSE_ERROR, cause)
   }
 
-  if (!isJsonObject<PushedAuthorizationResponse>(json)) {
+  if (!isJsonObject<Writeable<PushedAuthorizationResponse>>(json)) {
     throw OPE('"response" body must be a top level object', INVALID_RESPONSE, { body: json })
   }
 
@@ -2595,9 +2595,12 @@ export async function processPushedAuthorizationResponse(
     body: json,
   })
 
-  assertNumber(json.expires_in, false, '"response" body "expires_in" property', INVALID_RESPONSE, {
+  let expiresIn: unknown =
+    typeof json.expires_in !== 'number' ? parseFloat(json.expires_in) : json.expires_in
+  assertNumber(expiresIn, false, '"response" body "expires_in" property', INVALID_RESPONSE, {
     body: json,
   })
+  json.expires_in = expiresIn
 
   return json
 }
@@ -3313,7 +3316,7 @@ async function processGenericAccessTokenResponse(
     throw OPE('failed to parse "response" body as JSON', PARSE_ERROR, cause)
   }
 
-  if (!isJsonObject<TokenEndpointResponse>(json)) {
+  if (!isJsonObject<Writeable<TokenEndpointResponse>>(json)) {
     throw OPE('"response" body must be a top level object', INVALID_RESPONSE, { body: json })
   }
 
@@ -3325,21 +3328,19 @@ async function processGenericAccessTokenResponse(
     body: json,
   })
 
-  // @ts-expect-error
-  json.token_type = json.token_type.toLowerCase()
+  json.token_type = json.token_type.toLowerCase() as Lowercase<string>
 
   if (json.token_type !== 'dpop' && json.token_type !== 'bearer') {
     throw new UnsupportedOperationError('unsupported `token_type` value', { cause: { body: json } })
   }
 
   if (json.expires_in !== undefined) {
-    assertNumber(
-      json.expires_in,
-      false,
-      '"response" body "expires_in" property',
-      INVALID_RESPONSE,
-      { body: json },
-    )
+    let expiresIn: unknown =
+      typeof json.expires_in !== 'number' ? parseFloat(json.expires_in) : json.expires_in
+    assertNumber(expiresIn, false, '"response" body "expires_in" property', INVALID_RESPONSE, {
+      body: json,
+    })
+    json.expires_in = expiresIn
   }
 
   if (json.refresh_token !== undefined) {
@@ -3658,6 +3659,8 @@ export interface AuthorizationDetails {
 
   readonly [parameter: string]: JsonValue | undefined
 }
+
+type Writeable<T> = { -readonly [P in keyof T]: T[P] }
 
 export interface TokenEndpointResponse {
   readonly access_token: string
@@ -5472,7 +5475,7 @@ export async function processDeviceAuthorizationResponse(
     throw OPE('failed to parse "response" body as JSON', PARSE_ERROR, cause)
   }
 
-  if (!isJsonObject<DeviceAuthorizationResponse>(json)) {
+  if (!isJsonObject<Writeable<DeviceAuthorizationResponse>>(json)) {
     throw OPE('"response" body must be a top level object', INVALID_RESPONSE, { body: json })
   }
 
@@ -5489,9 +5492,12 @@ export async function processDeviceAuthorizationResponse(
     { body: json },
   )
 
-  assertNumber(json.expires_in, false, '"response" body "expires_in" property', INVALID_RESPONSE, {
+  let expiresIn: unknown =
+    typeof json.expires_in !== 'number' ? parseFloat(json.expires_in) : json.expires_in
+  assertNumber(expiresIn, false, '"response" body "expires_in" property', INVALID_RESPONSE, {
     body: json,
   })
+  json.expires_in = expiresIn
 
   if (json.verification_uri_complete !== undefined) {
     assertString(
