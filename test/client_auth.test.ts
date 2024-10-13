@@ -155,7 +155,7 @@ test('private_key_jwt', async (t) => {
     message: '"clientPrivateKey.key" must be a private CryptoKey',
   })
   t.throws(() => lib.PrivateKeyJwt({ key: null as any }), {
-    message: '"clientPrivateKey.key" must be a private CryptoKey',
+    message: '"clientPrivateKey.key" must be a CryptoKey',
   })
   t.pass()
 })

@@ -1007,7 +1007,7 @@ function OPE(message: string, code?: string, cause?: unknown) {
 
 function assertCryptoKey(key: unknown, it: string): asserts key is CryptoKey {
   if (!(key instanceof CryptoKey)) {
-    throw CodedTypeError(`${it} must be a private CryptoKey`, ERR_INVALID_ARG_TYPE)
+    throw CodedTypeError(`${it} must be a CryptoKey`, ERR_INVALID_ARG_TYPE)
   }
 }
 
