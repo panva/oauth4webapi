@@ -4918,37 +4918,16 @@ export async function validateCodeIdTokenResponse(
   )
 }
 
-function concat(buffers: Uint8Array[]): Uint8Array {
-  const size = buffers.reduce((acc, { length }) => acc + length, 0)
-  const buf = new Uint8Array(size)
-  let i = 0
-  for (const buffer of buffers) {
-    buf.set(buffer, i)
-    i += buffer.length
-  }
-  return buf
-}
-
 async function consumeStream(request: Request) {
-  if (request.bodyUsed || !request.body) {
+  if (request.bodyUsed) {
     throw CodedTypeError(
       'form_post Request instances must contain a readable body',
       ERR_INVALID_ARG_VALUE,
       { cause: request },
     )
   }
-  const reader = request.body.getReader()
-  let chunks = []
 
-  while (true) {
-    const { done, value } = await reader.read()
-
-    if (done) break
-
-    chunks.push(value)
-  }
-
-  return concat(chunks)
+  return request.text()
 }
 
 async function formPostResponse(request: Request) {
@@ -4968,7 +4947,7 @@ async function formPostResponse(request: Request) {
     )
   }
 
-  return new URLSearchParams(new TextDecoder().decode(await consumeStream(request)))
+  return consumeStream(request)
 }
 
 async function validateHybridResponse(
@@ -4993,7 +4972,7 @@ async function validateHybridResponse(
     }
     parameters = new URLSearchParams(parameters.hash.slice(1))
   } else if (looseInstanceOf(parameters, Request)) {
-    parameters = await formPostResponse(parameters)
+    parameters = new URLSearchParams(await formPostResponse(parameters))
   } else if (parameters instanceof URLSearchParams) {
     parameters = new URLSearchParams(parameters)
   } else {
