@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.1.0](https://github.com/panva/oauth4webapi/compare/v3.0.1...v3.1.0) (2024-10-14)
+
+
+### Features
+
+* add support for form_post Request instance in hybrid response mode validate response functions ([5e22d9d](https://github.com/panva/oauth4webapi/commit/5e22d9d1afb45d1ffe4f9199b1ff8895392f92c0))
+
 ## [3.0.1](https://github.com/panva/oauth4webapi/compare/v3.0.0...v3.0.1) (2024-10-13)
 
 
