@@ -163,10 +163,32 @@ export default (QUnit: QUnit) => {
 
       let callbackParams: URLSearchParams
       if (hybrid) {
+        let input: URLSearchParams | URL | Request
+        switch ([URLSearchParams, URL, Request][Math.floor(Math.random() * 3)]) {
+          case URL:
+            input = currentUrl
+            break
+          case URLSearchParams:
+            input = new URLSearchParams(currentUrl.hash.slice(1))
+            break
+          case Request:
+            input = new Request(
+              `${currentUrl.protocol}//${currentUrl.host}${currentUrl.pathname}`,
+              {
+                method: 'POST',
+                headers: { 'content-type': 'application/x-www-form-urlencoded' },
+                body: currentUrl.hash.slice(1),
+              },
+            )
+            break
+          default:
+            throw new Error('unreachable')
+        }
+
         callbackParams = await lib.validateCodeIdTokenResponse(
           as,
           client,
-          currentUrl,
+          input,
           nonce!,
           lib.expectNoState,
           maxAge,
@@ -176,12 +198,17 @@ export default (QUnit: QUnit) => {
         callbackParams = await lib.validateJwtAuthResponse(
           as,
           client,
-          currentUrl,
+          random() ? currentUrl : currentUrl.searchParams,
           lib.expectNoState,
           { [lib.allowInsecureRequests]: true, [lib.jweDecrypt]: decrypt },
         )
       } else {
-        callbackParams = lib.validateAuthResponse(as, client, currentUrl, lib.expectNoState)
+        callbackParams = lib.validateAuthResponse(
+          as,
+          client,
+          random() ? currentUrl : currentUrl.searchParams,
+          lib.expectNoState,
+        )
       }
 
       {

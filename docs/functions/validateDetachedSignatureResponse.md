@@ -17,7 +17,7 @@ responses.
 | ------ | ------ | ------ |
 | `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata. |
 | `client` | [`Client`](../interfaces/Client.md) | Client Metadata. |
-| `parameters` | [`URLSearchParams`](https://developer.mozilla.org/docs/Web/API/URLSearchParams) \| [`URL`](https://developer.mozilla.org/docs/Web/API/URL) | Authorization Response parameters as URLSearchParams or an instance of URL with parameters in a fragment/hash. |
+| `parameters` | [`URLSearchParams`](https://developer.mozilla.org/docs/Web/API/URLSearchParams) \| [`Request`](https://developer.mozilla.org/docs/Web/API/Request) \| [`URL`](https://developer.mozilla.org/docs/Web/API/URL) | Authorization Response parameters as URLSearchParams, instance of URL with parameters in a fragment/hash, or a `form_post` Request instance. |
 | `expectedNonce` | `string` | Expected ID Token `nonce` claim value. |
 | `expectedState`? | `string` \| *typeof* [`expectNoState`](../variables/expectNoState.md) | Expected `state` parameter value. Default is [expectNoState](../variables/expectNoState.md). |
 | `maxAge`? | `number` \| *typeof* [`skipAuthTimeCheck`](../variables/skipAuthTimeCheck.md) | ID Token [`auth_time`](../interfaces/IDToken.md#auth_time) claim value will be checked to be present and conform to the `maxAge` value. Use of this option is required if you sent a `max_age` parameter in an authorization request. Default is [`client.default_max_age`](../interfaces/Client.md#default_max_age) and falls back to [skipAuthTimeCheck](../variables/skipAuthTimeCheck.md). |

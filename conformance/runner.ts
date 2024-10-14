@@ -32,6 +32,10 @@ const configuration: {
   }
 } = conformance.configuration
 
+function random() {
+  return Math.random() < 0.5
+}
+
 const ALG = conformance.ALG as string
 export const plan: Plan = conformance.plan
 export const variant: Record<string, string> = conformance.variant
@@ -377,10 +381,37 @@ export const flow = (options?: MacroOptions) => {
         let params: ReturnType<typeof oauth.validateAuthResponse>
 
         if (usesJarm(variant)) {
-          params = await oauth.validateJwtAuthResponse(as, client, currentUrl, state, {
-            [oauth.jweDecrypt]: decrypt,
-          })
+          params = await oauth.validateJwtAuthResponse(
+            as,
+            client,
+            random() ? currentUrl : currentUrl.searchParams,
+            state,
+            {
+              [oauth.jweDecrypt]: decrypt,
+            },
+          )
         } else if (response_type === 'code id_token') {
+          let input: URLSearchParams | URL | Request
+          switch ([URLSearchParams, URL, Request][Math.floor(Math.random() * 3)]) {
+            case URL:
+              input = currentUrl
+              break
+            case URLSearchParams:
+              input = new URLSearchParams(currentUrl.hash.slice(1))
+              break
+            case Request:
+              input = new Request(
+                `${currentUrl.protocol}//${currentUrl.host}${currentUrl.pathname}`,
+                {
+                  method: 'POST',
+                  headers: { 'content-type': 'application/x-www-form-urlencoded' },
+                  body: currentUrl.hash.slice(1),
+                },
+              )
+              break
+            default:
+              throw new Error('unreachable')
+          }
           params = await (
             plan.name.startsWith('fapi1')
               ? oauth.validateDetachedSignatureResponse
@@ -389,7 +420,12 @@ export const flow = (options?: MacroOptions) => {
             [oauth.jweDecrypt]: decrypt,
           })
         } else {
-          params = oauth.validateAuthResponse(as, client, currentUrl, state)
+          params = oauth.validateAuthResponse(
+            as,
+            client,
+            random() ? currentUrl : currentUrl.searchParams,
+            state,
+          )
         }
 
         t.log('parsed callback parameters', Object.fromEntries(params.entries()))

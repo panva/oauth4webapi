@@ -2960,8 +2960,8 @@ async function getPublicSigKeyFromIssuerJwksUri(
  */
 export const skipSubjectCheck: unique symbol = Symbol()
 
-function getContentType(response: Response) {
-  return response.headers.get('content-type')?.split(';')[0]
+function getContentType(input: Response | Request) {
+  return input.headers.get('content-type')?.split(';')[0]
 }
 
 export interface JWEDecryptOptions {
@@ -4836,8 +4836,8 @@ async function idTokenHashMatches(
  *
  * @param as Authorization Server Metadata.
  * @param client Client Metadata.
- * @param parameters Authorization Response parameters as URLSearchParams or an instance of URL with
- *   parameters in a fragment/hash.
+ * @param parameters Authorization Response parameters as URLSearchParams, instance of URL with
+ *   parameters in a fragment/hash, or a `form_post` Request instance.
  * @param expectedNonce Expected ID Token `nonce` claim value.
  * @param expectedState Expected `state` parameter value. Default is {@link expectNoState}.
  * @param maxAge ID Token {@link IDToken.auth_time `auth_time`} claim value will be checked to be
@@ -4856,7 +4856,7 @@ async function idTokenHashMatches(
 export async function validateDetachedSignatureResponse(
   as: AuthorizationServer,
   client: Client,
-  parameters: URLSearchParams | URL,
+  parameters: URLSearchParams | URL | Request,
   expectedNonce: string,
   expectedState?: string | typeof expectNoState,
   maxAge?: number | typeof skipAuthTimeCheck,
@@ -4879,8 +4879,8 @@ export async function validateDetachedSignatureResponse(
  *
  * @param as Authorization Server Metadata.
  * @param client Client Metadata.
- * @param parameters Authorization Response parameters as URLSearchParams or an instance of URL with
- *   parameters in a fragment/hash.
+ * @param parameters Authorization Response parameters as URLSearchParams, instance of URL with
+ *   parameters in a fragment/hash, or a `form_post` Request instance.
  * @param expectedNonce Expected ID Token `nonce` claim value.
  * @param expectedState Expected `state` parameter value. Default is {@link expectNoState}.
  * @param maxAge ID Token {@link IDToken.auth_time `auth_time`} claim value will be checked to be
@@ -4900,7 +4900,7 @@ export async function validateDetachedSignatureResponse(
 export async function validateCodeIdTokenResponse(
   as: AuthorizationServer,
   client: Client,
-  parameters: URLSearchParams | URL,
+  parameters: URLSearchParams | URL | Request,
   expectedNonce: string,
   expectedState?: string | typeof expectNoState,
   maxAge?: number | typeof skipAuthTimeCheck,
@@ -4918,10 +4918,63 @@ export async function validateCodeIdTokenResponse(
   )
 }
 
+function concat(buffers: Uint8Array[]): Uint8Array {
+  const size = buffers.reduce((acc, { length }) => acc + length, 0)
+  const buf = new Uint8Array(size)
+  let i = 0
+  for (const buffer of buffers) {
+    buf.set(buffer, i)
+    i += buffer.length
+  }
+  return buf
+}
+
+async function consumeStream(request: Request) {
+  if (request.bodyUsed || !request.body) {
+    throw CodedTypeError(
+      'form_post Request instances must contain a readable body',
+      ERR_INVALID_ARG_VALUE,
+      { cause: request },
+    )
+  }
+  const reader = request.body.getReader()
+  let chunks = []
+
+  while (true) {
+    const { done, value } = await reader.read()
+
+    if (done) break
+
+    chunks.push(value)
+  }
+
+  return concat(chunks)
+}
+
+async function formPostResponse(request: Request) {
+  if (request.method !== 'POST') {
+    throw CodedTypeError(
+      'form_post responses are expected to use the POST method',
+      ERR_INVALID_ARG_VALUE,
+      { cause: request },
+    )
+  }
+
+  if (getContentType(request) !== 'application/x-www-form-urlencoded') {
+    throw CodedTypeError(
+      'form_post responses are expected to use the application/x-www-form-urlencoded content-type',
+      ERR_INVALID_ARG_VALUE,
+      { cause: request },
+    )
+  }
+
+  return new URLSearchParams(new TextDecoder().decode(await consumeStream(request)))
+}
+
 async function validateHybridResponse(
   as: AuthorizationServer,
   client: Client,
-  parameters: URLSearchParams | URL,
+  parameters: URLSearchParams | URL | Request,
   expectedNonce: string,
   expectedState: string | typeof expectNoState | undefined,
   maxAge: number | typeof skipAuthTimeCheck | undefined,
@@ -4939,16 +4992,16 @@ async function validateHybridResponse(
       )
     }
     parameters = new URLSearchParams(parameters.hash.slice(1))
-  }
-
-  if (!(parameters instanceof URLSearchParams)) {
+  } else if (looseInstanceOf(parameters, Request)) {
+    parameters = await formPostResponse(parameters)
+  } else if (parameters instanceof URLSearchParams) {
+    parameters = new URLSearchParams(parameters)
+  } else {
     throw CodedTypeError(
-      '"parameters" must be an instance of URLSearchParams',
+      '"parameters" must be an instance of URLSearchParams, URL, or Response',
       ERR_INVALID_ARG_TYPE,
     )
   }
-
-  parameters = new URLSearchParams(parameters)
 
   const id_token = getURLSearchParameter(parameters, 'id_token')
   parameters.delete('id_token')
