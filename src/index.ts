@@ -5150,8 +5150,6 @@ async function validateHybridResponse(
   return result
 }
 
-const SUPPORTED_JWS_ALGS: unique symbol = Symbol()
-
 /**
  * If configured must be the configured one (client), if not configured must be signalled by the
  * issuer to be supported (issuer), if not signalled may be a default fallback, otherwise its a
@@ -5160,7 +5158,7 @@ const SUPPORTED_JWS_ALGS: unique symbol = Symbol()
 function checkSigningAlgorithm(
   client: string | string[] | undefined,
   issuer: string[] | undefined,
-  fallback: string | string[] | typeof SUPPORTED_JWS_ALGS | undefined,
+  fallback: string | string[] | typeof supported | undefined,
   header: CompactJWSHeaderParameters,
 ) {
   if (client !== undefined) {
@@ -5189,8 +5187,8 @@ function checkSigningAlgorithm(
     if (
       typeof fallback === 'string'
         ? header.alg !== fallback
-        : typeof fallback === 'symbol'
-          ? !supported(header.alg)
+        : typeof fallback === 'function'
+          ? !fallback(header.alg)
           : !fallback.includes(header.alg)
     ) {
       throw OPE('unexpected JWT "alg" header parameter', INVALID_RESPONSE, {
@@ -5734,12 +5732,7 @@ async function validateDPoP(
   const clockSkew = getClockSkew(options)
   const proof = await validateJwt(
     headerValue,
-    checkSigningAlgorithm.bind(
-      undefined,
-      options?.signingAlgorithms,
-      undefined,
-      SUPPORTED_JWS_ALGS,
-    ),
+    checkSigningAlgorithm.bind(undefined, options?.signingAlgorithms, undefined, supported),
     clockSkew,
     getClockTolerance(options),
     undefined,
@@ -5930,12 +5923,7 @@ export async function validateJwtAccessToken(
 
   const { claims, header } = await validateJwt(
     accessToken,
-    checkSigningAlgorithm.bind(
-      undefined,
-      options?.signingAlgorithms,
-      undefined,
-      SUPPORTED_JWS_ALGS,
-    ),
+    checkSigningAlgorithm.bind(undefined, options?.signingAlgorithms, undefined, supported),
     getClockSkew(options),
     getClockTolerance(options),
     undefined,
