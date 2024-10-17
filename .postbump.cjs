@@ -4,7 +4,12 @@ const { version } = require('./package.json')
 
 const updates = [
   ['./src/index.ts', /const VERSION = 'v\d+\.\d+\.\d+'/gm, `const VERSION = 'v${version}'`],
-  ['./build/index.js', /const VERSION = 'v\d+\.\d+\.\d+'/gm, `const VERSION = 'v${version}'`, false],
+  [
+    './build/index.js',
+    /const VERSION = 'v\d+\.\d+\.\d+'/gm,
+    `const VERSION = 'v${version}'`,
+    false,
+  ],
   ['./jsr.json', /"version": "\d+\.\d+\.\d+"/gm, `"version": "${version}"`],
 ]
 

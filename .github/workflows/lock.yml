@@ -1,4 +1,4 @@
-name: "Lock threads"
+name: 'Lock threads'
 
 on:
   schedule:
@@ -12,8 +12,8 @@ jobs:
       - uses: dessant/lock-threads@1bf7ec25051fe7c00bdd17e6a7cf3d7bfb7dc771 # v5.0.1
         with:
           github-token: ${{ github.token }}
-          issue-inactive-days: "90"
-          issue-lock-reason: ""
-          pr-inactive-days: "90"
-          pr-lock-reason: ""
-          discussion-inactive-days: "90"
+          issue-inactive-days: '90'
+          issue-lock-reason: ''
+          pr-inactive-days: '90'
+          pr-lock-reason: ''
+          discussion-inactive-days: '90'
