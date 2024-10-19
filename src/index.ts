@@ -788,7 +788,7 @@ export interface MTLSEndpointAliases
     | 'token_endpoint'
     | 'userinfo_endpoint'
   > {
-  readonly [metadata: string]: JsonValue | undefined
+  readonly [metadata: string]: string | undefined
 }
 
 /**
