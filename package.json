@@ -77,8 +77,8 @@
   "devDependencies": {
     "@koa/cors": "^5.0.0",
     "@types/koa__cors": "^5.0.0",
-    "@types/node": "^20.16.13",
-    "@types/qunit": "^2.19.10",
+    "@types/node": "^20.17.0",
+    "@types/qunit": "^2.19.11",
     "archiver": "^7.0.1",
     "ava": "^6.1.3",
     "chrome-launcher": "^1.1.2",
