@@ -37,4 +37,4 @@ A collection of examples for the most common use cases.
   - FAPI 2.0 Security Profile - [source](fapi2.ts) | [diff](fapi2.diff)
   - FAPI 2.0 Message Signing - [source](fapi2-message-signing.ts) | [diff](fapi2-message-signing.diff)
 
-[sponsor-auth0]: https://auth0.com/signup?utm_source=external_sites&utm_medium=panva&utm_campaign=devn_signup
+[sponsor-auth0]: https://a0.to/signup/panva

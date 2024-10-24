@@ -96,6 +96,6 @@ The supported JavaScript runtimes include those that support the utilized Web AP
 | [v2.x](https://github.com/panva/oauth4webapi/tree/v2.x) | ❌                | ❌                 | ❌              |
 | [v1.x](https://github.com/panva/oauth4webapi/tree/v1.x) | ❌                | ❌                 | ❌              |
 
-[sponsor-auth0]: https://auth0.com/signup?utm_source=external_sites&utm_medium=panva&utm_campaign=devn_signup
+[sponsor-auth0]: https://a0.to/signup/panva
 
 [^cjs]: CJS style `let oauth = require('oauth4webapi')` is possible in Node.js versions where `process.features.require_module` is `true` or with the `--experimental-require-module` Node.js CLI flag.
