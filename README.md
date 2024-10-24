@@ -93,8 +93,6 @@ The supported JavaScript runtimes include those that support the utilized Web AP
 | Version                                                 | Security Fixes 🔑 | Other Bug Fixes 🐞 | New Features ⭐ |
 | ------------------------------------------------------- | ----------------- | ------------------ | --------------- |
 | [v3.x](https://github.com/panva/oauth4webapi/tree/v3.x) | ✅                | ✅                 | ✅              |
-| [v2.x](https://github.com/panva/oauth4webapi/tree/v2.x) | ❌                | ❌                 | ❌              |
-| [v1.x](https://github.com/panva/oauth4webapi/tree/v1.x) | ❌                | ❌                 | ❌              |
 
 [sponsor-auth0]: https://a0.to/signup/panva
 
