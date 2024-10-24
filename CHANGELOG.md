@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.1.2](https://github.com/panva/oauth4webapi/compare/v3.1.1...v3.1.2) (2024-10-24)
+
+
+### Refactor
+
+* shake the supported function when not needed ([c390093](https://github.com/panva/oauth4webapi/commit/c390093beea6ee6e0ed1cf0276ea43c0758c6555))
+* **types:** update indexable on MTLSEndpointAliases to be a string ([a405c89](https://github.com/panva/oauth4webapi/commit/a405c898a11110527a771ac41d1e6c1c289ec85e))
+
 ## [3.1.1](https://github.com/panva/oauth4webapi/compare/v3.1.0...v3.1.1) (2024-10-14)
 
 
