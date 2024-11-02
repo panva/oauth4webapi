@@ -77,8 +77,8 @@
   "devDependencies": {
     "@koa/cors": "^5.0.0",
     "@types/koa__cors": "^5.0.0",
-    "@types/node": "^22.8.4",
-    "@types/qunit": "^2.19.11",
+    "@types/node": "^22.8.6",
+    "@types/qunit": "^2.19.12",
     "archiver": "^7.0.1",
     "ava": "^6.2.0",
     "chrome-launcher": "^1.1.2",
@@ -95,8 +95,8 @@
     "selfsigned": "^2.4.1",
     "timekeeper": "^2.3.1",
     "tsx": "^4.19.2",
-    "typedoc": "^0.26.10",
-    "typedoc-plugin-markdown": "^4.2.9",
+    "typedoc": "^0.26.11",
+    "typedoc-plugin-markdown": "^4.2.10",
     "typedoc-plugin-mdn-links": "^3.3.5",
     "typescript": "~5.6.3",
     "undici": "^6.20.1"
