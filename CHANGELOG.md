@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.1.3](https://github.com/panva/oauth4webapi/compare/v3.1.2...v3.1.3) (2024-11-15)
+
+
+### Refactor
+
+* more descriptive "not a conform" message ([0295887](https://github.com/panva/oauth4webapi/commit/02958874d0e03f13bbf95e9ef2a78cea3241a4bd))
+
 ## [3.1.2](https://github.com/panva/oauth4webapi/compare/v3.1.1...v3.1.2) (2024-10-24)
 
 
