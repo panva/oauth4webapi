@@ -126,7 +126,8 @@ test('processRevocationResponse()', async (t) => {
     message: '"response" must be an instance of Response',
   })
   await t.throwsAsync(lib.processRevocationResponse(getResponse('', { status: 404 })), {
-    message: '"response" is not a conform Revocation Endpoint response',
+    message:
+      '"response" is not a conform Revocation Endpoint response (unexpected HTTP status code)',
   })
 
   t.is(await lib.processRevocationResponse(getResponse('')), undefined)

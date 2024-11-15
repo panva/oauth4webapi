@@ -113,7 +113,8 @@ test('processUserInfoResponse() - json', async (t) => {
       getResponse(JSON.stringify({ sub: 'urn:example:subject' }), { status: 404 }),
     ),
     {
-      message: '"response" is not a conform UserInfo Endpoint response',
+      message:
+        '"response" is not a conform UserInfo Endpoint response (unexpected HTTP status code)',
     },
   )
   await t.throwsAsync(

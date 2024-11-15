@@ -215,7 +215,8 @@ test('processIntrospectionResponse()', async (t) => {
   await t.throwsAsync(
     lib.processIntrospectionResponse(issuer, client, getResponse('', { status: 404 })),
     {
-      message: '"response" is not a conform Introspection Endpoint response',
+      message:
+        '"response" is not a conform Introspection Endpoint response (unexpected HTTP status code)',
     },
   )
   await t.throwsAsync(lib.processIntrospectionResponse(issuer, client, getResponse('{"')), {

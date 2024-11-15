@@ -161,7 +161,8 @@ test('processPushedAuthorizationResponse()', async (t) => {
   await t.throwsAsync(
     lib.processPushedAuthorizationResponse(issuer, client, getResponse('', { status: 404 })),
     {
-      message: '"response" is not a conform Pushed Authorization Request Endpoint response',
+      message:
+        '"response" is not a conform Pushed Authorization Request Endpoint response (unexpected HTTP status code)',
     },
   )
   await t.throwsAsync(

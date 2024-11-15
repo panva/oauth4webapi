@@ -118,7 +118,8 @@ test('processDeviceAuthorizationResponse()', async (t) => {
   await t.throwsAsync(
     lib.processDeviceAuthorizationResponse(issuer, client, getResponse('', { status: 404 })),
     {
-      message: '"response" is not a conform Device Authorization Endpoint response',
+      message:
+        '"response" is not a conform Device Authorization Endpoint response (unexpected HTTP status code)',
     },
   )
   await t.throwsAsync(
@@ -384,7 +385,7 @@ test('processDeviceCodeResponse() without ID Tokens', async (t) => {
   await t.throwsAsync(
     lib.processDeviceCodeResponse(issuer, client, getResponse('', { status: 404 })),
     {
-      message: '"response" is not a conform Token Endpoint response',
+      message: '"response" is not a conform Token Endpoint response (unexpected HTTP status code)',
     },
   )
   await t.throwsAsync(lib.processDeviceCodeResponse(issuer, client, getResponse('{"')), {

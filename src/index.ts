@@ -1301,7 +1301,7 @@ export async function processDiscoveryResponse(
 
   if (response.status !== 200) {
     throw OPE(
-      '"response" is not a conform Authorization Server Metadata response',
+      '"response" is not a conform Authorization Server Metadata response (unexpected HTTP status code)',
       RESPONSE_IS_NOT_CONFORM,
       response,
     )
@@ -2572,7 +2572,7 @@ export async function processPushedAuthorizationResponse(
       })
     }
     throw OPE(
-      '"response" is not a conform Pushed Authorization Request Endpoint response',
+      '"response" is not a conform Pushed Authorization Request Endpoint response (unexpected HTTP status code)',
       RESPONSE_IS_NOT_CONFORM,
       response,
     )
@@ -3015,7 +3015,7 @@ export async function processUserInfoResponse(
 
   if (response.status !== 200) {
     throw OPE(
-      '"response" is not a conform UserInfo Endpoint response',
+      '"response" is not a conform UserInfo Endpoint response (unexpected HTTP status code)',
       RESPONSE_IS_NOT_CONFORM,
       response,
     )
@@ -3301,7 +3301,7 @@ async function processGenericAccessTokenResponse(
       })
     }
     throw OPE(
-      '"response" is not a conform Token Endpoint response',
+      '"response" is not a conform Token Endpoint response (unexpected HTTP status code)',
       RESPONSE_IS_NOT_CONFORM,
       response,
     )
@@ -4215,7 +4215,7 @@ export async function processRevocationResponse(response: Response): Promise<und
       })
     }
     throw OPE(
-      '"response" is not a conform Revocation Endpoint response',
+      '"response" is not a conform Revocation Endpoint response (unexpected HTTP status code)',
       RESPONSE_IS_NOT_CONFORM,
       response,
     )
@@ -4368,7 +4368,7 @@ export async function processIntrospectionResponse(
       })
     }
     throw OPE(
-      '"response" is not a conform Introspection Endpoint response',
+      '"response" is not a conform Introspection Endpoint response (unexpected HTTP status code)',
       RESPONSE_IS_NOT_CONFORM,
       response,
     )
@@ -4455,7 +4455,7 @@ async function processJwksResponse(response: Response): Promise<JWKS> {
 
   if (response.status !== 200) {
     throw OPE(
-      '"response" is not a conform JSON Web Key Set response',
+      '"response" is not a conform JSON Web Key Set response (unexpected HTTP status code)',
       RESPONSE_IS_NOT_CONFORM,
       response,
     )
@@ -5490,7 +5490,7 @@ export async function processDeviceAuthorizationResponse(
       })
     }
     throw OPE(
-      '"response" is not a conform Device Authorization Endpoint response',
+      '"response" is not a conform Device Authorization Endpoint response (unexpected HTTP status code)',
       RESPONSE_IS_NOT_CONFORM,
       response,
     )

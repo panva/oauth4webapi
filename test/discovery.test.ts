@@ -106,7 +106,8 @@ test('processDiscoveryResponse()', async (t) => {
     message: '"expectedIssuer" must be an instance of URL',
   })
   await t.throwsAsync(lib.processDiscoveryResponse(expected, getResponse('', { status: 404 })), {
-    message: '"response" is not a conform Authorization Server Metadata response',
+    message:
+      '"response" is not a conform Authorization Server Metadata response (unexpected HTTP status code)',
   })
   await t.throwsAsync(lib.processDiscoveryResponse(expected, getResponse('{"')), {
     message: 'failed to parse "response" body as JSON',

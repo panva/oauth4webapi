@@ -162,7 +162,7 @@ test('processRefreshTokenResponse() without ID Tokens', async (t) => {
   await t.throwsAsync(
     lib.processRefreshTokenResponse(issuer, client, getResponse('', { status: 404 })),
     {
-      message: '"response" is not a conform Token Endpoint response',
+      message: '"response" is not a conform Token Endpoint response (unexpected HTTP status code)',
     },
   )
   await t.throwsAsync(lib.processRefreshTokenResponse(issuer, client, getResponse('{"')), {
