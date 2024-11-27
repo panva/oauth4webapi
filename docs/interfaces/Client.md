@@ -14,7 +14,7 @@ Recognized Client Metadata that have an effect on the exposed functionality.
 
 ## Indexable
 
- \[`metadata`: `string`\]: [`JsonValue`](../type-aliases/JsonValue.md) \| `undefined`
+ \[`metadata`: `string`\]: `undefined` \| [`JsonValue`](../type-aliases/JsonValue.md)
 
 ## Properties
 

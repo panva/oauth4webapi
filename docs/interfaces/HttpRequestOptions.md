@@ -36,7 +36,7 @@ See [customFetch](../variables/customFetch.md).
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
 | `url` | `string` | URL the request is being made sent to [fetch](https://developer.mozilla.org/docs/Web/API/Window/fetch) as the `resource` argument |
-| `options` | `object` | Options otherwise sent to [fetch](https://developer.mozilla.org/docs/Web/API/Window/fetch) as the `options` argument |
+| `options` | \{`body`: `BodyType`;`headers`: [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `string`\>;`method`: `Method`;`redirect`: `"manual"`;`signal`: [`AbortSignal`](https://developer.mozilla.org/docs/Web/API/AbortSignal); \} | Options otherwise sent to [fetch](https://developer.mozilla.org/docs/Web/API/Window/fetch) as the `options` argument |
 | `options.body` | `BodyType` | The request body content to send to the server |
 | `options.headers` | [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `string`\> | HTTP Headers |
 | `options.method` | `Method` | The [request method](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods) |
