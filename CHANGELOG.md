@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.1.4](https://github.com/panva/oauth4webapi/compare/v3.1.3...v3.1.4) (2024-12-02)
+
+
+### Refactor
+
+* **types:** move customFetch options into its own interface ([21c7d0a](https://github.com/panva/oauth4webapi/commit/21c7d0a0b9dc4375c05d5334777e939b3da8514f))
+
 ## [3.1.3](https://github.com/panva/oauth4webapi/compare/v3.1.2...v3.1.3) (2024-11-15)
 
 
