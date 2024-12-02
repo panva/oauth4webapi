@@ -29,12 +29,7 @@ See [customFetch](../variables/customFetch.md).
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
 | `url` | `string` | URL the request is being made sent to [fetch](https://developer.mozilla.org/docs/Web/API/Window/fetch) as the `resource` argument |
-| `options` | \{`body`: [`URLSearchParams`](https://developer.mozilla.org/docs/Web/API/URLSearchParams);`headers`: [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `string`\>;`method`: `"POST"`;`redirect`: `"manual"`;`signal`: [`AbortSignal`](https://developer.mozilla.org/docs/Web/API/AbortSignal); \} | Options otherwise sent to [fetch](https://developer.mozilla.org/docs/Web/API/Window/fetch) as the `options` argument |
-| `options.body` | [`URLSearchParams`](https://developer.mozilla.org/docs/Web/API/URLSearchParams) | The request body content to send to the server |
-| `options.headers` | [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `string`\> | HTTP Headers |
-| `options.method` | `"POST"` | The [request method](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods) |
-| `options.redirect` | `"manual"` | See [Request.redirect](https://developer.mozilla.org/docs/Web/API/Request/redirect) |
-| `options.signal`? | [`AbortSignal`](https://developer.mozilla.org/docs/Web/API/AbortSignal) | Depending on whether [HttpRequestOptions.signal](HttpRequestOptions.md#signal) was used, if so, it is the value passed, otherwise undefined |
+| `options` | [`CustomFetchOptions`](CustomFetchOptions.md)\<`"POST"`, [`URLSearchParams`](https://developer.mozilla.org/docs/Web/API/URLSearchParams)\> | Options otherwise sent to [fetch](https://developer.mozilla.org/docs/Web/API/Window/fetch) as the `options` argument |
 
 #### Returns
 

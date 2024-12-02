@@ -1037,6 +1037,30 @@ export interface JWKSCacheOptions {
   [jwksCache]?: JWKSCacheInput
 }
 
+export interface CustomFetchOptions<Method, BodyType = undefined> {
+  /**
+   * The request body content to send to the server
+   */
+  body: BodyType
+  /**
+   * HTTP Headers
+   */
+  headers: Record<string, string>
+  /**
+   * The {@link https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods request method}
+   */
+  method: Method
+  /**
+   * See {@link !Request.redirect}
+   */
+  redirect: 'manual'
+  /**
+   * Depending on whether {@link HttpRequestOptions.signal} was used, if so, it is the value passed,
+   * otherwise undefined
+   */
+  signal?: AbortSignal
+}
+
 export interface HttpRequestOptions<Method, BodyType = undefined> {
   /**
    * An AbortSignal instance, or a factory returning one, to abort the HTTP request(s) triggered by
@@ -1068,29 +1092,7 @@ export interface HttpRequestOptions<Method, BodyType = undefined> {
     /**
      * Options otherwise sent to {@link !fetch} as the `options` argument
      */
-    options: {
-      /**
-       * The request body content to send to the server
-       */
-      body: BodyType
-      /**
-       * HTTP Headers
-       */
-      headers: Record<string, string>
-      /**
-       * The {@link https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods request method}
-       */
-      method: Method
-      /**
-       * See {@link !Request.redirect}
-       */
-      redirect: 'manual'
-      /**
-       * Depending on whether {@link HttpRequestOptions.signal} was used, if so, it is the value
-       * passed, otherwise undefined
-       */
-      signal?: AbortSignal
-    },
+    options: CustomFetchOptions<Method, BodyType>,
   ) => Promise<Response>
 
   /**

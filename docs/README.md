@@ -188,6 +188,7 @@ Support from the community to continue maintaining and improving this module is 
 - [ClientCredentialsGrantRequestOptions](interfaces/ClientCredentialsGrantRequestOptions.md)
 - [ConfirmationClaims](interfaces/ConfirmationClaims.md)
 - [CryptoKeyPair](interfaces/CryptoKeyPair.md)
+- [CustomFetchOptions](interfaces/CustomFetchOptions.md)
 - [DeviceAuthorizationRequestOptions](interfaces/DeviceAuthorizationRequestOptions.md)
 - [DeviceAuthorizationResponse](interfaces/DeviceAuthorizationResponse.md)
 - [DiscoveryRequestOptions](interfaces/DiscoveryRequestOptions.md)
