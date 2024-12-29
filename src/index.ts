@@ -3310,7 +3310,8 @@ async function processGenericAccessTokenResponse(
   }
 
   assertReadableResponse(response)
-  assertApplicationJson(response)
+  // comment this because some providers (China's wechat) return text/plain but the body is valid JSON
+  // assertApplicationJson(response)
   let json: JsonValue
   try {
     json = await response.json()
