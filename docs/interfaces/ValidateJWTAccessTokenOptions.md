@@ -45,7 +45,7 @@ See [customFetch](../variables/customFetch.md).
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
 | `url` | `string` | URL the request is being made sent to [fetch](https://developer.mozilla.org/docs/Web/API/Window/fetch) as the `resource` argument |
-| `options` | [`CustomFetchOptions`](CustomFetchOptions.md)\<`"GET"`, `undefined`\> | Options otherwise sent to [fetch](https://developer.mozilla.org/docs/Web/API/Window/fetch) as the `options` argument |
+| `options` | [`CustomFetchOptions`](CustomFetchOptions.md)\<`"GET"`\> | Options otherwise sent to [fetch](https://developer.mozilla.org/docs/Web/API/Window/fetch) as the `options` argument |
 
 #### Returns
 
