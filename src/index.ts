@@ -1310,11 +1310,11 @@ export async function processDiscoveryResponse(
   }
 
   assertReadableResponse(response)
-  assertApplicationJson(response)
   let json: JsonValue
   try {
     json = await response.json()
   } catch (cause) {
+    assertApplicationJson(response)
     throw OPE('failed to parse "response" body as JSON', PARSE_ERROR, cause)
   }
 
@@ -2581,11 +2581,11 @@ export async function processPushedAuthorizationResponse(
   }
 
   assertReadableResponse(response)
-  assertApplicationJson(response)
   let json: JsonValue
   try {
     json = await response.json()
   } catch (cause) {
+    assertApplicationJson(response)
     throw OPE('failed to parse "response" body as JSON', PARSE_ERROR, cause)
   }
 
@@ -3049,10 +3049,10 @@ export async function processUserInfoResponse(
       throw OPE('JWT UserInfo Response expected', JWT_USERINFO_EXPECTED, response)
     }
 
-    assertApplicationJson(response)
     try {
       json = await response.json()
     } catch (cause) {
+      assertApplicationJson(response)
       throw OPE('failed to parse "response" body as JSON', PARSE_ERROR, cause)
     }
   }
@@ -3310,11 +3310,11 @@ async function processGenericAccessTokenResponse(
   }
 
   assertReadableResponse(response)
-  assertApplicationJson(response)
   let json: JsonValue
   try {
     json = await response.json()
   } catch (cause) {
+    assertApplicationJson(response)
     throw OPE('failed to parse "response" body as JSON', PARSE_ERROR, cause)
   }
 
@@ -4405,10 +4405,10 @@ export async function processIntrospectionResponse(
     }
   } else {
     assertReadableResponse(response)
-    assertApplicationJson(response)
     try {
       json = await response.json()
     } catch (cause) {
+      assertApplicationJson(response)
       throw OPE('failed to parse "response" body as JSON', PARSE_ERROR, cause)
     }
     if (!isJsonObject(json)) {
@@ -4464,11 +4464,11 @@ async function processJwksResponse(response: Response): Promise<JWKS> {
   }
 
   assertReadableResponse(response)
-  assertContentTypes(response, 'application/json', 'application/jwk-set+json')
   let json: JsonValue
   try {
     json = await response.json()
   } catch (cause) {
+    assertContentTypes(response, 'application/json', 'application/jwk-set+json')
     throw OPE('failed to parse "response" body as JSON', PARSE_ERROR, cause)
   }
 
@@ -5499,11 +5499,11 @@ export async function processDeviceAuthorizationResponse(
   }
 
   assertReadableResponse(response)
-  assertApplicationJson(response)
   let json: JsonValue
   try {
     json = await response.json()
   } catch (cause) {
+    assertApplicationJson(response)
     throw OPE('failed to parse "response" body as JSON', PARSE_ERROR, cause)
   }
 
