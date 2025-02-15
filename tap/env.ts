@@ -4,9 +4,8 @@ export const isBun = typeof Bun !== 'undefined'
 // @ts-ignore
 export const isDeno = typeof Deno !== 'undefined'
 
-export const isElectron =
-  // @ts-ignore
-  typeof process !== 'undefined' && !!process.versions.electron
+// @ts-ignore
+export const isElectron = typeof process !== 'undefined' && process.versions?.electron !== undefined
 
 export const isNode =
   // @ts-ignore
