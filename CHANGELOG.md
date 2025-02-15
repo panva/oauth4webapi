@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.1.5](https://github.com/panva/oauth4webapi/compare/v3.1.4...v3.1.5) (2025-02-15)
+
+
+### Refactor
+
+* assert success content-type only if JSON parsing fails ([1fe8f48](https://github.com/panva/oauth4webapi/commit/1fe8f48d8b10848206b8f51c2f9eb1c4afb574b0))
+
 ## [3.1.4](https://github.com/panva/oauth4webapi/compare/v3.1.3...v3.1.4) (2024-12-02)
 
 
