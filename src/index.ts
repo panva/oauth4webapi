@@ -3191,12 +3191,12 @@ const idTokenClaims = new WeakMap<TokenEndpointResponse, IDToken>()
 const jwtRefs = new WeakMap<Response, string>()
 
 /**
- * Returns ID Token claims validated during {@link processRefreshTokenResponse} or
- * {@link processDeviceCodeResponse}. To optionally validate its JWS Signature use
- * {@link validateApplicationLevelSignature}
+ * Returns ID Token claims validated during {@link processRefreshTokenResponse},
+ * {@link processBackchannelAuthenticationGrantResponse}, or {@link processDeviceCodeResponse}. To
+ * optionally validate its JWS Signature use {@link validateApplicationLevelSignature}
  *
  * @param ref Value previously resolved from {@link processRefreshTokenResponse},
- *   {@link processBackchannelAuthenticationGrantResponse} or {@link processDeviceCodeResponse}.
+ *   {@link processBackchannelAuthenticationGrantResponse}, or {@link processDeviceCodeResponse}.
  *
  * @returns JWT Claims Set from an ID Token, or undefined if there is no ID Token in `ref`.
  *
