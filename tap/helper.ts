@@ -93,6 +93,7 @@ export async function setup(
     require_auth_time: random(),
     default_max_age: authEndpoint ? (random() ? 30 : undefined) : undefined,
     grant_types: grantTypes,
+    backchannel_token_delivery_mode: 'poll',
     jwks: makeJwks(),
   }
 

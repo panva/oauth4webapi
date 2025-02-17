@@ -5989,6 +5989,216 @@ function reassignRSCode(err: unknown): never {
   throw err
 }
 
+export interface BackchannelAuthenticationRequestOptions
+  extends HttpRequestOptions<'POST', URLSearchParams> {}
+
+/**
+ * Performs a Backchannel Authentication Request at the
+ * {@link AuthorizationServer.backchannel_authentication_endpoint `as.backchannel_authentication_endpoint`}.
+ *
+ * @param as Authorization Server Metadata.
+ * @param client Client Metadata.
+ * @param clientAuthentication Client Authentication Method.
+ * @param parameters Backchannel Authentication Request parameters.
+ *
+ * @group Client-Initiated Backchannel Authentication
+ *
+ * @see [OpenID Connect Client-Initiated Backchannel Authentication](https://openid.net/specs/openid-client-initiated-backchannel-authentication-core-1_0.html#auth_request)
+ */
+export async function backchannelAuthenticationRequest(
+  as: AuthorizationServer,
+  client: Client,
+  clientAuthentication: ClientAuth,
+  parameters: URLSearchParams | Record<string, string> | string[][],
+  options?: BackchannelAuthenticationRequestOptions,
+): Promise<Response> {
+  assertAs(as)
+  assertClient(client)
+
+  const url = resolveEndpoint(
+    as,
+    'backchannel_authentication_endpoint',
+    client.use_mtls_endpoint_aliases,
+    options?.[allowInsecureRequests] !== true,
+  )
+
+  const body = new URLSearchParams(parameters)
+  body.set('client_id', client.client_id)
+
+  const headers = prepareHeaders(options?.headers)
+  headers.set('accept', 'application/json')
+
+  return authenticatedRequest(as, client, clientAuthentication, url, body, headers, options)
+}
+
+export interface BackchannelAuthenticationResponse {
+  /**
+   * Unique identifier to identify the authentication request.
+   */
+  readonly auth_req_id: string
+  /**
+   * The lifetime in seconds of the "auth_req_id".
+   */
+  readonly expires_in: number
+  /**
+   * The minimum amount of time in seconds that the client should wait between polling requests to
+   * the token endpoint.
+   */
+  readonly interval?: number
+
+  readonly [parameter: string]: JsonValue | undefined
+}
+
+/**
+ * Validates {@link !Response} instance to be one coming from the
+ * {@link AuthorizationServer.backchannel_authentication_endpoint `as.backchannel_authentication_endpoint`}.
+ *
+ * @param as Authorization Server Metadata.
+ * @param client Client Metadata.
+ * @param response Resolved value from {@link backchannelAuthenticationRequest}.
+ *
+ * @returns Resolves with an object representing the parsed successful response. OAuth 2.0 protocol
+ *   style errors are rejected using {@link ResponseBodyError}. WWW-Authenticate HTTP Header
+ *   challenges are rejected with {@link WWWAuthenticateChallengeError}.
+ *
+ * @group Client-Initiated Backchannel Authentication
+ *
+ * @see [OpenID Connect Client-Initiated Backchannel Authentication](https://openid.net/specs/openid-client-initiated-backchannel-authentication-core-1_0.html#auth_request)
+ */
+export async function processBackchannelAuthenticationResponse(
+  as: AuthorizationServer,
+  client: Client,
+  response: Response,
+): Promise<BackchannelAuthenticationResponse> {
+  assertAs(as)
+  assertClient(client)
+
+  if (!looseInstanceOf(response, Response)) {
+    throw CodedTypeError('"response" must be an instance of Response', ERR_INVALID_ARG_TYPE)
+  }
+
+  let challenges: WWWAuthenticateChallenge[] | undefined
+  if ((challenges = parseWwwAuthenticateChallenges(response))) {
+    throw new WWWAuthenticateChallengeError(
+      'server responded with a challenge in the WWW-Authenticate HTTP Header',
+      { cause: challenges, response },
+    )
+  }
+
+  if (response.status !== 200) {
+    let err: OAuth2Error | undefined
+    if ((err = await handleOAuthBodyError(response))) {
+      await response.body?.cancel()
+      throw new ResponseBodyError('server responded with an error in the response body', {
+        cause: err,
+        response,
+      })
+    }
+    throw OPE(
+      '"response" is not a conform Backchannel Authentication Endpoint response (unexpected HTTP status code)',
+      RESPONSE_IS_NOT_CONFORM,
+      response,
+    )
+  }
+
+  assertReadableResponse(response)
+  let json: JsonValue
+  try {
+    json = await response.json()
+  } catch (cause) {
+    assertApplicationJson(response)
+    throw OPE('failed to parse "response" body as JSON', PARSE_ERROR, cause)
+  }
+
+  if (!isJsonObject<Writeable<BackchannelAuthenticationResponse>>(json)) {
+    throw OPE('"response" body must be a top level object', INVALID_RESPONSE, { body: json })
+  }
+
+  assertString(json.auth_req_id, '"response" body "auth_req_id" property', INVALID_RESPONSE, {
+    body: json,
+  })
+
+  let expiresIn: unknown =
+    typeof json.expires_in !== 'number' ? parseFloat(json.expires_in) : json.expires_in
+  assertNumber(expiresIn, false, '"response" body "expires_in" property', INVALID_RESPONSE, {
+    body: json,
+  })
+  json.expires_in = expiresIn
+
+  if (json.interval !== undefined) {
+    assertNumber(json.interval, false, '"response" body "interval" property', INVALID_RESPONSE, {
+      body: json,
+    })
+  }
+
+  return json
+}
+
+/**
+ * Performs a Backchannel Authentication Grant request at the
+ * {@link AuthorizationServer.token_endpoint `as.token_endpoint`}.
+ *
+ * @param as Authorization Server Metadata.
+ * @param client Client Metadata.
+ * @param clientAuthentication Client Authentication Method.
+ * @param authReqId Unique identifier to identify the authentication request. This is the
+ *   {@link BackchannelAuthenticationResponse.auth_req_id `auth_req_id`} retrieved from
+ *   {@link processBackchannelAuthenticationResponse}.
+ *
+ * @group Client-Initiated Backchannel Authentication
+ *
+ * @see [OpenID Connect Client-Initiated Backchannel Authentication](https://openid.net/specs/openid-client-initiated-backchannel-authentication-core-1_0.html#token_request)
+ * @see [RFC 9449 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)](https://www.rfc-editor.org/rfc/rfc9449.html#name-dpop-access-token-request)
+ */
+export async function backchannelAuthenticationGrantRequest(
+  as: AuthorizationServer,
+  client: Client,
+  clientAuthentication: ClientAuth,
+  authReqId: string,
+  options?: TokenEndpointRequestOptions,
+): Promise<Response> {
+  assertAs(as)
+  assertClient(client)
+
+  assertString(authReqId, '"authReqId"')
+
+  const parameters = new URLSearchParams(options?.additionalParameters)
+  parameters.set('auth_req_id', authReqId)
+  return tokenEndpointRequest(
+    as,
+    client,
+    clientAuthentication,
+    'urn:openid:params:grant-type:ciba',
+    parameters,
+    options,
+  )
+}
+
+/**
+ * Validates Backchannel Authentication Grant {@link !Response} instance to be one coming from the
+ * {@link AuthorizationServer.token_endpoint `as.token_endpoint`}.
+ *
+ * @param as Authorization Server Metadata.
+ * @param client Client Metadata.
+ * @param response Resolved value from {@link backchannelAuthenticationGrantRequest}.
+ *
+ * @returns Resolves with an object representing the parsed successful response. OAuth 2.0 protocol
+ *   style errors are rejected using {@link ResponseBodyError}. WWW-Authenticate HTTP Header
+ *   challenges are rejected with {@link WWWAuthenticateChallengeError}.
+ *
+ * @group Client-Initiated Backchannel Authentication
+ *
+ * @see [OpenID Connect Client-Initiated Backchannel Authentication](https://openid.net/specs/openid-client-initiated-backchannel-authentication-core-1_0.html#token_request)
+ */
+export async function processBackchannelAuthenticationGrantResponse(
+  as: AuthorizationServer,
+  client: Client,
+  response: Response,
+  options?: JWEDecryptOptions,
+): Promise<TokenEndpointResponse> {
+  return processGenericAccessTokenResponse(as, client, response, undefined, options)
+}
+
 /**
  * This is not part of the public API.
  *

@@ -16,6 +16,9 @@ export default async (QUnit: QUnit, done: (details: QUnit.DoneDetails) => void) 
     import('./random.js'),
     import('./request_object.js'),
   ])
+  if (!(typeof navigator !== 'undefined' && navigator.userAgent?.startsWith?.('Mozilla/5.0 '))) {
+    modules.push(await import('./end2end-ciba.js'))
+  }
   for (const { default: module } of modules) {
     await module(QUnit)
   }
