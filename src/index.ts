@@ -3195,10 +3195,14 @@ const jwtRefs = new WeakMap<Response, string>()
  * {@link processDeviceCodeResponse}. To optionally validate its JWS Signature use
  * {@link validateApplicationLevelSignature}
  *
- * @param ref Value previously resolved from {@link processRefreshTokenResponse} or
- *   {@link processDeviceCodeResponse}.
+ * @param ref Value previously resolved from {@link processRefreshTokenResponse},
+ *   {@link processBackchannelAuthenticationGrantResponse} or {@link processDeviceCodeResponse}.
  *
  * @returns JWT Claims Set from an ID Token, or undefined if there is no ID Token in `ref`.
+ *
+ * @group Authorization Code Grant w/ OpenID Connect (OIDC)
+ * @group Client-Initiated Backchannel Authentication (CIBA)
+ * @group Device Authorization Grant
  */
 export function getValidatedIdTokenClaims(ref: TokenEndpointResponse): IDToken | undefined {
   if (!ref.id_token) {

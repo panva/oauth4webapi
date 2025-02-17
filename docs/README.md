@@ -4,10 +4,6 @@
 
 Support from the community to continue maintaining and improving this module is welcome. If you find the module useful, please consider supporting the project by [becoming a sponsor](https://github.com/sponsors/panva).
 
-## Functions
-
-- [getValidatedIdTokenClaims](functions/getValidatedIdTokenClaims.md)
-
 ## Accessing Protected Resources
 
 - [processUserInfoResponse](functions/processUserInfoResponse.md)
@@ -29,6 +25,7 @@ Support from the community to continue maintaining and improving this module is 
 - [authorizationCodeGrantRequest](functions/authorizationCodeGrantRequest.md)
 - [calculatePKCECodeChallenge](functions/calculatePKCECodeChallenge.md)
 - [generateRandomCodeVerifier](functions/generateRandomCodeVerifier.md)
+- [getValidatedIdTokenClaims](functions/getValidatedIdTokenClaims.md)
 - [issueRequestObject](functions/issueRequestObject.md)
 - [processAuthorizationCodeResponse](functions/processAuthorizationCodeResponse.md)
 - [processUserInfoResponse](functions/processUserInfoResponse.md)
@@ -61,6 +58,7 @@ Support from the community to continue maintaining and improving this module is 
 
 - [backchannelAuthenticationGrantRequest](functions/backchannelAuthenticationGrantRequest.md)
 - [backchannelAuthenticationRequest](functions/backchannelAuthenticationRequest.md)
+- [getValidatedIdTokenClaims](functions/getValidatedIdTokenClaims.md)
 - [processBackchannelAuthenticationGrantResponse](functions/processBackchannelAuthenticationGrantResponse.md)
 - [processBackchannelAuthenticationResponse](functions/processBackchannelAuthenticationResponse.md)
 
@@ -73,6 +71,7 @@ Support from the community to continue maintaining and improving this module is 
 
 - [deviceAuthorizationRequest](functions/deviceAuthorizationRequest.md)
 - [deviceCodeGrantRequest](functions/deviceCodeGrantRequest.md)
+- [getValidatedIdTokenClaims](functions/getValidatedIdTokenClaims.md)
 - [processDeviceAuthorizationResponse](functions/processDeviceAuthorizationResponse.md)
 - [processDeviceCodeResponse](functions/processDeviceCodeResponse.md)
 
