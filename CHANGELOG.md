@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.2.0](https://github.com/panva/oauth4webapi/compare/v3.1.5...v3.2.0) (2025-02-17)
+
+
+### Features
+
+* add Client-Initiated Backchannel Authentication ([3af0ec3](https://github.com/panva/oauth4webapi/commit/3af0ec3c2c4e13ea2915731fcd79103bdb3c5d9c))
+
+
+### Documentation
+
+* update deviceCodeGrantRequest ([f947b47](https://github.com/panva/oauth4webapi/commit/f947b473cdf259474d541aaa9bfb131b615878b6))
+
 ## [3.1.5](https://github.com/panva/oauth4webapi/compare/v3.1.4...v3.1.5) (2025-02-15)
 
 
