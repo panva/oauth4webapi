@@ -3245,7 +3245,7 @@ export interface ValidateSignatureOptions extends HttpRequestOptions<'GET'>, JWK
  * @group OpenID Connect (OIDC) UserInfo
  * @group Token Introspection
  *
- * @see [draft-ietf-oauth-jwt-introspection-response-12 - JWT Response for OAuth Token Introspection](https://www.ietf.org/archive/id/draft-ietf-oauth-jwt-introspection-response-12.html#section-5)
+ * @see [RFC 9701 - JWT Response for OAuth Token Introspection](https://www.rfc-editor.org/rfc/rfc9701.html#section-5)
  * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#UserInfo)
  */
 export async function validateApplicationLevelSignature(
@@ -4266,7 +4266,7 @@ function assertReadableResponse(response: Response): void {
  * @group Token Introspection
  *
  * @see [RFC 7662 - OAuth 2.0 Token Introspection](https://www.rfc-editor.org/rfc/rfc7662.html#section-2)
- * @see [draft-ietf-oauth-jwt-introspection-response-12 - JWT Response for OAuth Token Introspection](https://www.ietf.org/archive/id/draft-ietf-oauth-jwt-introspection-response-12.html#section-4)
+ * @see [RFC 9701 - JWT Response for OAuth Token Introspection](https://www.rfc-editor.org/rfc/rfc9701.html#section-4)
  */
 export async function introspectionRequest(
   as: AuthorizationServer,
@@ -4341,7 +4341,7 @@ export interface IntrospectionResponse {
  * @group Token Introspection
  *
  * @see [RFC 7662 - OAuth 2.0 Token Introspection](https://www.rfc-editor.org/rfc/rfc7662.html#section-2)
- * @see [draft-ietf-oauth-jwt-introspection-response-12 - JWT Response for OAuth Token Introspection](https://www.ietf.org/archive/id/draft-ietf-oauth-jwt-introspection-response-12.html#section-5)
+ * @see [RFC 9701 - JWT Response for OAuth Token Introspection](https://www.rfc-editor.org/rfc/rfc9701.html#section-5)
  */
 export async function processIntrospectionResponse(
   as: AuthorizationServer,
