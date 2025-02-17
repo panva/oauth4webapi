@@ -57,7 +57,7 @@ Support from the community to continue maintaining and improving this module is 
 - [clientCredentialsGrantRequest](functions/clientCredentialsGrantRequest.md)
 - [processClientCredentialsResponse](functions/processClientCredentialsResponse.md)
 
-## Client-Initiated Backchannel Authentication
+## Client-Initiated Backchannel Authentication (CIBA)
 
 - [backchannelAuthenticationGrantRequest](functions/backchannelAuthenticationGrantRequest.md)
 - [backchannelAuthenticationRequest](functions/backchannelAuthenticationRequest.md)

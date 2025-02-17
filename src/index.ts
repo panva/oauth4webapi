@@ -6003,7 +6003,7 @@ export interface BackchannelAuthenticationRequestOptions
  * @param clientAuthentication Client Authentication Method.
  * @param parameters Backchannel Authentication Request parameters.
  *
- * @group Client-Initiated Backchannel Authentication
+ * @group Client-Initiated Backchannel Authentication (CIBA)
  *
  * @see [OpenID Connect Client-Initiated Backchannel Authentication](https://openid.net/specs/openid-client-initiated-backchannel-authentication-core-1_0.html#auth_request)
  */
@@ -6063,7 +6063,7 @@ export interface BackchannelAuthenticationResponse {
  *   style errors are rejected using {@link ResponseBodyError}. WWW-Authenticate HTTP Header
  *   challenges are rejected with {@link WWWAuthenticateChallengeError}.
  *
- * @group Client-Initiated Backchannel Authentication
+ * @group Client-Initiated Backchannel Authentication (CIBA)
  *
  * @see [OpenID Connect Client-Initiated Backchannel Authentication](https://openid.net/specs/openid-client-initiated-backchannel-authentication-core-1_0.html#auth_request)
  */
@@ -6147,7 +6147,7 @@ export async function processBackchannelAuthenticationResponse(
  *   {@link BackchannelAuthenticationResponse.auth_req_id `auth_req_id`} retrieved from
  *   {@link processBackchannelAuthenticationResponse}.
  *
- * @group Client-Initiated Backchannel Authentication
+ * @group Client-Initiated Backchannel Authentication (CIBA)
  *
  * @see [OpenID Connect Client-Initiated Backchannel Authentication](https://openid.net/specs/openid-client-initiated-backchannel-authentication-core-1_0.html#token_request)
  * @see [RFC 9449 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)](https://www.rfc-editor.org/rfc/rfc9449.html#name-dpop-access-token-request)
@@ -6188,7 +6188,7 @@ export async function backchannelAuthenticationGrantRequest(
  *   style errors are rejected using {@link ResponseBodyError}. WWW-Authenticate HTTP Header
  *   challenges are rejected with {@link WWWAuthenticateChallengeError}.
  *
- * @group Client-Initiated Backchannel Authentication
+ * @group Client-Initiated Backchannel Authentication (CIBA)
  *
  * @see [OpenID Connect Client-Initiated Backchannel Authentication](https://openid.net/specs/openid-client-initiated-backchannel-authentication-core-1_0.html#token_request)
  */
