@@ -5556,7 +5556,9 @@ export async function processDeviceAuthorizationResponse(
  * @param as Authorization Server Metadata.
  * @param client Client Metadata.
  * @param clientAuthentication Client Authentication Method.
- * @param deviceCode Device Code.
+ * @param deviceCode Device Code. This is the
+ *   {@link DeviceAuthorizationResponse.device_code `device_code`} retrieved from
+ *   {@link processDeviceAuthorizationResponse}.
  *
  * @group Device Authorization Grant
  *
