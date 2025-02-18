@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.3.0](https://github.com/panva/oauth4webapi/compare/v3.2.0...v3.3.0) (2025-02-18)
+
+
+### Features
+
+* add a helper to DPoPHandle to calculate dpop_jkt ([2b8d9e7](https://github.com/panva/oauth4webapi/commit/2b8d9e70533f1de90f622f9c4f8915ac1c6350fd))
+
+
+### Documentation
+
+* update CIBA group tags ([318edce](https://github.com/panva/oauth4webapi/commit/318edce60377cd32bf2b09f9ade74cc372315606))
+* update getValidatedIdTokenClaims description ([15836c5](https://github.com/panva/oauth4webapi/commit/15836c5c9c4545f68b97ca218d211ab34e7affa8))
+* update getValidatedIdTokenClaims description ([9e13fb6](https://github.com/panva/oauth4webapi/commit/9e13fb60a476fc9e0d596c2b95c56fb0e5d83f3d))
+* update getValidatedIdTokenClaims group tags ([ea30884](https://github.com/panva/oauth4webapi/commit/ea308848afec7dd28f996db762a0e5c8cb50e602))
+* update JWT Introspection Response references to RFC 9701 ([1cf0cca](https://github.com/panva/oauth4webapi/commit/1cf0cca63e290afb3bc4261a820559dbc0ecf54d))
+
 ## [3.2.0](https://github.com/panva/oauth4webapi/compare/v3.1.5...v3.2.0) (2025-02-17)
 
 
