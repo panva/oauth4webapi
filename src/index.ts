@@ -2112,6 +2112,13 @@ export interface DPoPHandle {
    * @internal
    */
   cacheNonce(response: Response): void
+  /**
+   * Calculates the JWK Thumbprint of the DPoP public key using the SHA-256 hash function for use as
+   * the optional `dpop_jkt` authorization request parameter.
+   *
+   * @see [RFC 9449 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)](https://www.rfc-editor.org/rfc/rfc9449.html#name-authorization-code-binding-)
+   */
+  calculateThumbprint(): Promise<string>
 }
 
 class DPoPHandler implements DPoPHandle {
@@ -2121,6 +2128,7 @@ class DPoPHandler implements DPoPHandle {
   #clockSkew: number
   #modifyAssertion?: ModifyAssertionFunction
   #map?: Map<string, string>
+  #jkt?: string
 
   constructor(client: Client, keyPair: CryptoKeyPair, options?: ModifyAssertionOptions) {
     assertPrivateKey(keyPair?.privateKey, '"DPoP.privateKey"')
@@ -2154,6 +2162,32 @@ class DPoPHandler implements DPoPHandle {
       this.#map.delete(this.#map.keys().next().value!)
     }
     this.#map.set(key, val)
+  }
+
+  async calculateThumbprint() {
+    if (!this.#jkt) {
+      const jwk = await crypto.subtle.exportKey('jwk', this.#publicKey)
+      let components: JsonValue
+      switch (jwk.kty) {
+        case 'EC':
+          components = { crv: jwk.crv, kty: jwk.kty, x: jwk.x, y: jwk.y }
+          break
+        case 'OKP':
+          components = { crv: jwk.crv, kty: jwk.kty, x: jwk.x }
+          break
+        case 'RSA':
+          components = { e: jwk.e, kty: jwk.kty, n: jwk.n }
+          break
+        default:
+          throw new UnsupportedOperationError('unsupported JWK', { cause: { jwk } })
+      }
+
+      this.#jkt ||= b64u(
+        await crypto.subtle.digest({ name: 'SHA-256' }, buf(JSON.stringify(components))),
+      )
+    }
+
+    return this.#jkt
   }
 
   async addProof(url: URL, headers: Headers, htm: string, accessToken?: string): Promise<void> {

@@ -1,6 +1,6 @@
 import anyTest from 'ava'
 import type { Macro, TestFn } from 'ava'
-import { importJWK, type JWK, calculateJwkThumbprint, exportJWK, compactDecrypt } from 'jose'
+import { importJWK, type JWK, compactDecrypt } from 'jose'
 import * as undici from 'undici'
 import { inspect } from 'node:util'
 
@@ -322,10 +322,7 @@ export const flow = (options?: MacroOptions) => {
       if (usesDpop(variant)) {
         DPoPKeyPair = await oauth.generateKeyPair(ALG)
         DPoP = oauth.DPoP(client, DPoPKeyPair)
-        authorizationUrl.searchParams.set(
-          'dpop_jkt',
-          await calculateJwkThumbprint(await exportJWK(DPoPKeyPair.publicKey)),
-        )
+        authorizationUrl.searchParams.set('dpop_jkt', await DPoP.calculateThumbprint())
       }
 
       if (usesPar(plan)) {
