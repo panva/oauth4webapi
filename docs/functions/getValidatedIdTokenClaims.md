@@ -8,15 +8,15 @@ Support from the community to continue maintaining and improving this module is 
 
 ▸ **getValidatedIdTokenClaims**(`ref`): [`IDToken`](../interfaces/IDToken.md) \| `undefined`
 
-Returns ID Token claims validated during [processRefreshTokenResponse](processRefreshTokenResponse.md),
-[processBackchannelAuthenticationGrantResponse](processBackchannelAuthenticationGrantResponse.md), or [processDeviceCodeResponse](processDeviceCodeResponse.md). To
-optionally validate its JWS Signature use [validateApplicationLevelSignature](validateApplicationLevelSignature.md)
+Returns ID Token Claims Set from a [TokenEndpointResponse](../interfaces/TokenEndpointResponse.md) processed by e.g.
+[processAuthorizationCodeResponse](processAuthorizationCodeResponse.md). To optionally validate the ID Token Signature use
+[validateApplicationLevelSignature](validateApplicationLevelSignature.md).
 
 ## Parameters
 
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
-| `ref` | [`TokenEndpointResponse`](../interfaces/TokenEndpointResponse.md) | Value previously resolved from [processRefreshTokenResponse](processRefreshTokenResponse.md), [processBackchannelAuthenticationGrantResponse](processBackchannelAuthenticationGrantResponse.md), or [processDeviceCodeResponse](processDeviceCodeResponse.md). |
+| `ref` | [`TokenEndpointResponse`](../interfaces/TokenEndpointResponse.md) | [TokenEndpointResponse](../interfaces/TokenEndpointResponse.md) previously resolved from e.g. [processAuthorizationCodeResponse](processAuthorizationCodeResponse.md) |
 
 ## Returns
 
