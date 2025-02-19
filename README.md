@@ -10,7 +10,7 @@ The following features are currently in scope and implemented in this software:
 
 - Authorization Server Metadata discovery
 - Authorization Code Flow (profiled under OpenID Connect 1.0, OAuth 2.0, OAuth 2.1, and FAPI 2.0), with PKCE
-- Refresh Token, Device Authorization, Client-Initiated Backchannel Authentication, and Client Credentials Grants
+- Refresh Token, Device Authorization, Client-Initiated Backchannel Authentication (CIBA), and Client Credentials Grants
 - Demonstrating Proof-of-Possession at the Application Layer (DPoP)
 - Token Introspection and Revocation
 - Pushed Authorization Requests (PAR)
@@ -69,6 +69,7 @@ import * as oauth from 'oauth4webapi'
   - Public Client - [source](examples/public.ts) | [diff](examples/public.diff)
 - Other Grants
   - Client Credentials Grant - [source](examples/client_credentials.ts)
+  - Client-Initiated Backchannel Authentication Grant (CIBA) - [source](examples/ciba.ts)
   - Device Authorization Grant - [source](examples/device_authorization_grant.ts)
   - Refresh Token Grant - [source](examples/refresh_token.ts) | [diff](examples/refresh_token.diff)
 - FAPI

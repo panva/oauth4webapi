@@ -30,6 +30,7 @@ A collection of examples for the most common use cases.
   - Public Client - [source](public.ts) | [diff](public.diff)
 - Other Grants
   - Client Credentials Grant - [source](client_credentials.ts)
+  - Client-Initiated Backchannel Authentication Grant (CIBA) - [source](ciba.ts)
   - Device Authorization Grant - [source](device_authorization_grant.ts)
   - Refresh Token Grant - [source](refresh_token.ts) | [diff](refresh_token.diff)
 - FAPI
