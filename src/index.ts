@@ -956,7 +956,7 @@ function decodeBase64Url(input: string) {
 
 function b64u(input: string): Uint8Array
 function b64u(input: Uint8Array | ArrayBuffer): string
-function b64u(input: string | Uint8Array | ArrayBuffer) {
+function b64u(input: string | Uint8Array | ArrayBuffer): string | Uint8Array {
   if (typeof input === 'string') {
     return decodeBase64Url(input)
   }
