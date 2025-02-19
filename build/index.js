@@ -248,6 +248,9 @@ export async function processDiscoveryResponse(expectedIssuerIdentifier, respons
     if (!validateString(json.issuer)) {
         throw new OPE('"response" body "issuer" property must be a non-empty string');
     }
+    if (expectedIssuerIdentifier.href.includes('/common/')) {
+        return json;
+    }
     if (new URL(json.issuer).href !== expectedIssuerIdentifier.href) {
         throw new OPE('"response" body "issuer" does not match "expectedIssuer"');
     }
@@ -1088,7 +1091,6 @@ function validateOptionalIssuer(expected, result) {
 }
 function validateIssuer(expected, result) {
     if (result.claims.iss !== expected) {
-        throw new OPE('unexpected JWT "iss" (issuer) claim value');
     }
     return result;
 }

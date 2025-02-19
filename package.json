@@ -1,6 +1,6 @@
 {
-  "name": "oauth4webapi",
-  "version": "2.17.0",
+  "name": "@philpan/oauth4webapi",
+  "version": "2.17.0-azure-common.2",
   "description": "Low-Level OAuth 2 / OpenID Connect Client API for JavaScript Runtimes",
   "keywords": [
     "access token",

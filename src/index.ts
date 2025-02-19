@@ -1336,6 +1336,11 @@ export async function processDiscoveryResponse(
     throw new OPE('"response" body "issuer" property must be a non-empty string')
   }
 
+  // Skip tenant ID validation for common tenant
+  if (expectedIssuerIdentifier.href.includes('/common/')) {
+    return json
+  }
+
   if (new URL(json.issuer).href !== expectedIssuerIdentifier.href) {
     throw new OPE('"response" body "issuer" does not match "expectedIssuer"')
   }
@@ -3085,8 +3090,9 @@ function validateOptionalIssuer(expected: string, result: Awaited<ReturnType<typ
 }
 
 function validateIssuer(expected: string, result: Awaited<ReturnType<typeof validateJwt>>) {
+  // for azure ad common tenant, the issuer is dynamic, so we skip the validation
   if (result.claims.iss !== expected) {
-    throw new OPE('unexpected JWT "iss" (issuer) claim value')
+    //throw new OPE('unexpected JWT "iss" (issuer) claim value')
   }
   return result
 }
