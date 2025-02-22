@@ -61,7 +61,7 @@ switch (plan.name) {
 }
 
 async function importPrivateKey(alg: string, jwk: JWK) {
-  const key = await importJWK<CryptoKey>(jwk, alg)
+  const key = await importJWK(jwk, alg)
   if (!('type' in key)) {
     throw new Error()
   }
