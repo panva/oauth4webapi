@@ -1,6 +1,6 @@
 {
   "imports": {
-    "jose": "../node_modules/jose/dist/browser/index.js",
+    "jose": "../node_modules/jose/dist/webapi/index.js",
     "qunit": "../node_modules/qunit/qunit/qunit.js",
     "../src/index.js": "../src/index.ts",
     "./callback.js": "./callback.ts",
