@@ -121,6 +121,7 @@ dist-browser-tests
 
 
 .npmrc
+.netlify
 
 examples/**/*.js
 conformance/**/*.js
@@ -134,4 +135,5 @@ tap/run-*.cjs
 *.bak
 tap/.workerd.capnp
 tap/.workers.capnp
+tap/netlify
 submissions

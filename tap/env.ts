@@ -2,7 +2,10 @@
 export const isBun = typeof Bun !== 'undefined'
 
 // @ts-ignore
-export const isDeno = typeof Deno !== 'undefined'
+export const isNetlify = typeof Netlify !== 'undefined'
+
+// @ts-ignore
+export const isDeno = typeof Deno !== 'undefined' && !isNetlify
 
 // @ts-ignore
 export const isElectron = typeof process !== 'undefined' && process.versions?.electron !== undefined

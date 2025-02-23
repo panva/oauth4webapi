@@ -121,6 +121,30 @@ jobs:
           name: edge-runtime server log
           if-no-files-found: warn
 
+  netlify:
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: 'npm'
+      - run: npm clean-install
+      - name: Run Test Suite
+        run: npm run tap:netlify
+      - name: Upload server logs
+        if: ${{ failure() }}
+        id: artifact-upload-step
+        uses: actions/upload-artifact@v4
+        with:
+          path: server.log
+          name: netlify server log
+          if-no-files-found: warn
+
   electron:
     needs:
       - build
