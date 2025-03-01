@@ -18,6 +18,7 @@
     "noImplicitOverride": true,
     "noImplicitReturns": true,
     "types": [],
-    "stripInternal": true
+    "stripInternal": true,
+    "erasableSyntaxOnly": true
   }
 }
