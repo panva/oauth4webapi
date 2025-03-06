@@ -2590,29 +2590,9 @@ export async function processPushedAuthorizationResponse(
     throw CodedTypeError('"response" must be an instance of Response', ERR_INVALID_ARG_TYPE)
   }
 
-  let challenges: WWWAuthenticateChallenge[] | undefined
-  if ((challenges = parseWwwAuthenticateChallenges(response))) {
-    throw new WWWAuthenticateChallengeError(
-      'server responded with a challenge in the WWW-Authenticate HTTP Header',
-      { cause: challenges, response },
-    )
-  }
+  checkAuthenticationChallenges(response)
 
-  if (response.status !== 201) {
-    let err: OAuth2Error | undefined
-    if ((err = await handleOAuthBodyError(response))) {
-      await response.body?.cancel()
-      throw new ResponseBodyError('server responded with an error in the response body', {
-        cause: err,
-        response,
-      })
-    }
-    throw OPE(
-      '"response" is not a conform Pushed Authorization Request Endpoint response (unexpected HTTP status code)',
-      RESPONSE_IS_NOT_CONFORM,
-      response,
-    )
-  }
+  await checkOAuthBodyError(response, 201, 'Pushed Authorization Request Endpoint')
 
   assertReadableResponse(response)
   let json: JsonValue
@@ -2653,6 +2633,38 @@ export type ProtectedResourceRequestBody =
 export interface ProtectedResourceRequestOptions
   extends Omit<HttpRequestOptions<string, ProtectedResourceRequestBody>, 'headers'>,
     DPoPRequestOptions {}
+
+async function parseOAuthResponseErrorBody(response: Response): Promise<OAuth2Error | undefined> {
+  if (response.status > 399 && response.status < 500) {
+    assertReadableResponse(response)
+    assertApplicationJson(response)
+    try {
+      const json: JsonValue = await response.clone().json()
+      if (isJsonObject<OAuth2Error>(json) && typeof json.error === 'string' && json.error.length) {
+        return json
+      }
+    } catch {}
+  }
+  return undefined
+}
+
+async function checkOAuthBodyError(response: Response, expected: number, label: string) {
+  if (response.status !== expected) {
+    let err: OAuth2Error | undefined
+    if ((err = await parseOAuthResponseErrorBody(response))) {
+      await response.body?.cancel()
+      throw new ResponseBodyError('server responded with an error in the response body', {
+        cause: err,
+        response,
+      })
+    }
+    throw OPE(
+      `"response" is not a conform ${label} response (unexpected HTTP status code)`,
+      RESPONSE_IS_NOT_CONFORM,
+      response,
+    )
+  }
+}
 
 function assertDPoP(option: DPoPHandle): asserts option is DPoPHandler {
   if (!branded.has(option)) {
@@ -2724,16 +2736,9 @@ export async function protectedResourceRequest(
   body?: ProtectedResourceRequestBody,
   options?: ProtectedResourceRequestOptions,
 ): Promise<Response> {
-  return resourceRequest(accessToken, method, url, headers, body, options).then((response) => {
-    let challenges: WWWAuthenticateChallenge[] | undefined
-    if ((challenges = parseWwwAuthenticateChallenges(response))) {
-      throw new WWWAuthenticateChallengeError(
-        'server responded with a challenge in the WWW-Authenticate HTTP Header',
-        { cause: challenges, response },
-      )
-    }
-    return response
-  })
+  const response = await resourceRequest(accessToken, method, url, headers, body, options)
+  checkAuthenticationChallenges(response)
+  return response
 }
 
 export interface UserInfoRequestOptions extends HttpRequestOptions<'GET'>, DPoPRequestOptions {}
@@ -3041,13 +3046,7 @@ export async function processUserInfoResponse(
     throw CodedTypeError('"response" must be an instance of Response', ERR_INVALID_ARG_TYPE)
   }
 
-  let challenges: WWWAuthenticateChallenge[] | undefined
-  if ((challenges = parseWwwAuthenticateChallenges(response))) {
-    throw new WWWAuthenticateChallengeError(
-      'server responded with a challenge in the WWW-Authenticate HTTP Header',
-      { cause: challenges, response },
-    )
-  }
+  checkAuthenticationChallenges(response)
 
   if (response.status !== 200) {
     throw OPE(
@@ -3323,29 +3322,9 @@ async function processGenericAccessTokenResponse(
     throw CodedTypeError('"response" must be an instance of Response', ERR_INVALID_ARG_TYPE)
   }
 
-  let challenges: WWWAuthenticateChallenge[] | undefined
-  if ((challenges = parseWwwAuthenticateChallenges(response))) {
-    throw new WWWAuthenticateChallengeError(
-      'server responded with a challenge in the WWW-Authenticate HTTP Header',
-      { cause: challenges, response },
-    )
-  }
+  checkAuthenticationChallenges(response)
 
-  if (response.status !== 200) {
-    let err: OAuth2Error | undefined
-    if ((err = await handleOAuthBodyError(response))) {
-      await response.body?.cancel()
-      throw new ResponseBodyError('server responded with an error in the response body', {
-        cause: err,
-        response,
-      })
-    }
-    throw OPE(
-      '"response" is not a conform Token Endpoint response (unexpected HTTP status code)',
-      RESPONSE_IS_NOT_CONFORM,
-      response,
-    )
-  }
+  await checkOAuthBodyError(response, 200, 'Token Endpoint')
 
   assertReadableResponse(response)
   let json: JsonValue
@@ -3462,6 +3441,16 @@ async function processGenericAccessTokenResponse(
   }
 
   return json
+}
+
+function checkAuthenticationChallenges(response: Response) {
+  let challenges: WWWAuthenticateChallenge[] | undefined
+  if ((challenges = parseWwwAuthenticateChallenges(response))) {
+    throw new WWWAuthenticateChallengeError(
+      'server responded with a challenge in the WWW-Authenticate HTTP Header',
+      { cause: challenges, response },
+    )
+  }
 }
 
 /**
@@ -4237,29 +4226,9 @@ export async function processRevocationResponse(response: Response): Promise<und
     throw CodedTypeError('"response" must be an instance of Response', ERR_INVALID_ARG_TYPE)
   }
 
-  let challenges: WWWAuthenticateChallenge[] | undefined
-  if ((challenges = parseWwwAuthenticateChallenges(response))) {
-    throw new WWWAuthenticateChallengeError(
-      'server responded with a challenge in the WWW-Authenticate HTTP Header',
-      { cause: challenges, response },
-    )
-  }
+  checkAuthenticationChallenges(response)
 
-  if (response.status !== 200) {
-    let err: OAuth2Error | undefined
-    if ((err = await handleOAuthBodyError(response))) {
-      await response.body?.cancel()
-      throw new ResponseBodyError('server responded with an error in the response body', {
-        cause: err,
-        response,
-      })
-    }
-    throw OPE(
-      '"response" is not a conform Revocation Endpoint response (unexpected HTTP status code)',
-      RESPONSE_IS_NOT_CONFORM,
-      response,
-    )
-  }
+  await checkOAuthBodyError(response, 200, 'Revocation Endpoint')
 
   return undefined
 }
@@ -4390,29 +4359,9 @@ export async function processIntrospectionResponse(
     throw CodedTypeError('"response" must be an instance of Response', ERR_INVALID_ARG_TYPE)
   }
 
-  let challenges: WWWAuthenticateChallenge[] | undefined
-  if ((challenges = parseWwwAuthenticateChallenges(response))) {
-    throw new WWWAuthenticateChallengeError(
-      'server responded with a challenge in the WWW-Authenticate HTTP Header',
-      { cause: challenges, response },
-    )
-  }
+  checkAuthenticationChallenges(response)
 
-  if (response.status !== 200) {
-    let err: OAuth2Error | undefined
-    if ((err = await handleOAuthBodyError(response))) {
-      await response.body?.cancel()
-      throw new ResponseBodyError('server responded with an error in the response body', {
-        cause: err,
-        response,
-      })
-    }
-    throw OPE(
-      '"response" is not a conform Introspection Endpoint response (unexpected HTTP status code)',
-      RESPONSE_IS_NOT_CONFORM,
-      response,
-    )
-  }
+  await checkOAuthBodyError(response, 200, 'Introspection Endpoint')
 
   let json: JsonValue
   if (getContentType(response) === 'application/token-introspection+jwt') {
@@ -4527,20 +4476,6 @@ async function processJwksResponse(response: Response): Promise<JWKS> {
   }
 
   return json
-}
-
-async function handleOAuthBodyError(response: Response): Promise<OAuth2Error | undefined> {
-  if (response.status > 399 && response.status < 500) {
-    assertReadableResponse(response)
-    assertApplicationJson(response)
-    try {
-      const json: JsonValue = await response.clone().json()
-      if (isJsonObject<OAuth2Error>(json) && typeof json.error === 'string' && json.error.length) {
-        return json
-      }
-    } catch {}
-  }
-  return undefined
 }
 
 function supported(alg: string) {
@@ -5512,29 +5447,9 @@ export async function processDeviceAuthorizationResponse(
     throw CodedTypeError('"response" must be an instance of Response', ERR_INVALID_ARG_TYPE)
   }
 
-  let challenges: WWWAuthenticateChallenge[] | undefined
-  if ((challenges = parseWwwAuthenticateChallenges(response))) {
-    throw new WWWAuthenticateChallengeError(
-      'server responded with a challenge in the WWW-Authenticate HTTP Header',
-      { cause: challenges, response },
-    )
-  }
+  checkAuthenticationChallenges(response)
 
-  if (response.status !== 200) {
-    let err: OAuth2Error | undefined
-    if ((err = await handleOAuthBodyError(response))) {
-      await response.body?.cancel()
-      throw new ResponseBodyError('server responded with an error in the response body', {
-        cause: err,
-        response,
-      })
-    }
-    throw OPE(
-      '"response" is not a conform Device Authorization Endpoint response (unexpected HTTP status code)',
-      RESPONSE_IS_NOT_CONFORM,
-      response,
-    )
-  }
+  await checkOAuthBodyError(response, 200, 'Device Authorization Endpoint')
 
   assertReadableResponse(response)
   let json: JsonValue
@@ -6117,29 +6032,9 @@ export async function processBackchannelAuthenticationResponse(
     throw CodedTypeError('"response" must be an instance of Response', ERR_INVALID_ARG_TYPE)
   }
 
-  let challenges: WWWAuthenticateChallenge[] | undefined
-  if ((challenges = parseWwwAuthenticateChallenges(response))) {
-    throw new WWWAuthenticateChallengeError(
-      'server responded with a challenge in the WWW-Authenticate HTTP Header',
-      { cause: challenges, response },
-    )
-  }
+  checkAuthenticationChallenges(response)
 
-  if (response.status !== 200) {
-    let err: OAuth2Error | undefined
-    if ((err = await handleOAuthBodyError(response))) {
-      await response.body?.cancel()
-      throw new ResponseBodyError('server responded with an error in the response body', {
-        cause: err,
-        response,
-      })
-    }
-    throw OPE(
-      '"response" is not a conform Backchannel Authentication Endpoint response (unexpected HTTP status code)',
-      RESPONSE_IS_NOT_CONFORM,
-      response,
-    )
-  }
+  await checkOAuthBodyError(response, 200, 'Backchannel Authentication Endpoint')
 
   assertReadableResponse(response)
   let json: JsonValue
