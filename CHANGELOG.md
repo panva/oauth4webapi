@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.3.1](https://github.com/panva/oauth4webapi/compare/v3.3.0...v3.3.1) (2025-03-10)
+
+
+### Documentation
+
+* add note about minimal Node.js version to README.md ([1d4e703](https://github.com/panva/oauth4webapi/commit/1d4e703ee3faf9fce23ac20f1f178d0cd5c58d43))
+* bump typedoc ([589409a](https://github.com/panva/oauth4webapi/commit/589409afa56dafbed59cbbfa54561d54f12d5d37))
+
+
+### Refactor
+
+* reusable error handling routines ([1d1e23b](https://github.com/panva/oauth4webapi/commit/1d1e23bfbe7886a654f79c05a891bd65ea74ac82))
+* **types:** update overload signature of b64u ([bd28fcb](https://github.com/panva/oauth4webapi/commit/bd28fcbd764b12981809ebf235bb25160153ac89))
+
 ## [3.3.0](https://github.com/panva/oauth4webapi/compare/v3.2.0...v3.3.0) (2025-02-18)
 
 
