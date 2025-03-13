@@ -4553,8 +4553,7 @@ function keyToSubtle(key: CryptoKey): AlgorithmIdentifier | RsaPssParams | Ecdsa
     case 'RSASSA-PKCS1-v1_5':
       checkRsaKeyAlgorithm(key)
       return key.algorithm.name
-    case 'Ed25519': // Fall through
-    case 'EdDSA':
+    case 'Ed25519':
       return key.algorithm.name
   }
   throw new UnsupportedOperationError('unsupported CryptoKey algorithm name', { cause: key })
