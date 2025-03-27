@@ -746,7 +746,7 @@ export interface AuthorizationServer {
    */
   readonly check_session_iframe?: string
   /**
-   * JSON array containing a list of the JWS algorithms supported for DPoP proof JWTs.
+   * JSON array containing a list of the JWS algorithms supported for DPoP Proof JWTs.
    */
   readonly dpop_signing_alg_values_supported?: string[]
   /**
