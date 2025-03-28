@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.3.2](https://github.com/panva/oauth4webapi/compare/v3.3.1...v3.3.2) (2025-03-28)
+
+
+### Documentation
+
+* consistent DPoP Proof capitalization ([7eff4c5](https://github.com/panva/oauth4webapi/commit/7eff4c51cb36859a85d4e46d074b96de8fc15014))
+* drop cdnjs and denoland/x links in README ([63acb25](https://github.com/panva/oauth4webapi/commit/63acb25992e0fa40a108c2469db4467b984264a9))
+
+
+### Refactor
+
+* allow externally formed DPoP headers ([5b5064d](https://github.com/panva/oauth4webapi/commit/5b5064d42f51a8e23a7e9404455937a73cd61e1c))
+* remove an always false switch case ([4096393](https://github.com/panva/oauth4webapi/commit/4096393a57396c98d20cdf523e66fc8647ad2c65))
+
 ## [3.3.1](https://github.com/panva/oauth4webapi/compare/v3.3.0...v3.3.1) (2025-03-10)
 
 
