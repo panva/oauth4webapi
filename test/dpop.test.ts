@@ -84,3 +84,26 @@ test('dpop() w/ a nonce', async (t) => {
     DPoP: sign,
   })
 })
+
+test('externally formed dpop headers', async (t) => {
+  t.context.mock
+    .get('https://rs.example.com')
+    .intercept({
+      path: '/resource',
+      method: 'GET',
+      headers: {
+        authorization: (actual) => t.is(actual, 'DPoP token'),
+        dpop: (actual) => t.is(actual, 'foo'),
+      },
+    })
+    .reply(200, '')
+
+  const url = new URL('https://rs.example.com/resource')
+  const response = await lib.protectedResourceRequest(
+    'token',
+    'GET',
+    url,
+    new Headers({ dpop: 'foo' }),
+  )
+  t.true(response instanceof Response)
+})

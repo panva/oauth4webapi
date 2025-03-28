@@ -1131,18 +1131,14 @@ function prepareHeaders(input?: [string, string][] | Record<string, string> | He
   if (USER_AGENT && !headers.has('user-agent')) {
     headers.set('user-agent', USER_AGENT)
   }
+
   if (headers.has('authorization')) {
     throw CodedTypeError(
       '"options.headers" must not include the "authorization" header name',
       ERR_INVALID_ARG_VALUE,
     )
   }
-  if (headers.has('dpop')) {
-    throw CodedTypeError(
-      '"options.headers" must not include the "dpop" header name',
-      ERR_INVALID_ARG_VALUE,
-    )
-  }
+
   return headers
 }
 
@@ -2693,10 +2689,9 @@ async function resourceRequest(
   if (options?.DPoP) {
     assertDPoP(options.DPoP)
     await options.DPoP.addProof(url, headers, method.toUpperCase(), accessToken)
-    headers.set('authorization', `DPoP ${accessToken}`)
-  } else {
-    headers.set('authorization', `Bearer ${accessToken}`)
   }
+
+  headers.set('authorization', `${headers.has('dpop') ? 'DPoP' : 'Bearer'} ${accessToken}`)
 
   const response = await (options?.[customFetch] || fetch)(url.href, {
     body,
