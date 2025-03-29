@@ -4,9 +4,11 @@
 
 The following major versions are currently supported with security updates.
 
-| Version                                                 | Security Fixes 🔑 |
-| ------------------------------------------------------- | ----------------- |
-| [v3.x](https://github.com/panva/oauth4webapi/tree/v3.x) | ✅                |
+| Version                                                 | End-of-life |
+| ------------------------------------------------------- | ----------- |
+| [v3.x](https://github.com/panva/oauth4webapi/tree/v3.x) | TBD         |
+
+End-of-life for the current release will be determined prior to the release of its successor.
 
 ## Reporting a Vulnerability
 
