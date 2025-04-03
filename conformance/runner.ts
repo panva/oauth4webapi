@@ -6,7 +6,7 @@ import { inspect } from 'node:util'
 
 export const test = anyTest as TestFn<{ instance: Test }>
 
-import { getScope } from './ava.config.js'
+import { getScope, makePublicJwks } from './ava.config.js'
 import * as oauth from '../src/index.js'
 import {
   createTestFromPlan,
@@ -174,6 +174,72 @@ export const flow = (options?: MacroOptions) => {
 
       t.log('AS Metadata discovered for', as.issuer)
 
+      const response_type = responseType(plan.name, variant)
+      let client!: oauth.Client
+      if (variant.client_registration === 'dynamic_client') {
+        let token_endpoint_auth_method: string
+        switch (variant.client_auth_type) {
+          case 'mtls':
+            token_endpoint_auth_method = 'self_signed_tls_client_auth'
+            break
+          case 'none':
+          case 'private_key_jwt':
+          case 'client_secret_basic':
+          case 'client_secret_post':
+            token_endpoint_auth_method = variant.client_auth_type
+            break
+          default:
+            token_endpoint_auth_method = 'client_secret_post'
+        }
+
+        if (instance.name.includes('client-secret-basic')) {
+          token_endpoint_auth_method = 'client_secret_basic'
+        }
+
+        client = await oauth
+          .dynamicClientRegistrationRequest(
+            as,
+            makePublicJwks({
+              token_endpoint_auth_method,
+              redirect_uris: [configuration.client.redirect_uri],
+              use_mtls_endpoint_aliases: configuration.client.use_mtls_endpoint_aliases,
+              jwks: configuration.client.jwks,
+              response_types: [response_type],
+              grant_types:
+                response_type === 'code'
+                  ? ['authorization_code']
+                  : ['authorization_code', 'implicit'],
+            }),
+            {
+              // TODO: remove when https://gitlab.com/openid/conformance-suite/-/issues/1503 is fixed
+              async [oauth.customFetch](url, opts) {
+                let response = await fetch(url, opts)
+                if (response.ok) {
+                  const body = await response.json()
+                  if (body.client_secret) {
+                    body.client_secret_expires_at = 0
+                  }
+                  response = new Response(JSON.stringify(body), response)
+                }
+                return response
+              },
+            },
+          )
+          .then(oauth.processDynamicClientRegistrationResponse)
+      } else {
+        client = {
+          client_id: configuration.client.client_id,
+          use_mtls_endpoint_aliases: configuration.client.use_mtls_endpoint_aliases,
+        }
+      }
+
+      let client_secret: string | undefined
+      if (configuration.client.client_secret) {
+        client_secret = configuration.client.client_secret
+      } else if (client.client_secret) {
+        client_secret = client.client_secret as string
+      }
+
       const decoder = new TextDecoder()
       const decrypt: oauth.JweDecryptFunction = async (jwe) => {
         const { plaintext } = await compactDecrypt(
@@ -184,10 +250,6 @@ export const flow = (options?: MacroOptions) => {
           throw new oauth.OperationProcessingError('failed to decrypt', { cause })
         })
         return decoder.decode(plaintext)
-      }
-      const client: oauth.Client = {
-        client_id: configuration.client.client_id,
-        use_mtls_endpoint_aliases: configuration.client.use_mtls_endpoint_aliases,
       }
 
       let clientAuth: oauth.ClientAuth
@@ -206,18 +268,22 @@ export const flow = (options?: MacroOptions) => {
           })
           break
         case 'client_secret_basic':
-          clientAuth = oauth.ClientSecretBasic(configuration.client.client_secret!)
+          if (!client_secret) throw new Error()
+          clientAuth = oauth.ClientSecretBasic(client_secret)
           break
         case 'client_secret_post':
-          clientAuth = oauth.ClientSecretPost(configuration.client.client_secret!)
+          if (!client_secret) throw new Error()
+          clientAuth = oauth.ClientSecretPost(client_secret)
           break
         default:
-          clientAuth = oauth.ClientSecretPost(configuration.client.client_secret!)
+          if (!client_secret) throw new Error()
+          clientAuth = oauth.ClientSecretPost(client_secret)
           break
       }
 
       if (instance.name.includes('client-secret-basic')) {
-        clientAuth = oauth.ClientSecretBasic(configuration.client.client_secret!)
+        if (!client_secret) throw new Error()
+        clientAuth = oauth.ClientSecretBasic(client_secret)
       }
 
       const mtlsFetch = (...args: Parameters<typeof fetch>) => {
@@ -263,7 +329,6 @@ export const flow = (options?: MacroOptions) => {
         }
       }
 
-      const response_type = responseType(plan.name, variant)
       const scope = getScope(variant)
       const code_verifier = oauth.generateRandomCodeVerifier()
       const code_challenge = await oauth.calculatePKCECodeChallenge(code_verifier)
