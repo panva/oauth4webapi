@@ -75,6 +75,11 @@ Support from the community to continue maintaining and improving this module is 
 - [processDeviceAuthorizationResponse](functions/processDeviceAuthorizationResponse.md)
 - [processDeviceCodeResponse](functions/processDeviceCodeResponse.md)
 
+## Dynamic Client Registration (DCR)
+
+- [dynamicClientRegistrationRequest](functions/dynamicClientRegistrationRequest.md)
+- [processDynamicClientRegistrationResponse](functions/processDynamicClientRegistrationResponse.md)
+
 ## Error Codes
 
 - [AUTHORIZATION\_RESPONSE\_ERROR](variables/AUTHORIZATION_RESPONSE_ERROR.md)
@@ -202,6 +207,7 @@ Support from the community to continue maintaining and improving this module is 
 - [DiscoveryRequestOptions](interfaces/DiscoveryRequestOptions.md)
 - [DPoPHandle](interfaces/DPoPHandle.md)
 - [DPoPRequestOptions](interfaces/DPoPRequestOptions.md)
+- [DynamicClientRegistrationRequestOptions](interfaces/DynamicClientRegistrationRequestOptions.md)
 - [ExportedJWKSCache](interfaces/ExportedJWKSCache.md)
 - [GenerateKeyPairOptions](interfaces/GenerateKeyPairOptions.md)
 - [HttpRequestOptions](interfaces/HttpRequestOptions.md)
@@ -243,6 +249,7 @@ Support from the community to continue maintaining and improving this module is 
 - [JweDecryptFunction](type-aliases/JweDecryptFunction.md)
 - [JWKSCacheInput](type-aliases/JWKSCacheInput.md)
 - [JWSAlgorithm](type-aliases/JWSAlgorithm.md)
+- [OmitSymbolProperties](type-aliases/OmitSymbolProperties.md)
 - [ProtectedResourceRequestBody](type-aliases/ProtectedResourceRequestBody.md)
 
 ## Variables

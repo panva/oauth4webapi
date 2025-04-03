@@ -2135,7 +2135,11 @@ class DPoPHandler implements DPoPHandle {
   #map?: Map<string, string>
   #jkt?: string
 
-  constructor(client: Client, keyPair: CryptoKeyPair, options?: ModifyAssertionOptions) {
+  constructor(
+    client: Pick<Client, typeof clockSkew>,
+    keyPair: CryptoKeyPair,
+    options?: ModifyAssertionOptions,
+  ) {
     assertPrivateKey(keyPair?.privateKey, '"DPoP.privateKey"')
     assertPublicKey(keyPair?.publicKey, '"DPoP.publicKey"')
 
@@ -2276,7 +2280,7 @@ export function isDPoPNonceError(err: unknown): boolean {
  * @see {@link !DPoP RFC 9449 - OAuth 2.0 Demonstrating Proof of Possession (DPoP)}
  */
 export function DPoP(
-  client: Client,
+  client: Pick<Client, typeof clockSkew>,
   keyPair: CryptoKeyPair,
   options?: ModifyAssertionOptions,
 ): DPoPHandle {
@@ -6135,6 +6139,141 @@ export async function processBackchannelAuthenticationGrantResponse(
   options?: JWEDecryptOptions,
 ): Promise<TokenEndpointResponse> {
   return processGenericAccessTokenResponse(as, client, response, undefined, options)
+}
+
+/**
+ * Removes all Symbol properties from a type
+ */
+export type OmitSymbolProperties<T> = {
+  [K in keyof T as K extends symbol ? never : K]: T[K]
+}
+
+export interface DynamicClientRegistrationRequestOptions
+  extends HttpRequestOptions<'POST', string>,
+    DPoPRequestOptions {
+  /**
+   * Access token optionally issued by an authorization server used to authorize calls to the client
+   * registration endpoint.
+   */
+  initialAccessToken?: string
+}
+
+/**
+ * Performs a Dynamic Client Registration at the
+ * {@link AuthorizationServer.registration_endpoint `as.registration_endpoint`} using the provided
+ * client metadata.
+ *
+ * @group Dynamic Client Registration (DCR)
+ *
+ * @see [RFC 7591 - OAuth 2.0 Dynamic Client Registration Protocol (DCR)](https://www.rfc-editor.org/rfc/rfc7591.html#section-3.1)
+ * @see [OpenID Connect Dynamic Client Registration 1.0 (DCR)](https://openid.net/specs/openid-connect-registration-1_0-errata2.html#RegistrationRequest)
+ * @see [RFC 9449 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)](https://www.rfc-editor.org/rfc/rfc9449.html#name-protected-resource-access)
+ */
+export async function dynamicClientRegistrationRequest(
+  as: AuthorizationServer,
+  metadata: Partial<OmitSymbolProperties<Client>>,
+  options?: DynamicClientRegistrationRequestOptions,
+): Promise<Response> {
+  assertAs(as)
+
+  const url = resolveEndpoint(
+    as,
+    'registration_endpoint',
+    metadata.use_mtls_endpoint_aliases,
+    options?.[allowInsecureRequests] !== true,
+  )
+
+  const headers = prepareHeaders(options?.headers)
+  headers.set('accept', 'application/json')
+  headers.set('content-type', 'application/json')
+
+  const method = 'POST'
+
+  if (options?.DPoP) {
+    assertDPoP(options.DPoP)
+    await options.DPoP.addProof(url, headers, method, options.initialAccessToken)
+  }
+
+  if (options?.initialAccessToken) {
+    headers.set(
+      'authorization',
+      `${headers.has('dpop') ? 'DPoP' : 'Bearer'} ${options.initialAccessToken}`,
+    )
+  }
+
+  const response = await (options?.[customFetch] || fetch)(url.href, {
+    body: JSON.stringify(metadata),
+    headers: Object.fromEntries(headers.entries()),
+    method,
+    redirect: 'manual',
+    signal: options?.signal ? signal(options.signal) : undefined,
+  })
+  options?.DPoP?.cacheNonce(response)
+  return response
+}
+
+/**
+ * Validates {@link !Response} instance to be one coming from the
+ * {@link AuthorizationServer.registration_endpoint `as.registration_endpoint`}.
+ *
+ * @param response Resolved value from {@link dynamicClientRegistrationRequest}.
+ *
+ * @returns Resolves with an object representing the parsed successful response. OAuth 2.0 protocol
+ *   style errors are rejected using {@link ResponseBodyError}. WWW-Authenticate HTTP Header
+ *   challenges are rejected with {@link WWWAuthenticateChallengeError}.
+ *
+ * @group Dynamic Client Registration (DCR)
+ *
+ * @see [RFC 7591 - OAuth 2.0 Dynamic Client Registration Protocol (DCR)](https://www.rfc-editor.org/rfc/rfc7591.html#section-3.2)
+ * @see [OpenID Connect Dynamic Client Registration 1.0 (DCR)](https://openid.net/specs/openid-connect-registration-1_0-errata2.html#RegistrationResponse)
+ */
+export async function processDynamicClientRegistrationResponse(
+  response: Response,
+): Promise<OmitSymbolProperties<Client>> {
+  if (!looseInstanceOf(response, Response)) {
+    throw CodedTypeError('"response" must be an instance of Response', ERR_INVALID_ARG_TYPE)
+  }
+
+  checkAuthenticationChallenges(response)
+
+  await checkOAuthBodyError(response, 201, 'Dynamic Client Registration Endpoint')
+
+  assertReadableResponse(response)
+  let json: JsonValue
+  try {
+    json = await response.json()
+  } catch (cause) {
+    assertApplicationJson(response)
+    throw OPE('failed to parse "response" body as JSON', PARSE_ERROR, cause)
+  }
+
+  if (!isJsonObject<Writeable<Client>>(json)) {
+    throw OPE('"response" body must be a top level object', INVALID_RESPONSE, { body: json })
+  }
+
+  assertString(json.client_id, '"response" body "client_id" property', INVALID_RESPONSE, {
+    body: json,
+  })
+
+  if (json.client_secret !== undefined) {
+    assertString(json.client_secret, '"response" body "client_secret" property', INVALID_RESPONSE, {
+      body: json,
+    })
+  }
+
+  if (json.client_secret) {
+    assertNumber(
+      json.client_secret_expires_at,
+      true,
+      '"response" body "client_secret_expires_at" property',
+      INVALID_RESPONSE,
+      {
+        body: json,
+      },
+    )
+  }
+
+  return json
 }
 
 /**

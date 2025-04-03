@@ -21,7 +21,7 @@ expired/missing nonce.
 
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
-| `client` | [`Client`](../interfaces/Client.md) | - |
+| `client` | [`Pick`](https://www.typescriptlang.org/docs/handbook/utility-types.html#picktype-keys)\<[`Client`](../interfaces/Client.md), *typeof* [`clockSkew`](../variables/clockSkew.md)\> | - |
 | `keyPair` | [`CryptoKeyPair`](../interfaces/CryptoKeyPair.md) | Public/private key pair to sign the DPoP Proof JWT with |
 | `options`? | [`ModifyAssertionOptions`](../interfaces/ModifyAssertionOptions.md) | - |
 

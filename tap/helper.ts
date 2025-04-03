@@ -106,26 +106,26 @@ export async function setup(
     }
   }
 
-  let response = await fetch(new URL('http://localhost:3000/reg'), {
-    method: 'POST',
-    headers: { 'content-type': 'application/json;charset=utf-8' },
-    body: JSON.stringify(metadata),
-  })
+  const issuerIdentifier = new URL('http://localhost:3000')
 
-  if (response.status !== 201) {
-    throw new Error(await response.text())
-  }
+  const as = await lib
+    .discoveryRequest(issuerIdentifier, { [lib.allowInsecureRequests]: true })
+    .then((response) => lib.processDiscoveryResponse(issuerIdentifier, response))
+
+  const registered = await lib
+    .dynamicClientRegistrationRequest(as, metadata, { [lib.allowInsecureRequests]: true })
+    .then(lib.processDynamicClientRegistrationResponse)
 
   return {
     client: {
-      ...(await response.json()),
+      ...registered,
       introspection_signed_response_alg: jwtIntrospection ? alg : undefined,
     },
     clientPrivateKey: {
       kid: clientJwk.kid,
       key: clientKeyPair.privateKey,
     },
-    issuerIdentifier: new URL('http://localhost:3000'),
+    issuerIdentifier,
     decrypt: async (jwe) => {
       const { plaintext } = await jose
         .compactDecrypt(jwe, encKp.privateKey, {
