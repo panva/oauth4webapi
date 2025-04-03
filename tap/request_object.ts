@@ -184,16 +184,31 @@ export default (QUnit: QUnit) => {
       /parameter must be a number/,
     )
 
-    const jwt = await lib.issueRequestObject(
-      issuer,
-      client,
-      new URLSearchParams([['max_age', '10']]),
-      { key: kp.privateKey },
-    )
+    {
+      const jwt = await lib.issueRequestObject(
+        issuer,
+        client,
+        new URLSearchParams([['max_age', '10']]),
+        { key: kp.privateKey },
+      )
 
-    const { payload } = await jose.jwtVerify(jwt, kp.publicKey)
-    const { max_age } = payload
-    t.propEqual(max_age, 10)
+      const { payload } = await jose.jwtVerify(jwt, kp.publicKey)
+      const { max_age } = payload
+      t.propEqual(max_age, 10)
+    }
+
+    {
+      const jwt = await lib.issueRequestObject(
+        issuer,
+        client,
+        new URLSearchParams([['max_age', '0']]),
+        { key: kp.privateKey },
+      )
+
+      const { payload } = await jose.jwtVerify(jwt, kp.publicKey)
+      const { max_age } = payload
+      t.propEqual(max_age, 0)
+    }
   })
 
   test('issueRequestObject() signature kid', async (t) => {

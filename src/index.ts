@@ -1230,8 +1230,11 @@ function assertNumber(
 
     if (input > 0) return
 
-    if (allow0 && input !== 0) {
-      throw CodedTypeError(`${it} must be a non-negative number`, ERR_INVALID_ARG_VALUE, cause)
+    if (allow0) {
+      if (input !== 0) {
+        throw CodedTypeError(`${it} must be a non-negative number`, ERR_INVALID_ARG_VALUE, cause)
+      }
+      return
     }
 
     throw CodedTypeError(`${it} must be a positive number`, ERR_INVALID_ARG_VALUE, cause)
