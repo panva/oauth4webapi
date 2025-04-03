@@ -2009,7 +2009,13 @@ function validateEndpoint(
 }
 
 /**
+ * This is not part of the public API.
+ *
+ * @private
+ *
  * @ignore
+ *
+ * @internal
  */
 export function resolveEndpoint(
   as: AuthorizationServer,
