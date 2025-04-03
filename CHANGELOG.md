@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.4.0](https://github.com/panva/oauth4webapi/compare/v3.3.2...v3.4.0) (2025-04-03)
+
+
+### Features
+
+* add support for Dynamic Client Registration ([461c101](https://github.com/panva/oauth4webapi/commit/461c1012d81efb1ca073dac750be7be169d4507f))
+
+
+### Refactor
+
+* remove private API from exported types ([847046b](https://github.com/panva/oauth4webapi/commit/847046b993c55cc19349813c2a2b2e06c349f750))
+
+
+### Fixes
+
+* handle max_age=0 in issueRequestObject() ([b802645](https://github.com/panva/oauth4webapi/commit/b80264516e8543ea197db1322cae76a718257f27))
+
 ## [3.3.2](https://github.com/panva/oauth4webapi/compare/v3.3.1...v3.3.2) (2025-03-28)
 
 
