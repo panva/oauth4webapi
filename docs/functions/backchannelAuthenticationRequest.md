@@ -27,4 +27,4 @@ Performs a Backchannel Authentication Request at the
 
 ## See
 
-[OpenID Connect Client-Initiated Backchannel Authentication](https://openid.net/specs/openid-client-initiated-backchannel-authentication-core-1_0.html#auth_request)
+[OpenID Connect Client-Initiated Backchannel Authentication](https://openid.net/specs/openid-client-initiated-backchannel-authentication-core-1_0-final.html#auth_request)

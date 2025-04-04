@@ -32,4 +32,4 @@ Validated Authorization Response parameters. Authorization Error Responses are r
 ## See
 
  - [RFC 6749 - The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html#section-4.1.2)
- - [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#HybridFlowAuth)
+ - [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0-errata2.html#HybridFlowAuth)

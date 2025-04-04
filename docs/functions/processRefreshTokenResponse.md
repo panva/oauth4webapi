@@ -31,4 +31,4 @@ Resolves with an object representing the parsed successful response. OAuth 2.0 p
 ## See
 
  - [RFC 6749 - The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html#section-6)
- - [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#RefreshTokens)
+ - [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0-errata2.html#RefreshTokens)

@@ -16,4 +16,4 @@ Generate random `nonce` value.
 
 ## See
 
-[OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#IDToken)
+[OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0-errata2.html#IDToken)

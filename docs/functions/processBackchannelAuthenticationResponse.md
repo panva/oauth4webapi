@@ -29,4 +29,4 @@ Resolves with an object representing the parsed successful response. OAuth 2.0 p
 
 ## See
 
-[OpenID Connect Client-Initiated Backchannel Authentication](https://openid.net/specs/openid-client-initiated-backchannel-authentication-core-1_0.html#auth_request)
+[OpenID Connect Client-Initiated Backchannel Authentication](https://openid.net/specs/openid-client-initiated-backchannel-authentication-core-1_0-final.html#auth_request)

@@ -29,4 +29,4 @@ Validated Authorization Response parameters. Authorization Error Responses are r
 
 ## See
 
-[JWT Secured Authorization Response Mode for OAuth 2.0 (JARM)](https://openid.net/specs/openid-financial-api-jarm.html)
+[JWT Secured Authorization Response Mode for OAuth 2.0 (JARM)](https://openid.net/specs/openid-financial-api-jarm-final.html)

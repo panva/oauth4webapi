@@ -1171,7 +1171,7 @@ function signal(value: Exclude<HttpRequestOptions<any>['signal'], undefined>): A
  * @group OpenID Connect (OIDC) Discovery
  *
  * @see [RFC 8414 - OAuth 2.0 Authorization Server Metadata](https://www.rfc-editor.org/rfc/rfc8414.html#section-3)
- * @see [OpenID Connect Discovery 1.0](https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfig)
+ * @see [OpenID Connect Discovery 1.0](https://openid.net/specs/openid-connect-discovery-1_0-errata2.html#ProviderConfig)
  */
 export async function discoveryRequest(
   issuerIdentifier: URL,
@@ -1283,7 +1283,7 @@ function assertString(
  * @group OpenID Connect (OIDC) Discovery
  *
  * @see [RFC 8414 - OAuth 2.0 Authorization Server Metadata](https://www.rfc-editor.org/rfc/rfc8414.html#section-3)
- * @see [OpenID Connect Discovery 1.0](https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfig)
+ * @see [OpenID Connect Discovery 1.0](https://openid.net/specs/openid-connect-discovery-1_0-errata2.html#ProviderConfig)
  */
 export async function processDiscoveryResponse(
   expectedIssuerIdentifier: URL,
@@ -1404,7 +1404,7 @@ export function generateRandomState(): string {
  *
  * @group Utilities
  *
- * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#IDToken)
+ * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0-errata2.html#IDToken)
  */
 export function generateRandomNonce(): string {
   return randomBytes()
@@ -1632,7 +1632,7 @@ export type ClientAuth = (
  *
  * @see [OAuth Token Endpoint Authentication Methods](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#token-endpoint-auth-method)
  * @see [RFC 6749 - The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html#section-2.3)
- * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication)
+ * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0-errata2.html#ClientAuthentication)
  */
 export function ClientSecretPost(clientSecret: string): ClientAuth {
   assertString(clientSecret, '"clientSecret"')
@@ -1660,7 +1660,7 @@ export function ClientSecretPost(clientSecret: string): ClientAuth {
  *
  * @see [OAuth Token Endpoint Authentication Methods](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#token-endpoint-auth-method)
  * @see [RFC 6749 - The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html#section-2.3)
- * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication)
+ * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0-errata2.html#ClientAuthentication)
  */
 export function ClientSecretBasic(clientSecret: string): ClientAuth {
   assertString(clientSecret, '"clientSecret"')
@@ -1712,7 +1712,7 @@ function clientAssertionPayload(as: AuthorizationServer, client: Client) {
  * @group Client Authentication
  *
  * @see [OAuth Token Endpoint Authentication Methods](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#token-endpoint-auth-method)
- * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication)
+ * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0-errata2.html#ClientAuthentication)
  */
 export function PrivateKeyJwt(
   clientPrivateKey: CryptoKey | PrivateKey,
@@ -1751,7 +1751,7 @@ export function PrivateKeyJwt(
  * @group Client Authentication
  *
  * @see [OAuth Token Endpoint Authentication Methods](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#token-endpoint-auth-method)
- * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication)
+ * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0-errata2.html#ClientAuthentication)
  */
 export function ClientSecretJwt(
   clientSecret: string,
@@ -1794,7 +1794,7 @@ export function ClientSecretJwt(
  * @group Client Authentication
  *
  * @see [OAuth Token Endpoint Authentication Methods](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#token-endpoint-auth-method)
- * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication)
+ * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0-errata2.html#ClientAuthentication)
  */
 export function None(): ClientAuth {
   return (_as, client, body, _headers) => {
@@ -2765,7 +2765,7 @@ export interface UserInfoRequestOptions extends HttpRequestOptions<'GET'>, DPoPR
  * @group OpenID Connect (OIDC) UserInfo
  * @group Accessing Protected Resources
  *
- * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#UserInfo)
+ * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0-errata2.html#UserInfo)
  * @see [RFC 9449 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)](https://www.rfc-editor.org/rfc/rfc9449.html#name-protected-resource-access)
  */
 export async function userInfoRequest(
@@ -3005,7 +3005,7 @@ async function getPublicSigKeyFromIssuerJwksUri(
  * Use this as a value to {@link processUserInfoResponse} `expectedSubject` parameter to skip the
  * `sub` claim value check.
  *
- * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#UserInfoResponse)
+ * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0-errata2.html#UserInfoResponse)
  */
 export const skipSubjectCheck: unique symbol = Symbol()
 
@@ -3038,7 +3038,7 @@ export interface JWEDecryptOptions {
  * @group OpenID Connect (OIDC) UserInfo
  * @group Accessing Protected Resources
  *
- * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#UserInfo)
+ * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0-errata2.html#UserInfo)
  */
 export async function processUserInfoResponse(
   as: AuthorizationServer,
@@ -3201,7 +3201,7 @@ async function tokenEndpointRequest(
  * @group Refreshing an Access Token
  *
  * @see [RFC 6749 - The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html#section-6)
- * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#RefreshTokens)
+ * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0-errata2.html#RefreshTokens)
  * @see [RFC 9449 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)](https://www.rfc-editor.org/rfc/rfc9449.html#name-dpop-access-token-request)
  */
 export async function refreshTokenGrantRequest(
@@ -3287,7 +3287,7 @@ export interface ValidateSignatureOptions extends HttpRequestOptions<'GET'>, JWK
  * @group Token Introspection
  *
  * @see [RFC 9701 - JWT Response for OAuth Token Introspection](https://www.rfc-editor.org/rfc/rfc9701.html#section-5)
- * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#UserInfo)
+ * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0-errata2.html#UserInfo)
  */
 export async function validateApplicationLevelSignature(
   as: AuthorizationServer,
@@ -3476,7 +3476,7 @@ function checkAuthenticationChallenges(response: Response) {
  * @group Refreshing an Access Token
  *
  * @see [RFC 6749 - The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html#section-6)
- * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#RefreshTokens)
+ * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0-errata2.html#RefreshTokens)
  */
 export async function processRefreshTokenResponse(
   as: AuthorizationServer,
@@ -3562,7 +3562,7 @@ function brand(searchParams: URLSearchParams) {
  * @group Authorization Code Grant w/ OpenID Connect (OIDC)
  *
  * @see [RFC 6749 - The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html#section-4.1)
- * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#CodeFlowAuth)
+ * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0-errata2.html#CodeFlowAuth)
  * @see [RFC 7636 - Proof Key for Code Exchange (PKCE)](https://www.rfc-editor.org/rfc/rfc7636.html#section-4)
  * @see [RFC 9449 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)](https://www.rfc-editor.org/rfc/rfc9449.html#name-dpop-access-token-request)
  */
@@ -3761,7 +3761,7 @@ export interface ProcessAuthorizationCodeResponseOptions extends JWEDecryptOptio
  * @group Authorization Code Grant w/ OpenID Connect (OIDC)
  *
  * @see [RFC 6749 - The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html#section-4.1)
- * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#CodeFlowAuth)
+ * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0-errata2.html#CodeFlowAuth)
  */
 export async function processAuthorizationCodeResponse(
   as: AuthorizationServer,
@@ -4710,7 +4710,7 @@ async function validateJwt(
  * @group FAPI 2.0 Message Signing
  * @group FAPI 1.0 Advanced
  *
- * @see [JWT Secured Authorization Response Mode for OAuth 2.0 (JARM)](https://openid.net/specs/openid-financial-api-jarm.html)
+ * @see [JWT Secured Authorization Response Mode for OAuth 2.0 (JARM)](https://openid.net/specs/openid-financial-api-jarm-final.html)
  */
 export async function validateJwtAuthResponse(
   as: AuthorizationServer,
@@ -4833,7 +4833,7 @@ async function idTokenHashMatches(
  *
  * @group FAPI 1.0 Advanced
  *
- * @see [Financial-grade API Security Profile 1.0 - Part 2: Advanced](https://openid.net/specs/openid-financial-api-part-2-1_0.html#id-token-as-detached-signature)
+ * @see [Financial-grade API Security Profile 1.0 - Part 2: Advanced](https://openid.net/specs/openid-financial-api-part-2-1_0-final.html#id-token-as-detached-signature)
  */
 export async function validateDetachedSignatureResponse(
   as: AuthorizationServer,
@@ -4877,7 +4877,7 @@ export async function validateDetachedSignatureResponse(
  * @group Authorization Code Grant w/ OpenID Connect (OIDC)
  *
  * @see [RFC 6749 - The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html#section-4.1.2)
- * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#HybridFlowAuth)
+ * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0-errata2.html#HybridFlowAuth)
  */
 export async function validateCodeIdTokenResponse(
   as: AuthorizationServer,
@@ -5237,7 +5237,7 @@ export const expectNoState: unique symbol = Symbol()
  * @group Authorization Code Grant w/ OpenID Connect (OIDC)
  *
  * @see [RFC 6749 - The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html#section-4.1.2)
- * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0.html#CodeFlowAuth)
+ * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0-errata2.html#CodeFlowAuth)
  * @see [RFC 9207 - OAuth 2.0 Authorization Server Issuer Identification](https://www.rfc-editor.org/rfc/rfc9207.html)
  */
 export function validateAuthResponse(
@@ -5965,7 +5965,7 @@ export interface BackchannelAuthenticationRequestOptions
  *
  * @group Client-Initiated Backchannel Authentication (CIBA)
  *
- * @see [OpenID Connect Client-Initiated Backchannel Authentication](https://openid.net/specs/openid-client-initiated-backchannel-authentication-core-1_0.html#auth_request)
+ * @see [OpenID Connect Client-Initiated Backchannel Authentication](https://openid.net/specs/openid-client-initiated-backchannel-authentication-core-1_0-final.html#auth_request)
  */
 export async function backchannelAuthenticationRequest(
   as: AuthorizationServer,
@@ -6025,7 +6025,7 @@ export interface BackchannelAuthenticationResponse {
  *
  * @group Client-Initiated Backchannel Authentication (CIBA)
  *
- * @see [OpenID Connect Client-Initiated Backchannel Authentication](https://openid.net/specs/openid-client-initiated-backchannel-authentication-core-1_0.html#auth_request)
+ * @see [OpenID Connect Client-Initiated Backchannel Authentication](https://openid.net/specs/openid-client-initiated-backchannel-authentication-core-1_0-final.html#auth_request)
  */
 export async function processBackchannelAuthenticationResponse(
   as: AuthorizationServer,
@@ -6089,7 +6089,7 @@ export async function processBackchannelAuthenticationResponse(
  *
  * @group Client-Initiated Backchannel Authentication (CIBA)
  *
- * @see [OpenID Connect Client-Initiated Backchannel Authentication](https://openid.net/specs/openid-client-initiated-backchannel-authentication-core-1_0.html#token_request)
+ * @see [OpenID Connect Client-Initiated Backchannel Authentication](https://openid.net/specs/openid-client-initiated-backchannel-authentication-core-1_0-final.html#token_request)
  * @see [RFC 9449 - OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)](https://www.rfc-editor.org/rfc/rfc9449.html#name-dpop-access-token-request)
  */
 export async function backchannelAuthenticationGrantRequest(
@@ -6130,7 +6130,7 @@ export async function backchannelAuthenticationGrantRequest(
  *
  * @group Client-Initiated Backchannel Authentication (CIBA)
  *
- * @see [OpenID Connect Client-Initiated Backchannel Authentication](https://openid.net/specs/openid-client-initiated-backchannel-authentication-core-1_0.html#token_request)
+ * @see [OpenID Connect Client-Initiated Backchannel Authentication](https://openid.net/specs/openid-client-initiated-backchannel-authentication-core-1_0-final.html#token_request)
  */
 export async function processBackchannelAuthenticationGrantResponse(
   as: AuthorizationServer,
