@@ -25,180 +25,200 @@ async function getWWWAuthenticateChallengeError(t: ExecutionContext, response: R
         t.fail('rejection expected')
       },
       (err) => {
-        if (!(err instanceof lib.WWWAuthenticateChallengeError)) {
-          t.fail(err)
+        if (err instanceof lib.WWWAuthenticateChallengeError) {
+          return err.cause
         }
 
-        return err.cause
+        throw err
       },
     )
 }
 
-test('parseWwwAuthenticateChallenges()', async (t) => {
+// Adapted from https://github.com/jylauril/w3ap/blob/3c77a869729feb7cf1ad3c4792ae45cf36260f6e/spec/tests/ReschkeSpec.coffee
+// License: MIT (https://github.com/jylauril/w3ap/blob/3c77a869729feb7cf1ad3c4792ae45cf36260f6e/package.json#L47)
+const vectors = [
+  // fail
   {
-    const headers = new Headers()
-    headers.append(name, 'Basic realm="Access to the staging site", charset="UTF-8"')
-    t.deepEqual(await getWWWAuthenticateChallengeError(t, response(headers)), [
-      { scheme: 'basic', parameters: { charset: 'UTF-8', realm: 'Access to the staging site' } },
-    ])
-  }
-
+    description: 'empty',
+    header: '',
+  },
   {
-    const headers = new Headers()
-    headers.append(name, 'Basic')
-    t.deepEqual(await getWWWAuthenticateChallengeError(t, response(headers)), [
-      { scheme: 'basic', parameters: {} },
-    ])
-  }
-
+    description: 'empty * 2',
+    header: ',',
+  },
   {
-    const headers = new Headers()
-    headers.append(name, 'Basic realm=realm')
-    t.deepEqual(await getWWWAuthenticateChallengeError(t, response(headers)), [
-      { scheme: 'basic', parameters: { realm: 'realm' } },
-    ])
-  }
-
+    description:
+      'with a comma between schema and auth-param (this is invalid because of the missing space characters after the scheme name)',
+    header: 'Scheme, realm="foo"',
+  },
   {
-    const headers = new Headers()
-    headers.append(name, 'BASIC REALM=realM')
-    t.deepEqual(await getWWWAuthenticateChallengeError(t, response(headers)), [
-      { scheme: 'basic', parameters: { realm: 'realM' } },
-    ])
-  }
-
+    description: 'parameter missing',
+    header: 'Scheme',
+  },
   {
-    const headers = new Headers()
-    headers.append(name, 'Basic realm="realm"')
-    t.deepEqual(await getWWWAuthenticateChallengeError(t, response(headers)), [
-      { scheme: 'basic', parameters: { realm: 'realm' } },
-    ])
-  }
-
+    description: 'two schemes, parameters missing',
+    header: 'Scheme, DPoP',
+  },
   {
-    const headers = new Headers()
-    headers.append(name, 'Basic auth-param1="value"')
-    t.deepEqual(await getWWWAuthenticateChallengeError(t, response(headers)), [
-      { scheme: 'basic', parameters: { 'auth-param1': 'value' } },
-    ])
-  }
-
+    description: 'two schemes, parameters missing in one',
+    header: 'Scheme, DPoP algs="ES256"',
+  },
   {
-    const headers = new Headers()
-    headers.append(
-      name,
-      'Digest realm="http-auth@example.org", qop="auth, auth-int", algorithm=SHA-256, nonce="7ypf/xlj9XXwfDPEoM4URrv/xwf94BcCAzFZH4GiTo0v", opaque="FQhe/qaU925kfnzjCev0ciny7QMkPqMAFRtzCUYo5tdS"',
-    )
-    headers.append(
-      name,
-      'Digest realm="http-auth@example.org", qop="auth, auth-int", algorithm=MD5, nonce="7ypf/xlj9XXwfDPEoM4URrv/xwf94BcCAzFZH4GiTo0v", opaque="FQhe/qaU925kfnzjCev0ciny7QMkPqMAFRtzCUYo5tdS"',
-    )
+    description: 'using token format for a parameter including backslashes',
+    header: 'Scheme realm=\\f\\o\\o',
+  },
+  {
+    description:
+      'a header field containing a Scheme challenge, with a realm missing the second double quote',
+    header: 'Scheme realm="basic',
+  },
 
-    t.deepEqual(await getWWWAuthenticateChallengeError(t, response(headers)), [
+  // pass
+  {
+    description: 'simple scheme',
+    header: 'Scheme realm="foo"',
+    expected: [{ scheme: 'scheme', parameters: { realm: 'foo' } }],
+  },
+  {
+    description: 'simple scheme (using uppercase characters)',
+    header: 'SCHEME REALM="foo"',
+    expected: [{ scheme: 'scheme', parameters: { realm: 'foo' } }],
+  },
+  {
+    description: 'using token format for realm',
+    header: 'Scheme realm=foo',
+    expected: [{ scheme: 'scheme', parameters: { realm: 'foo' } }],
+  },
+  {
+    description: 'using single quotes (lax behaviour)',
+    header: "Scheme realm='foo'",
+    expected: [{ scheme: 'scheme', parameters: { realm: "'foo'" } }],
+  },
+  {
+    description: "containing a %-escape (which isn't special here)",
+    header: 'Scheme realm="foo%20bar"',
+    expected: [{ scheme: 'scheme', parameters: { realm: 'foo%20bar' } }],
+  },
+  {
+    description: 'with a comma between schema and auth-param',
+    header: 'Scheme , realm="foo"',
+    expected: [{ scheme: 'scheme', parameters: { realm: 'foo' } }],
+  },
+  {
+    description: 'duplicate parameters, second one overwrites the first',
+    header: 'Scheme realm="foo", realm="bar"',
+    expected: [{ scheme: 'scheme', parameters: { realm: 'bar' } }],
+  },
+  {
+    description: 'whitespace used in auth-param assignment (lax behaviour)',
+    header: 'Scheme realm = "foo"',
+    expected: [{ scheme: 'scheme', parameters: { realm: 'foo' } }],
+  },
+  {
+    description: 'with realm using quoted string escapes',
+    header: 'Scheme realm="\\"foo\\""',
+    expected: [{ scheme: 'scheme', parameters: { realm: '"foo"' } }],
+  },
+  {
+    description: 'with additional auth-params',
+    header: 'Scheme realm="foo", bar="xyz",, a=b,,,c=d',
+    expected: [{ scheme: 'scheme', parameters: { realm: 'foo', bar: 'xyz', a: 'b', c: 'd' } }],
+  },
+  {
+    description: 'with an additional auth-param (but with reversed order)',
+    header: 'Scheme bar="xyz", realm="foo"',
+    expected: [{ scheme: 'scheme', parameters: { bar: 'xyz', realm: 'foo' } }],
+  },
+  {
+    description: 'a header field containing one challenge, following an empty one',
+    header: ',Scheme realm="basic"',
+    expected: [{ scheme: 'scheme', parameters: { realm: 'basic' } }],
+  },
+  {
+    description:
+      'a header field containing two challenges, the first one for a new scheme and having a parameter using quoted-string syntax',
+    header: 'Newauth realm="apps", type=1, title="Login to \\"apps\\"", Scheme realm="simple" ',
+    expected: [
+      { scheme: 'newauth', parameters: { realm: 'apps', type: '1', title: 'Login to "apps"' } },
+      { scheme: 'scheme', parameters: { realm: 'simple' } },
+    ],
+  },
+  {
+    description:
+      'a header field containing a Scheme challenge, with a quoted-string extension param that happens to contain the string "realm="',
+    header: 'Scheme foo="realm=nottherealm", realm="basic"',
+    expected: [{ scheme: 'scheme', parameters: { foo: 'realm=nottherealm', realm: 'basic' } }],
+  },
+  {
+    description:
+      'a header field containing a Scheme challenge, with a preceding extension param named "nottherealm"',
+    header: 'Scheme nottherealm="nottherealm", realm="basic"',
+    expected: [{ scheme: 'scheme', parameters: { nottherealm: 'nottherealm', realm: 'basic' } }],
+  },
+  {
+    description: 'a token68 test without following equal sign',
+    header: 'NTLS Y2hhbGxlbmdlIHdpdGggYmFzZTY0IGRhdGEgd2l0aG91dCBlcXVhbCBzaWdu',
+    expected: [
       {
-        scheme: 'digest',
-        parameters: {
-          realm: 'http-auth@example.org',
-          qop: 'auth, auth-int',
-          algorithm: 'SHA-256',
-          nonce: '7ypf/xlj9XXwfDPEoM4URrv/xwf94BcCAzFZH4GiTo0v',
-          opaque: 'FQhe/qaU925kfnzjCev0ciny7QMkPqMAFRtzCUYo5tdS',
-        },
+        scheme: 'ntls',
+        parameters: {},
+        token68: 'Y2hhbGxlbmdlIHdpdGggYmFzZTY0IGRhdGEgd2l0aG91dCBlcXVhbCBzaWdu',
       },
+    ],
+  },
+  {
+    description: 'a token68 test without following equal sign and another challenge',
+    header:
+      'NTLS Y2hhbGxlbmdlIHdpdGggYmFzZTY0IGRhdGEgd2l0aG91dCBlcXVhbCBzaWdu, Scheme realm="foobar"',
+    expected: [
       {
-        scheme: 'digest',
-        parameters: {
-          realm: 'http-auth@example.org',
-          qop: 'auth, auth-int',
-          algorithm: 'MD5',
-          nonce: '7ypf/xlj9XXwfDPEoM4URrv/xwf94BcCAzFZH4GiTo0v',
-          opaque: 'FQhe/qaU925kfnzjCev0ciny7QMkPqMAFRtzCUYo5tdS',
-        },
+        scheme: 'ntls',
+        parameters: {},
+        token68: 'Y2hhbGxlbmdlIHdpdGggYmFzZTY0IGRhdGEgd2l0aG91dCBlcXVhbCBzaWdu',
       },
-    ])
-  }
-
+      { scheme: 'scheme', parameters: { realm: 'foobar' } },
+    ],
+  },
   {
-    const headers = new Headers()
-    headers.append(
-      name,
-      'Newauth realm="apps", type=1, title="Login to "apps"", Basic realm="simple"',
-    )
-    t.deepEqual(await getWWWAuthenticateChallengeError(t, response(headers)), [
-      {
-        scheme: 'newauth',
-        parameters: {
-          realm: 'apps',
-          type: '1',
-          title: 'Login to "apps"',
-        },
-      },
-      {
-        scheme: 'basic',
-        parameters: {
-          realm: 'simple',
-        },
-      },
-    ])
-  }
-
+    description: 'a token68 test with following equal sign',
+    header: 'NTLS Y2hhbGxlbmdlIHdpdGggYmFzZTY0IGRhdGE=',
+    expected: [{ scheme: 'ntls', parameters: {}, token68: 'Y2hhbGxlbmdlIHdpdGggYmFzZTY0IGRhdGE=' }],
+  },
   {
-    const headers = new Headers()
-    headers.append(name, 'Basic')
-    headers.append(name, 'DPoP')
-    t.deepEqual(await getWWWAuthenticateChallengeError(t, response(headers)), [
-      { scheme: 'basic', parameters: {} },
-      { scheme: 'dpop', parameters: {} },
-    ])
-  }
-
+    description: 'a token68 test with following equal sign and another challenge',
+    header: 'NTLS Y2hhbGxlbmdlIHdpdGggYmFzZTY0IGRhdGE=, Scheme realm="foobar"',
+    expected: [
+      { scheme: 'ntls', parameters: {}, token68: 'Y2hhbGxlbmdlIHdpdGggYmFzZTY0IGRhdGE=' },
+      { scheme: 'scheme', parameters: { realm: 'foobar' } },
+    ],
+  },
   {
-    const headers = new Headers()
-    headers.append(name, 'Newauth realm="apps", type=1, title="Login to "apps","')
-    headers.append(name, 'Newauth realm="apps", type=1, title="Login to "apps"')
-    t.deepEqual(await getWWWAuthenticateChallengeError(t, response(headers)), [
-      { scheme: 'newauth', parameters: { realm: 'apps', type: '1', title: 'Login to "apps",' } },
-      { scheme: 'newauth', parameters: { realm: 'apps', type: '1', title: 'Login to "apps' } },
-    ])
-  }
-
+    description: 'a token68 test with two following equal sign',
+    header: 'NTLS Y2hhbGxlbmdlIHdpdGggbW9yZSBiYXNlNjQgZGF0YQ==',
+    expected: [
+      { scheme: 'ntls', parameters: {}, token68: 'Y2hhbGxlbmdlIHdpdGggbW9yZSBiYXNlNjQgZGF0YQ==' },
+    ],
+  },
   {
-    const headers = new Headers()
-    headers.append(name, 'Newauth realm="apps", type=1, title="Login to "apps",",')
-    t.deepEqual(await getWWWAuthenticateChallengeError(t, response(headers)), [
-      { scheme: 'newauth', parameters: { realm: 'apps', type: '1', title: 'Login to "apps",' } },
-    ])
-  }
+    description: 'a token68 test with two following equal sign and another challenge',
+    header: 'NTLS Y2hhbGxlbmdlIHdpdGggbW9yZSBiYXNlNjQgZGF0YQ==, Scheme realm="foobar"',
+    expected: [
+      { scheme: 'ntls', parameters: {}, token68: 'Y2hhbGxlbmdlIHdpdGggbW9yZSBiYXNlNjQgZGF0YQ==' },
+      { scheme: 'scheme', parameters: { realm: 'foobar' } },
+    ],
+  },
+]
 
-  {
+for (const vector of vectors) {
+  test(`parseWwwAuthenticateChallenges() ${vector.description}`, async (t) => {
     const headers = new Headers()
-    headers.append(name, 'Newauth realm="apps", type=1, title="Login to "apps",')
-    t.deepEqual(await getWWWAuthenticateChallengeError(t, response(headers)), [
-      { scheme: 'newauth', parameters: { realm: 'apps', type: '1', title: 'Login to "apps' } },
-    ])
-  }
-
-  {
-    const headers = new Headers()
-    headers.append(name, 'Newauth realm="apps", type=1, title="Login to "apps","')
-    t.deepEqual(await getWWWAuthenticateChallengeError(t, response(headers)), [
-      { scheme: 'newauth', parameters: { realm: 'apps', type: '1', title: 'Login to "apps",' } },
-    ])
-  }
-
-  {
-    const headers = new Headers()
-    headers.append(name, 'Newauth realm="apps", type=1, title="Login to apps=asd"')
-    t.deepEqual(await getWWWAuthenticateChallengeError(t, response(headers)), [
-      { scheme: 'newauth', parameters: { realm: 'apps', type: '1', title: 'Login to apps=asd' } },
-    ])
-  }
-
-  {
-    const headers = new Headers()
-    headers.append(name, 'Newauth realm="apps", title="Login to, apps=asd", type=1')
-    t.deepEqual(await getWWWAuthenticateChallengeError(t, response(headers)), [
-      { scheme: 'newauth', parameters: { realm: 'apps', type: '1', title: 'Login to, apps=asd' } },
-    ])
-  }
-})
+    headers.append(name, vector.header)
+    if (vector.expected) {
+      t.deepEqual(await getWWWAuthenticateChallengeError(t, response(headers)), vector.expected)
+    } else {
+      await t.throwsAsync(getWWWAuthenticateChallengeError(t, response(headers)), {
+        code: 'OAUTH_RESPONSE_IS_NOT_CONFORM',
+      })
+    }
+  })
+}

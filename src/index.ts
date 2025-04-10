@@ -2429,8 +2429,8 @@ export class AuthorizationResponseError extends Error {
 }
 
 /**
- * Thrown when a server responds with WWW-Authenticate challenges, typically because of expired
- * tokens, or bad client authentication
+ * Thrown when a server responds with a parseable WWW-Authenticate challenges, typically because of
+ * expired tokens, or bad client authentication
  *
  * @example
  *
@@ -2478,6 +2478,9 @@ export class WWWAuthenticateChallengeError extends Error {
   }
 }
 
+/**
+ * WWW-Authenticate challenge auth-param dictionary with known and unknown parameter names
+ */
 export interface WWWAuthenticateChallengeParameters {
   readonly realm?: string
   readonly error?: string
@@ -2492,49 +2495,38 @@ export interface WWWAuthenticateChallengeParameters {
   readonly [parameter: Lowercase<string>]: string | undefined
 }
 
+/**
+ * Parsed WWW-Authenticate challenge
+ */
 export interface WWWAuthenticateChallenge {
   /**
+   * Parsed WWW-Authenticate challenge auth-scheme
+   *
    * NOTE: because the value is case insensitive it is always returned lowercased
    */
   readonly scheme: Lowercase<string>
+  /**
+   * Parsed WWW-Authenticate challenge auth-param dictionary (always present but will be empty when
+   * {@link WWWAuthenticateChallenge.token68 token68} is present)
+   */
   readonly parameters: WWWAuthenticateChallengeParameters
+  /**
+   * Parsed WWW-Authenticate challenge token68
+   */
+  readonly token68?: string
 }
 
-function unquote(value: string) {
-  if (value.length >= 2 && value[0] === '"' && value[value.length - 1] === '"') {
-    return value.slice(1, -1)
-  }
+const tokenMatch = "[a-zA-Z0-9!#$%&\\'\\*\\+\\-\\.\\^_`\\|~]+"
+const token68Match = '[a-zA-Z0-9\\-\\._\\~\\+\\/]+[=]{0,2}'
+const quotedMatch = '"((?:[^"\\\\]|\\\\.)*)"'
 
-  return value
-}
+const quotedParamMatcher = '(' + tokenMatch + ')\\s*=\\s*' + quotedMatch
+const paramMatcher = '(' + tokenMatch + ')\\s*=\\s*(' + tokenMatch + ')'
 
-const SPLIT_REGEXP = /((?:,|, )?[0-9a-zA-Z!#$%&'*+-.^_`|~]+=)/
-const SCHEMES_REGEXP = /(?:^|, ?)([0-9a-zA-Z!#$%&'*+\-.^_`|~]+)(?=$|[ ,])/g
-
-function wwwAuth(scheme: string, params: string): WWWAuthenticateChallenge {
-  const arr = params.split(SPLIT_REGEXP).slice(1)
-  if (!arr.length) {
-    return { scheme: scheme.toLowerCase() as Lowercase<string>, parameters: {} }
-  }
-  arr[arr.length - 1] = arr[arr.length - 1].replace(/,$/, '')
-  const parameters: WWWAuthenticateChallenge['parameters'] = {}
-  for (let i = 1; i < arr.length; i += 2) {
-    const idx = i
-    if (arr[idx][0] === '"') {
-      while (arr[idx].slice(-1) !== '"' && ++i < arr.length) {
-        arr[idx] += arr[i]
-      }
-    }
-    const key = arr[idx - 1].replace(/^(?:, ?)|=$/g, '').toLowerCase() as Lowercase<string>
-    // @ts-expect-error
-    parameters[key] = unquote(arr[idx])
-  }
-
-  return {
-    scheme: scheme.toLowerCase() as Lowercase<string>,
-    parameters,
-  }
-}
+const schemeRE = new RegExp('^[,\\s]*(' + tokenMatch + ')\\s(.*)')
+const quotedParamRE = new RegExp('^[,\\s]*' + quotedParamMatcher + '[,\\s]*(.*)')
+const unquotedParamRE = new RegExp('^[,\\s]*' + paramMatcher + '[,\\s]*(.*)')
+const token68ParamRE = new RegExp('^(' + token68Match + ')(?:$|[,\\s])(.*)')
 
 function parseWwwAuthenticateChallenges(
   response: Response,
@@ -2548,25 +2540,64 @@ function parseWwwAuthenticateChallenges(
     return undefined
   }
 
-  const result: [string, number][] = []
-  for (const { 1: scheme, index } of header.matchAll(SCHEMES_REGEXP)) {
-    result.push([scheme, index!])
+  const challenges: WWWAuthenticateChallenge[] = []
+
+  let rest: string | undefined = header
+  while (rest) {
+    let match: RegExpMatchArray | null = rest.match(schemeRE)
+    let scheme = match?.['1'].toLowerCase() as Lowercase<string>
+    rest = match?.['2']
+    if (!scheme) {
+      return undefined
+    }
+
+    let parameters: WWWAuthenticateChallenge['parameters'] = {}
+    let token68: string | undefined
+
+    while (rest) {
+      let key: string
+      let value: string
+      if ((match = rest.match(quotedParamRE))) {
+        ;[, key, value, rest] = match
+        if (value.indexOf('\\') !== -1) {
+          try {
+            value = JSON.parse(`"${value}"`)
+          } catch {}
+        }
+        // @ts-expect-error
+        parameters[key.toLowerCase() as Lowercase<string>] = value
+        continue
+      }
+
+      if ((match = rest.match(unquotedParamRE))) {
+        ;[, key, value, rest] = match
+        // @ts-expect-error
+        parameters[key.toLowerCase() as Lowercase<string>] = value
+        continue
+      }
+
+      if ((match = rest.match(token68ParamRE))) {
+        if (Object.keys(parameters).length) {
+          break
+        }
+        ;[, token68, rest] = match
+        break
+      }
+
+      return undefined
+    }
+
+    const challenge: WWWAuthenticateChallenge = { scheme, parameters }
+    if (token68) {
+      // @ts-expect-error
+      challenge.token68 = token68
+    }
+    challenges.push(challenge)
   }
 
-  if (!result.length) {
+  if (!challenges.length) {
     return undefined
   }
-
-  const challenges = result.map(([scheme, indexOf], i, others) => {
-    const next = others[i + 1]
-    let parameters: string
-    if (next) {
-      parameters = header.slice(indexOf, next[1])
-    } else {
-      parameters = header.slice(indexOf)
-    }
-    return wwwAuth(scheme, parameters)
-  })
 
   return challenges
 }
