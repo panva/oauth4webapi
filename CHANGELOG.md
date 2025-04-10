@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.4.1](https://github.com/panva/oauth4webapi/compare/v3.4.0...v3.4.1) (2025-04-10)
+
+
+### Documentation
+
+* hardcode spec revision links (e.g. final or errata) ([b6911c4](https://github.com/panva/oauth4webapi/commit/b6911c4f54f990d761bb88875dca11f63be56519))
+
+
+### Fixes
+
+* properly handle a number of edge-cases in www-authenticate header parsing ([c380dd2](https://github.com/panva/oauth4webapi/commit/c380dd2ed6612edaae9e36611f40f24ca1056166))
+
 ## [3.4.0](https://github.com/panva/oauth4webapi/compare/v3.3.2...v3.4.0) (2025-04-03)
 
 
