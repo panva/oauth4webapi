@@ -2545,13 +2545,13 @@ function parseWwwAuthenticateChallenges(
   let rest: string | undefined = header
   while (rest) {
     let match: RegExpMatchArray | null = rest.match(schemeRE)
-    let scheme = match?.['1'].toLowerCase() as Lowercase<string>
+    const scheme = match?.['1'].toLowerCase() as Lowercase<string>
     rest = match?.['2']
     if (!scheme) {
       return undefined
     }
 
-    let parameters: WWWAuthenticateChallenge['parameters'] = {}
+    const parameters: WWWAuthenticateChallenge['parameters'] = {}
     let token68: string | undefined
 
     while (rest) {
@@ -2559,7 +2559,7 @@ function parseWwwAuthenticateChallenges(
       let value: string
       if ((match = rest.match(quotedParamRE))) {
         ;[, key, value, rest] = match
-        if (value.indexOf('\\') !== -1) {
+        if (value.includes('\\')) {
           try {
             value = JSON.parse(`"${value}"`)
           } catch {}

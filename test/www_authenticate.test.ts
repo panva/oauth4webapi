@@ -207,6 +207,268 @@ const vectors = [
       { scheme: 'scheme', parameters: { realm: 'foobar' } },
     ],
   },
+  {
+    description: 'Single Bearer challenge with error and description',
+    header: `Bearer error="invalid_token", error_description="The access token expired"`,
+    expected: [
+      {
+        scheme: 'bearer',
+        parameters: {
+          error: 'invalid_token',
+          error_description: 'The access token expired',
+        },
+      },
+    ],
+  },
+  {
+    description: 'Bearer challenge with escaped quote in description',
+    header: `Bearer error="invalid_token", error_description="The token was \\"tampered\\""`,
+    expected: [
+      {
+        scheme: 'bearer',
+        parameters: {
+          error: 'invalid_token',
+          error_description: `The token was "tampered"`,
+        },
+      },
+    ],
+  },
+  {
+    description: 'Multiple challenges: Bearer and Basic',
+    header: `Bearer error="invalid_token", error_description="bad stuff", Basic realm="simple"`,
+    expected: [
+      {
+        scheme: 'bearer',
+        parameters: {
+          error: 'invalid_token',
+          error_description: 'bad stuff',
+        },
+      },
+      {
+        scheme: 'basic',
+        parameters: {
+          realm: 'simple',
+        },
+      },
+    ],
+  },
+  {
+    description: 'Digest challenge with quoted and unquoted params',
+    header: `Digest realm="test", qop=auth, nonce="abc123"`,
+    expected: [
+      {
+        scheme: 'digest',
+        parameters: {
+          realm: 'test',
+          qop: 'auth',
+          nonce: 'abc123',
+        },
+      },
+    ],
+  },
+  {
+    description: 'Challenge with token68 only',
+    header: `Negotiate YIIB/wYJKoZIhvcSAQICAQBuggHkMIIB4AIBADGCAZowggGWAgEBMIGQMH4xCzAJBgNVBAYTAkJFMRUwEwYDVQQIEwxTb21lLVN0YXRlMRAwDgYDVQQHEwdCcnVzc2VsczEXMBUGA1UEChMOVGVzdCBDb21wYW55LCBJbmMxHDAaBgNVBAMTE1Rlc3QgUm9vdCBDZXJ0aWZpY2F0ZQ==`,
+    expected: [
+      {
+        scheme: 'negotiate',
+        parameters: {},
+        token68:
+          'YIIB/wYJKoZIhvcSAQICAQBuggHkMIIB4AIBADGCAZowggGWAgEBMIGQMH4xCzAJBgNVBAYTAkJFMRUwEwYDVQQIEwxTb21lLVN0YXRlMRAwDgYDVQQHEwdCcnVzc2VsczEXMBUGA1UEChMOVGVzdCBDb21wYW55LCBJbmMxHDAaBgNVBAMTE1Rlc3QgUm9vdCBDZXJ0aWZpY2F0ZQ==',
+      },
+    ],
+  },
+  {
+    description: 'Weird spacing and commas between parameters',
+    header: `Bearer   realm =   "something"   ,error="bad_token" ,  error_description = " spaced "`,
+    expected: [
+      {
+        scheme: 'bearer',
+        parameters: {
+          realm: 'something',
+          error: 'bad_token',
+          error_description: ' spaced ',
+        },
+      },
+    ],
+  },
+  {
+    description: 'Empty header',
+    header: ``,
+  },
+  {
+    description: 'Missing scheme',
+    header: `error="invalid_token"`,
+  },
+  {
+    description: 'Token68 followed by valid scheme (should parse only token68 as one challenge)',
+    header: `Negotiate abc123==, Basic realm="test"`,
+    expected: [
+      {
+        scheme: 'negotiate',
+        parameters: {},
+        token68: 'abc123==',
+      },
+      {
+        scheme: 'basic',
+        parameters: {
+          realm: 'test',
+        },
+      },
+    ],
+  },
+  {
+    description: 'Unknown parameter included',
+    header: `Bearer foobar="baz", scope="read"`,
+    expected: [
+      {
+        scheme: 'bearer',
+        parameters: {
+          foobar: 'baz',
+          scope: 'read',
+        },
+      },
+    ],
+  },
+  {
+    description: 'Missing parameter value (treated as token68)',
+    header: `Bearer error=`,
+    expected: [
+      {
+        scheme: 'bearer',
+        parameters: {},
+        token68: 'error=',
+      },
+    ],
+  },
+  {
+    description: 'Unmatched quote in quoted string',
+    header: `Bearer realm="unclosed`,
+  },
+  {
+    description: 'Missing equals sign between key and value',
+    header: `Bearer error"invalid_token"`,
+  },
+  {
+    description: 'Empty scheme with valid parameters',
+    header: `  error="invalid_token", error_description="no scheme"`,
+  },
+  {
+    description: 'Garbage input',
+    header: `%%%%%%%`,
+  },
+  {
+    description: 'Valid scheme followed by unparseable junk',
+    header: `Bearer error="ok", ???`,
+  },
+  {
+    description: 'Parameter value with stray escape',
+    header: `Bearer error="bad\\escape\\"`,
+  },
+  {
+    description: 'Token68 with trailing garbage',
+    header: `Negotiate abc== ???`,
+  },
+  {
+    description: 'Comma at the start (bad but possible)',
+    header: `,Bearer realm="foo"`,
+    expected: [
+      {
+        scheme: 'bearer',
+        parameters: {
+          realm: 'foo',
+        },
+      },
+    ],
+  },
+  {
+    description: 'Token68 and auth-param combined is not supported',
+    header: `Negotiate abc123==, realm="ignored"`,
+  },
+  {
+    description: 'Quoted value with escaped backslash',
+    header: `Bearer error_description="bad \\\\ token"`,
+    expected: [
+      {
+        scheme: 'bearer',
+        parameters: {
+          error_description: 'bad \\ token',
+        },
+      },
+    ],
+  },
+  {
+    description: 'Challenge with duplicated keys',
+    header: `Bearer error="a", error="b"`,
+    expected: [
+      {
+        scheme: 'bearer',
+        parameters: {
+          error: 'b', // last one wins
+        },
+      },
+    ],
+  },
+  {
+    description: 'Upper-case parameter keys (should be lowercased)',
+    header: `Bearer ERROR="token", Scope="read"`,
+    expected: [
+      {
+        scheme: 'bearer',
+        parameters: {
+          error: 'token',
+          scope: 'read',
+        },
+      },
+    ],
+  },
+  {
+    description: 'Scheme with trailing space before param',
+    header: `Basic   realm="spaces"`,
+    expected: [
+      {
+        scheme: 'basic',
+        parameters: {
+          realm: 'spaces',
+        },
+      },
+    ],
+  },
+  {
+    description: 'Trailing comma with nothing after',
+    header: `Bearer realm="foo",`,
+    expected: [
+      {
+        scheme: 'bearer',
+        parameters: {
+          realm: 'foo',
+        },
+      },
+    ],
+  },
+  {
+    description: 'Multiple valid challenges with one malformed (should still parse others)',
+    header: `Bearer realm="foo", Digest blah==, Basic realm="bar"`,
+    expected: [
+      {
+        scheme: 'bearer',
+        parameters: {
+          realm: 'foo',
+        },
+      },
+      {
+        scheme: 'digest',
+        parameters: {},
+        token68: 'blah==',
+      },
+      {
+        scheme: 'basic',
+        parameters: {
+          realm: 'bar',
+        },
+      },
+    ],
+  },
 ]
 
 for (const vector of vectors) {
