@@ -458,6 +458,8 @@ export const jwksCache: unique symbol = Symbol()
 /**
  * Authorization Server Metadata
  *
+ * @group Authorization Server Metadata
+ *
  * @see [IANA OAuth Authorization Server Metadata registry](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#authorization-server-metadata)
  */
 export interface AuthorizationServer {
@@ -1293,7 +1295,10 @@ export async function processDiscoveryResponse(
     !(expectedIssuerIdentifier instanceof URL) &&
     expectedIssuerIdentifier !== _nodiscoverycheck
   ) {
-    throw CodedTypeError('"expectedIssuer" must be an instance of URL', ERR_INVALID_ARG_TYPE)
+    throw CodedTypeError(
+      '"expectedIssuerIdentifier" must be an instance of URL',
+      ERR_INVALID_ARG_TYPE,
+    )
   }
 
   if (!looseInstanceOf(response, Response)) {
@@ -2277,7 +2282,7 @@ export function isDPoPNonceError(err: unknown): boolean {
  *
  * @group DPoP
  *
- * @see {@link !DPoP RFC 9449 - OAuth 2.0 Demonstrating Proof of Possession (DPoP)}
+ * @see {@link https://www.rfc-editor.org/rfc/rfc9449.html RFC 9449 - OAuth 2.0 Demonstrating Proof of Possession (DPoP)}
  */
 export function DPoP(
   client: Pick<Client, typeof clockSkew>,
@@ -2482,11 +2487,33 @@ export class WWWAuthenticateChallengeError extends Error {
  * WWW-Authenticate challenge auth-param dictionary with known and unknown parameter names
  */
 export interface WWWAuthenticateChallengeParameters {
+  /**
+   * Identifies the protection space
+   */
   readonly realm?: string
+  /**
+   * A machine-readable error code value
+   */
   readonly error?: string
+  /**
+   * Human-readable ASCII text providing additional information, used to assist the client developer
+   * in understanding the error that occurred
+   */
   readonly error_description?: string
+  /**
+   * A URI identifying a human-readable web page with information about the error, used to provide
+   * the client developer with additional information about the error
+   */
   readonly error_uri?: string
+  /**
+   * A comma-delimited list of supported algorithms, used in
+   * {@link https://www.rfc-editor.org/rfc/rfc9449.html RFC 9449 - OAuth 2.0 Demonstrating Proof of Possession (DPoP)}
+   * challenges
+   */
   readonly algs?: string
+  /**
+   * The scope necessary to access the protected resource, used with `insufficient_scope` error code
+   */
   readonly scope?: string
 
   /**

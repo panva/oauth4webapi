@@ -103,7 +103,7 @@ test('processDiscoveryResponse()', async (t) => {
     message: '"response" must be an instance of Response',
   })
   await t.throwsAsync(lib.processDiscoveryResponse(null as any, new Response()), {
-    message: '"expectedIssuer" must be an instance of URL',
+    message: '"expectedIssuerIdentifier" must be an instance of URL',
   })
   await t.throwsAsync(lib.processDiscoveryResponse(expected, getResponse('', { status: 404 })), {
     message:

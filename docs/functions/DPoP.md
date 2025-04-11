@@ -40,4 +40,4 @@ let DPoP = oauth.DPoP(client, keyPair)
 
 ## See
 
-[RFC 9449 - OAuth 2.0 Demonstrating Proof of Possession (DPoP)](DPoP.md)
+[RFC 9449 - OAuth 2.0 Demonstrating Proof of Possession (DPoP)](https://www.rfc-editor.org/rfc/rfc9449.html)

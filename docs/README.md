@@ -37,6 +37,7 @@ Support from the community to continue maintaining and improving this module is 
 
 ## Authorization Server Metadata
 
+- [AuthorizationServer](interfaces/AuthorizationServer.md)
 - [discoveryRequest](functions/discoveryRequest.md)
 - [processDiscoveryResponse](functions/processDiscoveryResponse.md)
 
@@ -194,7 +195,6 @@ Support from the community to continue maintaining and improving this module is 
 ## Interfaces
 
 - [AuthorizationDetails](interfaces/AuthorizationDetails.md)
-- [AuthorizationServer](interfaces/AuthorizationServer.md)
 - [BackchannelAuthenticationRequestOptions](interfaces/BackchannelAuthenticationRequestOptions.md)
 - [BackchannelAuthenticationResponse](interfaces/BackchannelAuthenticationResponse.md)
 - [Client](interfaces/Client.md)
