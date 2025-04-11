@@ -58,6 +58,14 @@ Identifies the protection space
 
 ***
 
+### resource\_metadata?
+
+• `readonly` `optional` **resource\_metadata**: `string`
+
+The URL of the protected resource metadata
+
+***
+
 ### scope?
 
 • `readonly` `optional` **scope**: `string`
