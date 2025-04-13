@@ -99,6 +99,6 @@ The supported JavaScript runtimes include those that support the utilized Web AP
 [sponsor-auth0]: https://a0.to/signup/panva
 [Security Policy]: https://github.com/panva/oauth4webapi/security/policy
 
-[^cjs]: CJS style `let oauth = require('oauth4webapi')` is possible in Node.js versions where `process.features.require_module` is `true` by default (^20.19.0 || ^22.12.0 || >= 23.0.0) or with the `--experimental-require-module` Node.js CLI flag.
+[^cjs]: CJS style `let oauth = require('oauth4webapi')` is possible in Node.js versions where the `require(esm)` feature is enabled by default (^20.19.0 || ^22.12.0 || >= 23.0.0).
 
 [^nodejs]: Node.js v20.x as baseline is required
