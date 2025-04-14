@@ -775,6 +775,10 @@ export interface AuthorizationServer {
    * Boolean value specifying whether the authorization server supports back-channel logout.
    */
   readonly backchannel_logout_supported?: boolean
+  /**
+   * JSON array containing a list of resource identifiers for OAuth protected resources.
+   */
+  readonly protected_resources?: string[]
 
   readonly [metadata: string]: JsonValue | undefined
 }
@@ -2515,6 +2519,10 @@ export interface WWWAuthenticateChallengeParameters {
    * The scope necessary to access the protected resource, used with `insufficient_scope` error code
    */
   readonly scope?: string
+  /**
+   * The URL of the protected resource metadata
+   */
+  readonly resource_metadata?: string
 
   /**
    * NOTE: because the parameter names are case insensitive they are always returned lowercased
