@@ -10,7 +10,7 @@ Protected Resource Server Metadata
 
 ## See
 
-[IANA OAuth Protected Resource Server Metadata registry](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#protected-resource-server-metadata)
+[IANA OAuth Protected Resource Server Metadata registry](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#protected-resource-metadata)
 
 ## Indexable
 

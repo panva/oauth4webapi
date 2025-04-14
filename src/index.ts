@@ -6326,7 +6326,7 @@ export async function processDynamicClientRegistrationResponse(
  *
  * @group Resource Server Metadata
  *
- * @see [IANA OAuth Protected Resource Server Metadata registry](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#protected-resource-server-metadata)
+ * @see [IANA OAuth Protected Resource Server Metadata registry](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#protected-resource-metadata)
  */
 export interface ResourceServer {
   /**
