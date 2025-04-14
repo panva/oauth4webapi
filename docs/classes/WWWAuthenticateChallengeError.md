@@ -37,7 +37,7 @@ The parsed WWW-Authenticate HTTP Header challenges
 • **response**: [`Response`](https://developer.mozilla.org/docs/Web/API/Response)
 
 The [Response](https://developer.mozilla.org/docs/Web/API/Response) that included a WWW-Authenticate HTTP Header challenges, its
-[Response.bodyUsed](https://developer.mozilla.org/docs/Web/API/Response/bodyUsed) is `true`
+[Response.bodyUsed](https://developer.mozilla.org/docs/Web/API/Response/bodyUsed) is `false`
 
 ***
 

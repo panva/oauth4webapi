@@ -2377,7 +2377,7 @@ export class ResponseBodyError extends Error {
   error_description?: string
 
   /**
-   * The "OAuth-style" error {@link !Response}, its {@link !Response.bodyUsed} is `false` and the JSON
+   * The "OAuth-style" error {@link !Response}, its {@link !Response.bodyUsed} is `true` and the JSON
    * body is available in {@link ResponseBodyError.cause}
    */
   response!: Response
@@ -2481,7 +2481,7 @@ export class WWWAuthenticateChallengeError extends Error {
 
   /**
    * The {@link !Response} that included a WWW-Authenticate HTTP Header challenges, its
-   * {@link !Response.bodyUsed} is `true`
+   * {@link !Response.bodyUsed} is `false`
    */
   response: Response
 

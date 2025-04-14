@@ -499,7 +499,10 @@ test('processDeviceCodeResponse() without ID Tokens', async (t) => {
   )
 
   t.true(
-    err instanceof lib.ResponseBodyError && err.error === 'invalid_grant' && err.status === 400,
+    err instanceof lib.ResponseBodyError &&
+      err.error === 'invalid_grant' &&
+      err.status === 400 &&
+      err instanceof lib.ResponseBodyError,
   )
 
   await lib.processDeviceCodeResponse(

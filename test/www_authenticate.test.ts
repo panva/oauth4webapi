@@ -26,6 +26,7 @@ async function getWWWAuthenticateChallengeError(t: ExecutionContext, response: R
       },
       (err) => {
         if (err instanceof lib.WWWAuthenticateChallengeError) {
+          t.false(err.response.bodyUsed)
           return err.cause
         }
 
