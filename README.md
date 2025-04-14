@@ -9,6 +9,7 @@ This software provides a collection of routines that can be used to build client
 The following features are currently in scope and implemented in this software:
 
 - Authorization Server Metadata discovery
+- Resource Server Metadata discovery
 - Authorization Code Flow (profiled under OpenID Connect 1.0, OAuth 2.0, OAuth 2.1, and FAPI 2.0), with PKCE
 - Refresh Token, Device Authorization, Client-Initiated Backchannel Authentication (CIBA), and Client Credentials Grants
 - Demonstrating Proof-of-Possession at the Application Layer (DPoP)
