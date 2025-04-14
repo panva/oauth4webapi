@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.5.0](https://github.com/panva/oauth4webapi/compare/v3.4.1...v3.5.0) (2025-04-14)
+
+
+### Features
+
+* support for RFC-to-be 9728 - OAuth 2.0 Protected Resource Metadata ([eef0d7d](https://github.com/panva/oauth4webapi/commit/eef0d7d57899ad5741b9ddfbbf41ce598797e2bb))
+
+
+### Documentation
+
+* add descriptions to dynamicClientRegistrationRequest params ([1244b00](https://github.com/panva/oauth4webapi/commit/1244b001df1f676d4dce49ffa9d78becef5e71a5))
+* add mentions of the respective process* method for Response-resolving methods ([545f9ea](https://github.com/panva/oauth4webapi/commit/545f9ead8fc92d57763f8beacca696de4beda173))
+* add Protected Resource Metadata related AS Metadata and WWWAuthenticate params ([1644494](https://github.com/panva/oauth4webapi/commit/1644494d995629e11dae3f773c46ddb02ee11aa3))
+* fixup DPoP references, add WWW-Authenticate parameter descriptions ([fedb5cd](https://github.com/panva/oauth4webapi/commit/fedb5cd4e2267f14984cdf512807dc5a98338887))
+
+
+### Refactor
+
+* DRY Response JSON parsing ([8a3e554](https://github.com/panva/oauth4webapi/commit/8a3e5548a4cbb95b050e8007962552840b62e5b5))
+
 ## [3.4.1](https://github.com/panva/oauth4webapi/compare/v3.4.0...v3.4.1) (2025-04-10)
 
 
