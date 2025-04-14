@@ -13,8 +13,7 @@ expired tokens, or bad client authentication
 
 ```http
 HTTP/1.1 401 Unauthorized
-WWW-Authenticate: Bearer error="invalid_token",
-                         error_description="The access token expired"
+WWW-Authenticate: Bearer error="invalid_token", error_description="The access token expired"
 ```
 
 ## Properties
