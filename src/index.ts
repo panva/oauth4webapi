@@ -2530,7 +2530,7 @@ export interface WWWAuthenticateChallengeParameters {
    */
   readonly error_uri?: string
   /**
-   * A comma-delimited list of supported algorithms, used in
+   * A space-delimited list of supported algorithms, used in
    * {@link https://www.rfc-editor.org/rfc/rfc9449.html RFC 9449 - OAuth 2.0 Demonstrating Proof of Possession (DPoP)}
    * challenges
    */
