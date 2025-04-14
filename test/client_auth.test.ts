@@ -12,7 +12,7 @@ import * as lib from '../src/index.js'
 
 const test = anyTest as TestFn<ContextWithAlgs>
 
-test.before(setup)
+test.before(setup())
 test.after(teardown)
 test.before(setupContextKeys)
 

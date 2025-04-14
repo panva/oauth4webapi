@@ -1163,6 +1163,53 @@ function signal(value: Exclude<HttpRequestOptions<any>['signal'], undefined>): A
   return value
 }
 
+function replaceDoubleSlash(pathname: string) {
+  if (pathname.includes('//')) {
+    return pathname.replace('//', '/')
+  }
+  return pathname
+}
+
+function prependWellKnown(url: URL, wellKnown: string) {
+  if (url.pathname === '/') {
+    url.pathname = wellKnown
+  } else {
+    url.pathname = replaceDoubleSlash(`${wellKnown}/${url.pathname}`)
+  }
+  return url
+}
+
+function appendWellKnown(url: URL, wellKnown: string) {
+  url.pathname = replaceDoubleSlash(`${url.pathname}/${wellKnown}`)
+  return url
+}
+
+async function performDiscovery(
+  input: URL,
+  urlName: string,
+  transform: (url: URL) => URL,
+  options?: HttpRequestOptions<'GET'>,
+) {
+  if (!(input instanceof URL)) {
+    throw CodedTypeError(`"${urlName}" must be an instance of URL`, ERR_INVALID_ARG_TYPE)
+  }
+
+  checkProtocol(input, options?.[allowInsecureRequests] !== true)
+
+  const url = transform(new URL(input.href))
+
+  const headers = prepareHeaders(options?.headers)
+  headers.set('accept', 'application/json')
+
+  return (options?.[customFetch] || fetch)(url.href, {
+    body: undefined,
+    headers: Object.fromEntries(headers.entries()),
+    method: 'GET',
+    redirect: 'manual',
+    signal: options?.signal ? signal(options.signal) : undefined,
+  })
+}
+
 /**
  * Performs an authorization server metadata discovery using one of two
  * {@link DiscoveryRequestOptions.algorithm transformation algorithms} applied to the
@@ -1185,43 +1232,28 @@ export async function discoveryRequest(
   issuerIdentifier: URL,
   options?: DiscoveryRequestOptions,
 ): Promise<Response> {
-  if (!(issuerIdentifier instanceof URL)) {
-    throw CodedTypeError('"issuerIdentifier" must be an instance of URL', ERR_INVALID_ARG_TYPE)
-  }
-
-  checkProtocol(issuerIdentifier, options?.[allowInsecureRequests] !== true)
-
-  const url = new URL(issuerIdentifier.href)
-
-  switch (options?.algorithm) {
-    case undefined: // Fall through
-    case 'oidc':
-      url.pathname = `${url.pathname}/.well-known/openid-configuration`.replace('//', '/')
-      break
-    case 'oauth2':
-      if (url.pathname === '/') {
-        url.pathname = '.well-known/oauth-authorization-server'
-      } else {
-        url.pathname = `.well-known/oauth-authorization-server/${url.pathname}`.replace('//', '/')
+  return performDiscovery(
+    issuerIdentifier,
+    'issuerIdentifier',
+    (url) => {
+      switch (options?.algorithm) {
+        case undefined: // Fall through
+        case 'oidc':
+          appendWellKnown(url, '.well-known/openid-configuration')
+          break
+        case 'oauth2':
+          prependWellKnown(url, '.well-known/oauth-authorization-server')
+          break
+        default:
+          throw CodedTypeError(
+            '"options.algorithm" must be "oidc" (default), or "oauth2"',
+            ERR_INVALID_ARG_VALUE,
+          )
       }
-      break
-    default:
-      throw CodedTypeError(
-        '"options.algorithm" must be "oidc" (default), or "oauth2"',
-        ERR_INVALID_ARG_VALUE,
-      )
-  }
-
-  const headers = prepareHeaders(options?.headers)
-  headers.set('accept', 'application/json')
-
-  return (options?.[customFetch] || fetch)(url.href, {
-    body: undefined,
-    headers: Object.fromEntries(headers.entries()),
-    method: 'GET',
-    redirect: 'manual',
-    signal: options?.signal ? signal(options.signal) : undefined,
-  })
+      return url
+    },
+    options,
+  )
 }
 
 function assertNumber(
@@ -1297,10 +1329,8 @@ export async function processDiscoveryResponse(
   expectedIssuerIdentifier: URL,
   response: Response,
 ): Promise<AuthorizationServer> {
-  if (
-    !(expectedIssuerIdentifier instanceof URL) &&
-    expectedIssuerIdentifier !== _nodiscoverycheck
-  ) {
+  const expected = expectedIssuerIdentifier as URL | typeof _nodiscoverycheck
+  if (!(expected instanceof URL) && expected !== _nodiscoverycheck) {
     throw CodedTypeError(
       '"expectedIssuerIdentifier" must be an instance of URL',
       ERR_INVALID_ARG_TYPE,
@@ -1334,15 +1364,11 @@ export async function processDiscoveryResponse(
 
   assertString(json.issuer, '"response" body "issuer" property', INVALID_RESPONSE, { body: json })
 
-  if (
-    new URL(json.issuer).href !== expectedIssuerIdentifier.href &&
-    // @ts-expect-error
-    expectedIssuerIdentifier !== _nodiscoverycheck
-  ) {
+  if (expected !== _nodiscoverycheck && new URL(json.issuer).href !== expected.href) {
     throw OPE(
       '"response" body "issuer" property does not match the expected value',
       JSON_ATTRIBUTE_COMPARISON,
-      { expected: expectedIssuerIdentifier.href, body: json, attribute: 'issuer' },
+      { expected: expected.href, body: json, attribute: 'issuer' },
     )
   }
 
@@ -6376,6 +6402,196 @@ export async function processDynamicClientRegistrationResponse(
       {
         body: json,
       },
+    )
+  }
+
+  return json
+}
+
+/**
+ * Protected Resource Server Metadata
+ *
+ * @group Resource Server Metadata
+ *
+ * @see [IANA OAuth Protected Resource Server Metadata registry](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#protected-resource-server-metadata)
+ */
+export interface ResourceServer {
+  /**
+   * Resource server's Resource Identifier URL.
+   */
+  readonly resource: string
+
+  /**
+   * JSON array containing a list of OAuth authorization server issuer identifiers
+   */
+  readonly authorization_servers?: string[]
+
+  /**
+   * URL of the protected resource's JWK Set document
+   */
+  readonly jwks_uri?: string
+
+  /**
+   * JSON array containing a list of the OAuth 2.0 scope values that are used in authorization
+   * requests to request access to this protected resource
+   */
+  readonly scopes_supported?: string[]
+
+  /**
+   * JSON array containing a list of the OAuth 2.0 Bearer Token presentation methods that this
+   * protected resource supports
+   */
+  readonly bearer_methods_supported?: string[]
+
+  /**
+   * JSON array containing a list of the JWS signing algorithms (alg values) supported by the
+   * protected resource for signed content
+   */
+  readonly resource_signing_alg_values_supported?: string[]
+
+  /**
+   * Human-readable name of the protected resource
+   */
+  readonly resource_name?: string
+
+  /**
+   * URL of a page containing human-readable information that developers might want or need to know
+   * when using the protected resource
+   */
+  readonly resource_documentation?: string
+
+  /**
+   * URL of a page containing human-readable information about the protected resource's requirements
+   * on how the client can use the data provided by the protected resource
+   */
+  readonly resource_policy_uri?: string
+
+  /**
+   * URL of a page containing human-readable information about the protected resource's terms of
+   * service
+   */
+  readonly resource_tos_uri?: string
+
+  /**
+   * Boolean value indicating protected resource support for mutual-TLS client certificate-bound
+   * access tokens
+   */
+  readonly tls_client_certificate_bound_access_tokens?: boolean
+
+  /**
+   * JSON array containing a list of the authorization details type values supported by the resource
+   * server when the authorization_details request parameter is used
+   */
+  readonly authorization_details_types_supported?: boolean
+
+  /**
+   * JSON array containing a list of the JWS alg values supported by the resource server for
+   * validating DPoP proof JWTs
+   */
+  readonly dpop_signing_alg_values_supported?: boolean
+
+  /**
+   * Boolean value specifying whether the protected resource always requires the use of DPoP-bound
+   * access tokens
+   */
+  readonly dpop_bound_access_tokens_required?: boolean
+
+  /**
+   * Signed JWT containing metadata parameters about the protected resource as claims
+   */
+  readonly signed_metadata?: string
+
+  readonly [metadata: string]: JsonValue | undefined
+}
+
+/**
+ * Performs a protected resource metadata discovery.
+ *
+ * @param resourceIdentifier Protected resource's resource identifier to resolve the well-known
+ *   discovery URI for
+ *
+ * @returns Resolves with a {@link !Response} to then invoke {@link processResourceDiscoveryResponse}
+ *   with
+ *
+ * @group Resource Server Metadata
+ *
+ * @see [RFC-to-be 9728 - OAuth 2.0 Protected Resource Metadata](https://www.ietf.org/archive/id/draft-ietf-oauth-resource-metadata-13.html#name-protected-resource-metadata-)
+ */
+export async function resourceDiscoveryRequest(
+  resourceIdentifier: URL,
+  options?: HttpRequestOptions<'GET'>,
+): Promise<Response> {
+  return performDiscovery(
+    resourceIdentifier,
+    'resourceIdentifier',
+    (url) => {
+      prependWellKnown(url, '.well-known/oauth-protected-resource')
+      return url
+    },
+    options,
+  )
+}
+
+/**
+ * Validates {@link !Response} instance to be one coming from the resource server's well-known
+ * discovery endpoint.
+ *
+ * @param expectedResourceIdentifier Expected Resource Identifier value.
+ * @param response Resolved value from {@link resourceDiscoveryRequest} or from a general
+ *   {@link !fetch} following {@link WWWAuthenticateChallengeParameters.resource_metadata}.
+ *
+ * @returns Resolves with the discovered Resource Server Metadata.
+ *
+ * @group Resource Server Metadata
+ *
+ * @see [RFC-to-be 9728 - OAuth 2.0 Protected Resource Metadata](https://www.ietf.org/archive/id/draft-ietf-oauth-resource-metadata-13.html#name-protected-resource-metadata-r)
+ */
+export async function processResourceDiscoveryResponse(
+  expectedResourceIdentifier: URL,
+  response: Response,
+): Promise<ResourceServer> {
+  const expected = expectedResourceIdentifier as URL | typeof _nodiscoverycheck
+  if (!(expected instanceof URL) && expected !== _nodiscoverycheck) {
+    throw CodedTypeError(
+      '"expectedResourceIdentifier" must be an instance of URL',
+      ERR_INVALID_ARG_TYPE,
+    )
+  }
+
+  if (!looseInstanceOf(response, Response)) {
+    throw CodedTypeError('"response" must be an instance of Response', ERR_INVALID_ARG_TYPE)
+  }
+
+  if (response.status !== 200) {
+    throw OPE(
+      '"response" is not a conform Resource Server Metadata response (unexpected HTTP status code)',
+      RESPONSE_IS_NOT_CONFORM,
+      response,
+    )
+  }
+
+  assertReadableResponse(response)
+  let json: JsonValue
+  try {
+    json = await response.json()
+  } catch (cause) {
+    assertApplicationJson(response)
+    throw OPE('failed to parse "response" body as JSON', PARSE_ERROR, cause)
+  }
+
+  if (!isJsonObject<ResourceServer>(json)) {
+    throw OPE('"response" body must be a top level object', INVALID_RESPONSE, { body: json })
+  }
+
+  assertString(json.resource, '"response" body "resource" property', INVALID_RESPONSE, {
+    body: json,
+  })
+
+  if (expected !== _nodiscoverycheck && new URL(json.resource).href !== expected.href) {
+    throw OPE(
+      '"response" body "resource" property does not match the expected value',
+      JSON_ATTRIBUTE_COMPARISON,
+      { expected: expected.href, body: json, attribute: 'resource' },
     )
   }
 

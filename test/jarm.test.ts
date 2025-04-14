@@ -13,7 +13,7 @@ import * as tools from './_tools.js'
 
 const test = anyTest as TestFn<ContextWithAlgs>
 
-test.before(setup)
+test.before(setup())
 test.after(teardown)
 test.before(setupJwks)
 

@@ -12,7 +12,7 @@ import setup, { type Context, teardown, issuer, UA } from './_setup.js'
 
 const test = anyTest as TestFn<Context>
 
-test.before(setup)
+test.before(setup())
 test.after(teardown)
 
 test('when in browser does not set custom user-agent', async (t) => {

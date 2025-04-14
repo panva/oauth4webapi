@@ -14,15 +14,16 @@ export interface Context {
   intercept: InstanceType<typeof undici.MockPool>['intercept']
 }
 
-export default (t: ExecutionContext<Context>) => {
-  const mockAgent = new undici.MockAgent()
-  mockAgent.disableNetConnect()
-  undici.setGlobalDispatcher(mockAgent)
-  const pool = mockAgent.get(identifier)
+export default (origin: string = identifier) =>
+  (t: ExecutionContext<Context>) => {
+    const mockAgent = new undici.MockAgent()
+    mockAgent.disableNetConnect()
+    undici.setGlobalDispatcher(mockAgent)
+    const pool = mockAgent.get(origin)
 
-  t.context.mock ||= mockAgent
-  t.context.intercept ||= undici.MockPool.prototype.intercept.bind(pool)
-}
+    t.context.mock ||= mockAgent
+    t.context.intercept ||= undici.MockPool.prototype.intercept.bind(pool)
+  }
 
 export async function setupContextKeys(t: ExecutionContext<ContextWithAlgs>) {
   t.context.ES256 = await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, [
