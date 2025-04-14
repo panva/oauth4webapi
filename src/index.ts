@@ -1350,17 +1350,7 @@ export async function processDiscoveryResponse(
   }
 
   assertReadableResponse(response)
-  let json: JsonValue
-  try {
-    json = await response.json()
-  } catch (cause) {
-    assertApplicationJson(response)
-    throw OPE('failed to parse "response" body as JSON', PARSE_ERROR, cause)
-  }
-
-  if (!isJsonObject<AuthorizationServer>(json)) {
-    throw OPE('"response" body must be a top level object', INVALID_RESPONSE, { body: json })
-  }
+  const json = await getResponseJsonBody<AuthorizationServer>(response)
 
   assertString(json.issuer, '"response" body "issuer" property', INVALID_RESPONSE, { body: json })
 
@@ -2701,17 +2691,7 @@ export async function processPushedAuthorizationResponse(
   await checkOAuthBodyError(response, 201, 'Pushed Authorization Request Endpoint')
 
   assertReadableResponse(response)
-  let json: JsonValue
-  try {
-    json = await response.json()
-  } catch (cause) {
-    assertApplicationJson(response)
-    throw OPE('failed to parse "response" body as JSON', PARSE_ERROR, cause)
-  }
-
-  if (!isJsonObject<Writeable<PushedAuthorizationResponse>>(json)) {
-    throw OPE('"response" body must be a top level object', INVALID_RESPONSE, { body: json })
-  }
+  const json = await getResponseJsonBody<Writeable<PushedAuthorizationResponse>>(response)
 
   assertString(json.request_uri, '"response" body "request_uri" property', INVALID_RESPONSE, {
     body: json,
@@ -3165,7 +3145,7 @@ export async function processUserInfoResponse(
 
   assertReadableResponse(response)
 
-  let json: JsonValue
+  let json: JsonObject
   if (getContentType(response) === 'application/jwt') {
     const { claims, jwt } = await validateJwt(
       await response.text(),
@@ -3183,22 +3163,12 @@ export async function processUserInfoResponse(
       .then(validateOptionalIssuer.bind(undefined, as))
 
     jwtRefs.set(response, jwt)
-    json = claims as JsonValue
+    json = claims
   } else {
     if (client.userinfo_signed_response_alg) {
       throw OPE('JWT UserInfo Response expected', JWT_USERINFO_EXPECTED, response)
     }
-
-    try {
-      json = await response.json()
-    } catch (cause) {
-      assertApplicationJson(response)
-      throw OPE('failed to parse "response" body as JSON', PARSE_ERROR, cause)
-    }
-  }
-
-  if (!isJsonObject<UserInfoResponse>(json)) {
-    throw OPE('"response" body must be a top level object', INVALID_RESPONSE, { body: json })
+    json = await getResponseJsonBody(response)
   }
 
   assertString(json.sub, '"response" body "sub" property', INVALID_RESPONSE, { body: json })
@@ -3218,7 +3188,7 @@ export async function processUserInfoResponse(
       }
   }
 
-  return json
+  return json as UserInfoResponse
 }
 
 async function authenticatedRequest(
@@ -3436,17 +3406,7 @@ async function processGenericAccessTokenResponse(
   await checkOAuthBodyError(response, 200, 'Token Endpoint')
 
   assertReadableResponse(response)
-  let json: JsonValue
-  try {
-    json = await response.json()
-  } catch (cause) {
-    assertApplicationJson(response)
-    throw OPE('failed to parse "response" body as JSON', PARSE_ERROR, cause)
-  }
-
-  if (!isJsonObject<Writeable<TokenEndpointResponse>>(json)) {
-    throw OPE('"response" body must be a top level object', INVALID_RESPONSE, { body: json })
-  }
+  const json = await getResponseJsonBody<Writeable<TokenEndpointResponse>>(response)
 
   assertString(json.access_token, '"response" body "access_token" property', INVALID_RESPONSE, {
     body: json,
@@ -4485,7 +4445,7 @@ export async function processIntrospectionResponse(
 
   await checkOAuthBodyError(response, 200, 'Introspection Endpoint')
 
-  let json: JsonValue
+  let json: JsonObject
   if (getContentType(response) === 'application/token-introspection+jwt') {
     assertReadableResponse(response)
     const { claims, jwt } = await validateJwt(
@@ -4506,23 +4466,15 @@ export async function processIntrospectionResponse(
       .then(validateAudience.bind(undefined, client.client_id))
 
     jwtRefs.set(response, jwt)
-    json = claims.token_introspection as JsonValue
-    if (!isJsonObject(json)) {
+    if (!isJsonObject(claims.token_introspection)) {
       throw OPE('JWT "token_introspection" claim must be a JSON object', INVALID_RESPONSE, {
         claims,
       })
     }
+    json = claims.token_introspection
   } else {
     assertReadableResponse(response)
-    try {
-      json = await response.json()
-    } catch (cause) {
-      assertApplicationJson(response)
-      throw OPE('failed to parse "response" body as JSON', PARSE_ERROR, cause)
-    }
-    if (!isJsonObject(json)) {
-      throw OPE('"response" body must be a top level object', INVALID_RESPONSE, { body: json })
-    }
+    json = await getResponseJsonBody(response)
   }
 
   if (typeof json.active !== 'boolean') {
@@ -4573,17 +4525,9 @@ async function processJwksResponse(response: Response): Promise<JWKS> {
   }
 
   assertReadableResponse(response)
-  let json: JsonValue
-  try {
-    json = await response.json()
-  } catch (cause) {
-    assertContentTypes(response, 'application/json', 'application/jwk-set+json')
-    throw OPE('failed to parse "response" body as JSON', PARSE_ERROR, cause)
-  }
-
-  if (!isJsonObject<JWKS>(json)) {
-    throw OPE('"response" body must be a top level object', INVALID_RESPONSE, { body: json })
-  }
+  const json = await getResponseJsonBody<JWKS>(response, (response) =>
+    assertContentTypes(response, 'application/json', 'application/jwk-set+json'),
+  )
 
   if (!Array.isArray(json.keys)) {
     throw OPE('"response" body "keys" property must be an array', INVALID_RESPONSE, { body: json })
@@ -5576,17 +5520,7 @@ export async function processDeviceAuthorizationResponse(
   await checkOAuthBodyError(response, 200, 'Device Authorization Endpoint')
 
   assertReadableResponse(response)
-  let json: JsonValue
-  try {
-    json = await response.json()
-  } catch (cause) {
-    assertApplicationJson(response)
-    throw OPE('failed to parse "response" body as JSON', PARSE_ERROR, cause)
-  }
-
-  if (!isJsonObject<Writeable<DeviceAuthorizationResponse>>(json)) {
-    throw OPE('"response" body must be a top level object', INVALID_RESPONSE, { body: json })
-  }
+  const json = await getResponseJsonBody<Writeable<DeviceAuthorizationResponse>>(response)
 
   assertString(json.device_code, '"response" body "device_code" property', INVALID_RESPONSE, {
     body: json,
@@ -6166,17 +6100,7 @@ export async function processBackchannelAuthenticationResponse(
   await checkOAuthBodyError(response, 200, 'Backchannel Authentication Endpoint')
 
   assertReadableResponse(response)
-  let json: JsonValue
-  try {
-    json = await response.json()
-  } catch (cause) {
-    assertApplicationJson(response)
-    throw OPE('failed to parse "response" body as JSON', PARSE_ERROR, cause)
-  }
-
-  if (!isJsonObject<Writeable<BackchannelAuthenticationResponse>>(json)) {
-    throw OPE('"response" body must be a top level object', INVALID_RESPONSE, { body: json })
-  }
+  const json = await getResponseJsonBody<Writeable<BackchannelAuthenticationResponse>>(response)
 
   assertString(json.auth_req_id, '"response" body "auth_req_id" property', INVALID_RESPONSE, {
     body: json,
@@ -6371,17 +6295,7 @@ export async function processDynamicClientRegistrationResponse(
   await checkOAuthBodyError(response, 201, 'Dynamic Client Registration Endpoint')
 
   assertReadableResponse(response)
-  let json: JsonValue
-  try {
-    json = await response.json()
-  } catch (cause) {
-    assertApplicationJson(response)
-    throw OPE('failed to parse "response" body as JSON', PARSE_ERROR, cause)
-  }
-
-  if (!isJsonObject<Writeable<Client>>(json)) {
-    throw OPE('"response" body must be a top level object', INVALID_RESPONSE, { body: json })
-  }
+  const json = await getResponseJsonBody<Writeable<Client>>(response)
 
   assertString(json.client_id, '"response" body "client_id" property', INVALID_RESPONSE, {
     body: json,
@@ -6571,17 +6485,7 @@ export async function processResourceDiscoveryResponse(
   }
 
   assertReadableResponse(response)
-  let json: JsonValue
-  try {
-    json = await response.json()
-  } catch (cause) {
-    assertApplicationJson(response)
-    throw OPE('failed to parse "response" body as JSON', PARSE_ERROR, cause)
-  }
-
-  if (!isJsonObject<ResourceServer>(json)) {
-    throw OPE('"response" body must be a top level object', INVALID_RESPONSE, { body: json })
-  }
+  const json = await getResponseJsonBody<ResourceServer>(response)
 
   assertString(json.resource, '"response" body "resource" property', INVALID_RESPONSE, {
     body: json,
@@ -6593,6 +6497,25 @@ export async function processResourceDiscoveryResponse(
       JSON_ATTRIBUTE_COMPARISON,
       { expected: expected.href, body: json, attribute: 'resource' },
     )
+  }
+
+  return json
+}
+
+async function getResponseJsonBody<T = JsonObject>(
+  response: Response,
+  check: (response: Response) => void = assertApplicationJson,
+): Promise<T> {
+  let json: JsonValue
+  try {
+    json = await response.json()
+  } catch (cause) {
+    check(response)
+    throw OPE('failed to parse "response" body as JSON', PARSE_ERROR, cause)
+  }
+
+  if (!isJsonObject<T>(json)) {
+    throw OPE('"response" body must be a top level object', INVALID_RESPONSE, { body: json })
   }
 
   return json
