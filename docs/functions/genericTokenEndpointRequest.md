@@ -27,6 +27,9 @@ Token Grant Type, or SAML 2.0 Bearer Assertion Grant Type.
 
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Response`](https://developer.mozilla.org/docs/Web/API/Response)\>
 
+Resolves with a [Response](https://developer.mozilla.org/docs/Web/API/Response) to then invoke
+  [processGenericTokenEndpointResponse](processGenericTokenEndpointResponse.md) with
+
 ## See
 
  - [Token Exchange Grant Type](https://www.rfc-editor.org/rfc/rfc8693.html)

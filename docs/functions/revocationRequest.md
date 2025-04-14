@@ -25,6 +25,8 @@ Performs a Revocation Request at the
 
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Response`](https://developer.mozilla.org/docs/Web/API/Response)\>
 
+Resolves with a [Response](https://developer.mozilla.org/docs/Web/API/Response) to then invoke [processRevocationResponse](processRevocationResponse.md) with
+
 ## See
 
 [RFC 7009 - OAuth 2.0 Token Revocation](https://www.rfc-editor.org/rfc/rfc7009.html#section-2)

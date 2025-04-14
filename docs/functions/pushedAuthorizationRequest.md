@@ -25,6 +25,9 @@ Performs a Pushed Authorization Request at the
 
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Response`](https://developer.mozilla.org/docs/Web/API/Response)\>
 
+Resolves with a [Response](https://developer.mozilla.org/docs/Web/API/Response) to then invoke
+  [processPushedAuthorizationResponse](processPushedAuthorizationResponse.md) with
+
 ## See
 
  - [RFC 9126 - OAuth 2.0 Pushed Authorization Requests (PAR)](https://www.rfc-editor.org/rfc/rfc9126.html#name-pushed-authorization-reques)

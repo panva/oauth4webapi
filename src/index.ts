@@ -1173,6 +1173,8 @@ function signal(value: Exclude<HttpRequestOptions<any>['signal'], undefined>): A
  *
  * @param issuerIdentifier Issuer Identifier to resolve the well-known discovery URI for.
  *
+ * @returns Resolves with a {@link !Response} to then invoke {@link processDiscoveryResponse} with
+ *
  * @group Authorization Server Metadata
  * @group OpenID Connect (OIDC) Discovery
  *
@@ -2056,6 +2058,9 @@ export function resolveEndpoint(
  * @param clientAuthentication Client Authentication Method.
  * @param parameters Authorization Request parameters.
  *
+ * @returns Resolves with a {@link !Response} to then invoke
+ *   {@link processPushedAuthorizationResponse} with
+ *
  * @group Pushed Authorization Requests (PAR)
  *
  * @see [RFC 9126 - OAuth 2.0 Pushed Authorization Requests (PAR)](https://www.rfc-editor.org/rfc/rfc9126.html#name-pushed-authorization-reques)
@@ -2827,6 +2832,8 @@ export interface UserInfoRequestOptions extends HttpRequestOptions<'GET'>, DPoPR
  * @param client Client Metadata.
  * @param accessToken Access Token value.
  *
+ * @returns Resolves with a {@link !Response} to then invoke {@link processUserInfoResponse} with
+ *
  * @group Authorization Code Grant w/ OpenID Connect (OIDC)
  * @group OpenID Connect (OIDC) UserInfo
  * @group Accessing Protected Resources
@@ -3264,6 +3271,8 @@ async function tokenEndpointRequest(
  * @param clientAuthentication Client Authentication Method.
  * @param refreshToken Refresh Token value.
  *
+ * @returns Resolves with a {@link !Response} to then invoke {@link processRefreshTokenResponse} with
+ *
  * @group Refreshing an Access Token
  *
  * @see [RFC 6749 - The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html#section-6)
@@ -3623,6 +3632,9 @@ function brand(searchParams: URLSearchParams) {
  *   from {@link validateAuthResponse}, or {@link validateJwtAuthResponse}.
  * @param redirectUri `redirect_uri` value used in the authorization request.
  * @param codeVerifier PKCE `code_verifier` to send to the token endpoint.
+ *
+ * @returns Resolves with a {@link !Response} to then invoke {@link processAuthorizationCodeResponse}
+ *   with
  *
  * @group Authorization Code Grant
  * @group Authorization Code Grant w/ OpenID Connect (OIDC)
@@ -4117,6 +4129,9 @@ export interface ClientCredentialsGrantRequestOptions
  * @param client Client Metadata.
  * @param clientAuthentication Client Authentication Method.
  *
+ * @returns Resolves with a {@link !Response} to then invoke {@link processClientCredentialsResponse}
+ *   with
+ *
  * @group Client Credentials Grant
  *
  * @see [RFC 6749 - The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html#section-4.4)
@@ -4151,6 +4166,9 @@ export async function clientCredentialsGrantRequest(
  * @param client Client Metadata.
  * @param clientAuthentication Client Authentication Method.
  * @param grantType Grant Type.
+ *
+ * @returns Resolves with a {@link !Response} to then invoke
+ *   {@link processGenericTokenEndpointResponse} with
  *
  * @group JWT Bearer Token Grant Type
  * @group SAML 2.0 Bearer Assertion Grant Type
@@ -4250,6 +4268,8 @@ export interface RevocationRequestOptions extends HttpRequestOptions<'POST', URL
  * @param token Token to revoke. You can provide the `token_type_hint` parameter via
  *   {@link RevocationRequestOptions.additionalParameters options}.
  *
+ * @returns Resolves with a {@link !Response} to then invoke {@link processRevocationResponse} with
+ *
  * @group Token Revocation
  *
  * @see [RFC 7009 - OAuth 2.0 Token Revocation](https://www.rfc-editor.org/rfc/rfc7009.html#section-2)
@@ -4339,6 +4359,8 @@ function assertReadableResponse(response: Response): void {
  * @param clientAuthentication Client Authentication Method.
  * @param token Token to introspect. You can provide the `token_type_hint` parameter via
  *   {@link IntrospectionRequestOptions.additionalParameters options}.
+ *
+ * @returns Resolves with a {@link !Response} to then invoke {@link processIntrospectionResponse} with
  *
  * @group Token Introspection
  *
@@ -5430,6 +5452,9 @@ export interface DeviceAuthorizationRequestOptions
  * @param clientAuthentication Client Authentication Method.
  * @param parameters Device Authorization Request parameters.
  *
+ * @returns Resolves with a {@link !Response} to then invoke
+ *   {@link processDeviceAuthorizationResponse} with
+ *
  * @group Device Authorization Grant
  *
  * @see [RFC 8628 - OAuth 2.0 Device Authorization Grant](https://www.rfc-editor.org/rfc/rfc8628.html#section-3.1)
@@ -5585,6 +5610,8 @@ export async function processDeviceAuthorizationResponse(
  * @param deviceCode Device Code. This is the
  *   {@link DeviceAuthorizationResponse.device_code `device_code`} retrieved from
  *   {@link processDeviceAuthorizationResponse}.
+ *
+ * @returns Resolves with a {@link !Response} to then invoke {@link processDeviceCodeResponse} with
  *
  * @group Device Authorization Grant
  *
@@ -6029,6 +6056,9 @@ export interface BackchannelAuthenticationRequestOptions
  * @param clientAuthentication Client Authentication Method.
  * @param parameters Backchannel Authentication Request parameters.
  *
+ * @returns Resolves with a {@link !Response} to then invoke
+ *   {@link processBackchannelAuthenticationResponse} with
+ *
  * @group Client-Initiated Backchannel Authentication (CIBA)
  *
  * @see [OpenID Connect Client-Initiated Backchannel Authentication](https://openid.net/specs/openid-client-initiated-backchannel-authentication-core-1_0-final.html#auth_request)
@@ -6153,6 +6183,9 @@ export async function processBackchannelAuthenticationResponse(
  *   {@link BackchannelAuthenticationResponse.auth_req_id `auth_req_id`} retrieved from
  *   {@link processBackchannelAuthenticationResponse}.
  *
+ * @returns Resolves with a {@link !Response} to then invoke
+ *   {@link processBackchannelAuthenticationGrantResponse} with
+ *
  * @group Client-Initiated Backchannel Authentication (CIBA)
  *
  * @see [OpenID Connect Client-Initiated Backchannel Authentication](https://openid.net/specs/openid-client-initiated-backchannel-authentication-core-1_0-final.html#token_request)
@@ -6232,6 +6265,9 @@ export interface DynamicClientRegistrationRequestOptions
  * @param as Authorization Server Metadata.
  * @param metadata Requested Client Metadata.
  * @param options
+ *
+ * @returns Resolves with a {@link !Response} to then invoke
+ *   {@link processDynamicClientRegistrationResponse} with
  *
  * @group Dynamic Client Registration (DCR)
  *

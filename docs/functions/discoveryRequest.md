@@ -26,6 +26,8 @@ Performs an authorization server metadata discovery using one of two
 
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Response`](https://developer.mozilla.org/docs/Web/API/Response)\>
 
+Resolves with a [Response](https://developer.mozilla.org/docs/Web/API/Response) to then invoke [processDiscoveryResponse](processDiscoveryResponse.md) with
+
 ## See
 
  - [RFC 8414 - OAuth 2.0 Authorization Server Metadata](https://www.rfc-editor.org/rfc/rfc8414.html#section-3)

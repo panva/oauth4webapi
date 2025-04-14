@@ -25,6 +25,8 @@ Performs an Introspection Request at the
 
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Response`](https://developer.mozilla.org/docs/Web/API/Response)\>
 
+Resolves with a [Response](https://developer.mozilla.org/docs/Web/API/Response) to then invoke [processIntrospectionResponse](processIntrospectionResponse.md) with
+
 ## See
 
  - [RFC 7662 - OAuth 2.0 Token Introspection](https://www.rfc-editor.org/rfc/rfc7662.html#section-2)

@@ -25,6 +25,9 @@ Performs a Backchannel Authentication Grant request at the
 
 [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Response`](https://developer.mozilla.org/docs/Web/API/Response)\>
 
+Resolves with a [Response](https://developer.mozilla.org/docs/Web/API/Response) to then invoke
+  [processBackchannelAuthenticationGrantResponse](processBackchannelAuthenticationGrantResponse.md) with
+
 ## See
 
  - [OpenID Connect Client-Initiated Backchannel Authentication](https://openid.net/specs/openid-client-initiated-backchannel-authentication-core-1_0-final.html#token_request)
