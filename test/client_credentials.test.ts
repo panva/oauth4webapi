@@ -12,7 +12,7 @@ import * as lib from '../src/index.js'
 
 const test = anyTest as TestFn<Context>
 
-test.before(setup)
+test.before(setup())
 test.after(teardown)
 
 const tClient: lib.Client = { ...client, client_secret: 'foo' }

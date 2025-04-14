@@ -164,6 +164,12 @@ Support from the community to continue maintaining and improving this module is 
 - [processRefreshTokenResponse](functions/processRefreshTokenResponse.md)
 - [refreshTokenGrantRequest](functions/refreshTokenGrantRequest.md)
 
+## Resource Server Metadata
+
+- [ResourceServer](interfaces/ResourceServer.md)
+- [processResourceDiscoveryResponse](functions/processResourceDiscoveryResponse.md)
+- [resourceDiscoveryRequest](functions/resourceDiscoveryRequest.md)
+
 ## SAML 2.0 Bearer Assertion Grant Type
 
 - [genericTokenEndpointRequest](functions/genericTokenEndpointRequest.md)

@@ -6,7 +6,7 @@ import timekeeper from 'timekeeper'
 
 const test = anyTest as TestFn<Context>
 
-test.before(setup)
+test.before(setup())
 test.after(teardown)
 
 let cache: lib.JWKSCacheInput = {}
