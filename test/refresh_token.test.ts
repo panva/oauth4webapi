@@ -279,7 +279,7 @@ test('processRefreshTokenResponse() without ID Tokens', async (t) => {
     err instanceof lib.ResponseBodyError &&
       err.error === 'invalid_grant' &&
       err.status === 400 &&
-      err instanceof lib.ResponseBodyError,
+      err.response.bodyUsed === true,
   )
 
   await lib.processRefreshTokenResponse(

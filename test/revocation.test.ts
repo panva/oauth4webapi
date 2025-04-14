@@ -142,6 +142,6 @@ test('processRevocationResponse()', async (t) => {
     err instanceof lib.ResponseBodyError &&
       err.error === 'invalid_client' &&
       err.status === 401 &&
-      err instanceof lib.ResponseBodyError,
+      err.response.bodyUsed === true,
   )
 })
