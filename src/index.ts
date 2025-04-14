@@ -6221,6 +6221,10 @@ export interface DynamicClientRegistrationRequestOptions
  * {@link AuthorizationServer.registration_endpoint `as.registration_endpoint`} using the provided
  * client metadata.
  *
+ * @param as Authorization Server Metadata.
+ * @param metadata Requested Client Metadata.
+ * @param options
+ *
  * @group Dynamic Client Registration (DCR)
  *
  * @see [RFC 7591 - OAuth 2.0 Dynamic Client Registration Protocol (DCR)](https://www.rfc-editor.org/rfc/rfc7591.html#section-3.1)

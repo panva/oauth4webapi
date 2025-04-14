@@ -14,11 +14,11 @@ client metadata.
 
 ## Parameters
 
-| Parameter | Type |
-| ------ | ------ |
-| `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) |
-| `metadata` | [`Partial`](https://www.typescriptlang.org/docs/handbook/utility-types.html#partialtype)\<[`OmitSymbolProperties`](../type-aliases/OmitSymbolProperties.md)\<[`Client`](../interfaces/Client.md)\>\> |
-| `options`? | [`DynamicClientRegistrationRequestOptions`](../interfaces/DynamicClientRegistrationRequestOptions.md) |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata. |
+| `metadata` | [`Partial`](https://www.typescriptlang.org/docs/handbook/utility-types.html#partialtype)\<[`OmitSymbolProperties`](../type-aliases/OmitSymbolProperties.md)\<[`Client`](../interfaces/Client.md)\>\> | Requested Client Metadata. |
+| `options`? | [`DynamicClientRegistrationRequestOptions`](../interfaces/DynamicClientRegistrationRequestOptions.md) |  |
 
 ## Returns
 
