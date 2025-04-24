@@ -6428,7 +6428,7 @@ export interface ResourceServer {
  *
  * @group Resource Server Metadata
  *
- * @see [RFC-to-be 9728 - OAuth 2.0 Protected Resource Metadata](https://www.ietf.org/archive/id/draft-ietf-oauth-resource-metadata-13.html#name-protected-resource-metadata-)
+ * @see [RFC 9728 - OAuth 2.0 Protected Resource Metadata](https://www.rfc-editor.org/rfc/rfc9728.html#name-protected-resource-metadata-)
  */
 export async function resourceDiscoveryRequest(
   resourceIdentifier: URL,
@@ -6457,7 +6457,7 @@ export async function resourceDiscoveryRequest(
  *
  * @group Resource Server Metadata
  *
- * @see [RFC-to-be 9728 - OAuth 2.0 Protected Resource Metadata](https://www.ietf.org/archive/id/draft-ietf-oauth-resource-metadata-13.html#name-protected-resource-metadata-r)
+ * @see [RFC 9728 - OAuth 2.0 Protected Resource Metadata](https://www.rfc-editor.org/rfc/rfc9728.html#name-protected-resource-metadata-r)
  */
 export async function processResourceDiscoveryResponse(
   expectedResourceIdentifier: URL,

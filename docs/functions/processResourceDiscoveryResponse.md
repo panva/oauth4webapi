@@ -26,4 +26,4 @@ Resolves with the discovered Resource Server Metadata.
 
 ## See
 
-[RFC-to-be 9728 - OAuth 2.0 Protected Resource Metadata](https://www.ietf.org/archive/id/draft-ietf-oauth-resource-metadata-13.html#name-protected-resource-metadata-r)
+[RFC 9728 - OAuth 2.0 Protected Resource Metadata](https://www.rfc-editor.org/rfc/rfc9728.html#name-protected-resource-metadata-r)
