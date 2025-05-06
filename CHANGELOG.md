@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.5.1](https://github.com/panva/oauth4webapi/compare/v3.5.0...v3.5.1) (2025-05-06)
+
+
+### Documentation
+
+* correct note about bodyUsed in ResponseBodyError and WWWAuthenticateChallengeError ([adaa6fe](https://github.com/panva/oauth4webapi/commit/adaa6fef6a9c93e1d1204185e7f337da4f71338e))
+* fix url to IANA OAuth Protected Resource Metadata registry ([d7baf99](https://github.com/panva/oauth4webapi/commit/d7baf99efff89538fba14ef3795f80c5d4ae535b))
+* fix WWWAuthenticateChallengeParameters.algs description to be space-delimited ([adae79f](https://github.com/panva/oauth4webapi/commit/adae79f66213db069c5249040487794a794036af))
+* remove newline from www-authenticate http example ([9234699](https://github.com/panva/oauth4webapi/commit/923469964425daca328b6a20595c45fcfdfff2ae))
+* update Protected Resource Metadata spec links to RFC 9728 ([1836968](https://github.com/panva/oauth4webapi/commit/183696807f153dd962f4cfd63e1849a508d7f4a1))
+
+
+### Refactor
+
+* expose more internal helpers for openid-client to use ([dc00001](https://github.com/panva/oauth4webapi/commit/dc00001d2f6573537bf4921a72e4d59c2f6cdd2f))
+
 ## [3.5.0](https://github.com/panva/oauth4webapi/compare/v3.4.1...v3.5.0) (2025-04-14)
 
 
