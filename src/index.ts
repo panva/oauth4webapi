@@ -3087,7 +3087,16 @@ async function getPublicSigKeyFromIssuerJwksUri(
  */
 export const skipSubjectCheck: unique symbol = Symbol()
 
-function getContentType(input: Response | Request) {
+/**
+ * This is not part of the public API.
+ *
+ * @private
+ *
+ * @ignore
+ *
+ * @internal
+ */
+export function getContentType(input: Response | Request): string | undefined {
   return input.headers.get('content-type')?.split(';')[0]
 }
 
@@ -4969,7 +4978,16 @@ async function consumeStream(request: Request) {
   return request.text()
 }
 
-async function formPostResponse(request: Request) {
+/**
+ * This is not part of the public API.
+ *
+ * @private
+ *
+ * @ignore
+ *
+ * @internal
+ */
+export async function formPostResponse(request: Request): Promise<string> {
   if (request.method !== 'POST') {
     throw CodedTypeError(
       'form_post responses are expected to use the POST method',
