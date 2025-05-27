@@ -30,4 +30,5 @@ Implementation of the Client's Authentication Method at the Authorization Server
  - [PrivateKeyJwt](../functions/PrivateKeyJwt.md)
  - [None](../functions/None.md)
  - [TlsClientAuth](../functions/TlsClientAuth.md)
+ - [AttestationAuth](../functions/AttestationAuth.md)
  - [OAuth Token Endpoint Authentication Methods](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#token-endpoint-auth-method)

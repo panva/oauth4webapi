@@ -1633,6 +1633,7 @@ function formUrlEncode(token: string) {
  * @see {@link PrivateKeyJwt}
  * @see {@link None}
  * @see {@link TlsClientAuth}
+ * @see {@link AttestationAuth}
  * @see [OAuth Token Endpoint Authentication Methods](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#token-endpoint-auth-method)
  */
 export type ClientAuth = (
@@ -1757,6 +1758,65 @@ export function PrivateKeyJwt(
     body.set('client_id', client.client_id)
     body.set('client_assertion_type', 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer')
     body.set('client_assertion', await signJwt(header, payload, key))
+  }
+}
+
+function attestationPopPayload(as: AuthorizationServer, client: Client) {
+  const now = epochTime() + getClockSkew(client)
+  return {
+    jti: randomBytes(),
+    aud: as.issuer,
+    exp: now + 60,
+    iat: now,
+    nbf: now,
+    iss: client.client_id,
+  }
+}
+
+/**
+ * **`attest_jwt_client_auth`** uses the HTTP request body to send only `client_id` as
+ * `application/x-www-form-urlencoded` body parameter, `OAuth-Client-Attestation` HTTP Header field
+ * to transmit a Client Attestation JWT issued to the client instance by its Client Attester, and
+ * `OAuth-Client-Attestation-PoP` HTTP Header field to transmit a Proof of Possession (PoP) of its
+ * Client Instance Key.
+ *
+ * > [!NOTE]\
+ * > This is an experimental feature.
+ *
+ * @example
+ *
+ * ```ts
+ * let key!: oauth.CryptoKey
+ * let attestation!: string
+ *
+ * let clientAuth = oauth.AttestationAuth(attestation, key)
+ * ```
+ *
+ * @param attestation Client Attestation JWT issued to the client instance by its Client Attester.
+ * @param key Client Instance Key
+ * @param options
+ *
+ * @group Client Authentication
+ *
+ * @see [OAuth Token Endpoint Authentication Methods](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#token-endpoint-auth-method)
+ * @see [draft-ietf-oauth-attestation-based-client-auth-05 - OAuth 2.0 Attestation-Based Client Authentication](https://www.ietf.org/archive/id/draft-ietf-oauth-attestation-based-client-auth-05.html)
+ */
+export function AttestationAuth(
+  attestation: string,
+  key: CryptoKey,
+  options?: ModifyAssertionOptions,
+): ClientAuth {
+  assertString(attestation, '"attestation"')
+  assertPrivateKey(key, '"key"')
+  return async (as, client, body, headers) => {
+    const header = { alg: keyToJws(key), typ: 'oauth-client-attestation-pop+jwt' }
+    const payload = attestationPopPayload(as, client)
+
+    options?.[modifyAssertion]?.(header, payload)
+
+    body.set('client_id', client.client_id)
+    headers.set('oauth-client-attestation', attestation)
+    headers.set('oauth-client-attestation-pop', await signJwt(header, payload, key))
   }
 }
 
