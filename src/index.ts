@@ -402,9 +402,10 @@ export const modifyAssertion: unique symbol = Symbol()
 export const jweDecrypt: unique symbol = Symbol()
 
 /**
- * DANGER ZONE - This option has security implications that must be understood, assessed for
- * applicability, and accepted before use. It is critical that the JSON Web Key Set cache only be
- * writable by your own code.
+ * > [!WARNING]\
+ * > This option has security implications that must be understood, assessed for applicability, and
+ * > accepted before use. It is critical that the JSON Web Key Set cache only be writable by your own
+ * > code.
  *
  * This option is intended for cloud computing runtimes that cannot keep an in memory cache between
  * their code's invocations. Use in runtimes where an in memory cache between requests is available
@@ -2545,7 +2546,8 @@ export interface WWWAuthenticateChallengeParameters {
   readonly resource_metadata?: string
 
   /**
-   * NOTE: because the parameter names are case insensitive they are always returned lowercased
+   * > [!NOTE]\
+   * > Because the parameter names are case insensitive they are always returned lowercased
    */
   readonly [parameter: Lowercase<string>]: string | undefined
 }
@@ -2557,7 +2559,8 @@ export interface WWWAuthenticateChallenge {
   /**
    * Parsed WWW-Authenticate challenge auth-scheme
    *
-   * NOTE: because the value is case insensitive it is always returned lowercased
+   * > [!NOTE]\
+   * > Because the value is case insensitive it is always returned lowercased
    */
   readonly scheme: Lowercase<string>
   /**
@@ -3077,8 +3080,9 @@ async function getPublicSigKeyFromIssuerJwksUri(
 }
 
 /**
- * DANGER ZONE - This option has security implications that must be understood, assessed for
- * applicability, and accepted before use.
+ * > [!WARNING]\
+ * > This option has security implications that must be understood, assessed for applicability, and
+ * > accepted before use.
  *
  * Use this as a value to {@link processUserInfoResponse} `expectedSubject` parameter to skip the
  * `sub` claim value check.
@@ -3346,12 +3350,14 @@ export interface ValidateSignatureOptions extends HttpRequestOptions<'GET'>, JWK
  * Validates the JWS Signature of either a JWT {@link !Response.body} or
  * {@link TokenEndpointResponse.id_token} of a processed {@link !Response}
  *
- * Note: Validating signatures of JWTs received via direct communication between the Client and a
- * TLS-secured Endpoint (which it is here) is not mandatory since the TLS server validation is used
- * to validate the issuer instead of checking the token signature. You only need to use this method
- * for non-repudiation purposes.
+ * > [!NOTE]\
+ * > Validating signatures of JWTs received via direct communication between the Client and a
+ * > TLS-secured Endpoint (which it is here) is not mandatory since the TLS server validation is used
+ * > to validate the issuer instead of checking the token signature. You only need to use this method
+ * > for non-repudiation purposes.
  *
- * Note: Supports only digital signatures.
+ * > [!NOTE]\
+ * > Supports only digital signatures.
  *
  * @param as Authorization Server Metadata.
  * @param ref Response previously processed by this module that contained an ID Token or its
@@ -3779,7 +3785,8 @@ export interface TokenEndpointResponse {
   readonly scope?: string
   readonly authorization_details?: AuthorizationDetails[]
   /**
-   * NOTE: because the value is case insensitive it is always returned lowercased
+   * > [!NOTE]\
+   * > Because the value is case insensitive it is always returned lowercased
    */
   readonly token_type: 'bearer' | 'dpop' | Lowercase<string>
 
@@ -5277,8 +5284,9 @@ function getURLSearchParameter(parameters: URLSearchParams, name: string): strin
 }
 
 /**
- * DANGER ZONE - This option has security implications that must be understood, assessed for
- * applicability, and accepted before use.
+ * > [!WARNING]\
+ * > This option has security implications that must be understood, assessed for applicability, and
+ * > accepted before use.
  *
  * Use this as a value to {@link validateAuthResponse} `expectedState` parameter to skip the `state`
  * value check when you'll be validating such `state` value yourself instead. This should only be

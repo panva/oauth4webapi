@@ -11,12 +11,14 @@ Support from the community to continue maintaining and improving this module is 
 Validates the JWS Signature of either a JWT [Response.body](https://developer.mozilla.org/docs/Web/API/Response/body) or
 [TokenEndpointResponse.id_token](../interfaces/TokenEndpointResponse.md#id_token) of a processed [Response](https://developer.mozilla.org/docs/Web/API/Response)
 
-Note: Validating signatures of JWTs received via direct communication between the Client and a
-TLS-secured Endpoint (which it is here) is not mandatory since the TLS server validation is used
-to validate the issuer instead of checking the token signature. You only need to use this method
-for non-repudiation purposes.
+> [!NOTE]\
+> Validating signatures of JWTs received via direct communication between the Client and a
+> TLS-secured Endpoint (which it is here) is not mandatory since the TLS server validation is used
+> to validate the issuer instead of checking the token signature. You only need to use this method
+> for non-repudiation purposes.
 
-Note: Supports only digital signatures.
+> [!NOTE]\
+> Supports only digital signatures.
 
 ## Parameters
 

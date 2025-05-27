@@ -8,8 +8,9 @@ Support from the community to continue maintaining and improving this module is 
 
 • `const` **skipStateCheck**: unique `symbol`
 
-DANGER ZONE - This option has security implications that must be understood, assessed for
-applicability, and accepted before use.
+> [!WARNING]\
+> This option has security implications that must be understood, assessed for applicability, and
+> accepted before use.
 
 Use this as a value to [validateAuthResponse](../functions/validateAuthResponse.md) `expectedState` parameter to skip the `state`
 value check when you'll be validating such `state` value yourself instead. This should only be
