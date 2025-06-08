@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.5.2](https://github.com/panva/oauth4webapi/compare/v3.5.1...v3.5.2) (2025-06-08)
+
+
+### Documentation
+
+* use GitHub Flavored Markdown for notes and warnings ([d82e083](https://github.com/panva/oauth4webapi/commit/d82e08356a1f8d70322a0fdddfd17fecc411876a))
+
+
+### Refactor
+
+* use native Uint8Array<->base64 when available in the runtime ([456ba67](https://github.com/panva/oauth4webapi/commit/456ba6796dacdde287c0f2f875dd6c4996a645c9))
+
 ## [3.5.1](https://github.com/panva/oauth4webapi/compare/v3.5.0...v3.5.1) (2025-05-06)
 
 
