@@ -1164,7 +1164,7 @@ function prepareHeaders(input?: [string, string][] | Record<string, string> | He
   if (looseInstanceOf(input, Headers)) {
     input = Object.fromEntries(input.entries())
   }
-  const headers = new Headers(input)
+  const headers = new Headers(input ?? {})
 
   if (USER_AGENT && !headers.has('user-agent')) {
     headers.set('user-agent', USER_AGENT)
