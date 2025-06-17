@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.5.3](https://github.com/panva/oauth4webapi/compare/v3.5.2...v3.5.3) (2025-06-17)
+
+
+### Refactor
+
+* expose internal symbol to skip use of PKCE for authorization code flow ([d5748d0](https://github.com/panva/oauth4webapi/commit/d5748d078f49d2c8d9a03e869193d3de0b6bc96b)), closes [#176](https://github.com/panva/oauth4webapi/issues/176)
+* handle older WebOS runtimes' Header constructors ([b37330f](https://github.com/panva/oauth4webapi/commit/b37330ffab5ac3a9468c1e5f94c482326fc20e3a)), closes [#178](https://github.com/panva/oauth4webapi/issues/178)
+
 ## [3.5.2](https://github.com/panva/oauth4webapi/compare/v3.5.1...v3.5.2) (2025-06-08)
 
 
