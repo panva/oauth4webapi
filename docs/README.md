@@ -269,6 +269,7 @@ Support from the community to continue maintaining and improving this module is 
 - [jweDecrypt](variables/jweDecrypt.md)
 - [jwksCache](variables/jwksCache.md)
 - [modifyAssertion](variables/modifyAssertion.md)
+- [nopkce](variables/nopkce.md)
 - [skipAuthTimeCheck](variables/skipAuthTimeCheck.md)
 - [skipStateCheck](variables/skipStateCheck.md)
 - [skipSubjectCheck](variables/skipSubjectCheck.md)

@@ -3653,6 +3653,22 @@ function brand(searchParams: URLSearchParams) {
 }
 
 /**
+ * > [!WARNING]\
+ * > This option has security implications that must be understood, assessed for applicability, and
+ * > accepted before use.
+ *
+ * Use this as a value to {@link authorizationCodeGrantRequest} `codeVerifier` parameter to skip the
+ * use of PKCE.
+ *
+ * @deprecated To make it stand out as something you shouldn't have the need to use as the use of
+ *   PKCE is backwards compatible with authorization servers that don't support it and properly
+ *   ignore unrecognized parameters.
+ *
+ * @see [RFC 7636 - Proof Key for Code Exchange (PKCE)](https://www.rfc-editor.org/rfc/rfc7636.html)
+ */
+export const nopkce: unique symbol = Symbol()
+
+/**
  * Performs an Authorization Code grant request at the
  * {@link AuthorizationServer.token_endpoint `as.token_endpoint`}.
  *
@@ -3681,7 +3697,7 @@ export async function authorizationCodeGrantRequest(
   clientAuthentication: ClientAuth,
   callbackParameters: URLSearchParams,
   redirectUri: string,
-  codeVerifier: string,
+  codeVerifier: string | typeof nopkce,
   options?: TokenEndpointRequestOptions,
 ): Promise<Response> {
   assertAs(as)
@@ -3705,8 +3721,7 @@ export async function authorizationCodeGrantRequest(
   parameters.set('redirect_uri', redirectUri)
   parameters.set('code', code)
 
-  // @ts-expect-error
-  if (codeVerifier !== _nopkce) {
+  if (codeVerifier !== nopkce) {
     assertString(codeVerifier, '"codeVerifier"')
     parameters.set('code_verifier', codeVerifier)
   }
@@ -6586,7 +6601,7 @@ async function getResponseJsonBody<T = JsonObject>(
  *
  * @internal
  */
-export const _nopkce: unique symbol = Symbol()
+export const _nopkce = nopkce
 
 /**
  * This is not part of the public API.
