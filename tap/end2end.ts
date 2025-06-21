@@ -93,7 +93,7 @@ export default (QUnit: QUnit) => {
       params.set('client_id', client.client_id)
       params.set('code_challenge', code_challenge)
       params.set('code_challenge_method', code_challenge_method)
-      params.set('redirect_uri', 'http://localhost:3000/cb')
+      params.set('redirect_uri', 'http://localhost:8080/cb')
       params.set('response_type', hybrid ? 'code id_token' : 'code')
       params.set('scope', 'openid offline_access')
       params.set('prompt', 'consent')
@@ -218,7 +218,7 @@ export default (QUnit: QUnit) => {
             client,
             clientAuth,
             callbackParams,
-            'http://localhost:3000/cb',
+            'http://localhost:8080/cb',
             code_verifier,
             { DPoP, [lib.allowInsecureRequests]: true },
           )

@@ -1,8 +1,12 @@
 import * as crypto from 'node:crypto'
 import { promisify } from 'node:util'
+import { createServer } from 'node:http'
+import { once } from 'node:events'
 
-import * as puppeteer from 'puppeteer-core'
-import { getChromePath } from 'chrome-launcher'
+import { fetch } from 'undici'
+import { CookieJar } from 'tough-cookie'
+import { CookieAgent } from 'http-cookie-agent/undici'
+import { Browser } from 'happy-dom'
 import Provider from 'oidc-provider'
 import raw from 'raw-body'
 
@@ -88,6 +92,15 @@ provider.Client.Schema.prototype.invalidate = function invalidate(message, code)
   orig.call(this, message)
 }
 
+let location
+provider.use(async (ctx, next) => {
+  try {
+    await next()
+  } finally {
+    location = ctx.response.headers.location
+  }
+})
+
 const cors = koaCors()
 provider.use((ctx, next) => {
   if (ctx.URL.pathname === '/drive' || ctx.URL.pathname === '/reg') {
@@ -148,78 +161,114 @@ provider.use(async (ctx, next) => {
 
   if (ctx.URL.pathname === '/drive' && ctx.method === 'POST') {
     let browser
+    let rp
     try {
+      const jar = new CookieJar()
+      const agent = new CookieAgent({ cookies: { jar } })
+
       const body = await raw(ctx.req, {
         length: ctx.request.length,
         encoding: ctx.charset,
       })
       const params = new URLSearchParams(body.toString())
-      const target = params.get('goto')
+      let target = new URL(params.get('goto'))
+      const cancel = params.has('cancel')
+      browser = new Browser()
+      const page = browser.newPage()
+      rp = createServer((req, res) => {
+        res.statusCode = 204
+        res.setHeader('Content-Length', '0')
+        res.end()
+      }).listen(8080)
+      await once(rp, 'listening')
 
-      console.log('\n\n=====')
-      console.log('starting user interaction on', target)
-
-      browser = await puppeteer.launch({
-        executablePath: getChromePath(),
-        headless: 'new',
+      let response = await fetch(target, {
+        dispatcher: agent,
+        redirect: 'follow',
       })
 
-      const s = '[type="submit"]'
-
-      const page = await browser.newPage()
-      await Promise.all([
-        page.goto(target),
-        page.waitForSelector(s),
-        page.waitForNetworkIdle({ idleTime: 100 }),
-      ])
-
-      let pending = true
-      let deviceFlow
-      let destination
-      while (pending) {
-        let title
-        try {
-          title = await page.title()
-        } catch {
-          continue
+      while (target) {
+        if (target.origin === 'http://localhost:8080') {
+          ctx.body = location
+          break
         }
-        switch (title) {
-          case 'Device Login Confirmation':
-            deviceFlow = true
-            await Promise.all([
-              page.click(s),
-              page.waitForFunction('document.title === "Sign-in"'),
-              page.waitForNetworkIdle({ idleTime: 100 }),
-            ])
-            break
-          case 'Sign-in':
-            await page.type('[name="login"]', 'user')
-            await page.type('[name="password"]', 'pass')
-            await Promise.all([
-              page.click(s),
-              page.waitForFunction('document.title === "Consent"'),
-              page.waitForNetworkIdle({ idleTime: 100 }),
-            ])
-            break
-          case 'Consent':
-            await Promise.all([page.click(s), page.waitForNetworkIdle({ idleTime: 100 })])
-            pending = false
-            destination = deviceFlow ? '/device/' : '/cb'
-            break
+
+        if (response.bodyUsed) {
+          response = await fetch(target, {
+            dispatcher: agent,
+            redirect: 'follow',
+          })
+        }
+
+        page.url = response.url
+        page.content = await response.text()
+
+        let document = page.mainFrame.window.document
+        switch (document.title) {
+          case 'Sign-in': {
+            if (cancel) {
+              response = await fetch(document.links[0].href, {
+                dispatcher: agent,
+                redirect: 'follow',
+              })
+            } else {
+              response = await fetch(document.forms[0].action, {
+                dispatcher: agent,
+                method: 'POST',
+                redirect: 'follow',
+                body: new URLSearchParams({
+                  prompt: 'login',
+                  login: 'user',
+                  password: 'pass',
+                }),
+              })
+            }
+            target = new URL(response.url)
+            continue
+          }
+          case 'Consent': {
+            response = await fetch(document.forms[0].action, {
+              dispatcher: agent,
+              method: 'POST',
+              redirect: 'follow',
+              body: new URLSearchParams({
+                prompt: 'consent',
+              }),
+            })
+
+            target = new URL(response.url)
+            continue
+          }
+          case 'Sign-in Success': {
+            target = new URL('http://localhost:8080')
+            continue
+          }
+          case 'Device Login Confirmation': // Fall through
+          case 'Submitting Callback': {
+            const body = new URLSearchParams()
+            for (const input of document.forms[0].getElementsByTagName('input')) {
+              body.append(input.name, input.value)
+            }
+            response = await fetch(document.forms[0].action, {
+              dispatcher: agent,
+              method: 'POST',
+              redirect: 'follow',
+              body: body.size ? body : undefined,
+            })
+
+            target = new URL(response.url)
+            continue
+          }
           default:
-            throw new Error(title)
+            console.log(page.url)
+            console.log(page.content)
+            throw new Error(document.title)
         }
       }
-
-      while (page.url().includes(destination) === false) {
-        await page.waitForNetworkIdle({ idleTime: 100 })
-      }
-
-      ctx.body = page.url()
-      console.log('done on title:', await page.title(), 'url:', ctx.body)
-      console.log('=====\n\n')
     } finally {
       await browser?.close()
+      rp?.close()
+      if (rp) await once(rp, 'close')
     }
   } else if (ctx.URL.pathname === '/cb') {
     ctx.body = ctx.URL.href
