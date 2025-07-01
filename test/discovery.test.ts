@@ -96,6 +96,20 @@ test('discoveryRequest() - oauth2 with a pathname', async (t) => {
   t.pass()
 })
 
+test('discoveryRequest() - oauth2 with a pathname and issuer terminating "/"', async (t) => {
+  const data = { issuer: 'https://op.example.com/path/' }
+  t.context
+    .intercept({
+      path: '/.well-known/oauth-authorization-server/path',
+      method: 'GET',
+    })
+    .reply(200, data)
+
+  const url = new URL(data.issuer)
+  await lib.discoveryRequest(url, { algorithm: 'oauth2' })
+  t.pass()
+})
+
 test('processDiscoveryResponse()', async (t) => {
   const expected = new URL('https://op.example.com')
 

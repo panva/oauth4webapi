@@ -1206,7 +1206,7 @@ function prependWellKnown(url: URL, wellKnown: string) {
   if (url.pathname === '/') {
     url.pathname = wellKnown
   } else {
-    url.pathname = replaceDoubleSlash(`${wellKnown}/${url.pathname}`)
+    url.pathname = replaceDoubleSlash(`${wellKnown}/${url.pathname.replace(/(\/)$/, '')}`)
   }
   return url
 }
