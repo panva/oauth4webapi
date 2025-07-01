@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.5.4](https://github.com/panva/oauth4webapi/compare/v3.5.3...v3.5.4) (2025-07-01)
+
+
+### Fixes
+
+* **RFC8414:** strip any terminating "/" when pathname is present ([50d8307](https://github.com/panva/oauth4webapi/commit/50d8307a8745ed9cdf836974e0cad39f7f76b031))
+
 ## [3.5.3](https://github.com/panva/oauth4webapi/compare/v3.5.2...v3.5.3) (2025-06-17)
 
 
