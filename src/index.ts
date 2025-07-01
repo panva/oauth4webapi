@@ -1202,11 +1202,13 @@ function replaceDoubleSlash(pathname: string) {
   return pathname
 }
 
-function prependWellKnown(url: URL, wellKnown: string) {
+function prependWellKnown(url: URL, wellKnown: string, allowTerminatingSlash = false) {
   if (url.pathname === '/') {
     url.pathname = wellKnown
   } else {
-    url.pathname = replaceDoubleSlash(`${wellKnown}/${url.pathname.replace(/(\/)$/, '')}`)
+    url.pathname = replaceDoubleSlash(
+      `${wellKnown}/${allowTerminatingSlash ? url.pathname : url.pathname.replace(/(\/)$/, '')}`,
+    )
   }
   return url
 }
@@ -6510,7 +6512,7 @@ export async function resourceDiscoveryRequest(
     resourceIdentifier,
     'resourceIdentifier',
     (url) => {
-      prependWellKnown(url, '.well-known/oauth-protected-resource')
+      prependWellKnown(url, '.well-known/oauth-protected-resource', true)
       return url
     },
     options,

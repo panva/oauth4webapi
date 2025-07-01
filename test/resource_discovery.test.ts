@@ -69,6 +69,20 @@ test('resourceDiscoveryRequest() with a pathname', async (t) => {
   t.pass()
 })
 
+test('resourceDiscoveryRequest() with a pathname and terminating "/"', async (t) => {
+  const data = { resource: 'https://rs.example.com/path/' }
+  t.context
+    .intercept({
+      path: '/.well-known/oauth-protected-resource/path/',
+      method: 'GET',
+    })
+    .reply(200, data)
+
+  const url = new URL(data.resource)
+  await lib.resourceDiscoveryRequest(url)
+  t.pass()
+})
+
 test('processResourceDiscoveryResponse()', async (t) => {
   const expected = new URL(resource)
 
