@@ -18,7 +18,7 @@ Token Grant Type, or SAML 2.0 Bearer Assertion Grant Type.
 | ------ | ------ | ------ |
 | `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata. |
 | `client` | [`Client`](../interfaces/Client.md) | Client Metadata. |
-| `clientAuthentication` | [`ClientAuth`](../type-aliases/ClientAuth.md) | Client Authentication Method. |
+| `clientAuthentication` | [`ClientAuth`](../interfaces/ClientAuth.md) | Client Authentication Method. |
 | `grantType` | `string` | Grant Type. |
 | `parameters` | [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `string`\> \| [`URLSearchParams`](https://developer.mozilla.org/docs/Web/API/URLSearchParams) \| `string`[][] | - |
 | `options`? | [`Omit`](https://www.typescriptlang.org/docs/handbook/utility-types.html#omittype-keys)\<[`TokenEndpointRequestOptions`](../interfaces/TokenEndpointRequestOptions.md), `"additionalParameters"`\> | - |

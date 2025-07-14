@@ -6,7 +6,7 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
-▸ **PrivateKeyJwt**(`clientPrivateKey`, `options`?): [`ClientAuth`](../type-aliases/ClientAuth.md)
+▸ **PrivateKeyJwt**(`clientPrivateKey`, `options`?): [`ClientAuth`](../interfaces/ClientAuth.md)
 
 **`private_key_jwt`** uses the HTTP request body to send `client_id`, `client_assertion_type`,
 and `client_assertion` as `application/x-www-form-urlencoded` body parameters. Digital signature
@@ -21,7 +21,7 @@ is used for the assertion's authenticity and integrity.
 
 ## Returns
 
-[`ClientAuth`](../type-aliases/ClientAuth.md)
+[`ClientAuth`](../interfaces/ClientAuth.md)
 
 ## Example
 

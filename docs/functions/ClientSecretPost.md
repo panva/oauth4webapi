@@ -6,7 +6,7 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
-▸ **ClientSecretPost**(`clientSecret`): [`ClientAuth`](../type-aliases/ClientAuth.md)
+▸ **ClientSecretPost**(`clientSecret`): [`ClientAuth`](../interfaces/ClientAuth.md)
 
 **`client_secret_post`** uses the HTTP request body to send `client_id` and `client_secret` as
 `application/x-www-form-urlencoded` body parameters
@@ -19,7 +19,7 @@ Support from the community to continue maintaining and improving this module is 
 
 ## Returns
 
-[`ClientAuth`](../type-aliases/ClientAuth.md)
+[`ClientAuth`](../interfaces/ClientAuth.md)
 
 ## Example
 

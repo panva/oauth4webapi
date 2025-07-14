@@ -43,6 +43,7 @@ Support from the community to continue maintaining and improving this module is 
 
 ## Client Authentication
 
+- [AttestationAuth](functions/AttestationAuth.md)
 - [ClientSecretBasic](functions/ClientSecretBasic.md)
 - [ClientSecretJwt](functions/ClientSecretJwt.md)
 - [ClientSecretPost](functions/ClientSecretPost.md)
@@ -109,6 +110,8 @@ Support from the community to continue maintaining and improving this module is 
 - [ResponseBodyError](classes/ResponseBodyError.md)
 - [UnsupportedOperationError](classes/UnsupportedOperationError.md)
 - [WWWAuthenticateChallengeError](classes/WWWAuthenticateChallengeError.md)
+- [isAttestationAuthChallengeError](functions/isAttestationAuthChallengeError.md)
+- [isDPoPNonceError](functions/isDPoPNonceError.md)
 
 ## FAPI 1.0 Advanced
 
@@ -204,6 +207,7 @@ Support from the community to continue maintaining and improving this module is 
 - [BackchannelAuthenticationRequestOptions](interfaces/BackchannelAuthenticationRequestOptions.md)
 - [BackchannelAuthenticationResponse](interfaces/BackchannelAuthenticationResponse.md)
 - [Client](interfaces/Client.md)
+- [ClientAuth](interfaces/ClientAuth.md)
 - [ClientCredentialsGrantRequestOptions](interfaces/ClientCredentialsGrantRequestOptions.md)
 - [ConfirmationClaims](interfaces/ConfirmationClaims.md)
 - [CryptoKeyPair](interfaces/CryptoKeyPair.md)
@@ -247,7 +251,6 @@ Support from the community to continue maintaining and improving this module is 
 
 ## Type Aliases
 
-- [ClientAuth](type-aliases/ClientAuth.md)
 - [JsonArray](type-aliases/JsonArray.md)
 - [JsonObject](type-aliases/JsonObject.md)
 - [JsonPrimitive](type-aliases/JsonPrimitive.md)

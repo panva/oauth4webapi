@@ -17,7 +17,7 @@ Performs an Authorization Code grant request at the
 | ------ | ------ | ------ |
 | `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata. |
 | `client` | [`Client`](../interfaces/Client.md) | Client Metadata. |
-| `clientAuthentication` | [`ClientAuth`](../type-aliases/ClientAuth.md) | Client Authentication Method. |
+| `clientAuthentication` | [`ClientAuth`](../interfaces/ClientAuth.md) | Client Authentication Method. |
 | `callbackParameters` | [`URLSearchParams`](https://developer.mozilla.org/docs/Web/API/URLSearchParams) | Parameters obtained from the callback to redirect_uri, this is returned from [validateAuthResponse](validateAuthResponse.md), or [validateJwtAuthResponse](validateJwtAuthResponse.md). |
 | `redirectUri` | `string` | `redirect_uri` value used in the authorization request. |
 | `codeVerifier` | `string` \| *typeof* [`nopkce`](../variables/nopkce.md) | PKCE `code_verifier` to send to the token endpoint. |

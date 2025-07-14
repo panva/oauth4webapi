@@ -17,7 +17,7 @@ Performs a Device Authorization Grant request at the
 | ------ | ------ | ------ |
 | `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata. |
 | `client` | [`Client`](../interfaces/Client.md) | Client Metadata. |
-| `clientAuthentication` | [`ClientAuth`](../type-aliases/ClientAuth.md) | Client Authentication Method. |
+| `clientAuthentication` | [`ClientAuth`](../interfaces/ClientAuth.md) | Client Authentication Method. |
 | `deviceCode` | `string` | Device Code. This is the [`device_code`](../interfaces/DeviceAuthorizationResponse.md#device_code) retrieved from [processDeviceAuthorizationResponse](processDeviceAuthorizationResponse.md). |
 | `options`? | [`TokenEndpointRequestOptions`](../interfaces/TokenEndpointRequestOptions.md) | - |
 

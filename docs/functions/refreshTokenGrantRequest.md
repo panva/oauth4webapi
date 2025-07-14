@@ -17,7 +17,7 @@ Performs a Refresh Token Grant request at the
 | ------ | ------ | ------ |
 | `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata. |
 | `client` | [`Client`](../interfaces/Client.md) | Client Metadata. |
-| `clientAuthentication` | [`ClientAuth`](../type-aliases/ClientAuth.md) | Client Authentication Method. |
+| `clientAuthentication` | [`ClientAuth`](../interfaces/ClientAuth.md) | Client Authentication Method. |
 | `refreshToken` | `string` | Refresh Token value. |
 | `options`? | [`TokenEndpointRequestOptions`](../interfaces/TokenEndpointRequestOptions.md) | - |
 

@@ -6,7 +6,7 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
-▸ **None**(): [`ClientAuth`](../type-aliases/ClientAuth.md)
+▸ **None**(): [`ClientAuth`](../interfaces/ClientAuth.md)
 
 **`none`** (public client) uses the HTTP request body to send only `client_id` as
 `application/x-www-form-urlencoded` body parameter.
@@ -17,7 +17,7 @@ let clientAuth = oauth.None()
 
 ## Returns
 
-[`ClientAuth`](../type-aliases/ClientAuth.md)
+[`ClientAuth`](../interfaces/ClientAuth.md)
 
 ## See
 

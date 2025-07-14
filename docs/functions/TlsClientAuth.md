@@ -6,7 +6,7 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
-▸ **TlsClientAuth**(): [`ClientAuth`](../type-aliases/ClientAuth.md)
+▸ **TlsClientAuth**(): [`ClientAuth`](../interfaces/ClientAuth.md)
 
 **`tls_client_auth`** uses the HTTP request body to send only `client_id` as
 `application/x-www-form-urlencoded` body parameter and the mTLS key and certificate is configured
@@ -18,7 +18,7 @@ let clientAuth = oauth.TlsClientAuth()
 
 ## Returns
 
-[`ClientAuth`](../type-aliases/ClientAuth.md)
+[`ClientAuth`](../interfaces/ClientAuth.md)
 
 ## See
 

@@ -780,6 +780,11 @@ export interface AuthorizationServer {
    * JSON array containing a list of resource identifiers for OAuth protected resources.
    */
   readonly protected_resources?: string[]
+  /**
+   * URL at the authorization server which is used to obtain a fresh challenge e.g. for usage in
+   * client authentication methods such as client attestation.
+   */
+  readonly challenge_endpoint?: string
 
   readonly [metadata: string]: JsonValue | undefined
 }
@@ -1668,14 +1673,24 @@ function formUrlEncode(token: string) {
  * @see {@link PrivateKeyJwt}
  * @see {@link None}
  * @see {@link TlsClientAuth}
+ * @see {@link AttestationAuth}
  * @see [OAuth Token Endpoint Authentication Methods](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#token-endpoint-auth-method)
  */
-export type ClientAuth = (
-  as: AuthorizationServer,
-  client: Client,
-  body: URLSearchParams,
-  headers: Headers,
-) => void | Promise<void>
+export interface ClientAuth {
+  (
+    as: AuthorizationServer,
+    client: Client,
+    body: URLSearchParams,
+    headers: Headers,
+  ): void | Promise<void>
+
+  beforeRequest?: (
+    as: AuthorizationServer,
+    client: Client,
+    options?: Omit<HttpRequestOptions<'POST', URLSearchParams>, 'headers'>,
+  ) => Promise<void>
+  afterHeaders?: (headers: Headers) => void
+}
 
 /**
  * **`client_secret_post`** uses the HTTP request body to send `client_id` and `client_secret` as
@@ -1793,6 +1808,132 @@ export function PrivateKeyJwt(
     body.set('client_assertion_type', 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer')
     body.set('client_assertion', await signJwt(header, payload, key))
   }
+}
+
+function attestationPopPayload(as: AuthorizationServer, client: Client, challenge?: string) {
+  const now = epochTime() + getClockSkew(client)
+  return {
+    jti: randomBytes(),
+    aud: as.issuer,
+    iat: now,
+    iss: client.client_id,
+    challenge,
+  }
+}
+
+/**
+ * **`attest_jwt_client_auth`** uses the HTTP request body to send only `client_id` as
+ * `application/x-www-form-urlencoded` body parameter, `OAuth-Client-Attestation` HTTP Header field
+ * to transmit a Client Attestation JWT issued to the client instance by its Client Attester, and
+ * `OAuth-Client-Attestation-PoP` HTTP Header field to transmit a Proof of Possession (PoP) of its
+ * Client Instance Key.
+ *
+ * This implementation will fetch the
+ * {@link AuthorizationServer.challenge_endpoint `as.challenge_endpoint`} (if one is available) once
+ * to fetch an initial `challenge` claim value before the authenticated request is made. Afterwards
+ * it will keep track of the latest `challenge` based on the response's
+ * `OAuth-Client-Attestation-Challenge` HTTP Header (if one was returned).
+ *
+ * {@link isAttestationAuthChallengeError} can be used to determine if a rejected error indicates the
+ * need to retry the request due to an expired/missing Attestation PoP JWT challenge.
+ *
+ * > [!NOTE]\
+ * > This is an experimental feature not subject to semantic versioning guarantees.
+ *
+ * @example
+ *
+ * ```ts
+ * let key!: oauth.CryptoKey
+ * let attestation!: string
+ *
+ * let clientAuth = oauth.AttestationAuth(attestation, key)
+ * ```
+ *
+ * @param attestation Client Attestation JWT issued to the client instance by its Client Attester.
+ * @param key Client Instance Key
+ * @param options
+ *
+ * @group Client Authentication
+ *
+ * @see [OAuth Token Endpoint Authentication Methods](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#token-endpoint-auth-method)
+ * @see [draft-ietf-oauth-attestation-based-client-auth-06 - OAuth 2.0 Attestation-Based Client Authentication](https://www.ietf.org/archive/id/draft-ietf-oauth-attestation-based-client-auth-06.html)
+ */
+export function AttestationAuth(
+  attestation: string,
+  key: CryptoKey,
+  options?: ModifyAssertionOptions,
+): ClientAuth {
+  assertString(attestation, '"attestation"')
+  assertPrivateKey(key, '"key"')
+  let challenge!: string | undefined | null
+  const auth: ClientAuth = async (as, client, body, headers) => {
+    const header = { alg: keyToJws(key), typ: 'oauth-client-attestation-pop+jwt' }
+    const payload = attestationPopPayload(
+      as,
+      client,
+      typeof challenge === 'string' ? challenge : undefined,
+    )
+
+    options?.[modifyAssertion]?.(header, payload)
+
+    body.set('client_id', client.client_id)
+    headers.set('oauth-client-attestation', attestation)
+    headers.set('oauth-client-attestation-pop', await signJwt(header, payload, key))
+  }
+
+  auth.beforeRequest = async function (as, _client, options) {
+    if (!challenge && as.challenge_endpoint) {
+      const url = resolveEndpoint(
+        as,
+        'challenge_endpoint',
+        false,
+        options?.[allowInsecureRequests] !== true,
+      )
+
+      const headers = prepareHeaders()
+      headers.set('accept', 'application/json')
+
+      const response = await (options?.[customFetch] || fetch)(url.href, {
+        // @ts-expect-error
+        body: undefined,
+        headers: Object.fromEntries(headers.entries()),
+        method: 'POST',
+        redirect: 'manual',
+        signal: signal(url, options?.signal),
+      })
+
+      assertReadableResponse(response)
+      const json = await getResponseJsonBody(response)
+
+      if (typeof json.attestation_challenge === 'string') {
+        challenge = json.attestation_challenge
+      } else {
+        auth.beforeRequest = undefined
+      }
+    } else if (!as.challenge_endpoint) {
+      auth.beforeRequest = undefined
+    }
+  }
+
+  auth.afterHeaders = (headers) => {
+    challenge = headers.get('oauth-client-attestation-challenge')
+  }
+
+  return auth
+}
+
+/**
+ * Used to determine if a rejected error indicates the need to retry the request due to an
+ * expired/missing Attestation PoP JWT challenge.
+ *
+ * @group Errors
+ */
+export function isAttestationAuthChallengeError(err: unknown): boolean {
+  if (err instanceof ResponseBodyError) {
+    return err.error === 'use_attestation_challenge'
+  }
+
+  return false
 }
 
 /**
@@ -2301,9 +2442,10 @@ class DPoPHandler implements DPoPHandle {
 
 /**
  * Used to determine if a rejected error indicates the need to retry the request due to an
- * expired/missing nonce.
+ * expired/missing DPoP JWT nonce.
  *
  * @group DPoP
+ * @group Errors
  */
 export function isDPoPNonceError(err: unknown): boolean {
   if (err instanceof WWWAuthenticateChallengeError) {
@@ -3247,16 +3389,21 @@ async function authenticatedRequest(
   headers: Headers,
   options?: Omit<HttpRequestOptions<'POST', URLSearchParams>, 'headers'>,
 ) {
+  await clientAuthentication.beforeRequest?.(as, client, options)
   await clientAuthentication(as, client, body, headers)
   headers.set('content-type', 'application/x-www-form-urlencoded;charset=UTF-8')
 
-  return (options?.[customFetch] || fetch)(url.href, {
+  const response = await (options?.[customFetch] || fetch)(url.href, {
     body,
     headers: Object.fromEntries(headers.entries()),
     method: 'POST',
     redirect: 'manual',
     signal: signal(url, options?.signal),
   })
+
+  clientAuthentication.afterHeaders?.(response.headers)
+
+  return response
 }
 
 export interface TokenEndpointRequestOptions

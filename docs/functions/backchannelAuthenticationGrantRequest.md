@@ -17,7 +17,7 @@ Performs a Backchannel Authentication Grant request at the
 | ------ | ------ | ------ |
 | `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata. |
 | `client` | [`Client`](../interfaces/Client.md) | Client Metadata. |
-| `clientAuthentication` | [`ClientAuth`](../type-aliases/ClientAuth.md) | Client Authentication Method. |
+| `clientAuthentication` | [`ClientAuth`](../interfaces/ClientAuth.md) | Client Authentication Method. |
 | `authReqId` | `string` | Unique identifier to identify the authentication request. This is the [`auth_req_id`](../interfaces/BackchannelAuthenticationResponse.md#auth_req_id) retrieved from [processBackchannelAuthenticationResponse](processBackchannelAuthenticationResponse.md). |
 | `options`? | [`TokenEndpointRequestOptions`](../interfaces/TokenEndpointRequestOptions.md) | - |
 
