@@ -79,7 +79,7 @@ Indicates whether DPoP use is required.
 
 ### signal?
 
-• `optional` **signal**: [`AbortSignal`](https://developer.mozilla.org/docs/Web/API/AbortSignal) \| () => [`AbortSignal`](https://developer.mozilla.org/docs/Web/API/AbortSignal)
+• `optional` **signal**: [`AbortSignal`](https://developer.mozilla.org/docs/Web/API/AbortSignal) \| (`url`) => [`AbortSignal`](https://developer.mozilla.org/docs/Web/API/AbortSignal)
 
 An AbortSignal instance, or a factory returning one, to abort the HTTP request(s) triggered by
 this function's invocation.

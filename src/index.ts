@@ -1112,7 +1112,7 @@ export interface HttpRequestOptions<Method, BodyType = undefined> {
    * let signal = () => AbortSignal.timeout(5_000) // Note: AbortSignal.timeout may not yet be available in all runtimes.
    * ```
    */
-  signal?: (() => AbortSignal) | AbortSignal
+  signal?: ((url: string) => AbortSignal) | AbortSignal
 
   /**
    * Headers to additionally send with the HTTP request(s) triggered by this function's invocation.
@@ -1180,16 +1180,18 @@ function prepareHeaders(input?: [string, string][] | Record<string, string> | He
   return headers
 }
 
-function signal(value: Exclude<HttpRequestOptions<any>['signal'], undefined>): AbortSignal {
-  if (typeof value === 'function') {
-    value = value()
-  }
+function signal(url: URL, value: HttpRequestOptions<any>['signal']): AbortSignal | undefined {
+  if (value !== undefined) {
+    if (typeof value === 'function') {
+      value = value(url.href)
+    }
 
-  if (!(value instanceof AbortSignal)) {
-    throw CodedTypeError(
-      '"options.signal" must return or be an instance of AbortSignal',
-      ERR_INVALID_ARG_TYPE,
-    )
+    if (!(value instanceof AbortSignal)) {
+      throw CodedTypeError(
+        '"options.signal" must return or be an instance of AbortSignal',
+        ERR_INVALID_ARG_TYPE,
+      )
+    }
   }
 
   return value
@@ -1240,7 +1242,7 @@ async function performDiscovery(
     headers: Object.fromEntries(headers.entries()),
     method: 'GET',
     redirect: 'manual',
-    signal: options?.signal ? signal(options.signal) : undefined,
+    signal: signal(url, options?.signal),
   })
 }
 
@@ -2823,7 +2825,7 @@ async function resourceRequest(
     headers: Object.fromEntries(headers.entries()),
     method,
     redirect: 'manual',
-    signal: options?.signal ? signal(options.signal) : undefined,
+    signal: signal(url, options?.signal),
   })
   options?.DPoP?.cacheNonce(response)
   return response
@@ -3253,7 +3255,7 @@ async function authenticatedRequest(
     headers: Object.fromEntries(headers.entries()),
     method: 'POST',
     redirect: 'manual',
-    signal: options?.signal ? signal(options.signal) : undefined,
+    signal: signal(url, options?.signal),
   })
 }
 
@@ -4566,7 +4568,7 @@ async function jwksRequest(
     headers: Object.fromEntries(headers.entries()),
     method: 'GET',
     redirect: 'manual',
-    signal: options?.signal ? signal(options.signal) : undefined,
+    signal: signal(url, options?.signal),
   })
 }
 
@@ -6335,7 +6337,7 @@ export async function dynamicClientRegistrationRequest(
     headers: Object.fromEntries(headers.entries()),
     method,
     redirect: 'manual',
-    signal: options?.signal ? signal(options.signal) : undefined,
+    signal: signal(url, options?.signal),
   })
   options?.DPoP?.cacheNonce(response)
   return response
