@@ -950,7 +950,7 @@ if (Uint8Array.prototype.toBase64) {
 
     const arr = []
     for (let i = 0; i < input.byteLength; i += CHUNK_SIZE) {
-      // @ts-expect-error
+      // @ts-ignore
       arr.push(String.fromCharCode.apply(null, input.subarray(i, i + CHUNK_SIZE)))
     }
     return btoa(arr.join('')).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_')
@@ -1192,9 +1192,11 @@ function signal(url: URL, value: HttpRequestOptions<any>['signal']): AbortSignal
         ERR_INVALID_ARG_TYPE,
       )
     }
+
+    return value
   }
 
-  return value
+  return undefined
 }
 
 function replaceDoubleSlash(pathname: string) {
