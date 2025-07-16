@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.6.0](https://github.com/panva/oauth4webapi/compare/v3.5.5...v3.6.0) (2025-07-16)
+
+
+### Features
+
+* add request's url as a signal function option argument ([aab6c30](https://github.com/panva/oauth4webapi/commit/aab6c30b78301b0cb47ead6729fb2c627a8aec9c))
+
+
+### Fixes
+
+* allow 0 in max_age and expires_in ([15c0c50](https://github.com/panva/oauth4webapi/commit/15c0c50f41c8bc2be3b762cde1c7b4df1b9a7d9f)), closes [#182](https://github.com/panva/oauth4webapi/issues/182)
+
+
+### Refactor
+
+* update signal() resolver for new Deno check rules ([4791e9c](https://github.com/panva/oauth4webapi/commit/4791e9cdda3a43931a6ccabfc83329400327e0af))
+
 ## [3.5.5](https://github.com/panva/oauth4webapi/compare/v3.5.4...v3.5.5) (2025-07-01)
 
 
