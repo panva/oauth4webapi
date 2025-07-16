@@ -2736,7 +2736,7 @@ export async function processPushedAuthorizationResponse(
 
   let expiresIn: unknown =
     typeof json.expires_in !== 'number' ? parseFloat(json.expires_in) : json.expires_in
-  assertNumber(expiresIn, false, '"response" body "expires_in" property', INVALID_RESPONSE, {
+  assertNumber(expiresIn, true, '"response" body "expires_in" property', INVALID_RESPONSE, {
     body: json,
   })
   json.expires_in = expiresIn
@@ -3474,7 +3474,7 @@ async function processGenericAccessTokenResponse(
   if (json.expires_in !== undefined) {
     let expiresIn: unknown =
       typeof json.expires_in !== 'number' ? parseFloat(json.expires_in) : json.expires_in
-    assertNumber(expiresIn, false, '"response" body "expires_in" property', INVALID_RESPONSE, {
+    assertNumber(expiresIn, true, '"response" body "expires_in" property', INVALID_RESPONSE, {
       body: json,
     })
     json.expires_in = expiresIn
@@ -3503,7 +3503,7 @@ async function processGenericAccessTokenResponse(
     }
 
     if (client.default_max_age !== undefined) {
-      assertNumber(client.default_max_age, false, '"client.default_max_age"')
+      assertNumber(client.default_max_age, true, '"client.default_max_age"')
       requiredClaims.push('auth_time')
     }
 
@@ -3947,7 +3947,7 @@ async function processAuthorizationCodeOpenIDResponse(
     case skipAuthTimeCheck:
       break
     default:
-      assertNumber(maxAge, false, '"maxAge" argument')
+      assertNumber(maxAge, true, '"maxAge" argument')
       additionalRequiredClaims.push('auth_time')
   }
 
@@ -4006,7 +4006,7 @@ async function processAuthorizationCodeOAuth2Response(
   const claims = getValidatedIdTokenClaims(result)
   if (claims) {
     if (client.default_max_age !== undefined) {
-      assertNumber(client.default_max_age, false, '"client.default_max_age"')
+      assertNumber(client.default_max_age, true, '"client.default_max_age"')
       const now = epochTime() + getClockSkew(client)
       const tolerance = getClockTolerance(client)
       if (claims.auth_time! + client.default_max_age < now - tolerance) {
@@ -5141,9 +5141,9 @@ async function validateHybridResponse(
   }
 
   if (maxAge !== undefined) {
-    assertNumber(maxAge, false, '"maxAge" argument')
+    assertNumber(maxAge, true, '"maxAge" argument')
   } else if (client.default_max_age !== undefined) {
-    assertNumber(client.default_max_age, false, '"client.default_max_age"')
+    assertNumber(client.default_max_age, true, '"client.default_max_age"')
   }
 
   maxAge ??= client.default_max_age ?? skipAuthTimeCheck
@@ -5612,7 +5612,7 @@ export async function processDeviceAuthorizationResponse(
 
   let expiresIn: unknown =
     typeof json.expires_in !== 'number' ? parseFloat(json.expires_in) : json.expires_in
-  assertNumber(expiresIn, false, '"response" body "expires_in" property', INVALID_RESPONSE, {
+  assertNumber(expiresIn, true, '"response" body "expires_in" property', INVALID_RESPONSE, {
     body: json,
   })
   json.expires_in = expiresIn
@@ -6183,7 +6183,7 @@ export async function processBackchannelAuthenticationResponse(
 
   let expiresIn: unknown =
     typeof json.expires_in !== 'number' ? parseFloat(json.expires_in) : json.expires_in
-  assertNumber(expiresIn, false, '"response" body "expires_in" property', INVALID_RESPONSE, {
+  assertNumber(expiresIn, true, '"response" body "expires_in" property', INVALID_RESPONSE, {
     body: json,
   })
   json.expires_in = expiresIn
