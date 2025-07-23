@@ -35,6 +35,14 @@ and falls back to [skipAuthTimeCheck](../variables/skipAuthTimeCheck.md).
 
 ***
 
+### recognizedTokenTypes?
+
+• `optional` **recognizedTokenTypes**: [`RecognizedTokenTypes`](../type-aliases/RecognizedTokenTypes.md)
+
+See [RecognizedTokenTypes](../type-aliases/RecognizedTokenTypes.md).
+
+***
+
 ### requireIdToken?
 
 • `optional` **requireIdToken**: `boolean`

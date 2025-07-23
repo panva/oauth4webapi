@@ -18,7 +18,7 @@ Validates Refresh Token Grant [Response](https://developer.mozilla.org/docs/Web/
 | `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata. |
 | `client` | [`Client`](../interfaces/Client.md) | Client Metadata. |
 | `response` | [`Response`](https://developer.mozilla.org/docs/Web/API/Response) | Resolved value from [refreshTokenGrantRequest](refreshTokenGrantRequest.md). |
-| `options`? | [`JWEDecryptOptions`](../interfaces/JWEDecryptOptions.md) | - |
+| `options`? | [`ProcessTokenResponseOptions`](../interfaces/ProcessTokenResponseOptions.md) | - |
 
 ## Returns
 

@@ -323,7 +323,6 @@ test('processAuthorizationCodeResponse()', async (t) => {
         JSON.stringify({
           access_token: 'token',
           token_type: 'unrecognized',
-          expires_in: new Date().toUTCString(),
         }),
       ),
     ),

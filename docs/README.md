@@ -231,6 +231,7 @@ Support from the community to continue maintaining and improving this module is 
 - [OAuth2Error](interfaces/OAuth2Error.md)
 - [PrivateKey](interfaces/PrivateKey.md)
 - [ProcessAuthorizationCodeResponseOptions](interfaces/ProcessAuthorizationCodeResponseOptions.md)
+- [ProcessTokenResponseOptions](interfaces/ProcessTokenResponseOptions.md)
 - [ProtectedResourceRequestOptions](interfaces/ProtectedResourceRequestOptions.md)
 - [PushedAuthorizationRequestOptions](interfaces/PushedAuthorizationRequestOptions.md)
 - [PushedAuthorizationResponse](interfaces/PushedAuthorizationResponse.md)
@@ -257,6 +258,7 @@ Support from the community to continue maintaining and improving this module is 
 - [JWSAlgorithm](type-aliases/JWSAlgorithm.md)
 - [OmitSymbolProperties](type-aliases/OmitSymbolProperties.md)
 - [ProtectedResourceRequestBody](type-aliases/ProtectedResourceRequestBody.md)
+- [RecognizedTokenTypes](type-aliases/RecognizedTokenTypes.md)
 
 ## Variables
 
