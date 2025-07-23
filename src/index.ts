@@ -3149,6 +3149,62 @@ export interface JWEDecryptOptions {
 }
 
 /**
+ * A record of custom `token_type` handlers for processing non-standard token types in OAuth 2.0
+ * token endpoint responses.
+ *
+ * This allows extending the library to support non-standard token types returned by the
+ * authorization server's token endpoint with optional specific processing.
+ *
+ * By default, this library recognizes and handles `bearer` and `dpop` token types. When a token
+ * endpoint response contains a different `token_type` value, you can provide custom handlers to
+ * process these tokens appropriately. Token types other than `bearer`, `dpop`, and ones represented
+ * in this record will be rejected as per https://www.rfc-editor.org/rfc/rfc6749.html#section-7.1
+ *
+ * @example
+ *
+ * Allow a custom `mac` token type
+ *
+ * ```ts
+ * let recognizedTokenTypes: oauth.RecognizedTokenTypes = {
+ *   mac: () => {},
+ * }
+ * ```
+ *
+ * @example
+ *
+ * Allow a custom `mac` token type with additional constraints put on the token endpoint JSON
+ * response
+ *
+ * ```ts
+ * let recognizedTokenTypes: oauth.RecognizedTokenTypes = {
+ *   mac: (response: Response, tokenResponse: oauth.TokenEndpointResponse) => {
+ *     if (typeof tokenResponse.id !== 'string') {
+ *       throw new oauth.UnsupportedOperationError('invalid "mac" token_type', {
+ *         cause: { body: tokenResponse },
+ *       })
+ *     }
+ *   },
+ * }
+ * ```
+ *
+ * > [!NOTE]\
+ * > Token type names are case insensitive and will be normalized to lowercase before lookup.
+ *
+ * @see [RFC 6749 - The OAuth 2.0 Authorization Framework](https://www.rfc-editor.org/rfc/rfc6749.html#section-7.1)
+ */
+export type RecognizedTokenTypes = Record<
+  Lowercase<string>,
+  (res: Response, body: TokenEndpointResponse) => void
+>
+
+export interface ProcessTokenResponseOptions extends JWEDecryptOptions {
+  /**
+   * See {@link RecognizedTokenTypes}.
+   */
+  recognizedTokenTypes?: RecognizedTokenTypes
+}
+
+/**
  * Validates {@link !Response} instance to be one coming from the
  * {@link AuthorizationServer.userinfo_endpoint `as.userinfo_endpoint`}.
  *
@@ -3443,7 +3499,8 @@ async function processGenericAccessTokenResponse(
   client: Client,
   response: Response,
   additionalRequiredIdTokenClaims: (keyof typeof jwtClaimNames)[] | undefined,
-  options: JWEDecryptOptions | undefined,
+  decryptFn: JweDecryptFunction | undefined,
+  recognizedTokenTypes: RecognizedTokenTypes | undefined,
 ): Promise<TokenEndpointResponse> {
   assertAs(as)
   assertClient(client)
@@ -3466,10 +3523,6 @@ async function processGenericAccessTokenResponse(
   })
 
   json.token_type = json.token_type.toLowerCase() as Lowercase<string>
-
-  if (json.token_type !== 'dpop' && json.token_type !== 'bearer') {
-    throw new UnsupportedOperationError('unsupported `token_type` value', { cause: { body: json } })
-  }
 
   if (json.expires_in !== undefined) {
     let expiresIn: unknown =
@@ -3521,7 +3574,7 @@ async function processGenericAccessTokenResponse(
       ),
       getClockSkew(client),
       getClockTolerance(client),
-      options?.[jweDecrypt],
+      decryptFn,
     )
       .then(validatePresence.bind(undefined, requiredClaims))
       .then(validateIssuer.bind(undefined, as))
@@ -3558,6 +3611,12 @@ async function processGenericAccessTokenResponse(
     idTokenClaims.set(json, claims as IDToken)
   }
 
+  if (recognizedTokenTypes?.[json.token_type] !== undefined) {
+    recognizedTokenTypes[json.token_type](response, json)
+  } else if (json.token_type !== 'dpop' && json.token_type !== 'bearer') {
+    throw new UnsupportedOperationError('unsupported `token_type` value', { cause: { body: json } })
+  }
+
   return json
 }
 
@@ -3592,9 +3651,16 @@ export async function processRefreshTokenResponse(
   as: AuthorizationServer,
   client: Client,
   response: Response,
-  options?: JWEDecryptOptions,
+  options?: ProcessTokenResponseOptions,
 ): Promise<TokenEndpointResponse> {
-  return processGenericAccessTokenResponse(as, client, response, undefined, options)
+  return processGenericAccessTokenResponse(
+    as,
+    client,
+    response,
+    undefined,
+    options?.[jweDecrypt],
+    options?.recognizedTokenTypes,
+  )
 }
 
 function validateOptionalAudience(
@@ -3856,7 +3922,7 @@ export const expectNoNonce: unique symbol = Symbol()
  */
 export const skipAuthTimeCheck: unique symbol = Symbol()
 
-export interface ProcessAuthorizationCodeResponseOptions extends JWEDecryptOptions {
+export interface ProcessAuthorizationCodeResponseOptions extends ProcessTokenResponseOptions {
   /**
    * Expected ID Token `nonce` claim value. Default is {@link expectNoNonce}.
    */
@@ -3909,13 +3975,18 @@ export async function processAuthorizationCodeResponse(
       response,
       options.expectedNonce,
       options.maxAge,
-      {
-        [jweDecrypt]: options[jweDecrypt],
-      },
+      options[jweDecrypt],
+      options.recognizedTokenTypes,
     )
   }
 
-  return processAuthorizationCodeOAuth2Response(as, client, response, options)
+  return processAuthorizationCodeOAuth2Response(
+    as,
+    client,
+    response,
+    options?.[jweDecrypt],
+    options?.recognizedTokenTypes,
+  )
 }
 
 async function processAuthorizationCodeOpenIDResponse(
@@ -3924,7 +3995,8 @@ async function processAuthorizationCodeOpenIDResponse(
   response: Response,
   expectedNonce: string | typeof expectNoNonce | undefined,
   maxAge: number | typeof skipAuthTimeCheck | undefined,
-  options: JWEDecryptOptions | undefined,
+  decryptFn: JweDecryptFunction | undefined,
+  recognizedTokenTypes: RecognizedTokenTypes | undefined,
 ): Promise<TokenEndpointResponse> {
   const additionalRequiredClaims: (keyof typeof jwtClaimNames)[] = []
 
@@ -3956,7 +4028,8 @@ async function processAuthorizationCodeOpenIDResponse(
     client,
     response,
     additionalRequiredClaims,
-    options,
+    decryptFn,
+    recognizedTokenTypes,
   )
 
   assertString(result.id_token, '"response" body "id_token" property', INVALID_RESPONSE, {
@@ -3999,9 +4072,17 @@ async function processAuthorizationCodeOAuth2Response(
   as: AuthorizationServer,
   client: Client,
   response: Response,
-  options?: JWEDecryptOptions,
+  decryptFn: JweDecryptFunction | undefined,
+  recognizedTokenTypes: RecognizedTokenTypes | undefined,
 ): Promise<TokenEndpointResponse> {
-  const result = await processGenericAccessTokenResponse(as, client, response, undefined, options)
+  const result = await processGenericAccessTokenResponse(
+    as,
+    client,
+    response,
+    undefined,
+    decryptFn,
+    recognizedTokenTypes,
+  )
 
   const claims = getValidatedIdTokenClaims(result)
   if (claims) {
@@ -4272,9 +4353,16 @@ export async function processGenericTokenEndpointResponse(
   as: AuthorizationServer,
   client: Client,
   response: Response,
-  options?: JWEDecryptOptions,
+  options?: ProcessTokenResponseOptions,
 ): Promise<TokenEndpointResponse> {
-  return processGenericAccessTokenResponse(as, client, response, undefined, options)
+  return processGenericAccessTokenResponse(
+    as,
+    client,
+    response,
+    undefined,
+    options?.[jweDecrypt],
+    options?.recognizedTokenTypes,
+  )
 }
 
 /**
@@ -4297,9 +4385,16 @@ export async function processClientCredentialsResponse(
   as: AuthorizationServer,
   client: Client,
   response: Response,
-  options?: JWEDecryptOptions,
+  options?: ProcessTokenResponseOptions,
 ): Promise<TokenEndpointResponse> {
-  return processGenericAccessTokenResponse(as, client, response, undefined, options)
+  return processGenericAccessTokenResponse(
+    as,
+    client,
+    response,
+    undefined,
+    options?.[jweDecrypt],
+    options?.recognizedTokenTypes,
+  )
 }
 
 export interface RevocationRequestOptions extends HttpRequestOptions<'POST', URLSearchParams> {
@@ -5691,9 +5786,16 @@ export async function processDeviceCodeResponse(
   as: AuthorizationServer,
   client: Client,
   response: Response,
-  options?: JWEDecryptOptions,
+  options?: ProcessTokenResponseOptions,
 ): Promise<TokenEndpointResponse> {
-  return processGenericAccessTokenResponse(as, client, response, undefined, options)
+  return processGenericAccessTokenResponse(
+    as,
+    client,
+    response,
+    undefined,
+    options?.[jweDecrypt],
+    options?.recognizedTokenTypes,
+  )
 }
 
 export interface GenerateKeyPairOptions {
@@ -6252,9 +6354,16 @@ export async function processBackchannelAuthenticationGrantResponse(
   as: AuthorizationServer,
   client: Client,
   response: Response,
-  options?: JWEDecryptOptions,
+  options?: ProcessTokenResponseOptions,
 ): Promise<TokenEndpointResponse> {
-  return processGenericAccessTokenResponse(as, client, response, undefined, options)
+  return processGenericAccessTokenResponse(
+    as,
+    client,
+    response,
+    undefined,
+    options?.[jweDecrypt],
+    options?.recognizedTokenTypes,
+  )
 }
 
 /**

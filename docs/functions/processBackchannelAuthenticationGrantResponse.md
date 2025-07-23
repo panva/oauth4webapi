@@ -18,7 +18,7 @@ Validates Backchannel Authentication Grant [Response](https://developer.mozilla.
 | `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata. |
 | `client` | [`Client`](../interfaces/Client.md) | Client Metadata. |
 | `response` | [`Response`](https://developer.mozilla.org/docs/Web/API/Response) | Resolved value from [backchannelAuthenticationGrantRequest](backchannelAuthenticationGrantRequest.md). |
-| `options`? | [`JWEDecryptOptions`](../interfaces/JWEDecryptOptions.md) | - |
+| `options`? | [`ProcessTokenResponseOptions`](../interfaces/ProcessTokenResponseOptions.md) | - |
 
 ## Returns
 
