@@ -18,7 +18,7 @@ Validates Token Endpoint [Response](https://developer.mozilla.org/docs/Web/API/R
 | `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata. |
 | `client` | [`Client`](../interfaces/Client.md) | Client Metadata. |
 | `response` | [`Response`](https://developer.mozilla.org/docs/Web/API/Response) | Resolved value from [genericTokenEndpointRequest](genericTokenEndpointRequest.md). |
-| `options`? | [`JWEDecryptOptions`](../interfaces/JWEDecryptOptions.md) | - |
+| `options`? | [`ProcessTokenResponseOptions`](../interfaces/ProcessTokenResponseOptions.md) | - |
 
 ## Returns
 

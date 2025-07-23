@@ -18,7 +18,7 @@ Validates Device Authorization Grant [Response](https://developer.mozilla.org/do
 | `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata. |
 | `client` | [`Client`](../interfaces/Client.md) | Client Metadata. |
 | `response` | [`Response`](https://developer.mozilla.org/docs/Web/API/Response) | Resolved value from [deviceCodeGrantRequest](deviceCodeGrantRequest.md). |
-| `options`? | [`JWEDecryptOptions`](../interfaces/JWEDecryptOptions.md) | - |
+| `options`? | [`ProcessTokenResponseOptions`](../interfaces/ProcessTokenResponseOptions.md) | - |
 
 ## Returns
 
