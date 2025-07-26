@@ -3901,7 +3901,7 @@ export async function processAuthorizationCodeResponse(
   options?: ProcessAuthorizationCodeResponseOptions,
 ): Promise<TokenEndpointResponse> {
   if (
-    typeof options?.expectedNonce === 'string' ||
+    typeof options?.expectedNonce === 'string' && options.expectedNonce !== '' ||
     typeof options?.maxAge === 'number' ||
     options?.requireIdToken
   ) {
@@ -3932,6 +3932,7 @@ async function processAuthorizationCodeOpenIDResponse(
 
   switch (expectedNonce) {
     case undefined:
+    case '':
       expectedNonce = expectNoNonce
       break
     case expectNoNonce:
@@ -3979,7 +3980,7 @@ async function processAuthorizationCodeOpenIDResponse(
   }
 
   if (expectedNonce === expectNoNonce) {
-    if (claims.nonce !== undefined) {
+    if (claims.nonce !== undefined && claims.nonce !== '') {
       throw OPE('unexpected ID Token "nonce" claim value', JWT_CLAIM_COMPARISON, {
         expected: undefined,
         claims,
@@ -4020,7 +4021,7 @@ async function processAuthorizationCodeOAuth2Response(
       }
     }
 
-    if (claims.nonce !== undefined) {
+    if (claims.nonce !== undefined && claims.nonce !== '') {
       throw OPE('unexpected ID Token "nonce" claim value', JWT_CLAIM_COMPARISON, {
         expected: undefined,
         claims,
