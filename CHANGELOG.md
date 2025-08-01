@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.6.1](https://github.com/panva/oauth4webapi/compare/v3.6.0...v3.6.1) (2025-08-01)
+
+
+### Fixes
+
+* allow 0 in auth_time ([3b9db46](https://github.com/panva/oauth4webapi/commit/3b9db46c69c2cca069e439ffc62ee9c64e44e3db))
+
 ## [3.6.0](https://github.com/panva/oauth4webapi/compare/v3.5.5...v3.6.0) (2025-07-16)
 
 
