@@ -3546,7 +3546,7 @@ async function processGenericAccessTokenResponse(
       }
     }
 
-    if (claims.auth_time !== undefined) {
+    if (requiredClaims.includes('auth_time') && claims.auth_time !== undefined) {
       assertNumber(
         claims.auth_time,
         false,
@@ -5183,7 +5183,7 @@ async function validateHybridResponse(
     claims,
   })
 
-  if (claims.auth_time !== undefined) {
+  if (requiredClaims.includes('auth_time') && claims.auth_time !== undefined) {
     assertNumber(
       claims.auth_time,
       false,
