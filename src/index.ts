@@ -3549,7 +3549,7 @@ async function processGenericAccessTokenResponse(
     if (claims.auth_time !== undefined) {
       assertNumber(
         claims.auth_time,
-        false,
+        true,
         'ID Token "auth_time" (authentication time)',
         INVALID_RESPONSE,
         { claims },
@@ -5186,7 +5186,7 @@ async function validateHybridResponse(
   if (claims.auth_time !== undefined) {
     assertNumber(
       claims.auth_time,
-      false,
+      true,
       'ID Token "auth_time" (authentication time)',
       INVALID_RESPONSE,
       { claims },

@@ -777,7 +777,7 @@ test('processAuthorizationCodeResponse() nonce checks', async (t) => {
 test('processAuthorizationCodeResponse() auth_time checks', async (t) => {
   const tIssuer: lib.AuthorizationServer = { ...issuer, jwks_uri: endpoint('jwks') }
 
-  for (const auth_time of [0, -1, null, '1', [], {}, true]) {
+  for (const auth_time of [-1, null, '1', [], {}, true]) {
     await t.throwsAsync(
       lib.processAuthorizationCodeResponse(
         tIssuer,
