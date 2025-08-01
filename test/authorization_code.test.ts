@@ -776,13 +776,12 @@ test('processAuthorizationCodeResponse() nonce checks', async (t) => {
 
 test('processAuthorizationCodeResponse() auth_time checks', async (t) => {
   const tIssuer: lib.AuthorizationServer = { ...issuer, jwks_uri: endpoint('jwks') }
-  const tClient = {...client , require_auth_time: true }
 
-  for (const auth_time of [0, -1, null, '1', [], {}, true]) {
+  for (const auth_time of [-1, null, '1', [], {}, true]) {
     await t.throwsAsync(
       lib.processAuthorizationCodeResponse(
         tIssuer,
-        tClient,
+        client,
         getResponse(
           JSON.stringify({
             access_token: 'token',
@@ -791,7 +790,7 @@ test('processAuthorizationCodeResponse() auth_time checks', async (t) => {
               .setProtectedHeader({ alg: 'RS256' })
               .setIssuer(issuer.issuer)
               .setSubject('urn:example:subject')
-              .setAudience(tClient.client_id)
+              .setAudience(client.client_id)
               .setExpirationTime('5m')
               .setIssuedAt()
               .sign(t.context.RS256.privateKey),
