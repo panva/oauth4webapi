@@ -85,7 +85,7 @@
     "esbuild": "^0.25.8",
     "happy-dom": "^18.0.1",
     "http-cookie-agent": "^7.0.2",
-    "jose": "^6.0.12",
+    "jose": "^6.1.0",
     "oidc-provider": "^9.4.0",
     "patch-package": "^8.0.0",
     "prettier": "^3.6.2",

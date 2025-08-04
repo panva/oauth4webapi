@@ -112,6 +112,9 @@ export type JWSAlgorithm =
   | 'ES512'
   | 'PS512'
   | 'RS512'
+  | 'ML-DSA-44'
+  | 'ML-DSA-65'
+  | 'ML-DSA-87'
   // Deprecated
   | 'EdDSA'
 
@@ -126,6 +129,7 @@ export interface JWK {
   readonly crv?: string
   readonly x?: string
   readonly y?: string
+  readonly pub?: string
 
   readonly [parameter: string]: JsonValue | undefined
 }
@@ -1043,6 +1047,44 @@ function OPE(message: string, code?: string, cause?: unknown) {
   return new OperationProcessingError(message, { code, cause })
 }
 
+async function calculateJwkThumbprint(jwk: JWK): Promise<string> {
+  let components: JsonObject
+  switch (jwk.kty) {
+    case 'EC':
+      components = {
+        crv: jwk.crv,
+        kty: jwk.kty,
+        x: jwk.x,
+        y: jwk.y,
+      }
+      break
+    case 'OKP':
+      components = {
+        crv: jwk.crv,
+        kty: jwk.kty,
+        x: jwk.x,
+      }
+      break
+    case 'AKP':
+      components = {
+        alg: jwk.alg,
+        kty: jwk.kty,
+        pub: jwk.pub,
+      }
+      break
+    case 'RSA':
+      components = {
+        e: jwk.e,
+        kty: jwk.kty,
+        n: jwk.n,
+      }
+      break
+    default:
+      throw new UnsupportedOperationError('unsupported JWK key type', { cause: jwk })
+  }
+  return b64u(await crypto.subtle.digest('SHA-256', buf(JSON.stringify(components))))
+}
+
 function assertCryptoKey(key: unknown, it: string): asserts key is CryptoKey {
   if (!(key instanceof CryptoKey)) {
     throw CodedTypeError(`${it} must be a CryptoKey`, ERR_INVALID_ARG_TYPE)
@@ -1591,7 +1633,11 @@ function keyToJws(key: CryptoKey) {
       return rsAlg(key)
     case 'ECDSA':
       return esAlg(key)
-    case 'Ed25519': // Fall through
+    case 'Ed25519':
+    case 'ML-DSA-44':
+    case 'ML-DSA-65':
+    case 'ML-DSA-87':
+      return key.algorithm.name
     case 'EdDSA':
       return 'Ed25519'
     default:
@@ -2244,24 +2290,7 @@ class DPoPHandler implements DPoPHandle {
   async calculateThumbprint() {
     if (!this.#jkt) {
       const jwk = await crypto.subtle.exportKey('jwk', this.#publicKey)
-      let components: JsonValue
-      switch (jwk.kty) {
-        case 'EC':
-          components = { crv: jwk.crv, kty: jwk.kty, x: jwk.x, y: jwk.y }
-          break
-        case 'OKP':
-          components = { crv: jwk.crv, kty: jwk.kty, x: jwk.x }
-          break
-        case 'RSA':
-          components = { e: jwk.e, kty: jwk.kty, n: jwk.n }
-          break
-        default:
-          throw new UnsupportedOperationError('unsupported JWK', { cause: { jwk } })
-      }
-
-      this.#jkt ||= b64u(
-        await crypto.subtle.digest({ name: 'SHA-256' }, buf(JSON.stringify(components))),
-      )
+      this.#jkt ||= await calculateJwkThumbprint(jwk as JWK)
     }
 
     return this.#jkt
@@ -3046,6 +3075,9 @@ async function getPublicSigKeyFromIssuerJwksUri(
       break
     case 'Ed':
       kty = 'OKP'
+      break
+    case 'ML':
+      kty = 'AKP'
       break
     default:
       throw new UnsupportedOperationError('unsupported JWS algorithm', { cause: { alg } })
@@ -4713,6 +4745,9 @@ function supported(alg: string) {
     case 'RS512':
     case 'Ed25519':
     case 'EdDSA':
+    case 'ML-DSA-44':
+    case 'ML-DSA-65':
+    case 'ML-DSA-87':
       return true
     default:
       return false
@@ -4775,6 +4810,9 @@ function keyToSubtle(key: CryptoKey): AlgorithmIdentifier | RsaPssParams | Ecdsa
     case 'RSASSA-PKCS1-v1_5':
       checkRsaKeyAlgorithm(key)
       return key.algorithm.name
+    case 'ML-DSA-44':
+    case 'ML-DSA-65':
+    case 'ML-DSA-87':
     case 'Ed25519':
       return key.algorithm.name
   }
@@ -4985,8 +5023,13 @@ export async function validateJwtAuthResponse(
   return validateAuthResponse(as, client, result, expectedState)
 }
 
+interface CShakeParams {
+  name: string
+  length: number
+}
+
 async function idTokenHash(data: string, header: CompactJWSHeaderParameters, claimName: string) {
-  let algorithm: string
+  let algorithm: string | CShakeParams
   switch (header.alg) {
     case 'RS256': // Fall through
     case 'PS256': // Fall through
@@ -5004,6 +5047,11 @@ async function idTokenHash(data: string, header: CompactJWSHeaderParameters, cla
     case 'Ed25519': // Fall through
     case 'EdDSA':
       algorithm = 'SHA-512'
+      break
+    case 'ML-DSA-44':
+    case 'ML-DSA-65':
+    case 'ML-DSA-87':
+      algorithm = { name: 'cSHAKE256', length: 512 }
       break
     default:
       throw new UnsupportedOperationError(
@@ -5563,9 +5611,13 @@ function algToSubtle(alg: string): RsaHashedImportParams | EcKeyImportParams | A
       return { name: 'ECDSA', namedCurve: `P-${alg.slice(-3)}` }
     case 'ES512':
       return { name: 'ECDSA', namedCurve: 'P-521' }
-    case 'Ed25519':
     case 'EdDSA':
       return 'Ed25519'
+    case 'Ed25519':
+    case 'ML-DSA-44':
+    case 'ML-DSA-65':
+    case 'ML-DSA-87':
+      return alg
     default:
       throw new UnsupportedOperationError('unsupported JWS algorithm', { cause: { alg } })
   }
@@ -5970,34 +6022,7 @@ async function validateDPoP(
   }
 
   {
-    let components: JWK
-    switch (proof.header.jwk!.kty) {
-      case 'EC':
-        components = {
-          crv: proof.header.jwk!.crv,
-          kty: proof.header.jwk!.kty,
-          x: proof.header.jwk!.x,
-          y: proof.header.jwk!.y,
-        }
-        break
-      case 'OKP':
-        components = {
-          crv: proof.header.jwk!.crv,
-          kty: proof.header.jwk!.kty,
-          x: proof.header.jwk!.x,
-        }
-        break
-      case 'RSA':
-        components = {
-          e: proof.header.jwk!.e,
-          kty: proof.header.jwk!.kty,
-          n: proof.header.jwk!.n,
-        }
-        break
-      default:
-        throw new UnsupportedOperationError('unsupported JWK key type', { cause: proof.header.jwk })
-    }
-    const expected = b64u(await crypto.subtle.digest('SHA-256', buf(JSON.stringify(components))))
+    const expected = await calculateJwkThumbprint(proof.header.jwk!)
 
     if (accessTokenClaims.cnf.jkt !== expected) {
       throw OPE('JWT Access Token confirmation mismatch', JWT_CLAIM_COMPARISON, {

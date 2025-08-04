@@ -40,3 +40,9 @@ export const isGecko = isBrowser && (await isEngine('Gecko'))
 
 export const isWorkerd =
   typeof navigator !== 'undefined' && navigator.userAgent === 'Cloudflare-Workers'
+
+export function isNodeVersionAtLeast(major: number, minor: number) {
+  // @ts-ignore
+  const parts = globalThis.process.versions.node.split('.').map((i: string) => parseInt(i, 10))
+  return parts[0] >= major || (parts[0] === major && parts[1] > minor)
+}

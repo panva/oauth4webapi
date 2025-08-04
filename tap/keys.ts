@@ -19,6 +19,12 @@ if (!env.isDeno) {
   algs.push('ES512')
 }
 
+if (env.isNode && env.isNodeVersionAtLeast(24, 7)) {
+  algs.push('ML-DSA-44', 'ML-DSA-65', 'ML-DSA-87')
+} else {
+  fails.push('ML-DSA-44', 'ML-DSA-65', 'ML-DSA-87')
+}
+
 export const keys = algs.reduce(
   (acc, alg) => {
     acc[alg] = lib.generateKeyPair(alg)

@@ -20,19 +20,7 @@ export default (QUnit: QUnit) => {
         ['resource', 'urn:example:resource'],
       ],
     ]) {
-      const jwt = await lib.issueRequestObject(
-        issuer,
-        client,
-        parameters,
-        { key: privateKey },
-        {
-          [lib.modifyAssertion]: (header) => {
-            if (header.alg === 'Ed25519') {
-              header.alg = 'EdDSA'
-            }
-          },
-        },
-      )
+      const jwt = await lib.issueRequestObject(issuer, client, parameters, { key: privateKey })
 
       const { payload, protectedHeader } = await jose.jwtVerify(jwt, publicKey)
       t.propEqual(protectedHeader, {

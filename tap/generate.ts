@@ -51,6 +51,9 @@ export default (QUnit: QUnit) => {
           case 'RS':
             t.equal(key.algorithm.name, 'RSASSA-PKCS1-v1_5')
             break
+          case 'ML':
+            t.equal(key.algorithm.name, alg)
+            break
         }
 
         if (isRSA(alg)) {
