@@ -2725,8 +2725,6 @@ export async function processPushedAuthorizationResponse(
     throw CodedTypeError('"response" must be an instance of Response', ERR_INVALID_ARG_TYPE)
   }
 
-  checkAuthenticationChallenges(response)
-
   await checkOAuthBodyError(response, 201, 'Pushed Authorization Request Endpoint')
 
   assertReadableResponse(response)
@@ -2775,6 +2773,8 @@ async function parseOAuthResponseErrorBody(response: Response): Promise<OAuth2Er
 
 async function checkOAuthBodyError(response: Response, expected: number, label: string) {
   if (response.status !== expected) {
+    checkAuthenticationChallenges(response)
+
     let err: OAuth2Error | undefined
     if ((err = await parseOAuthResponseErrorBody(response))) {
       await response.body?.cancel()
@@ -3451,8 +3451,6 @@ async function processGenericAccessTokenResponse(
   if (!looseInstanceOf(response, Response)) {
     throw CodedTypeError('"response" must be an instance of Response', ERR_INVALID_ARG_TYPE)
   }
-
-  checkAuthenticationChallenges(response)
 
   await checkOAuthBodyError(response, 200, 'Token Endpoint')
 
@@ -4373,8 +4371,6 @@ export async function processRevocationResponse(response: Response): Promise<und
     throw CodedTypeError('"response" must be an instance of Response', ERR_INVALID_ARG_TYPE)
   }
 
-  checkAuthenticationChallenges(response)
-
   await checkOAuthBodyError(response, 200, 'Revocation Endpoint')
 
   return undefined
@@ -4507,8 +4503,6 @@ export async function processIntrospectionResponse(
   if (!looseInstanceOf(response, Response)) {
     throw CodedTypeError('"response" must be an instance of Response', ERR_INVALID_ARG_TYPE)
   }
-
-  checkAuthenticationChallenges(response)
 
   await checkOAuthBodyError(response, 200, 'Introspection Endpoint')
 
@@ -5592,8 +5586,6 @@ export async function processDeviceAuthorizationResponse(
     throw CodedTypeError('"response" must be an instance of Response', ERR_INVALID_ARG_TYPE)
   }
 
-  checkAuthenticationChallenges(response)
-
   await checkOAuthBodyError(response, 200, 'Device Authorization Endpoint')
 
   assertReadableResponse(response)
@@ -6172,8 +6164,6 @@ export async function processBackchannelAuthenticationResponse(
     throw CodedTypeError('"response" must be an instance of Response', ERR_INVALID_ARG_TYPE)
   }
 
-  checkAuthenticationChallenges(response)
-
   await checkOAuthBodyError(response, 200, 'Backchannel Authentication Endpoint')
 
   assertReadableResponse(response)
@@ -6366,8 +6356,6 @@ export async function processDynamicClientRegistrationResponse(
   if (!looseInstanceOf(response, Response)) {
     throw CodedTypeError('"response" must be an instance of Response', ERR_INVALID_ARG_TYPE)
   }
-
-  checkAuthenticationChallenges(response)
 
   await checkOAuthBodyError(response, 201, 'Dynamic Client Registration Endpoint')
 
