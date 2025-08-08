@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.6.2](https://github.com/panva/oauth4webapi/compare/v3.6.1...v3.6.2) (2025-08-08)
+
+
+### Refactor
+
+* skip checking www-authenticate if expected status is received ([596ae33](https://github.com/panva/oauth4webapi/commit/596ae332840870561fc0c204e9226a17344a7b33)), closes [#191](https://github.com/panva/oauth4webapi/issues/191)
+
 ## [3.6.1](https://github.com/panva/oauth4webapi/compare/v3.6.0...v3.6.1) (2025-08-01)
 
 
