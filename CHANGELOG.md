@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.7.0](https://github.com/panva/oauth4webapi/compare/v3.6.2...v3.7.0) (2025-08-12)
+
+
+### Features
+
+* optional recognition of proprietary or unrecognized token types ([c875d5a](https://github.com/panva/oauth4webapi/commit/c875d5ab758ec4d40184607704251483722842ff))
+
 ## [3.6.2](https://github.com/panva/oauth4webapi/compare/v3.6.1...v3.6.2) (2025-08-08)
 
 

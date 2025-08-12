@@ -1,6 +1,6 @@
 {
   "name": "oauth4webapi",
-  "version": "3.6.2",
+  "version": "3.7.0",
   "description": "Low-Level OAuth 2 / OpenID Connect Client API for JavaScript Runtimes",
   "keywords": [
     "access token",
