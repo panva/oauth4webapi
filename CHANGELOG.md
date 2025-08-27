@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.8.0](https://github.com/panva/oauth4webapi/compare/v3.7.0...v3.8.0) (2025-08-27)
+
+
+### Features
+
+* support ML-DSA JWS Algorithm Identifiers ([5e9e629](https://github.com/panva/oauth4webapi/commit/5e9e6293d97db96942019b72d860a746293fc20b))
+
 ## [3.7.0](https://github.com/panva/oauth4webapi/compare/v3.6.2...v3.7.0) (2025-08-12)
 
 
