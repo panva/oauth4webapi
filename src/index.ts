@@ -2062,9 +2062,11 @@ export async function issueRequestObject(
 
 let jwkCache: WeakMap<CryptoKey, JWK>
 
-async function getSetPublicJwkCache(key: CryptoKey) {
-  const { kty, e, n, x, y, crv } = await crypto.subtle.exportKey('jwk', key)
-  const jwk = { kty, e, n, x, y, crv }
+async function getSetPublicJwkCache(key: CryptoKey, alg: string) {
+  // @ts-expect-error TS doesn't know about the OKP pub yet
+  const { kty, e, n, x, y, crv, pub } = await crypto.subtle.exportKey('jwk', key)
+  const jwk: JWK & { alg?: string } = { kty, e, n, x, y, crv, pub }
+  if (kty === 'AKP') jwk.alg = alg
   jwkCache.set(key, jwk)
   return jwk
 }
@@ -2072,9 +2074,9 @@ async function getSetPublicJwkCache(key: CryptoKey) {
 /**
  * Exports an asymmetric crypto key as bare JWK
  */
-async function publicJwk(key: CryptoKey) {
+async function publicJwk(key: CryptoKey, alg: string) {
   jwkCache ||= new WeakMap()
-  return jwkCache.get(key) || getSetPublicJwkCache(key)
+  return jwkCache.get(key) || getSetPublicJwkCache(key, alg)
 }
 
 // @ts-ignore
@@ -2297,10 +2299,11 @@ class DPoPHandler implements DPoPHandle {
   }
 
   async addProof(url: URL, headers: Headers, htm: string, accessToken?: string): Promise<void> {
+    const alg = keyToJws(this.#privateKey)
     this.#header ||= {
-      alg: keyToJws(this.#privateKey),
+      alg,
       typ: 'dpop+jwt',
-      jwk: await publicJwk(this.#publicKey),
+      jwk: await publicJwk(this.#publicKey, alg),
     }
 
     const nonce = this.#get(url.origin)
