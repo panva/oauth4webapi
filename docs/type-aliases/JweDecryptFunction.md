@@ -6,7 +6,7 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
-• **JweDecryptFunction**: (`jwe`) => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`string`\>
+• **JweDecryptFunction** = (`jwe`) => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`string`\>
 
 ## Parameters
 

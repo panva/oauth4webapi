@@ -1,4 +1,4 @@
-# Variable: ~~allowInsecureRequests~~
+# Variable: allowInsecureRequests
 
 [💗 Help the project](https://github.com/sponsors/panva)
 

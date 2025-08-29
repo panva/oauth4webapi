@@ -6,10 +6,10 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
-▸ **refreshTokenGrantRequest**(`as`, `client`, `clientAuthentication`, `refreshToken`, `options`?): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Response`](https://developer.mozilla.org/docs/Web/API/Response)\>
+▸ **refreshTokenGrantRequest**(`as`, `client`, `clientAuthentication`, `refreshToken`, `options?`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Response`](https://developer.mozilla.org/docs/Web/API/Response)\>
 
 Performs a Refresh Token Grant request at the
-[`as.token_endpoint`](../interfaces/AuthorizationServer.md#token_endpoint).
+[`as.token\_endpoint`](../interfaces/AuthorizationServer.md#token_endpoint).
 
 ## Parameters
 
@@ -19,7 +19,7 @@ Performs a Refresh Token Grant request at the
 | `client` | [`Client`](../interfaces/Client.md) | Client Metadata. |
 | `clientAuthentication` | [`ClientAuth`](../type-aliases/ClientAuth.md) | Client Authentication Method. |
 | `refreshToken` | `string` | Refresh Token value. |
-| `options`? | [`TokenEndpointRequestOptions`](../interfaces/TokenEndpointRequestOptions.md) | - |
+| `options?` | [`TokenEndpointRequestOptions`](../interfaces/TokenEndpointRequestOptions.md) | - |
 
 ## Returns
 

@@ -6,10 +6,10 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
-▸ **authorizationCodeGrantRequest**(`as`, `client`, `clientAuthentication`, `callbackParameters`, `redirectUri`, `codeVerifier`, `options`?): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Response`](https://developer.mozilla.org/docs/Web/API/Response)\>
+▸ **authorizationCodeGrantRequest**(`as`, `client`, `clientAuthentication`, `callbackParameters`, `redirectUri`, `codeVerifier`, `options?`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Response`](https://developer.mozilla.org/docs/Web/API/Response)\>
 
 Performs an Authorization Code grant request at the
-[`as.token_endpoint`](../interfaces/AuthorizationServer.md#token_endpoint).
+[`as.token\_endpoint`](../interfaces/AuthorizationServer.md#token_endpoint).
 
 ## Parameters
 
@@ -21,7 +21,7 @@ Performs an Authorization Code grant request at the
 | `callbackParameters` | [`URLSearchParams`](https://developer.mozilla.org/docs/Web/API/URLSearchParams) | Parameters obtained from the callback to redirect_uri, this is returned from [validateAuthResponse](validateAuthResponse.md), or [validateJwtAuthResponse](validateJwtAuthResponse.md). |
 | `redirectUri` | `string` | `redirect_uri` value used in the authorization request. |
 | `codeVerifier` | `string` \| *typeof* [`nopkce`](../variables/nopkce.md) | PKCE `code_verifier` to send to the token endpoint. |
-| `options`? | [`TokenEndpointRequestOptions`](../interfaces/TokenEndpointRequestOptions.md) | - |
+| `options?` | [`TokenEndpointRequestOptions`](../interfaces/TokenEndpointRequestOptions.md) | - |
 
 ## Returns
 

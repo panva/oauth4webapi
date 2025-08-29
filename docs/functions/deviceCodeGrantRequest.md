@@ -6,10 +6,10 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
-▸ **deviceCodeGrantRequest**(`as`, `client`, `clientAuthentication`, `deviceCode`, `options`?): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Response`](https://developer.mozilla.org/docs/Web/API/Response)\>
+▸ **deviceCodeGrantRequest**(`as`, `client`, `clientAuthentication`, `deviceCode`, `options?`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Response`](https://developer.mozilla.org/docs/Web/API/Response)\>
 
 Performs a Device Authorization Grant request at the
-[`as.token_endpoint`](../interfaces/AuthorizationServer.md#token_endpoint).
+[`as.token\_endpoint`](../interfaces/AuthorizationServer.md#token_endpoint).
 
 ## Parameters
 
@@ -18,8 +18,8 @@ Performs a Device Authorization Grant request at the
 | `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata. |
 | `client` | [`Client`](../interfaces/Client.md) | Client Metadata. |
 | `clientAuthentication` | [`ClientAuth`](../type-aliases/ClientAuth.md) | Client Authentication Method. |
-| `deviceCode` | `string` | Device Code. This is the [`device_code`](../interfaces/DeviceAuthorizationResponse.md#device_code) retrieved from [processDeviceAuthorizationResponse](processDeviceAuthorizationResponse.md). |
-| `options`? | [`TokenEndpointRequestOptions`](../interfaces/TokenEndpointRequestOptions.md) | - |
+| `deviceCode` | `string` | Device Code. This is the [`device\_code`](../interfaces/DeviceAuthorizationResponse.md#device_code) retrieved from [processDeviceAuthorizationResponse](processDeviceAuthorizationResponse.md). |
+| `options?` | [`TokenEndpointRequestOptions`](../interfaces/TokenEndpointRequestOptions.md) | - |
 
 ## Returns
 

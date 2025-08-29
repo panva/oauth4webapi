@@ -6,7 +6,7 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
-▸ **DPoP**(`client`, `keyPair`, `options`?): [`DPoPHandle`](../interfaces/DPoPHandle.md)
+▸ **DPoP**(`client`, `keyPair`, `options?`): [`DPoPHandle`](../interfaces/DPoPHandle.md)
 
 Returns a wrapper / handle around a [CryptoKeyPair](../interfaces/CryptoKeyPair.md) that is used for negotiating and proving
 proof-of-possession to sender-constrain OAuth 2.0 tokens via DPoP at the Authorization Server and
@@ -23,7 +23,7 @@ expired/missing nonce.
 | ------ | ------ | ------ |
 | `client` | [`Pick`](https://www.typescriptlang.org/docs/handbook/utility-types.html#picktype-keys)\<[`Client`](../interfaces/Client.md), *typeof* [`clockSkew`](../variables/clockSkew.md)\> | - |
 | `keyPair` | [`CryptoKeyPair`](../interfaces/CryptoKeyPair.md) | Public/private key pair to sign the DPoP Proof JWT with |
-| `options`? | [`ModifyAssertionOptions`](../interfaces/ModifyAssertionOptions.md) | - |
+| `options?` | [`ModifyAssertionOptions`](../interfaces/ModifyAssertionOptions.md) | - |
 
 ## Returns
 

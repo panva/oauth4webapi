@@ -6,7 +6,7 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
-▸ **discoveryRequest**(`issuerIdentifier`, `options`?): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Response`](https://developer.mozilla.org/docs/Web/API/Response)\>
+▸ **discoveryRequest**(`issuerIdentifier`, `options?`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Response`](https://developer.mozilla.org/docs/Web/API/Response)\>
 
 Performs an authorization server metadata discovery using one of two
 [transformation algorithms](../interfaces/DiscoveryRequestOptions.md#algorithm) applied to the
@@ -20,7 +20,7 @@ Performs an authorization server metadata discovery using one of two
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
 | `issuerIdentifier` | [`URL`](https://developer.mozilla.org/docs/Web/API/URL) | Issuer Identifier to resolve the well-known discovery URI for. |
-| `options`? | [`DiscoveryRequestOptions`](../interfaces/DiscoveryRequestOptions.md) | - |
+| `options?` | [`DiscoveryRequestOptions`](../interfaces/DiscoveryRequestOptions.md) | - |
 
 ## Returns
 

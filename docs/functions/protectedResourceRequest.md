@@ -6,7 +6,7 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
-▸ **protectedResourceRequest**(`accessToken`, `method`, `url`, `headers`?, `body`?, `options`?): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Response`](https://developer.mozilla.org/docs/Web/API/Response)\>
+▸ **protectedResourceRequest**(`accessToken`, `method`, `url`, `headers?`, `body?`, `options?`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Response`](https://developer.mozilla.org/docs/Web/API/Response)\>
 
 Performs a protected resource request at an arbitrary URL.
 
@@ -19,9 +19,9 @@ Authorization Header is used to transmit the Access Token value.
 | `accessToken` | `string` | The Access Token for the request. |
 | `method` | `string` | The HTTP method for the request. |
 | `url` | [`URL`](https://developer.mozilla.org/docs/Web/API/URL) | Target URL for the request. |
-| `headers`? | [`Headers`](https://developer.mozilla.org/docs/Web/API/Headers) | Headers for the request. |
-| `body`? | [`ProtectedResourceRequestBody`](../type-aliases/ProtectedResourceRequestBody.md) | Request body compatible with the Fetch API and the request's method. |
-| `options`? | [`ProtectedResourceRequestOptions`](../interfaces/ProtectedResourceRequestOptions.md) | - |
+| `headers?` | [`Headers`](https://developer.mozilla.org/docs/Web/API/Headers) | Headers for the request. |
+| `body?` | [`ProtectedResourceRequestBody`](../type-aliases/ProtectedResourceRequestBody.md) | Request body compatible with the Fetch API and the request's method. |
+| `options?` | [`ProtectedResourceRequestOptions`](../interfaces/ProtectedResourceRequestOptions.md) | - |
 
 ## Returns
 

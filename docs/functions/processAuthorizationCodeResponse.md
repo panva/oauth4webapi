@@ -6,10 +6,10 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
-▸ **processAuthorizationCodeResponse**(`as`, `client`, `response`, `options`?): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`TokenEndpointResponse`](../interfaces/TokenEndpointResponse.md)\>
+▸ **processAuthorizationCodeResponse**(`as`, `client`, `response`, `options?`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`TokenEndpointResponse`](../interfaces/TokenEndpointResponse.md)\>
 
 Validates Authorization Code Grant [Response](https://developer.mozilla.org/docs/Web/API/Response) instance to be one coming from the
-[`as.token_endpoint`](../interfaces/AuthorizationServer.md#token_endpoint).
+[`as.token\_endpoint`](../interfaces/AuthorizationServer.md#token_endpoint).
 
 ## Parameters
 
@@ -18,7 +18,7 @@ Validates Authorization Code Grant [Response](https://developer.mozilla.org/docs
 | `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata. |
 | `client` | [`Client`](../interfaces/Client.md) | Client Metadata. |
 | `response` | [`Response`](https://developer.mozilla.org/docs/Web/API/Response) | Resolved value from [authorizationCodeGrantRequest](authorizationCodeGrantRequest.md). |
-| `options`? | [`ProcessAuthorizationCodeResponseOptions`](../interfaces/ProcessAuthorizationCodeResponseOptions.md) | - |
+| `options?` | [`ProcessAuthorizationCodeResponseOptions`](../interfaces/ProcessAuthorizationCodeResponseOptions.md) | - |
 
 ## Returns
 

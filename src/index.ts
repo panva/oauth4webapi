@@ -924,11 +924,11 @@ export interface Client {
 const encoder = new TextEncoder()
 const decoder = new TextDecoder()
 
-function buf(input: string): Uint8Array
+function buf(input: string): Uint8Array<ArrayBuffer>
 function buf(input: Uint8Array): string
 function buf(input: string | Uint8Array) {
   if (typeof input === 'string') {
-    return encoder.encode(input)
+    return encoder.encode(input) as Uint8Array<ArrayBuffer>
   }
 
   return decoder.decode(input)
@@ -1082,7 +1082,12 @@ async function calculateJwkThumbprint(jwk: JWK): Promise<string> {
     default:
       throw new UnsupportedOperationError('unsupported JWK key type', { cause: jwk })
   }
-  return b64u(await crypto.subtle.digest('SHA-256', buf(JSON.stringify(components))))
+  return b64u(
+    await crypto.subtle.digest(
+      'SHA-256',
+      buf(JSON.stringify(components)) as Uint8Array<ArrayBuffer>,
+    ),
+  )
 }
 
 function assertCryptoKey(key: unknown, it: string): asserts key is CryptoKey {
@@ -1532,7 +1537,7 @@ export function generateRandomNonce(): string {
 export async function calculatePKCECodeChallenge(codeVerifier: string): Promise<string> {
   assertString(codeVerifier, 'codeVerifier')
 
-  return b64u(await crypto.subtle.digest('SHA-256', buf(codeVerifier)))
+  return b64u(await crypto.subtle.digest('SHA-256', buf(codeVerifier) as Uint8Array<ArrayBuffer>))
 }
 
 interface NormalizedKeyInput {
@@ -1874,7 +1879,7 @@ export function ClientSecretJwt(
   return async (as, client, body, _headers) => {
     key ||= await crypto.subtle.importKey(
       'raw',
-      buf(clientSecret),
+      buf(clientSecret) as Uint8Array<ArrayBuffer>,
       { hash: 'SHA-256', name: 'HMAC' },
       false,
       ['sign'],
@@ -1886,7 +1891,7 @@ export function ClientSecretJwt(
     modify?.(header, payload)
 
     const data = `${b64u(buf(JSON.stringify(header)))}.${b64u(buf(JSON.stringify(payload)))}`
-    const hmac = await crypto.subtle.sign(key.algorithm, key, buf(data))
+    const hmac = await crypto.subtle.sign(key.algorithm, key, buf(data) as Uint8Array<ArrayBuffer>)
 
     body.set('client_id', client.client_id)
     body.set('client_assertion_type', 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer')
@@ -1946,7 +1951,9 @@ async function signJwt(
     )
   }
   const input = `${b64u(buf(JSON.stringify(header)))}.${b64u(buf(JSON.stringify(payload)))}`
-  const signature = b64u(await crypto.subtle.sign(keyToSubtle(key), key, buf(input)))
+  const signature = b64u(
+    await crypto.subtle.sign(keyToSubtle(key), key, buf(input) as Uint8Array<ArrayBuffer>),
+  )
   return `${input}.${signature}`
 }
 
@@ -2315,7 +2322,9 @@ class DPoPHandler implements DPoPHandle {
       htm,
       nonce,
       htu: `${url.origin}${url.pathname}`,
-      ath: accessToken ? b64u(await crypto.subtle.digest('SHA-256', buf(accessToken))) : undefined,
+      ath: accessToken
+        ? b64u(await crypto.subtle.digest('SHA-256', buf(accessToken) as Uint8Array<ArrayBuffer>))
+        : undefined,
     }
 
     this.#modifyAssertion?.(this.#header, payload)
@@ -2855,6 +2864,7 @@ async function resourceRequest(
   headers.set('authorization', `${headers.has('dpop') ? 'DPoP' : 'Bearer'} ${accessToken}`)
 
   const response = await (options?.[customFetch] || fetch)(url.href, {
+    // @ts-ignore
     body,
     headers: Object.fromEntries(headers.entries()),
     method,
@@ -4830,7 +4840,12 @@ async function validateJwsSignature(
 ) {
   const data = buf(`${protectedHeader}.${payload}`)
   const algorithm = keyToSubtle(key)
-  const verified = await crypto.subtle.verify(algorithm, key, signature, data)
+  const verified = await crypto.subtle.verify(
+    algorithm,
+    key,
+    signature as Uint8Array<ArrayBuffer>,
+    data as Uint8Array<ArrayBuffer>,
+  )
   if (!verified) {
     throw OPE('JWT signature verification failed', INVALID_RESPONSE, {
       key,
@@ -5063,7 +5078,7 @@ async function idTokenHash(data: string, header: CompactJWSHeaderParameters, cla
       )
   }
 
-  const digest = await crypto.subtle.digest(algorithm, buf(data))
+  const digest = await crypto.subtle.digest(algorithm, buf(data) as Uint8Array<ArrayBuffer>)
   return b64u(digest.slice(0, digest.byteLength / 2))
 }
 
@@ -6013,7 +6028,9 @@ async function validateDPoP(
   }
 
   {
-    const expected = b64u(await crypto.subtle.digest('SHA-256', buf(accessToken)))
+    const expected = b64u(
+      await crypto.subtle.digest('SHA-256', buf(accessToken) as Uint8Array<ArrayBuffer>),
+    )
 
     if (proof.claims.ath !== expected) {
       throw OPE('DPoP Proof ath mismatch', JWT_CLAIM_COMPARISON, {

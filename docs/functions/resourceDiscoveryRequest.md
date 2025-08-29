@@ -6,7 +6,7 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
-▸ **resourceDiscoveryRequest**(`resourceIdentifier`, `options`?): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Response`](https://developer.mozilla.org/docs/Web/API/Response)\>
+▸ **resourceDiscoveryRequest**(`resourceIdentifier`, `options?`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Response`](https://developer.mozilla.org/docs/Web/API/Response)\>
 
 Performs a protected resource metadata discovery.
 
@@ -15,7 +15,7 @@ Performs a protected resource metadata discovery.
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
 | `resourceIdentifier` | [`URL`](https://developer.mozilla.org/docs/Web/API/URL) | Protected resource's resource identifier to resolve the well-known discovery URI for |
-| `options`? | [`HttpRequestOptions`](../interfaces/HttpRequestOptions.md)\<`"GET"`, `undefined`\> | - |
+| `options?` | [`HttpRequestOptions`](../interfaces/HttpRequestOptions.md)\<`"GET"`, `undefined`\> | - |
 
 ## Returns
 

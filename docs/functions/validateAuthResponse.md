@@ -6,11 +6,11 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
-▸ **validateAuthResponse**(`as`, `client`, `parameters`, `expectedState`?): [`URLSearchParams`](https://developer.mozilla.org/docs/Web/API/URLSearchParams)
+▸ **validateAuthResponse**(`as`, `client`, `parameters`, `expectedState?`): [`URLSearchParams`](https://developer.mozilla.org/docs/Web/API/URLSearchParams)
 
 Validates an OAuth 2.0 Authorization Response or Authorization Error Response message returned
 from the authorization server's
-[`as.authorization_endpoint`](../interfaces/AuthorizationServer.md#authorization_endpoint).
+[`as.authorization\_endpoint`](../interfaces/AuthorizationServer.md#authorization_endpoint).
 
 ## Parameters
 
@@ -19,7 +19,7 @@ from the authorization server's
 | `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata. |
 | `client` | [`Client`](../interfaces/Client.md) | Client Metadata. |
 | `parameters` | [`URLSearchParams`](https://developer.mozilla.org/docs/Web/API/URLSearchParams) \| [`URL`](https://developer.mozilla.org/docs/Web/API/URL) | Authorization response. |
-| `expectedState`? | `string` \| *typeof* [`expectNoState`](../variables/expectNoState.md) \| *typeof* [`skipStateCheck`](../variables/skipStateCheck.md) | Expected `state` parameter value. Default is [expectNoState](../variables/expectNoState.md). |
+| `expectedState?` | `string` \| *typeof* [`expectNoState`](../variables/expectNoState.md) \| *typeof* [`skipStateCheck`](../variables/skipStateCheck.md) | Expected `state` parameter value. Default is [expectNoState](../variables/expectNoState.md). |
 
 ## Returns
 

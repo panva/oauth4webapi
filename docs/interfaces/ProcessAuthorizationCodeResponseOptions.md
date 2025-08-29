@@ -28,9 +28,9 @@ Expected ID Token `nonce` claim value. Default is [expectNoNonce](../variables/e
 
 • `optional` **maxAge**: `number` \| *typeof* [`skipAuthTimeCheck`](../variables/skipAuthTimeCheck.md)
 
-ID Token [`auth_time`](IDToken.md#auth_time) claim value will be checked to be present and
+ID Token [`auth\_time`](IDToken.md#auth_time) claim value will be checked to be present and
 conform to the `maxAge` value. Use of this option is required if you sent a `max_age` parameter
-in an authorization request. Default is [`client.default_max_age`](Client.md#default_max_age)
+in an authorization request. Default is [`client.default\_max\_age`](Client.md#default_max_age)
 and falls back to [skipAuthTimeCheck](../variables/skipAuthTimeCheck.md).
 
 ***
@@ -47,4 +47,4 @@ See [RecognizedTokenTypes](../type-aliases/RecognizedTokenTypes.md).
 
 • `optional` **requireIdToken**: `boolean`
 
-When true this requires [TokenEndpointResponse.id_token](TokenEndpointResponse.md#id_token) to be present
+When true this requires [TokenEndpointResponse.id\_token](TokenEndpointResponse.md#id_token) to be present

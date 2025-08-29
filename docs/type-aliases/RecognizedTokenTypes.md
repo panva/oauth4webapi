@@ -6,7 +6,7 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
-• **RecognizedTokenTypes**: [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<[`Lowercase`](https://www.typescriptlang.org/docs/handbook/2/template-literal-types.html#lowercasestringtype)\<`string`\>, (`res`, `body`) => `void`\>
+• **RecognizedTokenTypes** = [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<[`Lowercase`](https://www.typescriptlang.org/docs/handbook/2/template-literal-types.html#lowercasestringtype)\<`string`\>, (`res`, `body`) => `void`\>
 
 A record of custom `token_type` handlers for processing non-standard token types in OAuth 2.0
 token endpoint responses.

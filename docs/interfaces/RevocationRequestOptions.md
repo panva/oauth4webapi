@@ -47,7 +47,7 @@ Any additional parameters to send. This cannot override existing parameter value
 
 ### headers?
 
-• `optional` **headers**: [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `string`\> \| [`string`, `string`][] \| [`Headers`](https://developer.mozilla.org/docs/Web/API/Headers)
+• `optional` **headers**: [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `string`\> \| \[`string`, `string`\][] \| [`Headers`](https://developer.mozilla.org/docs/Web/API/Headers)
 
 Headers to additionally send with the HTTP request(s) triggered by this function's invocation.
 

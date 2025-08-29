@@ -93,6 +93,7 @@ export default (QUnit: QUnit) => {
           {
             DPoP,
             [lib.allowInsecureRequests]: true,
+            // @ts-ignore
             async [lib.customFetch](...params: Parameters<typeof fetch>) {
               const url = new URL(params[0] as string)
               const { headers, method } = params[1]!

@@ -262,7 +262,7 @@ Support from the community to continue maintaining and improving this module is 
 
 ## Variables
 
-- [allowInsecureRequests](variables/allowInsecureRequests.md)
+- [~~allowInsecureRequests~~](variables/allowInsecureRequests.md)
 - [clockSkew](variables/clockSkew.md)
 - [clockTolerance](variables/clockTolerance.md)
 - [customFetch](variables/customFetch.md)
@@ -271,7 +271,7 @@ Support from the community to continue maintaining and improving this module is 
 - [jweDecrypt](variables/jweDecrypt.md)
 - [jwksCache](variables/jwksCache.md)
 - [modifyAssertion](variables/modifyAssertion.md)
-- [nopkce](variables/nopkce.md)
+- [~~nopkce~~](variables/nopkce.md)
 - [skipAuthTimeCheck](variables/skipAuthTimeCheck.md)
 - [skipStateCheck](variables/skipStateCheck.md)
 - [skipSubjectCheck](variables/skipSubjectCheck.md)

@@ -6,10 +6,10 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
-▸ **processBackchannelAuthenticationGrantResponse**(`as`, `client`, `response`, `options`?): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`TokenEndpointResponse`](../interfaces/TokenEndpointResponse.md)\>
+▸ **processBackchannelAuthenticationGrantResponse**(`as`, `client`, `response`, `options?`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`TokenEndpointResponse`](../interfaces/TokenEndpointResponse.md)\>
 
 Validates Backchannel Authentication Grant [Response](https://developer.mozilla.org/docs/Web/API/Response) instance to be one coming from the
-[`as.token_endpoint`](../interfaces/AuthorizationServer.md#token_endpoint).
+[`as.token\_endpoint`](../interfaces/AuthorizationServer.md#token_endpoint).
 
 ## Parameters
 
@@ -18,7 +18,7 @@ Validates Backchannel Authentication Grant [Response](https://developer.mozilla.
 | `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata. |
 | `client` | [`Client`](../interfaces/Client.md) | Client Metadata. |
 | `response` | [`Response`](https://developer.mozilla.org/docs/Web/API/Response) | Resolved value from [backchannelAuthenticationGrantRequest](backchannelAuthenticationGrantRequest.md). |
-| `options`? | [`ProcessTokenResponseOptions`](../interfaces/ProcessTokenResponseOptions.md) | - |
+| `options?` | [`ProcessTokenResponseOptions`](../interfaces/ProcessTokenResponseOptions.md) | - |
 
 ## Returns
 

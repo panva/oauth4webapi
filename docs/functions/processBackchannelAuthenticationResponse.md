@@ -9,7 +9,7 @@ Support from the community to continue maintaining and improving this module is 
 ▸ **processBackchannelAuthenticationResponse**(`as`, `client`, `response`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`BackchannelAuthenticationResponse`](../interfaces/BackchannelAuthenticationResponse.md)\>
 
 Validates [Response](https://developer.mozilla.org/docs/Web/API/Response) instance to be one coming from the
-[`as.backchannel_authentication_endpoint`](../interfaces/AuthorizationServer.md#backchannel_authentication_endpoint).
+[`as.backchannel\_authentication\_endpoint`](../interfaces/AuthorizationServer.md#backchannel_authentication_endpoint).
 
 ## Parameters
 

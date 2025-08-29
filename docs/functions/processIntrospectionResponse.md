@@ -6,10 +6,10 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
-▸ **processIntrospectionResponse**(`as`, `client`, `response`, `options`?): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`IntrospectionResponse`](../interfaces/IntrospectionResponse.md)\>
+▸ **processIntrospectionResponse**(`as`, `client`, `response`, `options?`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`IntrospectionResponse`](../interfaces/IntrospectionResponse.md)\>
 
 Validates [Response](https://developer.mozilla.org/docs/Web/API/Response) instance to be one coming from the
-[`as.introspection_endpoint`](../interfaces/AuthorizationServer.md#introspection_endpoint).
+[`as.introspection\_endpoint`](../interfaces/AuthorizationServer.md#introspection_endpoint).
 
 ## Parameters
 
@@ -18,7 +18,7 @@ Validates [Response](https://developer.mozilla.org/docs/Web/API/Response) instan
 | `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata. |
 | `client` | [`Client`](../interfaces/Client.md) | Client Metadata. |
 | `response` | [`Response`](https://developer.mozilla.org/docs/Web/API/Response) | Resolved value from [introspectionRequest](introspectionRequest.md). |
-| `options`? | [`JWEDecryptOptions`](../interfaces/JWEDecryptOptions.md) | - |
+| `options?` | [`JWEDecryptOptions`](../interfaces/JWEDecryptOptions.md) | - |
 
 ## Returns
 

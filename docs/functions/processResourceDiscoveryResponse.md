@@ -16,7 +16,7 @@ discovery endpoint.
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
 | `expectedResourceIdentifier` | [`URL`](https://developer.mozilla.org/docs/Web/API/URL) | Expected Resource Identifier value. |
-| `response` | [`Response`](https://developer.mozilla.org/docs/Web/API/Response) | Resolved value from [resourceDiscoveryRequest](resourceDiscoveryRequest.md) or from a general [fetch](https://developer.mozilla.org/docs/Web/API/Window/fetch) following [WWWAuthenticateChallengeParameters.resource_metadata](../interfaces/WWWAuthenticateChallengeParameters.md#resource_metadata). |
+| `response` | [`Response`](https://developer.mozilla.org/docs/Web/API/Response) | Resolved value from [resourceDiscoveryRequest](resourceDiscoveryRequest.md) or from a general [fetch](https://developer.mozilla.org/docs/Web/API/Window/fetch) following [WWWAuthenticateChallengeParameters.resource\_metadata](../interfaces/WWWAuthenticateChallengeParameters.md#resource_metadata). |
 
 ## Returns
 

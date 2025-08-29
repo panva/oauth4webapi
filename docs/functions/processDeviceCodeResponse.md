@@ -6,10 +6,10 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
-▸ **processDeviceCodeResponse**(`as`, `client`, `response`, `options`?): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`TokenEndpointResponse`](../interfaces/TokenEndpointResponse.md)\>
+▸ **processDeviceCodeResponse**(`as`, `client`, `response`, `options?`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`TokenEndpointResponse`](../interfaces/TokenEndpointResponse.md)\>
 
 Validates Device Authorization Grant [Response](https://developer.mozilla.org/docs/Web/API/Response) instance to be one coming from the
-[`as.token_endpoint`](../interfaces/AuthorizationServer.md#token_endpoint).
+[`as.token\_endpoint`](../interfaces/AuthorizationServer.md#token_endpoint).
 
 ## Parameters
 
@@ -18,7 +18,7 @@ Validates Device Authorization Grant [Response](https://developer.mozilla.org/do
 | `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata. |
 | `client` | [`Client`](../interfaces/Client.md) | Client Metadata. |
 | `response` | [`Response`](https://developer.mozilla.org/docs/Web/API/Response) | Resolved value from [deviceCodeGrantRequest](deviceCodeGrantRequest.md). |
-| `options`? | [`ProcessTokenResponseOptions`](../interfaces/ProcessTokenResponseOptions.md) | - |
+| `options?` | [`ProcessTokenResponseOptions`](../interfaces/ProcessTokenResponseOptions.md) | - |
 
 ## Returns
 

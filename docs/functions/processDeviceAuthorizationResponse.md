@@ -9,7 +9,7 @@ Support from the community to continue maintaining and improving this module is 
 ▸ **processDeviceAuthorizationResponse**(`as`, `client`, `response`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`DeviceAuthorizationResponse`](../interfaces/DeviceAuthorizationResponse.md)\>
 
 Validates [Response](https://developer.mozilla.org/docs/Web/API/Response) instance to be one coming from the
-[`as.device_authorization_endpoint`](../interfaces/AuthorizationServer.md#device_authorization_endpoint).
+[`as.device\_authorization\_endpoint`](../interfaces/AuthorizationServer.md#device_authorization_endpoint).
 
 ## Parameters
 

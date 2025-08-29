@@ -150,6 +150,7 @@ export default (QUnit: QUnit) => {
         {
           let response = await lib.introspectionRequest(as, client, clientAuth, access_token, {
             [lib.allowInsecureRequests]: true,
+            // @ts-ignore
             async [lib.customFetch](...params: Parameters<typeof fetch>) {
               if (authMethod === 'private_key_jwt') {
                 if (params[1]?.body instanceof URLSearchParams) {

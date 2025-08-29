@@ -19,7 +19,7 @@ is not desirable.
 
 When configured on an interface that extends [JWKSCacheOptions](../interfaces/JWKSCacheOptions.md), this applies to `options`
 parameter for functions that may trigger HTTP requests to
-[`as.jwks_uri`](../interfaces/AuthorizationServer.md#jwks_uri), this allows the passed in object to:
+[`as.jwks\_uri`](../interfaces/AuthorizationServer.md#jwks_uri), this allows the passed in object to:
 
 - Serve as an initial value for the JSON Web Key Set that the module would otherwise need to
   trigger an HTTP request for

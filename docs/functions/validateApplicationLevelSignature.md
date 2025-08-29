@@ -6,10 +6,10 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
-▸ **validateApplicationLevelSignature**(`as`, `ref`, `options`?): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
+▸ **validateApplicationLevelSignature**(`as`, `ref`, `options?`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
 Validates the JWS Signature of either a JWT [Response.body](https://developer.mozilla.org/docs/Web/API/Response/body) or
-[TokenEndpointResponse.id_token](../interfaces/TokenEndpointResponse.md#id_token) of a processed [Response](https://developer.mozilla.org/docs/Web/API/Response)
+[TokenEndpointResponse.id\_token](../interfaces/TokenEndpointResponse.md#id_token) of a processed [Response](https://developer.mozilla.org/docs/Web/API/Response)
 
 > [!NOTE]\
 > Validating signatures of JWTs received via direct communication between the Client and a
@@ -26,7 +26,7 @@ Validates the JWS Signature of either a JWT [Response.body](https://developer.mo
 | ------ | ------ | ------ |
 | `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata. |
 | `ref` | [`Response`](https://developer.mozilla.org/docs/Web/API/Response) | Response previously processed by this module that contained an ID Token or its response body was a JWT |
-| `options`? | [`ValidateSignatureOptions`](../interfaces/ValidateSignatureOptions.md) | - |
+| `options?` | [`ValidateSignatureOptions`](../interfaces/ValidateSignatureOptions.md) | - |
 
 ## Returns
 

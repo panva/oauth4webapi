@@ -6,4 +6,4 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
-• **JWKSCacheInput**: [`ExportedJWKSCache`](../interfaces/ExportedJWKSCache.md) \| [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `never`\>
+• **JWKSCacheInput** = [`ExportedJWKSCache`](../interfaces/ExportedJWKSCache.md) \| [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `never`\>

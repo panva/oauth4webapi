@@ -6,10 +6,10 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
-▸ **userInfoRequest**(`as`, `client`, `accessToken`, `options`?): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Response`](https://developer.mozilla.org/docs/Web/API/Response)\>
+▸ **userInfoRequest**(`as`, `client`, `accessToken`, `options?`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Response`](https://developer.mozilla.org/docs/Web/API/Response)\>
 
 Performs a UserInfo Request at the
-[`as.userinfo_endpoint`](../interfaces/AuthorizationServer.md#userinfo_endpoint).
+[`as.userinfo\_endpoint`](../interfaces/AuthorizationServer.md#userinfo_endpoint).
 
 Authorization Header is used to transmit the Access Token value.
 
@@ -20,7 +20,7 @@ Authorization Header is used to transmit the Access Token value.
 | `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata. |
 | `client` | [`Client`](../interfaces/Client.md) | Client Metadata. |
 | `accessToken` | `string` | Access Token value. |
-| `options`? | [`UserInfoRequestOptions`](../interfaces/UserInfoRequestOptions.md) | - |
+| `options?` | [`UserInfoRequestOptions`](../interfaces/UserInfoRequestOptions.md) | - |
 
 ## Returns
 
