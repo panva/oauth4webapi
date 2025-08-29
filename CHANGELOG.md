@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.8.1](https://github.com/panva/oauth4webapi/compare/v3.8.0...v3.8.1) (2025-08-29)
+
+
+### Fixes
+
+* **DPoP:** add header JWK alg and pub when using ML-DSA keys ([90a702e](https://github.com/panva/oauth4webapi/commit/90a702ed57fb5280416dcf509c738d3ac8b2dac7))
+
 ## [3.8.0](https://github.com/panva/oauth4webapi/compare/v3.7.0...v3.8.0) (2025-08-27)
 
 
