@@ -935,14 +935,14 @@ function buf(input: string | Uint8Array) {
 }
 
 let encodeBase64Url: (input: Uint8Array | ArrayBuffer) => string
-// @ts-expect-error
+// @ts-ignore
 if (Uint8Array.prototype.toBase64) {
   encodeBase64Url = (input) => {
     if (input instanceof ArrayBuffer) {
       input = new Uint8Array(input)
     }
 
-    // @ts-expect-error
+    // @ts-ignore
     return input.toBase64({ alphabet: 'base64url', omitPadding: true })
   }
 } else {
@@ -963,11 +963,11 @@ if (Uint8Array.prototype.toBase64) {
 
 let decodeBase64Url: (input: string) => Uint8Array
 
-// @ts-expect-error
+// @ts-ignore
 if (Uint8Array.fromBase64) {
   decodeBase64Url = (input) => {
     try {
-      // @ts-expect-error
+      // @ts-ignore
       return Uint8Array.fromBase64(input, { alphabet: 'base64url' })
     } catch (cause) {
       throw CodedTypeError(
