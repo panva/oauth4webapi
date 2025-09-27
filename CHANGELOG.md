@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.8.2](https://github.com/panva/oauth4webapi/compare/v3.8.1...v3.8.2) (2025-09-27)
+
+
+### Documentation
+
+* remove mention of Edge Runtime from the readme ([313c263](https://github.com/panva/oauth4webapi/commit/313c26315cc3422162148531f48c919b0d2fa5af))
+
+
+### Refactor
+
+* workaround dpop nonce caching caveats with customFetch ([e201d3a](https://github.com/panva/oauth4webapi/commit/e201d3a3b620d95b5d874fd2a232abad42afca37))
+
 ## [3.8.1](https://github.com/panva/oauth4webapi/compare/v3.8.0...v3.8.1) (2025-08-29)
 
 
