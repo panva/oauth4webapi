@@ -215,8 +215,6 @@ export const clockTolerance: unique symbol = Symbol()
  *
  * - Expect Type-related issues when passing the inputs through to fetch-like modules, they hardly
  *   ever get their typings inline with actual fetch, you should `@ts-expect-error` them.
- * - Returning self-constructed {@link !Response} instances prohibits AS/RS-signalled DPoP Nonce
- *   caching.
  *
  * @example
  *
@@ -2212,7 +2210,7 @@ export async function pushedAuthorizationRequest(
     headers,
     options,
   )
-  options?.DPoP?.cacheNonce(response)
+  options?.DPoP?.cacheNonce(response, url)
   return response
 }
 
@@ -2239,7 +2237,7 @@ export interface DPoPHandle {
    *
    * @internal
    */
-  cacheNonce(response: Response): void
+  cacheNonce(response: Response, url: URL): void
   /**
    * Calculates the JWK Thumbprint of the DPoP public key using the SHA-256 hash function for use as
    * the optional `dpop_jkt` authorization request parameter.
@@ -2332,11 +2330,11 @@ class DPoPHandler implements DPoPHandle {
     headers.set('dpop', await signJwt(this.#header, payload, this.#privateKey))
   }
 
-  cacheNonce(response: Response): void {
+  cacheNonce(response: Response, url: URL): void {
     try {
       const nonce = response.headers.get('dpop-nonce')
       if (nonce) {
-        this.#set(new URL(response.url).origin, nonce)
+        this.#set(url.origin, nonce)
       }
     } catch {}
   }
@@ -2871,7 +2869,7 @@ async function resourceRequest(
     redirect: 'manual',
     signal: signal(url, options?.signal),
   })
-  options?.DPoP?.cacheNonce(response)
+  options?.DPoP?.cacheNonce(response, url)
   return response
 }
 
@@ -3404,7 +3402,7 @@ async function tokenEndpointRequest(
     headers,
     options,
   )
-  options?.DPoP?.cacheNonce(response)
+  options?.DPoP?.cacheNonce(response, url)
   return response
 }
 
@@ -6485,7 +6483,7 @@ export async function dynamicClientRegistrationRequest(
     redirect: 'manual',
     signal: signal(url, options?.signal),
   })
-  options?.DPoP?.cacheNonce(response)
+  options?.DPoP?.cacheNonce(response, url)
   return response
 }
 
