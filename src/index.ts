@@ -5645,7 +5645,8 @@ async function importJwk(alg: string, jwk: JWK) {
 }
 
 export interface DeviceAuthorizationRequestOptions
-  extends HttpRequestOptions<'POST', URLSearchParams> {}
+  extends HttpRequestOptions<'POST', URLSearchParams>,
+    DPoPRequestOptions {}
 
 /**
  * Performs a Device Authorization Request at the
@@ -5686,7 +5687,24 @@ export async function deviceAuthorizationRequest(
   const headers = prepareHeaders(options?.headers)
   headers.set('accept', 'application/json')
 
-  return authenticatedRequest(as, client, clientAuthentication, url, body, headers, options)
+  if (options?.DPoP !== undefined) {
+    assertDPoP(options.DPoP)
+    await options.DPoP.addProof(url, headers, 'POST')
+  }
+
+  const response = await authenticatedRequest(
+    as,
+    client,
+    clientAuthentication,
+    url,
+    body,
+    headers,
+    options,
+  )
+
+  options?.DPoP?.cacheNonce(response, url)
+
+  return response
 }
 
 export interface DeviceAuthorizationResponse {

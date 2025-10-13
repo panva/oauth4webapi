@@ -37,6 +37,14 @@ See [customFetch](../variables/customFetch.md).
 
 ***
 
+### DPoP?
+
+• `optional` **DPoP**: [`DPoPHandle`](DPoPHandle.md)
+
+DPoP handle, obtained from [DPoP](../functions/DPoP.md)
+
+***
+
 ### headers?
 
 • `optional` **headers**: [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `string`\> \| \[`string`, `string`\][] \| [`Headers`](https://developer.mozilla.org/docs/Web/API/Headers)
