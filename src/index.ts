@@ -1835,7 +1835,7 @@ export function PrivateKeyJwt(
   const { key, kid } = getKeyAndKid(clientPrivateKey)
   assertPrivateKey(key, '"clientPrivateKey.key"')
   return async (as, client, body, _headers) => {
-    const header = { alg: keyToJws(key), kid }
+    const header = { alg: keyToJws(key), kid, typ: 'client-authentication+jwt' }
     const payload = clientAssertionPayload(as, client)
 
     options?.[modifyAssertion]?.(header, payload)
