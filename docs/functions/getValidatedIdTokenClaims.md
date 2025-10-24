@@ -6,7 +6,7 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
-▸ **getValidatedIdTokenClaims**(`ref`): `undefined` \| [`IDToken`](../interfaces/IDToken.md)
+▸ **getValidatedIdTokenClaims**(`ref`): [`IDToken`](../interfaces/IDToken.md) \| `undefined`
 
 Returns ID Token Claims Set from a [TokenEndpointResponse](../interfaces/TokenEndpointResponse.md) processed by e.g.
 [processAuthorizationCodeResponse](processAuthorizationCodeResponse.md). To optionally validate the ID Token Signature use
@@ -20,6 +20,6 @@ Returns ID Token Claims Set from a [TokenEndpointResponse](../interfaces/TokenEn
 
 ## Returns
 
-`undefined` \| [`IDToken`](../interfaces/IDToken.md)
+[`IDToken`](../interfaces/IDToken.md) \| `undefined`
 
 JWT Claims Set from an ID Token, or undefined if there is no ID Token in `ref`.
