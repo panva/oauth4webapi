@@ -98,7 +98,6 @@ let access_token: string
     redirect_uri,
     code_verifier,
     {
-      // @ts-expect-error
       [oauth.customFetch]: (url, init) => {
         return undici.fetch(url, {
           ...init,
@@ -133,7 +132,6 @@ let access_token: string
     undefined,
     undefined,
     {
-      // @ts-expect-error
       [oauth.customFetch]: (url, init) => {
         return undici.fetch(url, {
           ...init,
