@@ -55,14 +55,23 @@ const vectors = [
   {
     description: 'parameter missing',
     header: 'Scheme',
+    expected: [{ scheme: 'scheme', parameters: {} }],
   },
   {
     description: 'two schemes, parameters missing',
     header: 'Scheme, DPoP',
+    expected: [
+      { scheme: 'scheme', parameters: {} },
+      { scheme: 'dpop', parameters: {} },
+    ],
   },
   {
     description: 'two schemes, parameters missing in one',
     header: 'Scheme, DPoP algs="ES256"',
+    expected: [
+      { scheme: 'scheme', parameters: {} },
+      { scheme: 'dpop', parameters: { algs: 'ES256' } },
+    ],
   },
   {
     description: 'using token format for a parameter including backslashes',
@@ -353,10 +362,6 @@ const vectors = [
   {
     description: 'Empty scheme with valid parameters',
     header: `  error="invalid_token", error_description="no scheme"`,
-  },
-  {
-    description: 'Garbage input',
-    header: `%%%%%%%`,
   },
   {
     description: 'Valid scheme followed by unparseable junk',

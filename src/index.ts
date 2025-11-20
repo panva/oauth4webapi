@@ -2651,13 +2651,13 @@ export interface WWWAuthenticateChallenge {
 }
 
 const tokenMatch = "[a-zA-Z0-9!#$%&\\'\\*\\+\\-\\.\\^_`\\|~]+"
-const token68Match = '[a-zA-Z0-9\\-\\._\\~\\+\\/]+[=]{0,2}'
-const quotedMatch = '"((?:[^"\\\\]|\\\\.)*)"'
+const token68Match = '[a-zA-Z0-9\\-\\._\\~\\+\\/]+={0,2}'
+const quotedMatch = '"((?:[^"\\\\]|\\\\[\\s\\S])*)"'
 
 const quotedParamMatcher = '(' + tokenMatch + ')\\s*=\\s*' + quotedMatch
 const paramMatcher = '(' + tokenMatch + ')\\s*=\\s*(' + tokenMatch + ')'
 
-const schemeRE = new RegExp('^[,\\s]*(' + tokenMatch + ')\\s(.*)')
+const schemeRE = new RegExp('^[,\\s]*(' + tokenMatch + ')')
 const quotedParamRE = new RegExp('^[,\\s]*' + quotedParamMatcher + '[,\\s]*(.*)')
 const unquotedParamRE = new RegExp('^[,\\s]*' + paramMatcher + '[,\\s]*(.*)')
 const token68ParamRE = new RegExp('^(' + token68Match + ')(?:$|[,\\s])(.*)')
@@ -2680,45 +2680,60 @@ function parseWwwAuthenticateChallenges(
   while (rest) {
     let match: RegExpMatchArray | null = rest.match(schemeRE)
     const scheme = match?.['1'].toLowerCase() as Lowercase<string>
-    rest = match?.['2']
     if (!scheme) {
       return undefined
     }
 
+    // Calculate remainder after scheme
+    const afterScheme = rest.substring(match![0].length)
+    if (afterScheme && !afterScheme.match(/^[\s,]/)) {
+      // Invalid: scheme must be followed by space, comma, or end
+      return undefined
+    }
+    // Check if there's a space after scheme (indicating parameters may follow)
+    const spaceMatch = afterScheme.match(/^\s+(.*)$/)
+    const hasParameters = !!spaceMatch
+    rest = spaceMatch ? spaceMatch[1] : undefined
+
     const parameters: WWWAuthenticateChallenge['parameters'] = {}
     let token68: string | undefined
 
-    while (rest) {
-      let key: string
-      let value: string
-      if ((match = rest.match(quotedParamRE))) {
-        ;[, key, value, rest] = match
-        if (value.includes('\\')) {
-          try {
-            value = JSON.parse(`"${value}"`)
-          } catch {}
+    if (hasParameters) {
+      while (rest) {
+        let key: string
+        let value: string
+        if ((match = rest.match(quotedParamRE))) {
+          ;[, key, value, rest] = match
+          if (value.includes('\\')) {
+            try {
+              value = JSON.parse(`"${value}"`)
+            } catch {}
+          }
+          // @ts-expect-error
+          parameters[key.toLowerCase() as Lowercase<string>] = value
+          continue
         }
-        // @ts-expect-error
-        parameters[key.toLowerCase() as Lowercase<string>] = value
-        continue
-      }
 
-      if ((match = rest.match(unquotedParamRE))) {
-        ;[, key, value, rest] = match
-        // @ts-expect-error
-        parameters[key.toLowerCase() as Lowercase<string>] = value
-        continue
-      }
+        if ((match = rest.match(unquotedParamRE))) {
+          ;[, key, value, rest] = match
+          // @ts-expect-error
+          parameters[key.toLowerCase() as Lowercase<string>] = value
+          continue
+        }
 
-      if ((match = rest.match(token68ParamRE))) {
-        if (Object.keys(parameters).length) {
+        if ((match = rest.match(token68ParamRE))) {
+          if (Object.keys(parameters).length) {
+            break
+          }
+          ;[, token68, rest] = match
           break
         }
-        ;[, token68, rest] = match
-        break
-      }
 
-      return undefined
+        return undefined
+      }
+    } else {
+      // No space after scheme - set rest to the comma-prefixed remainder for next iteration
+      rest = afterScheme || undefined
     }
 
     const challenge: WWWAuthenticateChallenge = { scheme, parameters }
