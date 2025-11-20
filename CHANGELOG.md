@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.8.3](https://github.com/panva/oauth4webapi/compare/v3.8.2...v3.8.3) (2025-11-20)
+
+
+### Refactor
+
+* relax www-authenticate auth-param presence requirement ([35d4622](https://github.com/panva/oauth4webapi/commit/35d4622ad02598198039cf0f7f5ef10bc5e9448a))
+
 ## [3.8.2](https://github.com/panva/oauth4webapi/compare/v3.8.1...v3.8.2) (2025-09-27)
 
 
