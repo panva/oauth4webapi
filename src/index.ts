@@ -2640,8 +2640,9 @@ export interface WWWAuthenticateChallenge {
    */
   readonly scheme: Lowercase<string>
   /**
-   * Parsed WWW-Authenticate challenge auth-param dictionary (always present but will be empty when
-   * {@link WWWAuthenticateChallenge.token68 token68} is present)
+   * Parsed WWW-Authenticate challenge auth-param dictionary (always present but may be empty, e.g.
+   * when {@link WWWAuthenticateChallenge.token68 token68} is present, or when no auth-param pairs
+   * were provided)
    */
   readonly parameters: WWWAuthenticateChallengeParameters
   /**
