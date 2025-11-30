@@ -96,16 +96,6 @@ function CodedTypeError(message: string, code: codes, cause?: unknown) {
   return err
 }
 
-const RESPONSE_NOT_INSTANCE = '"response" must be an instance of Response'
-const notConform = (s: TemplateStringsArray, ...v: string[]) =>
-  `"response" is not a conform ${s[0] || v[0]} response (unexpected HTTP status code)`
-const bodyProp = (s: TemplateStringsArray) => `"response" body "${s[0]}" property`
-const bodyPropMismatch = (s: TemplateStringsArray) =>
-  `${bodyProp(s)} does not match the expected value`
-const bodyPropMustBe = (s: TemplateStringsArray) => (t: TemplateStringsArray) =>
-  `${bodyProp(s)} must be ${t[0]}`
-const dpopMismatch = (s: TemplateStringsArray) => `DPoP Proof ${s[0]} mismatch`
-
 /**
  * JWS `alg` Algorithm identifiers from the
  * {@link https://www.iana.org/assignments/jose/jose.xhtml#web-signature-encryption-algorithms JSON Web Signature and Encryption Algorithms IANA registry}
@@ -1431,24 +1421,28 @@ export async function processDiscoveryResponse(
   }
 
   if (!looseInstanceOf(response, Response)) {
-    throw CodedTypeError(RESPONSE_NOT_INSTANCE, ERR_INVALID_ARG_TYPE)
+    throw CodedTypeError('"response" must be an instance of Response', ERR_INVALID_ARG_TYPE)
   }
 
   if (response.status !== 200) {
-    throw OPE(notConform`Authorization Server Metadata`, RESPONSE_IS_NOT_CONFORM, response)
+    throw OPE(
+      '"response" is not a conform Authorization Server Metadata response (unexpected HTTP status code)',
+      RESPONSE_IS_NOT_CONFORM,
+      response,
+    )
   }
 
   assertReadableResponse(response)
   const json = await getResponseJsonBody<AuthorizationServer>(response)
 
-  assertString(json.issuer, bodyProp`issuer`, INVALID_RESPONSE, { body: json })
+  assertString(json.issuer, '"response" body "issuer" property', INVALID_RESPONSE, { body: json })
 
   if (expected !== _nodiscoverycheck && new URL(json.issuer).href !== expected.href) {
-    throw OPE(bodyPropMismatch`issuer`, JSON_ATTRIBUTE_COMPARISON, {
-      expected: expected.href,
-      body: json,
-      attribute: 'issuer',
-    })
+    throw OPE(
+      '"response" body "issuer" property does not match the expected value',
+      JSON_ATTRIBUTE_COMPARISON,
+      { expected: expected.href, body: json, attribute: 'issuer' },
+    )
   }
 
   return json
@@ -2673,7 +2667,7 @@ function parseWwwAuthenticateChallenges(
   response: Response,
 ): WWWAuthenticateChallenge[] | undefined {
   if (!looseInstanceOf(response, Response)) {
-    throw CodedTypeError(RESPONSE_NOT_INSTANCE, ERR_INVALID_ARG_TYPE)
+    throw CodedTypeError('"response" must be an instance of Response', ERR_INVALID_ARG_TYPE)
   }
 
   const header = response.headers.get('www-authenticate')
@@ -2783,7 +2777,7 @@ export async function processPushedAuthorizationResponse(
   assertClient(client)
 
   if (!looseInstanceOf(response, Response)) {
-    throw CodedTypeError(RESPONSE_NOT_INSTANCE, ERR_INVALID_ARG_TYPE)
+    throw CodedTypeError('"response" must be an instance of Response', ERR_INVALID_ARG_TYPE)
   }
 
   await checkOAuthBodyError(response, 201, 'Pushed Authorization Request Endpoint')
@@ -2791,13 +2785,13 @@ export async function processPushedAuthorizationResponse(
   assertReadableResponse(response)
   const json = await getResponseJsonBody<Writeable<PushedAuthorizationResponse>>(response)
 
-  assertString(json.request_uri, bodyProp`request_uri`, INVALID_RESPONSE, {
+  assertString(json.request_uri, '"response" body "request_uri" property', INVALID_RESPONSE, {
     body: json,
   })
 
   let expiresIn: unknown =
     typeof json.expires_in !== 'number' ? parseFloat(json.expires_in) : json.expires_in
-  assertNumber(expiresIn, true, bodyProp`expires_in`, INVALID_RESPONSE, {
+  assertNumber(expiresIn, true, '"response" body "expires_in" property', INVALID_RESPONSE, {
     body: json,
   })
   json.expires_in = expiresIn
@@ -2844,7 +2838,11 @@ async function checkOAuthBodyError(response: Response, expected: number, label: 
         response,
       })
     }
-    throw OPE(notConform`${label}`, RESPONSE_IS_NOT_CONFORM, response)
+    throw OPE(
+      `"response" is not a conform ${label} response (unexpected HTTP status code)`,
+      RESPONSE_IS_NOT_CONFORM,
+      response,
+    )
   }
 }
 
@@ -3296,13 +3294,17 @@ export async function processUserInfoResponse(
   assertClient(client)
 
   if (!looseInstanceOf(response, Response)) {
-    throw CodedTypeError(RESPONSE_NOT_INSTANCE, ERR_INVALID_ARG_TYPE)
+    throw CodedTypeError('"response" must be an instance of Response', ERR_INVALID_ARG_TYPE)
   }
 
   checkAuthenticationChallenges(response)
 
   if (response.status !== 200) {
-    throw OPE(notConform`UserInfo Endpoint`, RESPONSE_IS_NOT_CONFORM, response)
+    throw OPE(
+      '"response" is not a conform UserInfo Endpoint response (unexpected HTTP status code)',
+      RESPONSE_IS_NOT_CONFORM,
+      response,
+    )
   }
 
   assertReadableResponse(response)
@@ -3333,7 +3335,7 @@ export async function processUserInfoResponse(
     json = await getResponseJsonBody(response)
   }
 
-  assertString(json.sub, bodyProp`sub`, INVALID_RESPONSE, { body: json })
+  assertString(json.sub, '"response" body "sub" property', INVALID_RESPONSE, { body: json })
 
   switch (expectedSubject) {
     case skipSubjectCheck:
@@ -3563,7 +3565,7 @@ async function processGenericAccessTokenResponse(
   assertClient(client)
 
   if (!looseInstanceOf(response, Response)) {
-    throw CodedTypeError(RESPONSE_NOT_INSTANCE, ERR_INVALID_ARG_TYPE)
+    throw CodedTypeError('"response" must be an instance of Response', ERR_INVALID_ARG_TYPE)
   }
 
   await checkOAuthBodyError(response, 200, 'Token Endpoint')
@@ -3571,11 +3573,11 @@ async function processGenericAccessTokenResponse(
   assertReadableResponse(response)
   const json = await getResponseJsonBody<Writeable<TokenEndpointResponse>>(response)
 
-  assertString(json.access_token, bodyProp`access_token`, INVALID_RESPONSE, {
+  assertString(json.access_token, '"response" body "access_token" property', INVALID_RESPONSE, {
     body: json,
   })
 
-  assertString(json.token_type, bodyProp`token_type`, INVALID_RESPONSE, {
+  assertString(json.token_type, '"response" body "token_type" property', INVALID_RESPONSE, {
     body: json,
   })
 
@@ -3584,25 +3586,25 @@ async function processGenericAccessTokenResponse(
   if (json.expires_in !== undefined) {
     let expiresIn: unknown =
       typeof json.expires_in !== 'number' ? parseFloat(json.expires_in) : json.expires_in
-    assertNumber(expiresIn, true, bodyProp`expires_in`, INVALID_RESPONSE, {
+    assertNumber(expiresIn, true, '"response" body "expires_in" property', INVALID_RESPONSE, {
       body: json,
     })
     json.expires_in = expiresIn
   }
 
   if (json.refresh_token !== undefined) {
-    assertString(json.refresh_token, bodyProp`refresh_token`, INVALID_RESPONSE, {
+    assertString(json.refresh_token, '"response" body "refresh_token" property', INVALID_RESPONSE, {
       body: json,
     })
   }
 
   // allows empty
   if (json.scope !== undefined && typeof json.scope !== 'string') {
-    throw OPE(bodyPropMustBe`scope``a string`, INVALID_RESPONSE, { body: json })
+    throw OPE('"response" body "scope" property must be a string', INVALID_RESPONSE, { body: json })
   }
 
   if (json.id_token !== undefined) {
-    assertString(json.id_token, bodyProp`id_token`, INVALID_RESPONSE, {
+    assertString(json.id_token, '"response" body "id_token" property', INVALID_RESPONSE, {
       body: json,
     })
 
@@ -4089,7 +4091,7 @@ async function processAuthorizationCodeOpenIDResponse(
     recognizedTokenTypes,
   )
 
-  assertString(result.id_token, bodyProp`id_token`, INVALID_RESPONSE, {
+  assertString(result.id_token, '"response" body "id_token" property', INVALID_RESPONSE, {
     body: result,
   })
 
@@ -4520,7 +4522,7 @@ export async function revocationRequest(
  */
 export async function processRevocationResponse(response: Response): Promise<undefined> {
   if (!looseInstanceOf(response, Response)) {
-    throw CodedTypeError(RESPONSE_NOT_INSTANCE, ERR_INVALID_ARG_TYPE)
+    throw CodedTypeError('"response" must be an instance of Response', ERR_INVALID_ARG_TYPE)
   }
 
   await checkOAuthBodyError(response, 200, 'Revocation Endpoint')
@@ -4653,7 +4655,7 @@ export async function processIntrospectionResponse(
   assertClient(client)
 
   if (!looseInstanceOf(response, Response)) {
-    throw CodedTypeError(RESPONSE_NOT_INSTANCE, ERR_INVALID_ARG_TYPE)
+    throw CodedTypeError('"response" must be an instance of Response', ERR_INVALID_ARG_TYPE)
   }
 
   await checkOAuthBodyError(response, 200, 'Introspection Endpoint')
@@ -4691,7 +4693,7 @@ export async function processIntrospectionResponse(
   }
 
   if (typeof json.active !== 'boolean') {
-    throw OPE(bodyPropMustBe`active``a boolean`, INVALID_RESPONSE, {
+    throw OPE('"response" body "active" property must be a boolean', INVALID_RESPONSE, {
       body: json,
     })
   }
@@ -4726,11 +4728,15 @@ export interface JWKS {
 
 async function processJwksResponse(response: Response): Promise<JWKS> {
   if (!looseInstanceOf(response, Response)) {
-    throw CodedTypeError(RESPONSE_NOT_INSTANCE, ERR_INVALID_ARG_TYPE)
+    throw CodedTypeError('"response" must be an instance of Response', ERR_INVALID_ARG_TYPE)
   }
 
   if (response.status !== 200) {
-    throw OPE(notConform`JSON Web Key Set`, RESPONSE_IS_NOT_CONFORM, response)
+    throw OPE(
+      '"response" is not a conform JSON Web Key Set response (unexpected HTTP status code)',
+      RESPONSE_IS_NOT_CONFORM,
+      response,
+    )
   }
 
   assertReadableResponse(response)
@@ -4739,7 +4745,7 @@ async function processJwksResponse(response: Response): Promise<JWKS> {
   )
 
   if (!Array.isArray(json.keys)) {
-    throw OPE(bodyPropMustBe`keys``an array`, INVALID_RESPONSE, { body: json })
+    throw OPE('"response" body "keys" property must be an array', INVALID_RESPONSE, { body: json })
   }
 
   if (!Array.prototype.every.call(json.keys, isJsonObject)) {
@@ -5756,7 +5762,7 @@ export async function processDeviceAuthorizationResponse(
   assertClient(client)
 
   if (!looseInstanceOf(response, Response)) {
-    throw CodedTypeError(RESPONSE_NOT_INSTANCE, ERR_INVALID_ARG_TYPE)
+    throw CodedTypeError('"response" must be an instance of Response', ERR_INVALID_ARG_TYPE)
   }
 
   await checkOAuthBodyError(response, 200, 'Device Authorization Endpoint')
@@ -5764,19 +5770,22 @@ export async function processDeviceAuthorizationResponse(
   assertReadableResponse(response)
   const json = await getResponseJsonBody<Writeable<DeviceAuthorizationResponse>>(response)
 
-  assertString(json.device_code, bodyProp`device_code`, INVALID_RESPONSE, {
+  assertString(json.device_code, '"response" body "device_code" property', INVALID_RESPONSE, {
     body: json,
   })
-  assertString(json.user_code, bodyProp`user_code`, INVALID_RESPONSE, {
+  assertString(json.user_code, '"response" body "user_code" property', INVALID_RESPONSE, {
     body: json,
   })
-  assertString(json.verification_uri, bodyProp`verification_uri`, INVALID_RESPONSE, {
-    body: json,
-  })
+  assertString(
+    json.verification_uri,
+    '"response" body "verification_uri" property',
+    INVALID_RESPONSE,
+    { body: json },
+  )
 
   let expiresIn: unknown =
     typeof json.expires_in !== 'number' ? parseFloat(json.expires_in) : json.expires_in
-  assertNumber(expiresIn, true, bodyProp`expires_in`, INVALID_RESPONSE, {
+  assertNumber(expiresIn, true, '"response" body "expires_in" property', INVALID_RESPONSE, {
     body: json,
   })
   json.expires_in = expiresIn
@@ -5784,14 +5793,14 @@ export async function processDeviceAuthorizationResponse(
   if (json.verification_uri_complete !== undefined) {
     assertString(
       json.verification_uri_complete,
-      bodyProp`verification_uri_complete`,
+      '"response" body "verification_uri_complete" property',
       INVALID_RESPONSE,
       { body: json },
     )
   }
 
   if (json.interval !== undefined) {
-    assertNumber(json.interval, false, bodyProp`interval`, INVALID_RESPONSE, {
+    assertNumber(json.interval, false, '"response" body "interval" property', INVALID_RESPONSE, {
       body: json,
     })
   }
@@ -6014,7 +6023,7 @@ async function validateDPoP(
   }
 
   if (proof.claims.htm !== request.method) {
-    throw OPE(dpopMismatch`htm`, JWT_CLAIM_COMPARISON, {
+    throw OPE('DPoP Proof htm mismatch', JWT_CLAIM_COMPARISON, {
       expected: request.method,
       claims: proof.claims,
       claim: 'htm',
@@ -6025,7 +6034,7 @@ async function validateDPoP(
     typeof proof.claims.htu !== 'string' ||
     normalizeHtu(proof.claims.htu) !== normalizeHtu(request.url)
   ) {
-    throw OPE(dpopMismatch`htu`, JWT_CLAIM_COMPARISON, {
+    throw OPE('DPoP Proof htu mismatch', JWT_CLAIM_COMPARISON, {
       expected: normalizeHtu(request.url),
       claims: proof.claims,
       claim: 'htu',
@@ -6038,7 +6047,7 @@ async function validateDPoP(
     )
 
     if (proof.claims.ath !== expected) {
-      throw OPE(dpopMismatch`ath`, JWT_CLAIM_COMPARISON, {
+      throw OPE('DPoP Proof ath mismatch', JWT_CLAIM_COMPARISON, {
         expected,
         claims: proof.claims,
         claim: 'ath',
@@ -6313,7 +6322,7 @@ export async function processBackchannelAuthenticationResponse(
   assertClient(client)
 
   if (!looseInstanceOf(response, Response)) {
-    throw CodedTypeError(RESPONSE_NOT_INSTANCE, ERR_INVALID_ARG_TYPE)
+    throw CodedTypeError('"response" must be an instance of Response', ERR_INVALID_ARG_TYPE)
   }
 
   await checkOAuthBodyError(response, 200, 'Backchannel Authentication Endpoint')
@@ -6321,19 +6330,19 @@ export async function processBackchannelAuthenticationResponse(
   assertReadableResponse(response)
   const json = await getResponseJsonBody<Writeable<BackchannelAuthenticationResponse>>(response)
 
-  assertString(json.auth_req_id, bodyProp`auth_req_id`, INVALID_RESPONSE, {
+  assertString(json.auth_req_id, '"response" body "auth_req_id" property', INVALID_RESPONSE, {
     body: json,
   })
 
   let expiresIn: unknown =
     typeof json.expires_in !== 'number' ? parseFloat(json.expires_in) : json.expires_in
-  assertNumber(expiresIn, true, bodyProp`expires_in`, INVALID_RESPONSE, {
+  assertNumber(expiresIn, true, '"response" body "expires_in" property', INVALID_RESPONSE, {
     body: json,
   })
   json.expires_in = expiresIn
 
   if (json.interval !== undefined) {
-    assertNumber(json.interval, false, bodyProp`interval`, INVALID_RESPONSE, {
+    assertNumber(json.interval, false, '"response" body "interval" property', INVALID_RESPONSE, {
       body: json,
     })
   }
@@ -6513,7 +6522,7 @@ export async function processDynamicClientRegistrationResponse(
   response: Response,
 ): Promise<OmitSymbolProperties<Client>> {
   if (!looseInstanceOf(response, Response)) {
-    throw CodedTypeError(RESPONSE_NOT_INSTANCE, ERR_INVALID_ARG_TYPE)
+    throw CodedTypeError('"response" must be an instance of Response', ERR_INVALID_ARG_TYPE)
   }
 
   await checkOAuthBodyError(response, 201, 'Dynamic Client Registration Endpoint')
@@ -6521,12 +6530,12 @@ export async function processDynamicClientRegistrationResponse(
   assertReadableResponse(response)
   const json = await getResponseJsonBody<Writeable<Client>>(response)
 
-  assertString(json.client_id, bodyProp`client_id`, INVALID_RESPONSE, {
+  assertString(json.client_id, '"response" body "client_id" property', INVALID_RESPONSE, {
     body: json,
   })
 
   if (json.client_secret !== undefined) {
-    assertString(json.client_secret, bodyProp`client_secret`, INVALID_RESPONSE, {
+    assertString(json.client_secret, '"response" body "client_secret" property', INVALID_RESPONSE, {
       body: json,
     })
   }
@@ -6535,7 +6544,7 @@ export async function processDynamicClientRegistrationResponse(
     assertNumber(
       json.client_secret_expires_at,
       true,
-      bodyProp`client_secret_expires_at`,
+      '"response" body "client_secret_expires_at" property',
       INVALID_RESPONSE,
       {
         body: json,
@@ -6697,26 +6706,30 @@ export async function processResourceDiscoveryResponse(
   }
 
   if (!looseInstanceOf(response, Response)) {
-    throw CodedTypeError(RESPONSE_NOT_INSTANCE, ERR_INVALID_ARG_TYPE)
+    throw CodedTypeError('"response" must be an instance of Response', ERR_INVALID_ARG_TYPE)
   }
 
   if (response.status !== 200) {
-    throw OPE(notConform`Resource Server Metadata`, RESPONSE_IS_NOT_CONFORM, response)
+    throw OPE(
+      '"response" is not a conform Resource Server Metadata response (unexpected HTTP status code)',
+      RESPONSE_IS_NOT_CONFORM,
+      response,
+    )
   }
 
   assertReadableResponse(response)
   const json = await getResponseJsonBody<ResourceServer>(response)
 
-  assertString(json.resource, bodyProp`resource`, INVALID_RESPONSE, {
+  assertString(json.resource, '"response" body "resource" property', INVALID_RESPONSE, {
     body: json,
   })
 
   if (expected !== _nodiscoverycheck && new URL(json.resource).href !== expected.href) {
-    throw OPE(bodyPropMismatch`resource`, JSON_ATTRIBUTE_COMPARISON, {
-      expected: expected.href,
-      body: json,
-      attribute: 'resource',
-    })
+    throw OPE(
+      '"response" body "resource" property does not match the expected value',
+      JSON_ATTRIBUTE_COMPARISON,
+      { expected: expected.href, body: json, attribute: 'resource' },
+    )
   }
 
   return json
