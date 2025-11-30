@@ -52,7 +52,7 @@ test('dynamicClientRegistrationRequest() w/ initial access token', async (t) => 
   t.true(response instanceof Response)
 })
 
-test('dynamicClientRegistrationRequest() w/ initial access token and DPoP', async (t) => {
+test.serial('dynamicClientRegistrationRequest() w/ initial access token and DPoP', async (t) => {
   const kp = await lib.generateKeyPair('ES256')
   const publicJwk = await jose.exportJWK(kp.publicKey)
   const data = { client_id: 'foo' }
@@ -91,7 +91,7 @@ test('dynamicClientRegistrationRequest() w/ initial access token and DPoP', asyn
   t.true(response instanceof Response)
 })
 
-test('dynamicClientRegistrationRequest() w/o initial access token and DPoP', async (t) => {
+test.serial('dynamicClientRegistrationRequest() w/o initial access token and DPoP', async (t) => {
   const kp = await lib.generateKeyPair('ES256')
   const publicJwk = await jose.exportJWK(kp.publicKey)
   const data = { client_id: 'foo' }
