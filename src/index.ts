@@ -786,17 +786,16 @@ export interface AuthorizationServer {
   readonly [metadata: string]: JsonValue | undefined
 }
 
-export interface MTLSEndpointAliases
-  extends Pick<
-    AuthorizationServer,
-    | 'backchannel_authentication_endpoint'
-    | 'device_authorization_endpoint'
-    | 'introspection_endpoint'
-    | 'pushed_authorization_request_endpoint'
-    | 'revocation_endpoint'
-    | 'token_endpoint'
-    | 'userinfo_endpoint'
-  > {
+export interface MTLSEndpointAliases extends Pick<
+  AuthorizationServer,
+  | 'backchannel_authentication_endpoint'
+  | 'device_authorization_endpoint'
+  | 'introspection_endpoint'
+  | 'pushed_authorization_request_endpoint'
+  | 'revocation_endpoint'
+  | 'token_endpoint'
+  | 'userinfo_endpoint'
+> {
   readonly [metadata: string]: string | undefined
 }
 
@@ -1570,8 +1569,7 @@ export interface DPoPRequestOptions {
 }
 
 export interface PushedAuthorizationRequestOptions
-  extends HttpRequestOptions<'POST', URLSearchParams>,
-    DPoPRequestOptions {}
+  extends HttpRequestOptions<'POST', URLSearchParams>, DPoPRequestOptions {}
 
 /**
  * Determines an RSASSA-PSS algorithm identifier from CryptoKey instance properties.
@@ -2809,7 +2807,8 @@ export type ProtectedResourceRequestBody =
   | URLSearchParams
 
 export interface ProtectedResourceRequestOptions
-  extends Omit<HttpRequestOptions<string, ProtectedResourceRequestBody>, 'headers'>,
+  extends
+    Omit<HttpRequestOptions<string, ProtectedResourceRequestBody>, 'headers'>,
     DPoPRequestOptions {}
 
 async function parseOAuthResponseErrorBody(response: Response): Promise<OAuth2Error | undefined> {
@@ -3377,8 +3376,7 @@ async function authenticatedRequest(
 }
 
 export interface TokenEndpointRequestOptions
-  extends HttpRequestOptions<'POST', URLSearchParams>,
-    DPoPRequestOptions {
+  extends HttpRequestOptions<'POST', URLSearchParams>, DPoPRequestOptions {
   /**
    * Any additional parameters to send. This cannot override existing parameter values.
    */
@@ -4309,8 +4307,7 @@ function checkJwtType(expected: string, result: Awaited<ReturnType<typeof valida
 }
 
 export interface ClientCredentialsGrantRequestOptions
-  extends HttpRequestOptions<'POST', URLSearchParams>,
-    DPoPRequestOptions {}
+  extends HttpRequestOptions<'POST', URLSearchParams>, DPoPRequestOptions {}
 
 /**
  * Performs a Client Credentials Grant request at the
@@ -5660,8 +5657,10 @@ async function importJwk(alg: string, jwk: JWK) {
   return crypto.subtle.importKey('jwk', key, algToSubtle(alg), true, ['verify'])
 }
 
-export interface DeviceAuthorizationRequestOptions
-  extends HttpRequestOptions<'POST', URLSearchParams> {}
+export interface DeviceAuthorizationRequestOptions extends HttpRequestOptions<
+  'POST',
+  URLSearchParams
+> {}
 
 /**
  * Performs a Device Authorization Request at the
@@ -6234,8 +6233,10 @@ function reassignRSCode(err: unknown): never {
   throw err
 }
 
-export interface BackchannelAuthenticationRequestOptions
-  extends HttpRequestOptions<'POST', URLSearchParams> {}
+export interface BackchannelAuthenticationRequestOptions extends HttpRequestOptions<
+  'POST',
+  URLSearchParams
+> {}
 
 /**
  * Performs a Backchannel Authentication Request at the
@@ -6433,8 +6434,7 @@ export type OmitSymbolProperties<T> = {
 }
 
 export interface DynamicClientRegistrationRequestOptions
-  extends HttpRequestOptions<'POST', string>,
-    DPoPRequestOptions {
+  extends HttpRequestOptions<'POST', string>, DPoPRequestOptions {
   /**
    * Access token optionally issued by an authorization server used to authorize calls to the client
    * registration endpoint.
