@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.8.4](https://github.com/panva/oauth4webapi/compare/v3.8.3...v3.8.4) (2026-02-07)
+
+
+### Fixes
+
+* use duplex: half for resourceRequest with ReadableStream body input ([34f01d4](https://github.com/panva/oauth4webapi/commit/34f01d48405b25bdfe5381729450df52f9d3b198))
+
 ## [3.8.3](https://github.com/panva/oauth4webapi/compare/v3.8.2...v3.8.3) (2025-11-20)
 
 
