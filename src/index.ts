@@ -2878,6 +2878,8 @@ async function resourceRequest(
 
   const response = await (options?.[customFetch] || fetch)(url.href, {
     // @ts-ignore
+    duplex: looseInstanceOf(body, ReadableStream) ? 'half' : undefined,
+    // @ts-ignore
     body,
     headers: Object.fromEntries(headers.entries()),
     method,

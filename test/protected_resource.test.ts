@@ -22,3 +22,26 @@ test('protectedResource()', async (t) => {
   const response = await lib.protectedResourceRequest('token', 'GET', url)
   t.true(response instanceof Response)
 })
+
+test('protectedResource() w/ POST and ReadableStream body', async (t) => {
+  const payload = 'stream body content'
+  t.context.mock
+    .get('https://rs.example.com')
+    .intercept({
+      path: '/resource',
+      method: 'POST',
+      headers: {
+        authorization: 'Bearer token',
+      },
+    })
+    .reply(200, '')
+  const url = new URL('https://rs.example.com/resource')
+  const body = new ReadableStream({
+    start(controller) {
+      controller.enqueue(new TextEncoder().encode(payload))
+      controller.close()
+    },
+  })
+  const response = await lib.protectedResourceRequest('token', 'POST', url, undefined, body)
+  t.true(response instanceof Response)
+})
