@@ -5056,7 +5056,11 @@ export async function validateJwtAuthResponse(
 
 interface CShakeParams {
   name: string
+  /**
+   * @deprecated
+   */
   length: number
+  outputLength: number
 }
 
 async function idTokenHash(data: string, header: CompactJWSHeaderParameters, claimName: string) {
@@ -5082,7 +5086,7 @@ async function idTokenHash(data: string, header: CompactJWSHeaderParameters, cla
     case 'ML-DSA-44':
     case 'ML-DSA-65':
     case 'ML-DSA-87':
-      algorithm = { name: 'cSHAKE256', length: 512 }
+      algorithm = { name: 'cSHAKE256', length: 512, outputLength: 512 }
       break
     default:
       throw new UnsupportedOperationError(
