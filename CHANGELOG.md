@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.8.5](https://github.com/panva/oauth4webapi/compare/v3.8.4...v3.8.5) (2026-02-16)
+
+
+### Refactor
+
+* account for an upcoming Web Cryptography change ([ac13290](https://github.com/panva/oauth4webapi/commit/ac1329027a798d96ea8f6c243aac1c70d009ff05))
+
 ## [3.8.4](https://github.com/panva/oauth4webapi/compare/v3.8.3...v3.8.4) (2026-02-07)
 
 
