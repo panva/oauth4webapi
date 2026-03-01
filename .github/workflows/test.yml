@@ -93,7 +93,7 @@ jobs:
       - name: Upload server logs
         if: ${{ failure() && matrix.suite == 'tap:node' }}
         id: artifact-upload-step
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           path: server.log
           name: node idx(${{ strategy.job-index }}) server log
@@ -118,7 +118,7 @@ jobs:
       - name: Upload server logs
         if: ${{ failure() }}
         id: artifact-upload-step
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           path: server.log
           name: electron server log
@@ -147,7 +147,7 @@ jobs:
       - name: Upload server logs
         if: ${{ failure() }}
         id: artifact-upload-step
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           path: server.log
           name: deno server log
@@ -192,7 +192,7 @@ jobs:
       - name: Upload server logs
         if: ${{ failure() }}
         id: artifact-upload-step
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           path: server.log
           name: bun server log
@@ -239,7 +239,7 @@ jobs:
       - name: Upload server logs
         if: ${{ failure() }}
         id: artifact-upload-step
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           path: server.log
           name: ${{ matrix.browser.name }} server log
