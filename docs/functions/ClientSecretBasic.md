@@ -15,7 +15,7 @@ Support from the community to continue maintaining and improving this module is 
 
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
-| `clientSecret` | `string` |  |
+| `clientSecret` | `string` | - |
 
 ## Returns
 

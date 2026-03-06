@@ -16,8 +16,8 @@ the assertion's authenticity and integrity.
 
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
-| `clientSecret` | `string` |  |
-| `options?` | [`ModifyAssertionOptions`](../interfaces/ModifyAssertionOptions.md) |  |
+| `clientSecret` | `string` | - |
+| `options?` | [`ModifyAssertionOptions`](../interfaces/ModifyAssertionOptions.md) | - |
 
 ## Returns
 

@@ -18,7 +18,7 @@ client metadata.
 | ------ | ------ | ------ |
 | `as` | [`AuthorizationServer`](../interfaces/AuthorizationServer.md) | Authorization Server Metadata. |
 | `metadata` | [`Partial`](https://www.typescriptlang.org/docs/handbook/utility-types.html#partialtype)\<[`OmitSymbolProperties`](../type-aliases/OmitSymbolProperties.md)\<[`Client`](../interfaces/Client.md)\>\> | Requested Client Metadata. |
-| `options?` | [`DynamicClientRegistrationRequestOptions`](../interfaces/DynamicClientRegistrationRequestOptions.md) |  |
+| `options?` | [`DynamicClientRegistrationRequestOptions`](../interfaces/DynamicClientRegistrationRequestOptions.md) | - |
 
 ## Returns
 
