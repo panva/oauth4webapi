@@ -76,6 +76,7 @@
   },
   "devDependencies": {
     "@koa/cors": "^5.0.0",
+    "@playwright/test": "^1.58.2",
     "@types/koa__cors": "^5.0.1",
     "@types/node": "^24.12.0",
     "@types/qunit": "^2.19.13",
