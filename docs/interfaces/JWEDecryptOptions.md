@@ -10,6 +10,6 @@ Support from the community to continue maintaining and improving this module is 
 
 ### \[jweDecrypt\]?
 
-• `optional` **\[jweDecrypt\]**: [`JweDecryptFunction`](../type-aliases/JweDecryptFunction.md)
+• `optional` **\[jweDecrypt\]?**: [`JweDecryptFunction`](../type-aliases/JweDecryptFunction.md)
 
 See [jweDecrypt](../variables/jweDecrypt.md).

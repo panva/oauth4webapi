@@ -8,7 +8,7 @@ Support from the community to continue maintaining and improving this module is 
 
 ## Indexable
 
-\[`claim`: `string`\]: [`JsonValue`](../type-aliases/JsonValue.md) \| `undefined`
+> \[`claim`: `string`\]: [`JsonValue`](../type-aliases/JsonValue.md) \| `undefined`
 
 ## Properties
 
@@ -56,22 +56,22 @@ Support from the community to continue maintaining and improving this module is 
 
 ### authorization\_details?
 
-• `readonly` `optional` **authorization\_details**: [`AuthorizationDetails`](AuthorizationDetails.md)[]
+• `readonly` `optional` **authorization\_details?**: [`AuthorizationDetails`](AuthorizationDetails.md)[]
 
 ***
 
 ### cnf?
 
-• `readonly` `optional` **cnf**: [`ConfirmationClaims`](ConfirmationClaims.md)
+• `readonly` `optional` **cnf?**: [`ConfirmationClaims`](ConfirmationClaims.md)
 
 ***
 
 ### nbf?
 
-• `readonly` `optional` **nbf**: `number`
+• `readonly` `optional` **nbf?**: `number`
 
 ***
 
 ### scope?
 
-• `readonly` `optional` **scope**: `string`
+• `readonly` `optional` **scope?**: `string`

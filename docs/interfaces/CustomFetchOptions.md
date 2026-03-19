@@ -49,7 +49,7 @@ See [Request.redirect](https://developer.mozilla.org/docs/Web/API/Request/redire
 
 ### signal?
 
-• `optional` **signal**: [`AbortSignal`](https://developer.mozilla.org/docs/Web/API/AbortSignal)
+• `optional` **signal?**: [`AbortSignal`](https://developer.mozilla.org/docs/Web/API/AbortSignal)
 
 Depending on whether [HttpRequestOptions.signal](HttpRequestOptions.md#signal) was used, if so, it is the value passed,
 otherwise undefined

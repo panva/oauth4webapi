@@ -1,4 +1,4 @@
-# Type Alias: JweDecryptFunction()
+# Type Alias: JweDecryptFunction
 
 [💗 Help the project](https://github.com/sponsors/panva)
 

@@ -14,7 +14,7 @@ Recognized Client Metadata that have an effect on the exposed functionality.
 
 ## Indexable
 
-\[`metadata`: `string`\]: [`JsonValue`](../type-aliases/JsonValue.md) \| `undefined`
+> \[`metadata`: `string`\]: [`JsonValue`](../type-aliases/JsonValue.md) \| `undefined`
 
 ## Properties
 
@@ -28,7 +28,7 @@ Client identifier.
 
 ### \[clockSkew\]?
 
-• `optional` **\[clockSkew\]**: `number`
+• `optional` **\[clockSkew\]?**: `number`
 
 See [clockSkew](../variables/clockSkew.md).
 
@@ -36,7 +36,7 @@ See [clockSkew](../variables/clockSkew.md).
 
 ### \[clockTolerance\]?
 
-• `optional` **\[clockTolerance\]**: `number`
+• `optional` **\[clockTolerance\]?**: `number`
 
 See [clockTolerance](../variables/clockTolerance.md).
 
@@ -44,7 +44,7 @@ See [clockTolerance](../variables/clockTolerance.md).
 
 ### authorization\_signed\_response\_alg?
 
-• `optional` **authorization\_signed\_response\_alg**: `string`
+• `optional` **authorization\_signed\_response\_alg?**: `string`
 
 JWS `alg` algorithm required for signing authorization responses. When not configured the
 default is to allow only algorithms listed in
@@ -55,7 +55,7 @@ and fall back to `RS256` when the authorization server metadata is not set.
 
 ### default\_max\_age?
 
-• `optional` **default\_max\_age**: `number`
+• `optional` **default\_max\_age?**: `number`
 
 Default Maximum Authentication Age.
 
@@ -63,7 +63,7 @@ Default Maximum Authentication Age.
 
 ### id\_token\_signed\_response\_alg?
 
-• `optional` **id\_token\_signed\_response\_alg**: `string`
+• `optional` **id\_token\_signed\_response\_alg?**: `string`
 
 JWS `alg` algorithm required for signing the ID Token issued to this Client. When not
 configured the default is to allow only algorithms listed in
@@ -74,7 +74,7 @@ and fall back to `RS256` when the authorization server metadata is not set.
 
 ### introspection\_signed\_response\_alg?
 
-• `optional` **introspection\_signed\_response\_alg**: `string`
+• `optional` **introspection\_signed\_response\_alg?**: `string`
 
 JWS `alg` algorithm REQUIRED for signed introspection responses. When not configured the
 default is to allow only algorithms listed in
@@ -85,7 +85,7 @@ and fall back to `RS256` when the authorization server metadata is not set.
 
 ### require\_auth\_time?
 
-• `optional` **require\_auth\_time**: `boolean`
+• `optional` **require\_auth\_time?**: `boolean`
 
 Boolean value specifying whether the [`auth\_time`](IDToken.md#auth_time) Claim in the ID Token
 is REQUIRED. Default is `false`.
@@ -94,7 +94,7 @@ is REQUIRED. Default is `false`.
 
 ### use\_mtls\_endpoint\_aliases?
 
-• `optional` **use\_mtls\_endpoint\_aliases**: `boolean`
+• `optional` **use\_mtls\_endpoint\_aliases?**: `boolean`
 
 Indicates the requirement for a client to use mutual TLS endpoint aliases defined by the AS
 where present. Default is `false`.
@@ -155,7 +155,7 @@ let response = await oauth.pushedAuthorizationRequest(as, client, clientAuth, pa
 
 ### userinfo\_signed\_response\_alg?
 
-• `optional` **userinfo\_signed\_response\_alg**: `string`
+• `optional` **userinfo\_signed\_response\_alg?**: `string`
 
 JWS `alg` algorithm REQUIRED for signing UserInfo Responses. When not configured the default is
 to allow only algorithms listed in

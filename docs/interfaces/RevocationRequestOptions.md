@@ -10,7 +10,7 @@ Support from the community to continue maintaining and improving this module is 
 
 ### ~~\[allowInsecureRequests\]?~~
 
-• `optional` **\[allowInsecureRequests\]**: `boolean`
+• `optional` **\[allowInsecureRequests\]?**: `boolean`
 
 See [allowInsecureRequests](../variables/allowInsecureRequests.md).
 
@@ -18,9 +18,9 @@ See [allowInsecureRequests](../variables/allowInsecureRequests.md).
 
 ***
 
-### \[customFetch\]()?
+### \[customFetch\]?
 
-• `optional` **\[customFetch\]**: (`url`, `options`) => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Response`](https://developer.mozilla.org/docs/Web/API/Response)\>
+• `optional` **\[customFetch\]?**: (`url`, `options`) => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Response`](https://developer.mozilla.org/docs/Web/API/Response)\>
 
 See [customFetch](../variables/customFetch.md).
 
@@ -39,7 +39,7 @@ See [customFetch](../variables/customFetch.md).
 
 ### additionalParameters?
 
-• `optional` **additionalParameters**: [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `string`\> \| [`URLSearchParams`](https://developer.mozilla.org/docs/Web/API/URLSearchParams) \| `string`[][]
+• `optional` **additionalParameters?**: [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `string`\> \| [`URLSearchParams`](https://developer.mozilla.org/docs/Web/API/URLSearchParams) \| `string`[][]
 
 Any additional parameters to send. This cannot override existing parameter values.
 
@@ -47,7 +47,7 @@ Any additional parameters to send. This cannot override existing parameter value
 
 ### headers?
 
-• `optional` **headers**: [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `string`\> \| \[`string`, `string`\][] \| [`Headers`](https://developer.mozilla.org/docs/Web/API/Headers)
+• `optional` **headers?**: [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `string`\> \| \[`string`, `string`\][] \| [`Headers`](https://developer.mozilla.org/docs/Web/API/Headers)
 
 Headers to additionally send with the HTTP request(s) triggered by this function's invocation.
 
@@ -55,7 +55,7 @@ Headers to additionally send with the HTTP request(s) triggered by this function
 
 ### signal?
 
-• `optional` **signal**: [`AbortSignal`](https://developer.mozilla.org/docs/Web/API/AbortSignal) \| (`url`) => [`AbortSignal`](https://developer.mozilla.org/docs/Web/API/AbortSignal)
+• `optional` **signal?**: [`AbortSignal`](https://developer.mozilla.org/docs/Web/API/AbortSignal) \| ((`url`) => [`AbortSignal`](https://developer.mozilla.org/docs/Web/API/AbortSignal))
 
 An AbortSignal instance, or a factory returning one, to abort the HTTP request(s) triggered by
 this function's invocation.

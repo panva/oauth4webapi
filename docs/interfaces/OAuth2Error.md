@@ -8,7 +8,7 @@ Support from the community to continue maintaining and improving this module is 
 
 ## Indexable
 
-\[`parameter`: `string`\]: [`JsonValue`](../type-aliases/JsonValue.md) \| `undefined`
+> \[`parameter`: `string`\]: [`JsonValue`](../type-aliases/JsonValue.md) \| `undefined`
 
 ## Properties
 
@@ -20,22 +20,22 @@ Support from the community to continue maintaining and improving this module is 
 
 ### algs?
 
-• `readonly` `optional` **algs**: `string`
+• `readonly` `optional` **algs?**: `string`
 
 ***
 
 ### error\_description?
 
-• `readonly` `optional` **error\_description**: `string`
+• `readonly` `optional` **error\_description?**: `string`
 
 ***
 
 ### error\_uri?
 
-• `readonly` `optional` **error\_uri**: `string`
+• `readonly` `optional` **error\_uri?**: `string`
 
 ***
 
 ### scope?
 
-• `readonly` `optional` **scope**: `string`
+• `readonly` `optional` **scope?**: `string`

@@ -10,6 +10,6 @@ Support from the community to continue maintaining and improving this module is 
 
 ### \[jwksCache\]?
 
-• `optional` **\[jwksCache\]**: [`JWKSCacheInput`](../type-aliases/JWKSCacheInput.md)
+• `optional` **\[jwksCache\]?**: [`JWKSCacheInput`](../type-aliases/JWKSCacheInput.md)
 
 See [jwksCache](../variables/jwksCache.md).

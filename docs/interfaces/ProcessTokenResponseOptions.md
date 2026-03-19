@@ -10,7 +10,7 @@ Support from the community to continue maintaining and improving this module is 
 
 ### \[jweDecrypt\]?
 
-• `optional` **\[jweDecrypt\]**: [`JweDecryptFunction`](../type-aliases/JweDecryptFunction.md)
+• `optional` **\[jweDecrypt\]?**: [`JweDecryptFunction`](../type-aliases/JweDecryptFunction.md)
 
 See [jweDecrypt](../variables/jweDecrypt.md).
 
@@ -18,6 +18,6 @@ See [jweDecrypt](../variables/jweDecrypt.md).
 
 ### recognizedTokenTypes?
 
-• `optional` **recognizedTokenTypes**: [`RecognizedTokenTypes`](../type-aliases/RecognizedTokenTypes.md)
+• `optional` **recognizedTokenTypes?**: [`RecognizedTokenTypes`](../type-aliases/RecognizedTokenTypes.md)
 
 See [RecognizedTokenTypes](../type-aliases/RecognizedTokenTypes.md).

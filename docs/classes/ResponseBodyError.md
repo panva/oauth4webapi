@@ -64,7 +64,7 @@ HTTP Status Code of the response
 
 ### error\_description?
 
-• `optional` **error\_description**: `string`
+• `optional` **error\_description?**: `string`
 
 Human-readable text providing additional information, used to assist the developer in
 understanding the error that occurred, given in the JSON response

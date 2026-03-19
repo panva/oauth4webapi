@@ -10,7 +10,7 @@ Support from the community to continue maintaining and improving this module is 
 
 ### ~~\[allowInsecureRequests\]?~~
 
-• `optional` **\[allowInsecureRequests\]**: `boolean`
+• `optional` **\[allowInsecureRequests\]?**: `boolean`
 
 See [allowInsecureRequests](../variables/allowInsecureRequests.md).
 
@@ -20,7 +20,7 @@ See [allowInsecureRequests](../variables/allowInsecureRequests.md).
 
 ### \[clockSkew\]?
 
-• `optional` **\[clockSkew\]**: `number`
+• `optional` **\[clockSkew\]?**: `number`
 
 See [clockSkew](../variables/clockSkew.md).
 
@@ -28,15 +28,15 @@ See [clockSkew](../variables/clockSkew.md).
 
 ### \[clockTolerance\]?
 
-• `optional` **\[clockTolerance\]**: `number`
+• `optional` **\[clockTolerance\]?**: `number`
 
 See [clockTolerance](../variables/clockTolerance.md).
 
 ***
 
-### \[customFetch\]()?
+### \[customFetch\]?
 
-• `optional` **\[customFetch\]**: (`url`, `options`) => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Response`](https://developer.mozilla.org/docs/Web/API/Response)\>
+• `optional` **\[customFetch\]?**: (`url`, `options`) => [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Response`](https://developer.mozilla.org/docs/Web/API/Response)\>
 
 See [customFetch](../variables/customFetch.md).
 
@@ -55,7 +55,7 @@ See [customFetch](../variables/customFetch.md).
 
 ### \[jwksCache\]?
 
-• `optional` **\[jwksCache\]**: [`JWKSCacheInput`](../type-aliases/JWKSCacheInput.md)
+• `optional` **\[jwksCache\]?**: [`JWKSCacheInput`](../type-aliases/JWKSCacheInput.md)
 
 See [jwksCache](../variables/jwksCache.md).
 
@@ -63,7 +63,7 @@ See [jwksCache](../variables/jwksCache.md).
 
 ### headers?
 
-• `optional` **headers**: [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `string`\> \| \[`string`, `string`\][] \| [`Headers`](https://developer.mozilla.org/docs/Web/API/Headers)
+• `optional` **headers?**: [`Record`](https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkeys-type)\<`string`, `string`\> \| \[`string`, `string`\][] \| [`Headers`](https://developer.mozilla.org/docs/Web/API/Headers)
 
 Headers to additionally send with the HTTP request(s) triggered by this function's invocation.
 
@@ -71,7 +71,7 @@ Headers to additionally send with the HTTP request(s) triggered by this function
 
 ### requireDPoP?
 
-• `optional` **requireDPoP**: `boolean`
+• `optional` **requireDPoP?**: `boolean`
 
 Indicates whether DPoP use is required.
 
@@ -79,7 +79,7 @@ Indicates whether DPoP use is required.
 
 ### signal?
 
-• `optional` **signal**: [`AbortSignal`](https://developer.mozilla.org/docs/Web/API/AbortSignal) \| (`url`) => [`AbortSignal`](https://developer.mozilla.org/docs/Web/API/AbortSignal)
+• `optional` **signal?**: [`AbortSignal`](https://developer.mozilla.org/docs/Web/API/AbortSignal) \| ((`url`) => [`AbortSignal`](https://developer.mozilla.org/docs/Web/API/AbortSignal))
 
 An AbortSignal instance, or a factory returning one, to abort the HTTP request(s) triggered by
 this function's invocation.
@@ -96,7 +96,7 @@ let signal = () => AbortSignal.timeout(5_000) // Note: AbortSignal.timeout may n
 
 ### signingAlgorithms?
 
-• `optional` **signingAlgorithms**: `string`[]
+• `optional` **signingAlgorithms?**: `string`[]
 
 Supported (or expected) JWT "alg" header parameter values for the JWT Access Token (and DPoP
 Proof JWTs). Default is all [supported JWS Algorithms](../type-aliases/JWSAlgorithm.md).
