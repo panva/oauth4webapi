@@ -7,6 +7,7 @@
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "strict": true,
     "removeComments": true,
+    "rootDir": "src",
     "outDir": "build",
     "noUnusedLocals": true,
     "noUnusedParameters": true,
