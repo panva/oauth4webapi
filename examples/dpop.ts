@@ -67,6 +67,7 @@ let state: string | undefined
 // one eternity later, the user lands back on the redirect_uri
 // Authorization Code Grant Request & Response
 let access_token: string
+let token_type: string
 {
   const currentUrl: URL = getCurrentUrl()
   const params = oauth.validateAuthResponse(as, client, currentUrl, state)
@@ -96,7 +97,7 @@ let access_token: string
   })
 
   console.log('Access Token Response', result)
-  ;({ access_token } = result)
+  ;({ access_token, token_type } = result)
 }
 
 // Protected Resource Request
@@ -108,7 +109,7 @@ let access_token: string
       new URL('https://rs.example.com/api'),
       undefined,
       undefined,
-      { DPoP },
+      token_type === 'dpop' ? { DPoP } : undefined,
     )
   let response = await protectedResourceRequest().catch((err) => {
     if (oauth.isDPoPNonceError(err)) {

@@ -1,5 +1,5 @@
 diff --git a/examples/oauth.ts b/examples/dpop.ts
-index d55e62d..4cb7a95 100644
+index d55e62d..cc682bb 100644
 --- a/examples/oauth.ts
 +++ b/examples/dpop.ts
 @@ -15,6 +15,12 @@ let client_secret!: string
@@ -23,7 +23,12 @@ index d55e62d..4cb7a95 100644
  
  const code_challenge_method = 'S256'
  /**
-@@ -64,16 +71,29 @@ let access_token: string
+@@ -60,32 +67,57 @@ let state: string | undefined
+ // one eternity later, the user lands back on the redirect_uri
+ // Authorization Code Grant Request & Response
+ let access_token: string
++let token_type: string
+ {
    const currentUrl: URL = getCurrentUrl()
    const params = oauth.validateAuthResponse(as, client, currentUrl, state)
  
@@ -61,8 +66,9 @@ index d55e62d..4cb7a95 100644
 +  })
  
    console.log('Access Token Response', result)
-   ;({ access_token } = result)
-@@ -81,11 +101,22 @@ let access_token: string
+-  ;({ access_token } = result)
++  ;({ access_token, token_type } = result)
+ }
  
  // Protected Resource Request
  {
@@ -78,7 +84,7 @@ index d55e62d..4cb7a95 100644
 +      new URL('https://rs.example.com/api'),
 +      undefined,
 +      undefined,
-+      { DPoP },
++      token_type === 'dpop' ? { DPoP } : undefined,
 +    )
 +  let response = await protectedResourceRequest().catch((err) => {
 +    if (oauth.isDPoPNonceError(err)) {
