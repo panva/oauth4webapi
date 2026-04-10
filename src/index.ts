@@ -5582,7 +5582,7 @@ export function validateAuthResponse(
     throw OPE('response parameter "iss" (issuer) missing', INVALID_RESPONSE, { parameters })
   }
 
-  if (iss && iss !== as.issuer) {
+  if (iss && as.issuer && iss !== as.issuer) {
     throw OPE('unexpected "iss" (issuer) response parameter value', INVALID_RESPONSE, {
       expected: as.issuer,
       parameters,
