@@ -1714,6 +1714,7 @@ function formUrlEncode(token: string) {
  *
  * @see {@link ClientSecretPost}
  * @see {@link ClientSecretBasic}
+ * @see {@link ClientAssertion}
  * @see {@link PrivateKeyJwt}
  * @see {@link None}
  * @see {@link TlsClientAuth}
@@ -1725,6 +1726,13 @@ export type ClientAuth = (
   body: URLSearchParams,
   headers: Headers,
 ) => void | Promise<void>
+
+/**
+ * A function returning a JWT Bearer client assertion to be sent to the authorization server.
+ *
+ * @group Client Authentication
+ */
+export type ClientAssertionProvider = () => Promise<string>
 
 /**
  * **`client_secret_post`** uses the HTTP request body to send `client_id` and `client_secret` as
@@ -1784,6 +1792,37 @@ export function ClientSecretBasic(clientSecret: string): ClientAuth {
   }
 }
 
+/**
+ * Uses the HTTP request body to send `client_id`, `client_assertion_type`, and `client_assertion`
+ * as `application/x-www-form-urlencoded` body parameters. The JWT assertion is provided by the
+ * caller.
+ *
+ * @example
+ *
+ * ```ts
+ * let clientAssertionProvider!: oauth.ClientAssertionProvider
+ *
+ * let clientAuth = oauth.ClientAssertion(clientAssertionProvider)
+ * ```
+ *
+ * @param clientAssertionProvider
+ *
+ * @group Client Authentication
+ *
+ * @see [OAuth Token Endpoint Authentication Methods](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#token-endpoint-auth-method)
+ * @see [RFC 7523 - JSON Web Token (JWT) Profile for OAuth 2.0 Client Authentication and Authorization Grants](https://www.rfc-editor.org/rfc/rfc7523.html#section-2.2)
+ * @see [OpenID Connect Core 1.0](https://openid.net/specs/openid-connect-core-1_0-errata2.html#ClientAuthentication)
+ */
+export function ClientAssertion(clientAssertionProvider: ClientAssertionProvider): ClientAuth {
+  if (typeof clientAssertionProvider !== 'function') {
+    throw CodedTypeError('"clientAssertionProvider" must be a function', ERR_INVALID_ARG_TYPE)
+  }
+
+  return async (_as, client, body, _headers) => {
+    setClientAssertion(body, client, await clientAssertionProvider())
+  }
+}
+
 export interface ModifyAssertionOptions {
   /**
    * Use to modify a JWT assertion payload or header right before it is signed.
@@ -1838,9 +1877,7 @@ export function PrivateKeyJwt(
 
     options?.[modifyAssertion]?.(header, payload)
 
-    body.set('client_id', client.client_id)
-    body.set('client_assertion_type', 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer')
-    body.set('client_assertion', await signJwt(header, payload, key))
+    setClientAssertion(body, client, await signJwt(header, payload, key))
   }
 }
 
@@ -1889,9 +1926,7 @@ export function ClientSecretJwt(
     const data = `${b64u(buf(JSON.stringify(header)))}.${b64u(buf(JSON.stringify(payload)))}`
     const hmac = await crypto.subtle.sign(key.algorithm, key, buf(data) as Uint8Array<ArrayBuffer>)
 
-    body.set('client_id', client.client_id)
-    body.set('client_assertion_type', 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer')
-    body.set('client_assertion', `${data}.${b64u(new Uint8Array(hmac))}`)
+    setClientAssertion(body, client, `${data}.${b64u(new Uint8Array(hmac))}`)
   }
 }
 
@@ -6792,3 +6827,10 @@ export const _nodiscoverycheck: unique symbol = Symbol()
  * @internal
  */
 export const _expectedIssuer: unique symbol = Symbol()
+
+function setClientAssertion(body: URLSearchParams, client: Client, clientAssertion: string) {
+  assertString(clientAssertion, '"clientAssertion"')
+  body.set('client_id', client.client_id)
+  body.set('client_assertion_type', 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer')
+  body.set('client_assertion', clientAssertion)
+}

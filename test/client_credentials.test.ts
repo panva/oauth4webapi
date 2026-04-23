@@ -83,6 +83,54 @@ test('clientCredentialsGrantRequest()', async (t) => {
   )
 })
 
+test('clientCredentialsGrantRequest() with client assertion', async (t) => {
+  let calls = 0
+
+  const tIssuer: lib.AuthorizationServer = {
+    ...issuer,
+    token_endpoint: endpoint('token-client-assertion'),
+  }
+
+  t.context
+    .intercept({
+      path: '/token-client-assertion',
+      method: 'POST',
+      headers: {
+        accept: 'application/json',
+        'user-agent': UA,
+      },
+      body(body) {
+        const params = new URLSearchParams(body)
+        return (
+          params.get('grant_type') === 'client_credentials' &&
+          params.get('resource') === 'urn:example:resource' &&
+          params.get('client_id') === client.client_id &&
+          !params.has('client_secret') &&
+          params.get('client_assertion_type') ===
+            'urn:ietf:params:oauth:client-assertion-type:jwt-bearer' &&
+          params.get('client_assertion') === 'assertion'
+        )
+      },
+    })
+    .reply(200, { access_token: 'token', token_type: 'Bearer' })
+
+  await t.notThrowsAsync(
+    lib.clientCredentialsGrantRequest(
+      tIssuer,
+      client,
+      lib.ClientAssertion(async () => {
+        calls++
+        return 'assertion'
+      }),
+      {
+        resource: 'urn:example:resource',
+      },
+    ),
+  )
+
+  t.is(calls, 1)
+})
+
 test('clientCredentialsGrantRequest() w/ Extra Parameters', async (t) => {
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
