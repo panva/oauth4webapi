@@ -83,6 +83,17 @@ test('resourceDiscoveryRequest() with a pathname and terminating "/"', async (t)
   t.pass()
 })
 
+test('ResourceServer array metadata typings', (t) => {
+  const metadata: lib.ResourceServer = {
+    resource,
+    authorization_details_types_supported: ['payment_initiation'],
+    dpop_signing_alg_values_supported: ['ES256'],
+  }
+
+  t.deepEqual(metadata.authorization_details_types_supported, ['payment_initiation'])
+  t.deepEqual(metadata.dpop_signing_alg_values_supported, ['ES256'])
+})
+
 test('processResourceDiscoveryResponse()', async (t) => {
   const expected = new URL(resource)
 

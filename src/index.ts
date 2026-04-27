@@ -6635,13 +6635,13 @@ export interface ResourceServer {
    * JSON array containing a list of the authorization details type values supported by the resource
    * server when the authorization_details request parameter is used
    */
-  readonly authorization_details_types_supported?: boolean
+  readonly authorization_details_types_supported?: string[]
 
   /**
    * JSON array containing a list of the JWS alg values supported by the resource server for
    * validating DPoP proof JWTs
    */
-  readonly dpop_signing_alg_values_supported?: boolean
+  readonly dpop_signing_alg_values_supported?: string[]
 
   /**
    * Boolean value specifying whether the protected resource always requires the use of DPoP-bound

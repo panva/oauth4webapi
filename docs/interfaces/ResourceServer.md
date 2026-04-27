@@ -28,7 +28,7 @@ Resource server's Resource Identifier URL.
 
 ### authorization\_details\_types\_supported?
 
-• `readonly` `optional` **authorization\_details\_types\_supported?**: `boolean`
+• `readonly` `optional` **authorization\_details\_types\_supported?**: `string`[]
 
 JSON array containing a list of the authorization details type values supported by the resource
 server when the authorization_details request parameter is used
@@ -63,7 +63,7 @@ access tokens
 
 ### dpop\_signing\_alg\_values\_supported?
 
-• `readonly` `optional` **dpop\_signing\_alg\_values\_supported?**: `boolean`
+• `readonly` `optional` **dpop\_signing\_alg\_values\_supported?**: `string`[]
 
 JSON array containing a list of the JWS alg values supported by the resource server for
 validating DPoP proof JWTs
