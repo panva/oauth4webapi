@@ -6060,8 +6060,15 @@ async function validateDPoP(
     }
   }
 
+  const { jwk, alg } = proof.header
+  if (!isJsonObject<JWK>(jwk)) {
+    throw OPE('DPoP Proof jwk header parameter must be a JSON object', INVALID_REQUEST, {
+      header: proof.header,
+    })
+  }
+
   {
-    const expected = await calculateJwkThumbprint(proof.header.jwk!)
+    const expected = await calculateJwkThumbprint(jwk)
 
     if (accessTokenClaims.cnf.jkt !== expected) {
       throw OPE('JWT Access Token confirmation mismatch', JWT_CLAIM_COMPARISON, {
@@ -6075,12 +6082,6 @@ async function validateDPoP(
   const { 0: protectedHeader, 1: payload, 2: encodedSignature } = headerValue.split('.')
 
   const signature = b64u(encodedSignature)
-  const { jwk, alg } = proof.header
-  if (!jwk) {
-    throw OPE('DPoP Proof is missing the jwk header parameter', INVALID_REQUEST, {
-      header: proof.header,
-    })
-  }
   const key = await importJwk(alg, jwk)
   if (key.type !== 'public') {
     throw OPE('DPoP Proof jwk header parameter must contain a public key', INVALID_REQUEST, {
