@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [3.8.6](https://github.com/panva/oauth4webapi/compare/v3.8.5...v3.8.6) (2026-04-27)
+
+
+### Fixes
+
+* missing header.jwk in DPoP Proof JWT is now an OPE instead of TypeError ([b9967cd](https://github.com/panva/oauth4webapi/commit/b9967cd553e2b1a294c97ac1bdf7c080dc56579f))
+* **types:** fix two ResourceServer metadata typings ([9dd836d](https://github.com/panva/oauth4webapi/commit/9dd836dedb95f6aebc36a41381e67b9e8f0d1842))
+
 ## [3.8.5](https://github.com/panva/oauth4webapi/compare/v3.8.4...v3.8.5) (2026-02-16)
 
 
