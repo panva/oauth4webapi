@@ -2,7 +2,7 @@
 
 import test from 'ava'
 import { issuer, client, getResponse } from './_setup.js'
-import * as lib from '../src/index.js'
+import * as lib from './_lib.js'
 
 const response = () =>
   getResponse(JSON.stringify({ access_token: 'foo', token_type: 'bearer', scope: '' }))

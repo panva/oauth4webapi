@@ -5,7 +5,7 @@
 delete globalThis.navigator
 // @ts-expect-error
 globalThis.navigator = { userAgent: 'Mozilla/5.0 foo' }
-const lib = await import('../src/index.js')
+const lib = await import('./_lib.js')
 
 import anyTest, { type TestFn } from 'ava'
 import setup, { type Context, teardown, issuer, UA } from './_setup.js'

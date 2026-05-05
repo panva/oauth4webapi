@@ -8,7 +8,7 @@ import setup, {
   type ContextWithAlgs,
   UA,
 } from './_setup.js'
-import * as lib from '../src/index.js'
+import * as lib from './_lib.js'
 
 const test = anyTest as TestFn<ContextWithAlgs>
 

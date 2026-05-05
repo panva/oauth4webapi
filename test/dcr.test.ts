@@ -2,7 +2,7 @@ import anyTest, { type TestFn } from 'ava'
 import * as crypto from 'crypto'
 import setup, { type Context, teardown, issuer, getResponse, UA } from './_setup.js'
 import * as jose from 'jose'
-import * as lib from '../src/index.js'
+import * as lib from './_lib.js'
 
 const test = anyTest as TestFn<Context>
 
@@ -26,7 +26,7 @@ test('dynamicClientRegistrationRequest()', async (t) => {
     .reply(201, data)
 
   const response = await lib.dynamicClientRegistrationRequest(as, {})
-  t.true(response instanceof Response)
+  t.true(response instanceof lib.Response)
 })
 
 test('dynamicClientRegistrationRequest() w/ initial access token', async (t) => {
@@ -49,7 +49,7 @@ test('dynamicClientRegistrationRequest() w/ initial access token', async (t) => 
     {},
     { initialAccessToken: 'token' },
   )
-  t.true(response instanceof Response)
+  t.true(response instanceof lib.Response)
 })
 
 test.serial('dynamicClientRegistrationRequest() w/ initial access token and DPoP', async (t) => {
@@ -88,7 +88,7 @@ test.serial('dynamicClientRegistrationRequest() w/ initial access token and DPoP
       DPoP: lib.DPoP({}, kp),
     },
   )
-  t.true(response instanceof Response)
+  t.true(response instanceof lib.Response)
 })
 
 test.serial('dynamicClientRegistrationRequest() w/o initial access token and DPoP', async (t) => {
@@ -125,7 +125,7 @@ test.serial('dynamicClientRegistrationRequest() w/o initial access token and DPo
       DPoP: lib.DPoP({}, kp),
     },
   )
-  t.true(response instanceof Response)
+  t.true(response instanceof lib.Response)
 })
 
 test('dynamicClientRegistrationRequest() w/ initial access token and externally formed DPoP', async (t) => {
@@ -154,7 +154,7 @@ test('dynamicClientRegistrationRequest() w/ initial access token and externally 
       },
     },
   )
-  t.true(response instanceof Response)
+  t.true(response instanceof lib.Response)
 })
 
 test('dynamicClientRegistrationRequest() w/ Custom Headers', async (t) => {
@@ -183,7 +183,7 @@ test('dynamicClientRegistrationRequest() w/ Custom Headers', async (t) => {
     new Headers(Object.fromEntries(entries)),
   ]) {
     const response = await lib.dynamicClientRegistrationRequest(as, {}, { headers })
-    t.true(response instanceof Response)
+    t.true(response instanceof lib.Response)
   }
 })
 

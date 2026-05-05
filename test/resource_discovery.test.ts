@@ -1,6 +1,6 @@
 import anyTest, { type TestFn } from 'ava'
 import setup, { type Context, teardown, getResponse, UA } from './_setup.js'
-import * as lib from '../src/index.js'
+import * as lib from './_lib.js'
 
 const test = anyTest as TestFn<Context>
 
@@ -23,7 +23,7 @@ test('resourceDiscoveryRequest()', async (t) => {
     .reply(200, data)
 
   const response = await lib.resourceDiscoveryRequest(new URL(resource))
-  t.true(response instanceof Response)
+  t.true(response instanceof lib.Response)
 })
 
 test('resourceDiscoveryRequest() w/ Custom Headers', async (t) => {
@@ -51,7 +51,7 @@ test('resourceDiscoveryRequest() w/ Custom Headers', async (t) => {
     new Headers(Object.fromEntries(entries)),
   ]) {
     const response = await lib.resourceDiscoveryRequest(new URL(resource), { headers })
-    t.true(response instanceof Response)
+    t.true(response instanceof lib.Response)
   }
 })
 

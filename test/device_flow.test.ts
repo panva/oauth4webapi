@@ -10,7 +10,7 @@ import setup, {
   UA,
 } from './_setup.js'
 import * as jose from 'jose'
-import * as lib from '../src/index.js'
+import * as lib from './_lib.js'
 import * as tools from './_tools.js'
 
 const test = anyTest as TestFn<ContextWithAlgs>

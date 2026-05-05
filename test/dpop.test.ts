@@ -2,7 +2,7 @@ import anyTest, { type TestFn } from 'ava'
 import * as crypto from 'crypto'
 import setup, { type Context, teardown, client } from './_setup.js'
 import * as jose from 'jose'
-import * as lib from '../src/index.js'
+import * as lib from './_lib.js'
 
 const test = anyTest as TestFn<Context>
 
@@ -40,7 +40,7 @@ test('dpop()', async (t) => {
   const response = await lib.protectedResourceRequest('token', 'GET', url, undefined, undefined, {
     DPoP: sign,
   })
-  t.true(response instanceof Response)
+  t.true(response instanceof lib.Response)
 })
 
 test('dpop() w/ a nonce', async (t) => {
@@ -105,5 +105,5 @@ test('externally formed dpop headers', async (t) => {
     url,
     new Headers({ dpop: 'foo' }),
   )
-  t.true(response instanceof Response)
+  t.true(response instanceof lib.Response)
 })

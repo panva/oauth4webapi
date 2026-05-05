@@ -1,6 +1,6 @@
 import anyTest, { type TestFn } from 'ava'
 import setup, { type Context, teardown, issuer, getResponse, UA } from './_setup.js'
-import * as lib from '../src/index.js'
+import * as lib from './_lib.js'
 
 const test = anyTest as TestFn<Context>
 
@@ -21,7 +21,7 @@ test('discoveryRequest()', async (t) => {
     .reply(200, data)
 
   const response = await lib.discoveryRequest(new URL(issuer.issuer))
-  t.true(response instanceof Response)
+  t.true(response instanceof lib.Response)
 })
 
 test('discoveryRequest() w/ Custom Headers', async (t) => {
@@ -50,7 +50,7 @@ test('discoveryRequest() w/ Custom Headers', async (t) => {
     new Headers(Object.fromEntries(entries)),
   ]) {
     const response = await lib.discoveryRequest(new URL(issuer.issuer), { headers })
-    t.true(response instanceof Response)
+    t.true(response instanceof lib.Response)
   }
 })
 

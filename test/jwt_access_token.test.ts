@@ -1,6 +1,6 @@
 import test from 'ava'
 import * as jose from 'jose'
-import * as lib from '../src/index.js'
+import * as lib from './_lib.js'
 
 const encoder = new TextEncoder()
 

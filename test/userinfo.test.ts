@@ -9,7 +9,7 @@ import setup, {
   type ContextWithAlgs,
   UA,
 } from './_setup.js'
-import * as lib from '../src/index.js'
+import * as lib from './_lib.js'
 import * as jose from 'jose'
 import * as tools from './_tools.js'
 
@@ -35,7 +35,7 @@ test('userInfoRequest()', async (t) => {
   const tIssuer: lib.AuthorizationServer = { ...issuer, userinfo_endpoint: endpoint('userinfo') }
   const tClient: lib.Client = { ...client }
   const response = await lib.userInfoRequest(tIssuer, tClient, 'token')
-  t.true(response instanceof Response)
+  t.true(response instanceof lib.Response)
 })
 
 test('userInfoRequest() w/ Custom Headers', async (t) => {
@@ -69,7 +69,7 @@ test('userInfoRequest() w/ Custom Headers', async (t) => {
     new Headers(Object.fromEntries(entries)),
   ]) {
     const response = await lib.userInfoRequest(tIssuer, tClient, 'token', { headers })
-    t.true(response instanceof Response)
+    t.true(response instanceof lib.Response)
   }
 })
 

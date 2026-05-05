@@ -1,7 +1,7 @@
 import test from 'ava'
 import type { ExecutionContext } from 'ava'
 import { getResponse, issuer, client, endpoint } from './_setup.js'
-import * as lib from '../src/index.js'
+import * as lib from './_lib.js'
 
 function response(headers: Headers) {
   return getResponse('', { status: 401, headers })

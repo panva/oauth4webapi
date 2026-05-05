@@ -1,6 +1,6 @@
 import anyTest, { type TestFn } from 'ava'
 import setup, { type Context, teardown, issuer, endpoint, client } from './_setup.js'
-import * as lib from '../src/index.js'
+import * as lib from './_lib.js'
 import * as jose from 'jose'
 import timekeeper from 'timekeeper'
 

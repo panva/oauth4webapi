@@ -1,6 +1,6 @@
 import anyTest, { type TestFn } from 'ava'
 import setup, { type Context, teardown } from './_setup.js'
-import * as lib from '../src/index.js'
+import * as lib from './_lib.js'
 
 const test = anyTest as TestFn<Context>
 
@@ -20,7 +20,7 @@ test('protectedResource()', async (t) => {
     .reply(200, '')
   const url = new URL('https://rs.example.com/resource')
   const response = await lib.protectedResourceRequest('token', 'GET', url)
-  t.true(response instanceof Response)
+  t.true(response instanceof lib.Response)
 })
 
 test('protectedResource() w/ POST and ReadableStream body', async (t) => {
@@ -43,5 +43,5 @@ test('protectedResource() w/ POST and ReadableStream body', async (t) => {
     },
   })
   const response = await lib.protectedResourceRequest('token', 'POST', url, undefined, body)
-  t.true(response instanceof Response)
+  t.true(response instanceof lib.Response)
 })
