@@ -1,10 +1,16 @@
 import * as undici from 'undici'
 import * as lib from '../src/index.js'
 
+// Test facade for the public API. Importing this module instead of ../src/index.js keeps the tests
+// using the normal oauth4webapi call signatures while forcing every HTTP request through undici.
 export * from '../src/index.js'
 
+// Request helpers return the Response object created by undici.fetch. Export the matching
+// constructor so tests can assert against the implementation they intentionally exercise.
 export const Response = undici.Response as unknown as typeof globalThis.Response
 
+// The runtime value is undici's Response. The cast is only a TypeScript boundary because undici's
+// Response type and the DOM Response type differ structurally.
 const customFetch: NonNullable<lib.HttpRequestOptions<string, unknown>[typeof lib.customFetch]> = (
   url,
   options,
@@ -19,6 +25,8 @@ function withCustomFetch<T extends object | undefined>(options: T): T & Options 
   } as T & Options
 }
 
+// The public functions put their optional request options at different argument positions.
+// Wrapping them here keeps individual tests from repeating [customFetch]: undici.fetch.
 function defaultCustomFetch<Fn extends (...args: any[]) => any>(fn: Fn, optionsIndex: number): Fn {
   return ((...args: Parameters<Fn>): ReturnType<Fn> => {
     args[optionsIndex] = withCustomFetch(args[optionsIndex] as object | undefined)
