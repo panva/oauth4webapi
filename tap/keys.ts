@@ -16,7 +16,11 @@ export const algs = [
 ]
 export const fails: string[] = []
 
-if (env.isDeno || (env.isNode && env.isNodeVersionAtLeast(24, 7))) {
+if (
+  env.isDeno ||
+  (env.isNode && env.isNodeVersionAtLeast(24, 7)) ||
+  (env.isElectron && env.isNodeVersionAtLeast(24, 18))
+) {
   algs.push('ML-DSA-44', 'ML-DSA-65', 'ML-DSA-87')
 } else {
   fails.push('ML-DSA-44', 'ML-DSA-65', 'ML-DSA-87')
