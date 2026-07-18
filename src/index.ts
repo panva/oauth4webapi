@@ -2798,13 +2798,7 @@ export async function processPushedAuthorizationResponse(
 }
 
 export type ProtectedResourceRequestBody =
-  | ArrayBuffer
-  | null
-  | ReadableStream
-  | string
-  | Uint8Array
-  | undefined
-  | URLSearchParams
+  ArrayBuffer | null | ReadableStream | string | Uint8Array | undefined | URLSearchParams
 
 export interface ProtectedResourceRequestOptions
   extends
