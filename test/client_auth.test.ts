@@ -98,6 +98,47 @@ test('client_secret_post', async (t) => {
   t.pass()
 })
 
+test('client_assertion', async (t) => {
+  let calls = 0
+
+  t.context
+    .intercept({
+      path: '/test-client-assertion',
+      method: 'POST',
+      headers(headers) {
+        return !('authorization' in headers)
+      },
+      body(body) {
+        const params = new URLSearchParams(body)
+        t.false(params.has('client_secret'))
+        t.is(params.get('client_id'), client.client_id)
+        t.is(
+          params.get('client_assertion_type'),
+          'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
+        )
+        t.is(params.get('client_assertion'), 'assertion')
+
+        return true
+      },
+    })
+    .reply(200, '')
+
+  await lib.revocationRequest(
+    { ...issuer, revocation_endpoint: endpoint('test-client-assertion') },
+    client,
+    lib.ClientAssertion(async () => {
+      calls++
+      return 'assertion'
+    }),
+    'token',
+  )
+
+  t.is(calls, 1)
+  t.throws(() => lib.ClientAssertion(null as any), {
+    message: '"clientAssertionProvider" must be a function',
+  })
+})
+
 test('private_key_jwt', async (t) => {
   const tIssuer = {
     ...issuer,
