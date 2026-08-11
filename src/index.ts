@@ -138,22 +138,134 @@ export type JWSAlgorithm =
   | 'EdDSA'
 
 /**
- * A JSON Web Key with recognized and extension parameters.
+ * A JSON Web Key with standard JOSE and supported extension parameters.
+ *
+ * > [!NOTE]\
+ * > This is declared as a type alias rather than an interface so that it remains bidirectionally
+ * > assignable with the `JsonWebKey` types shipped by `@types/node` and `lib.dom` without accepting
+ * > arbitrary parameters itself.
+ *
+ * Application-specific extension parameters can be represented by intersecting this type with a
+ * type that declares them.
  */
-export interface JWK {
+export type JWK = {
+  /**
+   * JWK "kty" (Key Type) Parameter
+   */
   readonly kty?: string
-  readonly kid?: string
+  /**
+   * JWK "alg" (Algorithm) Parameter
+   */
   readonly alg?: string
-  readonly use?: string
+  /**
+   * JWK "key_ops" (Key Operations) Parameter
+   */
   readonly key_ops?: string[]
-  readonly e?: string
-  readonly n?: string
+  /**
+   * JWK "ext" (Extractable) Parameter
+   */
+  readonly ext?: boolean
+  /**
+   * JWK "use" (Public Key Use) Parameter
+   */
+  readonly use?: string
+  /**
+   * JWK "x5c" (X.509 Certificate Chain) Parameter
+   */
+  readonly x5c?: string[]
+  /**
+   * JWK "x5t" (X.509 Certificate SHA-1 Thumbprint) Parameter
+   */
+  readonly x5t?: string
+  /**
+   * JWK "x5t#S256" (X.509 Certificate SHA-256 Thumbprint) Parameter
+   */
+  readonly 'x5t#S256'?: string
+  /**
+   * JWK "x5u" (X.509 URL) Parameter
+   */
+  readonly x5u?: string
+  /**
+   * JWK "kid" (Key ID) Parameter
+   */
+  readonly kid?: string
+  /**
+   * - EC JWK "crv" (Curve) Parameter
+   * - OKP JWK "crv" (The Subtype of Key Pair) Parameter
+   */
   readonly crv?: string
+  /**
+   * - Private RSA JWK "d" (Private Exponent) Parameter
+   * - Private EC JWK "d" (ECC Private Key) Parameter
+   * - Private OKP JWK "d" (The Private Key) Parameter
+   */
+  readonly d?: string
+  /**
+   * Private RSA JWK "dp" (First Factor CRT Exponent) Parameter
+   */
+  readonly dp?: string
+  /**
+   * Private RSA JWK "dq" (Second Factor CRT Exponent) Parameter
+   */
+  readonly dq?: string
+  /**
+   * RSA JWK "e" (Exponent) Parameter
+   */
+  readonly e?: string
+  /**
+   * Oct JWK "k" (Key Value) Parameter
+   */
+  readonly k?: string
+  /**
+   * RSA JWK "n" (Modulus) Parameter
+   */
+  readonly n?: string
+  /**
+   * Private RSA JWK "p" (First Prime Factor) Parameter
+   */
+  readonly p?: string
+  /**
+   * Private RSA JWK "q" (Second Prime Factor) Parameter
+   */
+  readonly q?: string
+  /**
+   * Private RSA JWK "qi" (First CRT Coefficient) Parameter
+   */
+  readonly qi?: string
+  /**
+   * - EC JWK "x" (X Coordinate) Parameter
+   * - OKP JWK "x" (The public key) Parameter
+   */
   readonly x?: string
+  /**
+   * EC JWK "y" (Y Coordinate) Parameter
+   */
   readonly y?: string
+  /**
+   * AKP JWK "pub" (Public Key) Parameter
+   */
   readonly pub?: string
-
-  readonly [parameter: string]: JsonValue | undefined
+  /**
+   * AKP JWK "priv" (Private Key) Parameter
+   */
+  readonly priv?: string
+  /**
+   * RSA JWK "oth" (Other Primes Info) Parameter
+   */
+  readonly oth?: Array<{
+    /**
+     * The Factor CRT Exponent
+     */
+    d?: string
+    /**
+     * The Prime Factor
+     */
+    r?: string
+    /**
+     * The Factor CRT Coefficient
+     */
+    t?: string
+  }>
 }
 
 /**
@@ -2355,7 +2467,7 @@ class DPoPHandler implements DPoPHandle {
   async calculateThumbprint() {
     if (!this.#jkt) {
       const jwk = await crypto.subtle.exportKey('jwk', this.#publicKey)
-      this.#jkt ||= await calculateJwkThumbprint(jwk as JWK)
+      this.#jkt ||= await calculateJwkThumbprint(jwk)
     }
 
     return this.#jkt

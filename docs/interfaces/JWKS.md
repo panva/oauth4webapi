@@ -12,4 +12,4 @@ A JSON Web Key Set.
 
 ### keys
 
-• `readonly` **keys**: [`JWK`](JWK.md)[]
+• `readonly` **keys**: [`JWK`](../type-aliases/JWK.md)[]

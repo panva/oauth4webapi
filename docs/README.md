@@ -281,7 +281,6 @@ Support from the community to continue maintaining and improving this module is 
 | [IntrospectionRequestOptions](interfaces/IntrospectionRequestOptions.md) | Options for an OAuth 2.0 Token Introspection request. |
 | [IntrospectionResponse](interfaces/IntrospectionResponse.md) | A parsed successful OAuth 2.0 Token Introspection response. |
 | [JWEDecryptOptions](interfaces/JWEDecryptOptions.md) | Options for supplying compact JWE decryption support. |
-| [JWK](interfaces/JWK.md) | A JSON Web Key with recognized and extension parameters. |
 | [JWKS](interfaces/JWKS.md) | A JSON Web Key Set. |
 | [JWKSCacheOptions](interfaces/JWKSCacheOptions.md) | Options for supplying an externally persisted JSON Web Key Set cache. |
 | [JWTAccessTokenClaims](interfaces/JWTAccessTokenClaims.md) | Claims from a validated JWT access token. |
@@ -317,6 +316,7 @@ Support from the community to continue maintaining and improving this module is 
 | [JsonPrimitive](type-aliases/JsonPrimitive.md) | A JSON primitive value. |
 | [JsonValue](type-aliases/JsonValue.md) | Any JSON-compatible value. |
 | [JweDecryptFunction](type-aliases/JweDecryptFunction.md) | A function that decrypts a compact JWE and returns its nested JWT string. |
+| [JWK](type-aliases/JWK.md) | A JSON Web Key with standard JOSE and supported extension parameters. |
 | [JWKSCacheInput](type-aliases/JWKSCacheInput.md) | A previously exported JSON Web Key Set cache or an empty object to receive one. |
 | [JWSAlgorithm](type-aliases/JWSAlgorithm.md) | A supported JWS `alg` identifier for digital signature validation. |
 | [OmitSymbolProperties](type-aliases/OmitSymbolProperties.md) | Removes symbol-keyed properties from a type. |
