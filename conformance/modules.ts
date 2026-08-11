@@ -2,6 +2,17 @@ import type { ModulePrescription } from './api.js'
 
 const SAFE_HANDLER_NAME = /^[A-Za-z0-9][A-Za-z0-9._-]*$/
 const DIAGNOSTICS_FILE = '/conformance/download_archive.ts'
+const SKIPPED_OIDC_MODULES = new Set([
+  'aggregated-claims',
+  'discovery-jwks-uri-keys',
+  'discovery-openid-config',
+  'discovery-webfinger-acct',
+  'discovery-webfinger-url',
+  'distributed-claims',
+  'signing-key-rotation',
+  'signing-key-rotation-just-before-signing',
+  'userinfo-bearer-body',
+])
 
 function assertSafeHandlerName(name: string) {
   if (!SAFE_HANDLER_NAME.test(name)) {
@@ -17,6 +28,10 @@ export function sortConformanceTestFiles(first: string, second: string) {
     return firstIsDiagnostics ? 1 : -1
   }
   return first.localeCompare(second)
+}
+
+export function isSkippedUnhandledModule(planName: string, name: string) {
+  return planName.startsWith('oidcc-') && SKIPPED_OIDC_MODULES.has(name)
 }
 
 export function isRunnableModule(module: Pick<ModulePrescription, 'variant'>) {
@@ -36,26 +51,12 @@ export function isDiscoverableModule(
   return !planName.startsWith('oidcc-') || isRunnableModule(module)
 }
 
-export function getModuleHandler(planName: string, testModule: string) {
-  switch (planName) {
-    case 'fapi1-advanced-final-client-test-plan':
-    case 'fapi2-security-profile-final-client-test-plan':
-    case 'fapi2-message-signing-final-client-test-plan': {
-      const name = assertSafeHandlerName(
-        testModule.replace(
-          /(?:fapi2-(?:security-profile-final|message-signing-final)|fapi1-advanced-final)-client-test-/,
-          '',
-        ),
-      )
-      return { name, path: `./conformance/fapi/${name}.ts` }
-    }
-    case 'oidcc-client-test-plan':
-    case 'oidcc-client-basic-certification-test-plan':
-    case 'oidcc-client-hybrid-certification-test-plan': {
-      const name = assertSafeHandlerName(testModule.replace('oidcc-client-test-', ''))
-      return { name, path: `./conformance/oidc/${name}.ts` }
-    }
-    default:
-      throw new Error(`unsupported conformance plan: ${planName}`)
-  }
+export function getModuleHandler(testModule: string) {
+  const name = assertSafeHandlerName(
+    testModule.replace(
+      /(?:fapi2-(?:security-profile-final|message-signing-final)|fapi1-advanced-final|oidcc)-client-test-/,
+      '',
+    ),
+  )
+  return { name, path: `./conformance/modules/${name}.ts` }
 }

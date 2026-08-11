@@ -132,7 +132,7 @@ function pushEncryptionKey(def: any) {
     ...key,
     kid: `enc-${key.kid}`,
     use: 'enc',
-    alg: 'RSA-OEAP',
+    alg: 'RSA-OAEP',
   })
   return client
 }
@@ -238,7 +238,7 @@ export default async () => {
       continue
     }
 
-    const handler = getModuleHandler(PLAN_NAME, module.testModule)
+    const handler = getModuleHandler(module.testModule)
     if (exists(handler.path)) {
       files.add(handler.path)
     } else {

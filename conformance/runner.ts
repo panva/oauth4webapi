@@ -81,7 +81,8 @@ async function importPrivateKey(alg: string, jwk: JWK) {
   return key
 }
 
-export function modules(name: string): ModulePrescription[] {
+export function modules(metaUrl: string): ModulePrescription[] {
+  const name = metaUrl.split('/').reverse()[0].replace(/\.ts$/, '')
   return conformance.plan.modules.filter((x: ModulePrescription) => {
     if (!isRunnableModule(x)) {
       return false

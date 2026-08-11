@@ -9,6 +9,7 @@ import {
   getModuleHandler,
   isDiscoverableModule,
   isRunnableModule,
+  isSkippedUnhandledModule,
   sortConformanceTestFiles,
 } from '../conformance/modules.js'
 import {
@@ -45,6 +46,31 @@ test('conformance module response type filtering', (t) => {
   t.true(isDiscoverableModule('fapi2-security-profile-final-client-test-plan', excluded))
 })
 
+test('known unsupported OIDC conformance modules are skipped', (t) => {
+  for (const name of [
+    'aggregated-claims',
+    'discovery-jwks-uri-keys',
+    'discovery-openid-config',
+    'discovery-webfinger-acct',
+    'discovery-webfinger-url',
+    'distributed-claims',
+    'signing-key-rotation',
+    'signing-key-rotation-just-before-signing',
+    'userinfo-bearer-body',
+  ]) {
+    t.true(isSkippedUnhandledModule('oidcc-client-test-plan', name), name)
+    t.false(isSkippedUnhandledModule('fapi2-security-profile-final-client-test-plan', name), name)
+  }
+  t.false(isSkippedUnhandledModule('oidcc-client-test-plan', 'newly-exposed-test'))
+  t.false(isSkippedUnhandledModule('oidcc-client-test-plan', 'discovery-issuer-mismatch'))
+  t.false(
+    isSkippedUnhandledModule(
+      'fapi2-security-profile-final-client-test-plan',
+      'rs-dpop-auth-scheme-case-insensitivity',
+    ),
+  )
+})
+
 test('conformance diagnostics file is always sorted last', (t) => {
   const files = [
     '/repo/conformance/z-last-handler.ts',
@@ -66,30 +92,32 @@ test('conformance diagnostics file is always sorted last', (t) => {
 })
 
 test('conformance module handlers', (t) => {
+  t.deepEqual(getModuleHandler('oidcc-client-test-new-test'), {
+    name: 'new-test',
+    path: './conformance/modules/new-test.ts',
+  })
+  t.deepEqual(getModuleHandler('fapi2-message-signing-final-client-test-new-test'), {
+    name: 'new-test',
+    path: './conformance/modules/new-test.ts',
+  })
+  const discoveryIssuerMismatch = {
+    name: 'discovery-issuer-mismatch',
+    path: './conformance/modules/discovery-issuer-mismatch.ts',
+  }
   t.deepEqual(
-    getModuleHandler('oidcc-client-basic-certification-test-plan', 'oidcc-client-test-new-test'),
-    { name: 'new-test', path: './conformance/oidc/new-test.ts' },
+    getModuleHandler('oidcc-client-test-discovery-issuer-mismatch'),
+    discoveryIssuerMismatch,
   )
   t.deepEqual(
-    getModuleHandler(
-      'fapi2-message-signing-final-client-test-plan',
-      'fapi2-message-signing-final-client-test-new-test',
-    ),
-    { name: 'new-test', path: './conformance/fapi/new-test.ts' },
+    getModuleHandler('fapi2-security-profile-final-client-test-discovery-issuer-mismatch'),
+    discoveryIssuerMismatch,
   )
-  t.throws(
-    () =>
-      getModuleHandler(
-        'oidcc-client-basic-certification-test-plan',
-        'oidcc-client-test-../../malicious',
-      ),
-    { message: 'unsafe conformance module handler name: ../../malicious' },
-  )
-  t.throws(
-    () =>
-      getModuleHandler('oidcc-client-basic-certification-test-plan', 'oidcc-client-test-.hidden'),
-    { message: 'unsafe conformance module handler name: .hidden' },
-  )
+  t.throws(() => getModuleHandler('oidcc-client-test-../../malicious'), {
+    message: 'unsafe conformance module handler name: ../../malicious',
+  })
+  t.throws(() => getModuleHandler('oidcc-client-test-.hidden'), {
+    message: 'unsafe conformance module handler name: .hidden',
+  })
 })
 
 test('conformance identifiers', (t) => {
@@ -110,8 +138,8 @@ test('artifact download rejects unsafe plan identifiers before fetching', async 
 
 test('missing conformance module handler message', (t) => {
   t.is(
-    missingHandlerMessage('new-test', './conformance/oidc/new-test.ts'),
-    'The conformance suite exposed a new test module named "new-test", but no handler exists at ./conformance/oidc/new-test.ts',
+    missingHandlerMessage('new-test', './conformance/modules/new-test.ts'),
+    'The conformance suite exposed a new test module named "new-test", but no handler exists at ./conformance/modules/new-test.ts',
   )
 })
 

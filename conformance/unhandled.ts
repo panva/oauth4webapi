@@ -1,8 +1,13 @@
+import { isSkippedUnhandledModule } from './modules.js'
 import { missingHandlerMessage } from './report.js'
-import { test, unhandledModules } from './runner.js'
+import { plan, test, unhandledModules } from './runner.js'
 
 for (const { name, path } of unhandledModules) {
-  test(`missing conformance handler: ${name}`, (t) => {
-    t.fail(missingHandlerMessage(name, path))
-  })
+  if (isSkippedUnhandledModule(plan.name, name)) {
+    test.skip(`unsupported conformance module: ${name}`, () => {})
+  } else {
+    test(`missing conformance handler: ${name}`, (t) => {
+      t.fail(missingHandlerMessage(name, path))
+    })
+  }
 }
