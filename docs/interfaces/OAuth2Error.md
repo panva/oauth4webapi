@@ -6,6 +6,8 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
+A parsed OAuth 2.0 protocol error response body.
+
 ## Indexable
 
 > \[`parameter`: `string`\]: [`JsonValue`](../type-aliases/JsonValue.md) \| `undefined`

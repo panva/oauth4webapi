@@ -8,6 +8,6 @@ Support from the community to continue maintaining and improving this module is 
 
 • `const` **RESPONSE\_BODY\_ERROR**: `"OAUTH_RESPONSE_BODY_ERROR"` = `'OAUTH_RESPONSE_BODY_ERROR'`
 
-## See
+Error code for OAuth-style JSON error responses.
 
-[ResponseBodyError](../classes/ResponseBodyError.md)
+Assigned to [ResponseBodyError.code](../classes/ResponseBodyError.md#code).

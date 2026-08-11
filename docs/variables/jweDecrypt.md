@@ -8,7 +8,9 @@ Support from the community to continue maintaining and improving this module is 
 
 • `const` **jweDecrypt**: unique `symbol`
 
-Use to add support for decrypting JWEs the client encounters, namely
+Adds support for decrypting JWEs encountered while processing responses.
+
+Supported JWEs include:
 
 - Encrypted ID Tokens returned by the Token Endpoint
 - Encrypted ID Tokens returned as part of FAPI 1.0 Advanced Detached Signature authorization

@@ -8,7 +8,9 @@ Support from the community to continue maintaining and improving this module is 
 
 ▸ **dynamicClientRegistrationRequest**(`as`, `metadata`, `options?`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Response`](https://developer.mozilla.org/docs/Web/API/Response)\>
 
-Performs a Dynamic Client Registration at the
+Performs a Dynamic Client Registration request.
+
+The request is sent to the
 [`as.registration\_endpoint`](../interfaces/AuthorizationServer.md#registration_endpoint) using the provided
 client metadata.
 

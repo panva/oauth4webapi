@@ -8,8 +8,7 @@ Support from the community to continue maintaining and improving this module is 
 
 ▸ **validateApplicationLevelSignature**(`as`, `ref`, `options?`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<`void`\>
 
-Validates the JWS Signature of either a JWT [Response.body](https://developer.mozilla.org/docs/Web/API/Response/body) or
-[TokenEndpointResponse.id\_token](../interfaces/TokenEndpointResponse.md#id_token) of a processed [Response](https://developer.mozilla.org/docs/Web/API/Response)
+Validates the JWS signature of a processed JWT response body or ID Token.
 
 > [!NOTE]\
 > Validating signatures of JWTs received via direct communication between the Client and a

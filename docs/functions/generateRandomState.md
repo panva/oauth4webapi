@@ -8,7 +8,7 @@ Support from the community to continue maintaining and improving this module is 
 
 ▸ **generateRandomState**(): `string`
 
-Generate random `state` value.
+Generates a random `state` value.
 
 ## Returns
 

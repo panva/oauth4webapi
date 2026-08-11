@@ -8,8 +8,10 @@ Support from the community to continue maintaining and improving this module is 
 
 • `const` **clockSkew**: unique `symbol`
 
-Use to adjust the assumed current time. Positive and negative finite values representing seconds
-are allowed. Default is `0` (Date.now() + 0 seconds is used).
+Adjusts the current time used by protocol validations.
+
+Positive and negative finite values representing seconds are allowed. Default is `0`, so the
+current time is not adjusted.
 
 ## Examples
 

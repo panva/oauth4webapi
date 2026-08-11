@@ -6,7 +6,7 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
-Recognized Client Metadata that have an effect on the exposed functionality.
+Recognized client metadata that affects this module's behavior.
 
 ## See
 

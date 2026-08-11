@@ -8,6 +8,7 @@ Support from the community to continue maintaining and improving this module is 
 
 • `const` **expectNoState**: unique `symbol`
 
-Use this as a value to [validateAuthResponse](../functions/validateAuthResponse.md) `expectedState` parameter to indicate no
-`state` parameter value is expected, i.e. no `state` parameter value was sent with the
-authorization request.
+Indicates that no authorization response `state` parameter is expected.
+
+Use this as the [validateAuthResponse](../functions/validateAuthResponse.md) `expectedState` value when no `state` parameter was
+sent with the authorization request.

@@ -8,6 +8,6 @@ Support from the community to continue maintaining and improving this module is 
 
 • `const` **WWW\_AUTHENTICATE\_CHALLENGE**: `"OAUTH_WWW_AUTHENTICATE_CHALLENGE"` = `'OAUTH_WWW_AUTHENTICATE_CHALLENGE'`
 
-## See
+Error code for responses containing parseable `WWW-Authenticate` challenges.
 
-[WWWAuthenticateChallengeError](../classes/WWWAuthenticateChallengeError.md)
+Assigned to [WWWAuthenticateChallengeError.code](../classes/WWWAuthenticateChallengeError.md#code).

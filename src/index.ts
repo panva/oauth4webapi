@@ -14,7 +14,11 @@ interface CryptoKeyStructuralFallback {
 }
 
 /**
- * @ignore
+ * A Web Cryptography key as declared by the host runtime.
+ *
+ * This aliases the key type returned by the host's `SubtleCrypto.generateKey()` API when it is
+ * exposed on `globalThis`. A structural fallback is used otherwise, keeping the package portable to
+ * runtimes and TypeScript projects that do not include DOM or Node.js ambient types.
  */
 export type CryptoKey = typeof globalThis extends {
   crypto: { subtle: { generateKey(...args: any[]): Promise<infer R> } }
@@ -22,25 +26,28 @@ export type CryptoKey = typeof globalThis extends {
   ? Extract<R, { type: string }>
   : CryptoKeyStructuralFallback
 
+/**
+ * An asymmetric public and private `CryptoKey` pair.
+ */
 export interface CryptoKeyPair {
   privateKey: CryptoKey
   publicKey: CryptoKey
 }
 
 /**
- * JSON Object
+ * A JSON object.
  */
 export type JsonObject = { [Key in string]?: JsonValue }
 /**
- * JSON Array
+ * A JSON array.
  */
 export type JsonArray = JsonValue[]
 /**
- * JSON Primitives
+ * A JSON primitive value.
  */
 export type JsonPrimitive = string | number | boolean | null
 /**
- * JSON Values
+ * Any JSON-compatible value.
  */
 export type JsonValue = JsonPrimitive | JsonObject | JsonArray
 
@@ -61,6 +68,9 @@ function looseInstanceOf<T extends {}>(input: unknown, expected: Constructor<T>)
   }
 }
 
+/**
+ * A callback that mutates a JWT assertion header and claims immediately before signing.
+ */
 export interface ModifyAssertionFunction {
   (
     /**
@@ -75,8 +85,7 @@ export interface ModifyAssertionFunction {
 }
 
 /**
- * Interface to pass an asymmetric private key and, optionally, its associated JWK Key ID to be
- * added as a `kid` JOSE Header Parameter.
+ * An asymmetric private key with an optional JWK Key ID for JOSE headers.
  */
 export interface PrivateKey {
   /**
@@ -105,9 +114,11 @@ function CodedTypeError(message: string, code: codes, cause?: unknown) {
 }
 
 /**
- * JWS `alg` Algorithm identifiers from the
+ * A supported JWS `alg` identifier for digital signature validation.
+ *
+ * The identifiers come from the
  * {@link https://www.iana.org/assignments/jose/jose.xhtml#web-signature-encryption-algorithms JSON Web Signature and Encryption Algorithms IANA registry}
- * for which Digital Signature validation is implemented.
+ * and are limited to those for which digital signature validation is implemented.
  */
 export type JWSAlgorithm =
   | 'PS256'
@@ -126,6 +137,9 @@ export type JWSAlgorithm =
   // Deprecated
   | 'EdDSA'
 
+/**
+ * A JSON Web Key with recognized and extension parameters.
+ */
 export interface JWK {
   readonly kty?: string
   readonly kid?: string
@@ -152,8 +166,10 @@ export interface JWK {
 export const allowInsecureRequests: unique symbol = Symbol()
 
 /**
- * Use to adjust the assumed current time. Positive and negative finite values representing seconds
- * are allowed. Default is `0` (Date.now() + 0 seconds is used).
+ * Adjusts the current time used by protocol validations.
+ *
+ * Positive and negative finite values representing seconds are allowed. Default is `0`, so the
+ * current time is not adjusted.
  *
  * @example
  *
@@ -182,8 +198,9 @@ export const allowInsecureRequests: unique symbol = Symbol()
 export const clockSkew: unique symbol = Symbol()
 
 /**
- * Use to set allowed clock tolerance when checking DateTime JWT Claims. Only positive finite values
- * representing seconds are allowed. Default is `30` (30 seconds).
+ * Sets the allowed clock tolerance for JWT timestamp claim validation.
+ *
+ * Only positive finite values representing seconds are allowed. Default is `30` (30 seconds).
  *
  * @example
  *
@@ -200,9 +217,11 @@ export const clockSkew: unique symbol = Symbol()
 export const clockTolerance: unique symbol = Symbol()
 
 /**
- * When configured on an interface that extends {@link HttpRequestOptions}, this applies to `options`
- * parameter for functions that may trigger HTTP requests, this replaces the use of global fetch. As
- * a fetch replacement the arguments and expected return are the same as fetch.
+ * Overrides the Fetch API implementation used for outbound HTTP requests.
+ *
+ * When configured on an interface that extends {@link HttpRequestOptions}, this applies to the
+ * `options` parameter for functions that may trigger HTTP requests and replaces the use of global
+ * `fetch`. As a fetch replacement, the arguments and expected return are the same as `fetch`.
  *
  * In theory any module that claims to be compatible with the Fetch API can be used but your mileage
  * may vary. No workarounds to allow use of non-conform {@link !Response}s will be considered.
@@ -330,9 +349,10 @@ export const clockTolerance: unique symbol = Symbol()
 export const customFetch: unique symbol = Symbol()
 
 /**
- * Use to mutate JWT header and payload before they are signed. Its intended use is working around
- * non-conform server behaviours, such as modifying JWT "aud" (audience) claims, or otherwise
- * changing fixed claims used by this library.
+ * Provides a hook for mutating a JWT header and payload immediately before signing.
+ *
+ * Its intended use is working around non-conforming server behavior, such as modifying JWT `aud`
+ * (audience) claims or otherwise changing fixed claims used by this module.
  *
  * @example
  *
@@ -366,7 +386,9 @@ export const customFetch: unique symbol = Symbol()
 export const modifyAssertion: unique symbol = Symbol()
 
 /**
- * Use to add support for decrypting JWEs the client encounters, namely
+ * Adds support for decrypting JWEs encountered while processing responses.
+ *
+ * Supported JWEs include:
  *
  * - Encrypted ID Tokens returned by the Token Endpoint
  * - Encrypted ID Tokens returned as part of FAPI 1.0 Advanced Detached Signature authorization
@@ -412,6 +434,9 @@ export const modifyAssertion: unique symbol = Symbol()
 export const jweDecrypt: unique symbol = Symbol()
 
 /**
+ * Provides an externally managed JSON Web Key Set cache for runtimes without persistent in-memory
+ * state.
+ *
  * > [!WARNING]\
  * > This option has security implications that must be understood, assessed for applicability, and
  * > accepted before use. It is critical that the JSON Web Key Set cache only be writable by your own
@@ -467,7 +492,7 @@ export const jweDecrypt: unique symbol = Symbol()
 export const jwksCache: unique symbol = Symbol()
 
 /**
- * Authorization Server Metadata
+ * Metadata describing an OAuth 2.0 authorization server.
  *
  * @group Authorization Server Metadata
  *
@@ -794,6 +819,9 @@ export interface AuthorizationServer {
   readonly [metadata: string]: JsonValue | undefined
 }
 
+/**
+ * Authorization server endpoint aliases used for mutual TLS.
+ */
 export interface MTLSEndpointAliases extends Pick<
   AuthorizationServer,
   | 'backchannel_authentication_endpoint'
@@ -808,7 +836,7 @@ export interface MTLSEndpointAliases extends Pick<
 }
 
 /**
- * Recognized Client Metadata that have an effect on the exposed functionality.
+ * Recognized client metadata that affects this module's behavior.
  *
  * @see [IANA OAuth Client Registration Metadata registry](https://www.iana.org/assignments/oauth-parameters/oauth-parameters.xhtml#client-metadata)
  */
@@ -1012,6 +1040,8 @@ function b64u(input: string | Uint8Array | ArrayBuffer): string | Uint8Array {
 }
 
 /**
+ * Thrown when an attempted operation is not supported.
+ *
  * @group Errors
  */
 export class UnsupportedOperationError extends Error {
@@ -1029,6 +1059,8 @@ export class UnsupportedOperationError extends Error {
 }
 
 /**
+ * Thrown when an OAuth or OpenID Connect operation cannot be processed.
+ *
  * @group Errors
  */
 export class OperationProcessingError extends Error {
@@ -1120,6 +1152,9 @@ function assertPublicKey(key: unknown, it: string): asserts key is CryptoKey & {
   }
 }
 
+/**
+ * Options for supplying an externally persisted JSON Web Key Set cache.
+ */
 export interface JWKSCacheOptions {
   /**
    * See {@link jwksCache}.
@@ -1127,6 +1162,9 @@ export interface JWKSCacheOptions {
   [jwksCache]?: JWKSCacheInput
 }
 
+/**
+ * Fetch-style request options passed to a custom fetch implementation.
+ */
 export interface CustomFetchOptions<Method, BodyType = undefined> {
   /**
    * The request body content to send to the server
@@ -1151,6 +1189,9 @@ export interface CustomFetchOptions<Method, BodyType = undefined> {
   signal?: AbortSignal
 }
 
+/**
+ * Shared transport options for HTTP requests made by this module.
+ */
 export interface HttpRequestOptions<Method, BodyType = undefined> {
   /**
    * An AbortSignal instance, or a factory returning one, to abort the HTTP request(s) triggered by
@@ -1193,6 +1234,9 @@ export interface HttpRequestOptions<Method, BodyType = undefined> {
   [allowInsecureRequests]?: boolean
 }
 
+/**
+ * Options for an authorization server metadata discovery request.
+ */
 export interface DiscoveryRequestOptions extends HttpRequestOptions<'GET'> {
   /**
    * The issuer transformation algorithm to use.
@@ -1401,6 +1445,8 @@ function assertString(
 }
 
 /**
+ * Processes an authorization server metadata discovery response.
+ *
  * Validates {@link !Response} instance to be one coming from the authorization server's well-known
  * discovery endpoint.
  *
@@ -1492,7 +1538,7 @@ function randomBytes(): string {
 }
 
 /**
- * Generate random `code_verifier` value.
+ * Generates a random `code_verifier` value.
  *
  * @group Utilities
  * @group Authorization Code Grant
@@ -1506,7 +1552,7 @@ export function generateRandomCodeVerifier(): string {
 }
 
 /**
- * Generate random `state` value.
+ * Generates a random `state` value.
  *
  * @group Utilities
  *
@@ -1517,7 +1563,7 @@ export function generateRandomState(): string {
 }
 
 /**
- * Generate random `nonce` value.
+ * Generates a random `nonce` value.
  *
  * @group Utilities
  *
@@ -1569,6 +1615,9 @@ function getKeyAndKid(input: CryptoKey | PrivateKey | undefined): NormalizedKeyI
   }
 }
 
+/**
+ * Options for attaching a DPoP proof to an HTTP request.
+ */
 export interface DPoPRequestOptions {
   /**
    * DPoP handle, obtained from {@link DPoP}
@@ -1576,6 +1625,9 @@ export interface DPoPRequestOptions {
   DPoP?: DPoPHandle
 }
 
+/**
+ * Options for an OAuth 2.0 Pushed Authorization Request.
+ */
 export interface PushedAuthorizationRequestOptions
   extends HttpRequestOptions<'POST', URLSearchParams>, DPoPRequestOptions {}
 
@@ -1718,7 +1770,7 @@ function formUrlEncode(token: string) {
 }
 
 /**
- * Implementation of the Client's Authentication Method at the Authorization Server.
+ * A function that applies client authentication to an authorization server request.
  *
  * @see {@link ClientSecretPost}
  * @see {@link ClientSecretBasic}
@@ -1735,8 +1787,7 @@ export type ClientAuth = (
 ) => void | Promise<void>
 
 /**
- * **`client_secret_post`** uses the HTTP request body to send `client_id` and `client_secret` as
- * `application/x-www-form-urlencoded` body parameters
+ * **`client_secret_post`** sends `client_id` and `client_secret` in the form-encoded request body.
  *
  * @example
  *
@@ -1763,8 +1814,8 @@ export function ClientSecretPost(clientSecret: string): ClientAuth {
 }
 
 /**
- * **`client_secret_basic`** uses the HTTP `Basic` authentication scheme to send `client_id` and
- * `client_secret` in an `Authorization` HTTP Header.
+ * **`client_secret_basic`** sends `client_id` and `client_secret` using the HTTP Basic
+ * authentication scheme.
  *
  * @example
  *
@@ -1792,6 +1843,9 @@ export function ClientSecretBasic(clientSecret: string): ClientAuth {
   }
 }
 
+/**
+ * Options for customizing a JWT assertion immediately before signing.
+ */
 export interface ModifyAssertionOptions {
   /**
    * Use to modify a JWT assertion payload or header right before it is signed.
@@ -1815,9 +1869,8 @@ function clientAssertionPayload(as: AuthorizationServer, client: Client) {
 }
 
 /**
- * **`private_key_jwt`** uses the HTTP request body to send `client_id`, `client_assertion_type`,
- * and `client_assertion` as `application/x-www-form-urlencoded` body parameters. Digital signature
- * is used for the assertion's authenticity and integrity.
+ * **`private_key_jwt`** authenticates the client with a digitally signed JWT assertion sent in the
+ * form-encoded request body.
  *
  * @example
  *
@@ -1853,9 +1906,8 @@ export function PrivateKeyJwt(
 }
 
 /**
- * **`client_secret_jwt`** uses the HTTP request body to send `client_id`, `client_assertion_type`,
- * and `client_assertion` as `application/x-www-form-urlencoded` body parameters. HMAC is used for
- * the assertion's authenticity and integrity.
+ * **`client_secret_jwt`** authenticates the client with an HMAC-protected JWT assertion sent in the
+ * form-encoded request body.
  *
  * @example
  *
@@ -1904,8 +1956,7 @@ export function ClientSecretJwt(
 }
 
 /**
- * **`none`** (public client) uses the HTTP request body to send only `client_id` as
- * `application/x-www-form-urlencoded` body parameter.
+ * **`none`** sends only `client_id` in the form-encoded request body for a public client.
  *
  * ```ts
  * let clientAuth = oauth.None()
@@ -1923,9 +1974,8 @@ export function None(): ClientAuth {
 }
 
 /**
- * **`tls_client_auth`** uses the HTTP request body to send only `client_id` as
- * `application/x-www-form-urlencoded` body parameter and the mTLS key and certificate is configured
- * through {@link customFetch}.
+ * **`tls_client_auth`** sends `client_id` in the form-encoded request body while mTLS credentials
+ * are configured through {@link customFetch}.
  *
  * ```ts
  * let clientAuth = oauth.TlsClientAuth()
@@ -2163,7 +2213,9 @@ export function resolveEndpoint(
 }
 
 /**
- * Performs a Pushed Authorization Request at the
+ * Performs a Pushed Authorization Request.
+ *
+ * The request is sent to the
  * {@link AuthorizationServer.pushed_authorization_request_endpoint `as.pushed_authorization_request_endpoint`}.
  *
  * @param as Authorization Server Metadata.
@@ -2221,7 +2273,7 @@ export async function pushedAuthorizationRequest(
 }
 
 /**
- * DPoP handle, obtained from {@link DPoP}
+ * A DPoP proof-generation and nonce-management handle returned by {@link DPoP}.
  */
 export interface DPoPHandle {
   /**
@@ -2347,8 +2399,7 @@ class DPoPHandler implements DPoPHandle {
 }
 
 /**
- * Used to determine if a rejected error indicates the need to retry the request due to an
- * expired/missing nonce.
+ * Returns whether an error requires retrying the request with a fresh DPoP nonce.
  *
  * @group DPoP
  */
@@ -2368,9 +2419,8 @@ export function isDPoPNonceError(err: unknown): boolean {
 }
 
 /**
- * Returns a wrapper / handle around a {@link CryptoKeyPair} that is used for negotiating and proving
- * proof-of-possession to sender-constrain OAuth 2.0 tokens via DPoP at the Authorization Server and
- * Resource Server.
+ * Creates a DPoP handle that signs sender-constraining proofs with a {@link CryptoKeyPair} and
+ * tracks server-issued nonces.
  *
  * This wrapper / handle also keeps track of server-issued nonces, allowing requests to be retried
  * with a fresh nonce when the server indicates the need to use one. {@link isDPoPNonceError} can be
@@ -2400,6 +2450,9 @@ export function DPoP(
   return new DPoPHandler(client, keyPair, options)
 }
 
+/**
+ * A parsed successful OAuth 2.0 Pushed Authorization Response.
+ */
 export interface PushedAuthorizationResponse {
   readonly request_uri: string
   readonly expires_in: number
@@ -2407,6 +2460,9 @@ export interface PushedAuthorizationResponse {
   readonly [parameter: string]: JsonValue | undefined
 }
 
+/**
+ * A parsed OAuth 2.0 protocol error response body.
+ */
 export interface OAuth2Error {
   readonly error: string
   readonly error_description?: string
@@ -2418,7 +2474,7 @@ export interface OAuth2Error {
 }
 
 /**
- * Throw when a server responds with an "OAuth-style" error JSON body
+ * Thrown when a server returns an OAuth-style error in a JSON response body.
  *
  * @example
  *
@@ -2490,7 +2546,7 @@ export class ResponseBodyError extends Error {
 }
 
 /**
- * Thrown when OAuth 2.0 Authorization Error Response is encountered.
+ * Thrown when an OAuth 2.0 Authorization Error Response is encountered.
  *
  * @example
  *
@@ -2542,8 +2598,9 @@ export class AuthorizationResponseError extends Error {
 }
 
 /**
- * Thrown when a server responds with a parseable WWW-Authenticate challenges, typically because of
- * expired tokens, or bad client authentication
+ * Thrown when a server response contains one or more parseable `WWW-Authenticate` challenges.
+ *
+ * This typically occurs because of expired tokens or bad client authentication.
  *
  * @example
  *
@@ -2591,7 +2648,7 @@ export class WWWAuthenticateChallengeError extends Error {
 }
 
 /**
- * WWW-Authenticate challenge auth-param dictionary with known and unknown parameter names
+ * Known and extension authentication parameters from a `WWW-Authenticate` challenge.
  */
 export interface WWWAuthenticateChallengeParameters {
   /**
@@ -2635,7 +2692,7 @@ export interface WWWAuthenticateChallengeParameters {
 }
 
 /**
- * Parsed WWW-Authenticate challenge
+ * A parsed `WWW-Authenticate` challenge.
  */
 export interface WWWAuthenticateChallenge {
   /**
@@ -2759,6 +2816,8 @@ function parseWwwAuthenticateChallenges(
 }
 
 /**
+ * Processes a Pushed Authorization Response.
+ *
  * Validates {@link !Response} instance to be one coming from the
  * {@link AuthorizationServer.pushed_authorization_request_endpoint `as.pushed_authorization_request_endpoint`}.
  *
@@ -2805,9 +2864,15 @@ export async function processPushedAuthorizationResponse(
   return json
 }
 
+/**
+ * An HTTP request body accepted by {@link protectedResourceRequest}.
+ */
 export type ProtectedResourceRequestBody =
   ArrayBuffer | null | ReadableStream | string | Uint8Array | undefined | URLSearchParams
 
+/**
+ * Options for an authenticated protected resource request.
+ */
 export interface ProtectedResourceRequestOptions
   extends
     Omit<HttpRequestOptions<string, ProtectedResourceRequestBody>, 'headers'>,
@@ -2924,11 +2989,15 @@ export async function protectedResourceRequest(
   return response
 }
 
+/**
+ * Options for an OpenID Connect UserInfo request.
+ */
 export interface UserInfoRequestOptions extends HttpRequestOptions<'GET'>, DPoPRequestOptions {}
 
 /**
- * Performs a UserInfo Request at the
- * {@link AuthorizationServer.userinfo_endpoint `as.userinfo_endpoint`}.
+ * Performs a UserInfo Request.
+ *
+ * The request is sent to the {@link AuthorizationServer.userinfo_endpoint `as.userinfo_endpoint`}.
  *
  * Authorization Header is used to transmit the Access Token value.
  *
@@ -2975,6 +3044,9 @@ export async function userInfoRequest(
   } as ProtectedResourceRequestOptions)
 }
 
+/**
+ * The structured `address` claim in an OpenID Connect UserInfo response.
+ */
 export interface UserInfoAddress {
   readonly formatted?: string
   readonly street_address?: string
@@ -2986,6 +3058,9 @@ export interface UserInfoAddress {
   readonly [claim: string]: JsonValue | undefined
 }
 
+/**
+ * Claims from a parsed OpenID Connect UserInfo response.
+ */
 export interface UserInfoResponse {
   readonly sub: string
   readonly name?: string
@@ -3012,11 +3087,17 @@ export interface UserInfoResponse {
 
 let jwksMap: WeakMap<AuthorizationServer, ExportedJWKSCache & { age: number }>
 
+/**
+ * A JSON Web Key Set cache value suitable for external persistence.
+ */
 export interface ExportedJWKSCache {
   jwks: JWKS
   uat: number
 }
 
+/**
+ * A previously exported JSON Web Key Set cache or an empty object to receive one.
+ */
 export type JWKSCacheInput = ExportedJWKSCache | Record<string, never>
 
 function setJwksCache(
@@ -3179,6 +3260,8 @@ async function getPublicSigKeyFromIssuerJwksUri(
 }
 
 /**
+ * Skips the UserInfo `sub` claim value check performed by {@link processUserInfoResponse}.
+ *
  * > [!WARNING]\
  * > This option has security implications that must be understood, assessed for applicability, and
  * > accepted before use.
@@ -3203,6 +3286,9 @@ export function getContentType(input: Response | Request): string | undefined {
   return input.headers.get('content-type')?.split(';')[0]
 }
 
+/**
+ * Options for supplying compact JWE decryption support.
+ */
 export interface JWEDecryptOptions {
   /**
    * See {@link jweDecrypt}.
@@ -3259,6 +3345,9 @@ export type RecognizedTokenTypes = Record<
   (res: Response, body: TokenEndpointResponse) => void
 >
 
+/**
+ * Shared options for processing OAuth 2.0 token endpoint responses.
+ */
 export interface ProcessTokenResponseOptions extends JWEDecryptOptions {
   /**
    * See {@link RecognizedTokenTypes}.
@@ -3267,6 +3356,8 @@ export interface ProcessTokenResponseOptions extends JWEDecryptOptions {
 }
 
 /**
+ * Processes an OpenID Connect UserInfo response.
+ *
  * Validates {@link !Response} instance to be one coming from the
  * {@link AuthorizationServer.userinfo_endpoint `as.userinfo_endpoint`}.
  *
@@ -3379,6 +3470,9 @@ async function authenticatedRequest(
   })
 }
 
+/**
+ * Shared options for OAuth 2.0 token endpoint requests.
+ */
 export interface TokenEndpointRequestOptions
   extends HttpRequestOptions<'POST', URLSearchParams>, DPoPRequestOptions {
   /**
@@ -3425,8 +3519,9 @@ async function tokenEndpointRequest(
 }
 
 /**
- * Performs a Refresh Token Grant request at the
- * {@link AuthorizationServer.token_endpoint `as.token_endpoint`}.
+ * Performs a Refresh Token Grant request.
+ *
+ * The request is sent to the {@link AuthorizationServer.token_endpoint `as.token_endpoint`}.
  *
  * @param as Authorization Server Metadata.
  * @param client Client Metadata.
@@ -3469,9 +3564,8 @@ const idTokenClaims = new WeakMap<TokenEndpointResponse, IDToken>()
 const jwtRefs = new WeakMap<Response, string>()
 
 /**
- * Returns ID Token Claims Set from a {@link TokenEndpointResponse} processed by e.g.
- * {@link processAuthorizationCodeResponse}. To optionally validate the ID Token Signature use
- * {@link validateApplicationLevelSignature}.
+ * Returns validated ID Token claims from a processed {@link TokenEndpointResponse}, or `undefined`
+ * when it contains no ID Token.
  *
  * @param ref {@link TokenEndpointResponse} previously resolved from e.g.
  *   {@link processAuthorizationCodeResponse}
@@ -3498,11 +3592,13 @@ export function getValidatedIdTokenClaims(ref: TokenEndpointResponse): IDToken |
   return claims
 }
 
+/**
+ * Options for validating a JWT signature with the authorization server's JSON Web Key Set.
+ */
 export interface ValidateSignatureOptions extends HttpRequestOptions<'GET'>, JWKSCacheOptions {}
 
 /**
- * Validates the JWS Signature of either a JWT {@link !Response.body} or
- * {@link TokenEndpointResponse.id_token} of a processed {@link !Response}
+ * Validates the JWS signature of a processed JWT response body or ID Token.
  *
  * > [!NOTE]\
  * > Validating signatures of JWTs received via direct communication between the Client and a
@@ -3692,6 +3788,8 @@ function checkAuthenticationChallenges(response: Response) {
 }
 
 /**
+ * Processes a token response for a Refresh Token Grant.
+ *
  * Validates Refresh Token Grant {@link !Response} instance to be one coming from the
  * {@link AuthorizationServer.token_endpoint `as.token_endpoint`}.
  *
@@ -3784,6 +3882,8 @@ function brand(searchParams: URLSearchParams) {
 }
 
 /**
+ * Disables PKCE for an Authorization Code Grant request.
+ *
  * > [!WARNING]\
  * > This option has security implications that must be understood, assessed for applicability, and
  * > accepted before use.
@@ -3800,8 +3900,9 @@ function brand(searchParams: URLSearchParams) {
 export const nopkce: unique symbol = Symbol()
 
 /**
- * Performs an Authorization Code grant request at the
- * {@link AuthorizationServer.token_endpoint `as.token_endpoint`}.
+ * Performs an Authorization Code Grant request.
+ *
+ * The request is sent to the {@link AuthorizationServer.token_endpoint `as.token_endpoint`}.
  *
  * @param as Authorization Server Metadata.
  * @param client Client Metadata.
@@ -3880,6 +3981,9 @@ interface JWTPayload {
   readonly [claim: string]: JsonValue | undefined
 }
 
+/**
+ * Claims from a validated OpenID Connect ID Token.
+ */
 export interface IDToken extends JWTPayload {
   readonly iss: string
   readonly sub: string
@@ -3941,6 +4045,9 @@ function validatePresence(
   return result
 }
 
+/**
+ * An entry in an OAuth 2.0 Rich Authorization Requests `authorization_details` array.
+ */
 export interface AuthorizationDetails {
   readonly type: string
   readonly locations?: string[]
@@ -3954,6 +4061,9 @@ export interface AuthorizationDetails {
 
 type Writeable<T> = { -readonly [P in keyof T]: T[P] }
 
+/**
+ * A parsed successful OAuth 2.0 token endpoint response.
+ */
 export interface TokenEndpointResponse {
   readonly access_token: string
   readonly expires_in?: number
@@ -3971,18 +4081,23 @@ export interface TokenEndpointResponse {
 }
 
 /**
- * Use this as a value to {@link processAuthorizationCodeResponse} `oidc.expectedNonce` parameter to
- * indicate no `nonce` ID Token claim value is expected, i.e. no `nonce` parameter value was sent
- * with the authorization request.
+ * Indicates that no ID Token `nonce` claim is expected.
+ *
+ * Use this as the {@link processAuthorizationCodeResponse} `oidc.expectedNonce` value when no
+ * `nonce` parameter was sent with the authorization request.
  */
 export const expectNoNonce: unique symbol = Symbol()
 
 /**
- * Use this as a value to {@link processAuthorizationCodeResponse} `oidc.maxAge` parameter to
- * indicate no `auth_time` ID Token claim value check should be performed.
+ * Skips validation of the ID Token `auth_time` claim.
+ *
+ * Use this as the {@link processAuthorizationCodeResponse} `oidc.maxAge` value.
  */
 export const skipAuthTimeCheck: unique symbol = Symbol()
 
+/**
+ * Options for processing an Authorization Code Grant token response.
+ */
 export interface ProcessAuthorizationCodeResponseOptions extends ProcessTokenResponseOptions {
   /**
    * Expected ID Token `nonce` claim value. Default is {@link expectNoNonce}.
@@ -4002,6 +4117,8 @@ export interface ProcessAuthorizationCodeResponseOptions extends ProcessTokenRes
 }
 
 /**
+ * Processes an Authorization Code Grant token response.
+ *
  * Validates Authorization Code Grant {@link !Response} instance to be one coming from the
  * {@link AuthorizationServer.token_endpoint `as.token_endpoint`}.
  *
@@ -4173,38 +4290,51 @@ async function processAuthorizationCodeOAuth2Response(
 }
 
 /**
- * @group Error Codes
+ * Error code for responses containing parseable `WWW-Authenticate` challenges.
  *
- * @see {@link WWWAuthenticateChallengeError}
+ * Assigned to {@link WWWAuthenticateChallengeError.code}.
+ *
+ * @group Error Codes
  */
 export const WWW_AUTHENTICATE_CHALLENGE = 'OAUTH_WWW_AUTHENTICATE_CHALLENGE'
 /**
- * @group Error Codes
+ * Error code for OAuth-style JSON error responses.
  *
- * @see {@link ResponseBodyError}
+ * Assigned to {@link ResponseBodyError.code}.
+ *
+ * @group Error Codes
  */
 export const RESPONSE_BODY_ERROR = 'OAUTH_RESPONSE_BODY_ERROR'
 /**
- * @group Error Codes
+ * Error code for unsupported operations.
  *
- * @see {@link UnsupportedOperationError}
+ * Assigned to {@link UnsupportedOperationError.code}.
+ *
+ * @group Error Codes
  */
 export const UNSUPPORTED_OPERATION = 'OAUTH_UNSUPPORTED_OPERATION'
 /**
- * @group Error Codes
+ * Error code for OAuth 2.0 Authorization Error Responses.
  *
- * @see {@link AuthorizationResponseError}
+ * Assigned to {@link AuthorizationResponseError.code}.
+ *
+ * @group Error Codes
  */
 export const AUTHORIZATION_RESPONSE_ERROR = 'OAUTH_AUTHORIZATION_RESPONSE_ERROR'
 /**
- * Assigned as {@link OperationProcessingError.code} when a JWT UserInfo Response was expected but a
- * regular JSON one was given instead.
+ * Error code for receiving a JSON UserInfo response when a JWT response was expected.
+ *
+ * Assigned to {@link OperationProcessingError.code}.
  *
  * @group Error Codes
  */
 export const JWT_USERINFO_EXPECTED = 'OAUTH_JWT_USERINFO_EXPECTED'
 /**
- * Assigned as {@link OperationProcessingError.code} when the following fails to parse as JSON
+ * Error code for JSON parsing failures.
+ *
+ * Assigned to {@link OperationProcessingError.code}.
+ *
+ * This includes:
  *
  * - JWS/JWE Headers
  * - JSON response bodies
@@ -4215,49 +4345,57 @@ export const JWT_USERINFO_EXPECTED = 'OAUTH_JWT_USERINFO_EXPECTED'
  */
 export const PARSE_ERROR = 'OAUTH_PARSE_ERROR'
 /**
- * Assigned as {@link OperationProcessingError.code} when authorization server responses are invalid.
+ * Error code for invalid authorization server responses.
+ *
+ * Assigned to {@link OperationProcessingError.code}.
  *
  * @group Error Codes
  */
 export const INVALID_RESPONSE = 'OAUTH_INVALID_RESPONSE'
 /**
- * Assigned as {@link OperationProcessingError.code} during {@link validateJwtAccessToken} when the
- * request or its contents are invalid.
+ * Error code for invalid protected resource requests or request contents.
+ *
+ * Assigned to {@link OperationProcessingError.code}.
  *
  * @group Error Codes
  */
 export const INVALID_REQUEST = 'OAUTH_INVALID_REQUEST'
 /**
- * Assigned as {@link OperationProcessingError.code} when a {@link !Response} does not have the
- * expected `application/json` response-type HTTP Header.
+ * Error code for responses with an unexpected media type.
+ *
+ * Assigned to {@link OperationProcessingError.code}.
  *
  * @group Error Codes
  */
 export const RESPONSE_IS_NOT_JSON = 'OAUTH_RESPONSE_IS_NOT_JSON'
 /**
- * Assigned as {@link OperationProcessingError.code} when a {@link !Response} does not have the
- * expected success HTTP Status Code as defined by its specification.
+ * Error code for responses with an unexpected HTTP status code.
+ *
+ * Assigned to {@link OperationProcessingError.code}.
  *
  * @group Error Codes
  */
 export const RESPONSE_IS_NOT_CONFORM = 'OAUTH_RESPONSE_IS_NOT_CONFORM'
 /**
- * Assigned as {@link OperationProcessingError.code} when a request is about to made to a non-TLS
- * secured HTTP endpoint and {@link allowInsecureRequests} is not provided.
+ * Error code for requests targeting a non-TLS HTTP endpoint when insecure requests are disabled.
+ *
+ * Assigned to {@link OperationProcessingError.code}.
  *
  * @group Error Codes
  */
 export const HTTP_REQUEST_FORBIDDEN = 'OAUTH_HTTP_REQUEST_FORBIDDEN'
 /**
- * Assigned as {@link OperationProcessingError.code} when a request is about to made to a non-HTTP(S)
- * endpoint.
+ * Error code for requests targeting a non-HTTP(S) endpoint.
+ *
+ * Assigned to {@link OperationProcessingError.code}.
  *
  * @group Error Codes
  */
 export const REQUEST_PROTOCOL_FORBIDDEN = 'OAUTH_REQUEST_PROTOCOL_FORBIDDEN'
 /**
- * Assigned as {@link OperationProcessingError.code} when a JWT NumericDate comparison with the
- * current timestamp fails.
+ * Error code for failed JWT NumericDate comparisons with the current timestamp.
+ *
+ * Assigned to {@link OperationProcessingError.code}.
  *
  * @group Error Codes
  *
@@ -4265,8 +4403,9 @@ export const REQUEST_PROTOCOL_FORBIDDEN = 'OAUTH_REQUEST_PROTOCOL_FORBIDDEN'
  */
 export const JWT_TIMESTAMP_CHECK = 'OAUTH_JWT_TIMESTAMP_CHECK_FAILED'
 /**
- * Assigned as {@link OperationProcessingError.code} when a JWT claim is not of a given expected
- * value.
+ * Error code for unexpected JWT claim values.
+ *
+ * Assigned to {@link OperationProcessingError.code}.
  *
  * @group Error Codes
  *
@@ -4274,27 +4413,33 @@ export const JWT_TIMESTAMP_CHECK = 'OAUTH_JWT_TIMESTAMP_CHECK_FAILED'
  */
 export const JWT_CLAIM_COMPARISON = 'OAUTH_JWT_CLAIM_COMPARISON_FAILED'
 /**
- * Assigned as {@link OperationProcessingError.code} when a {@link !Response} JSON body attribute is
- * not of a given expected value.
+ * Error code for unexpected JSON response attribute values.
+ *
+ * Assigned to {@link OperationProcessingError.code}.
  *
  * @group Error Codes
  */
 export const JSON_ATTRIBUTE_COMPARISON = 'OAUTH_JSON_ATTRIBUTE_COMPARISON_FAILED'
 /**
- * Assigned as {@link OperationProcessingError.code} when a JWT signature validation fails to select
- * an applicable key.
+ * Error code for JWT signature key selection failures.
+ *
+ * Assigned to {@link OperationProcessingError.code}.
  *
  * @group Error Codes
  */
 export const KEY_SELECTION = 'OAUTH_KEY_SELECTION_FAILED'
 /**
- * Assigned as {@link OperationProcessingError.code} when the AS configuration is missing metadata.
+ * Error code for missing authorization server metadata.
+ *
+ * Assigned to {@link OperationProcessingError.code}.
  *
  * @group Error Codes
  */
 export const MISSING_SERVER_METADATA = 'OAUTH_MISSING_SERVER_METADATA'
 /**
- * Assigned as {@link OperationProcessingError.code} when the AS configuration has invalid metadata.
+ * Error code for invalid authorization server metadata.
+ *
+ * Assigned to {@link OperationProcessingError.code}.
  *
  * @group Error Codes
  */
@@ -4310,12 +4455,16 @@ function checkJwtType(expected: string, result: Awaited<ReturnType<typeof valida
   return result
 }
 
+/**
+ * Options for a Client Credentials Grant token request.
+ */
 export interface ClientCredentialsGrantRequestOptions
   extends HttpRequestOptions<'POST', URLSearchParams>, DPoPRequestOptions {}
 
 /**
- * Performs a Client Credentials Grant request at the
- * {@link AuthorizationServer.token_endpoint `as.token_endpoint`}.
+ * Performs a Client Credentials Grant request.
+ *
+ * The request is sent to the {@link AuthorizationServer.token_endpoint `as.token_endpoint`}.
  *
  * @param as Authorization Server Metadata.
  * @param client Client Metadata.
@@ -4350,9 +4499,10 @@ export async function clientCredentialsGrantRequest(
 }
 
 /**
- * Performs any Grant request at the {@link AuthorizationServer.token_endpoint `as.token_endpoint`}.
- * The purpose is to be able to execute grant requests such as Token Exchange Grant Type, JWT Bearer
- * Token Grant Type, or SAML 2.0 Bearer Assertion Grant Type.
+ * Performs an arbitrary OAuth grant request.
+ *
+ * The request is sent to the {@link AuthorizationServer.token_endpoint `as.token_endpoint`} and can
+ * be used for token exchange and JWT or SAML bearer grants.
  *
  * @param as Authorization Server Metadata.
  * @param client Client Metadata.
@@ -4394,6 +4544,8 @@ export async function genericTokenEndpointRequest(
 }
 
 /**
+ * Processes a token response for an arbitrary OAuth grant.
+ *
  * Validates Token Endpoint {@link !Response} instance to be one coming from the
  * {@link AuthorizationServer.token_endpoint `as.token_endpoint`}.
  *
@@ -4426,6 +4578,8 @@ export async function processGenericTokenEndpointResponse(
 }
 
 /**
+ * Processes a Client Credentials Grant token response.
+ *
  * Validates Client Credentials Grant {@link !Response} instance to be one coming from the
  * {@link AuthorizationServer.token_endpoint `as.token_endpoint`}.
  *
@@ -4457,6 +4611,9 @@ export async function processClientCredentialsResponse(
   )
 }
 
+/**
+ * Options for an OAuth 2.0 Token Revocation request.
+ */
 export interface RevocationRequestOptions extends HttpRequestOptions<'POST', URLSearchParams> {
   /**
    * Any additional parameters to send. This cannot override existing parameter values.
@@ -4465,7 +4622,9 @@ export interface RevocationRequestOptions extends HttpRequestOptions<'POST', URL
 }
 
 /**
- * Performs a Revocation Request at the
+ * Performs a Revocation Request.
+ *
+ * The request is sent to the
  * {@link AuthorizationServer.revocation_endpoint `as.revocation_endpoint`}.
  *
  * @param as Authorization Server Metadata.
@@ -4509,6 +4668,8 @@ export async function revocationRequest(
 }
 
 /**
+ * Processes a Token Revocation response.
+ *
  * Validates {@link !Response} instance to be one coming from the
  * {@link AuthorizationServer.revocation_endpoint `as.revocation_endpoint`}.
  *
@@ -4531,6 +4692,9 @@ export async function processRevocationResponse(response: Response): Promise<und
   return undefined
 }
 
+/**
+ * Options for an OAuth 2.0 Token Introspection request.
+ */
 export interface IntrospectionRequestOptions extends HttpRequestOptions<'POST', URLSearchParams> {
   /**
    * Any additional parameters to send. This cannot override existing parameter values.
@@ -4555,7 +4719,9 @@ function assertReadableResponse(response: Response): void {
 }
 
 /**
- * Performs an Introspection Request at the
+ * Performs an Introspection Request.
+ *
+ * The request is sent to the
  * {@link AuthorizationServer.introspection_endpoint `as.introspection_endpoint`}.
  *
  * @param as Authorization Server Metadata.
@@ -4602,6 +4768,9 @@ export async function introspectionRequest(
   return authenticatedRequest(as, client, clientAuthentication, url, body, headers, options)
 }
 
+/**
+ * Proof-of-possession confirmation (`cnf`) claims associated with a token.
+ */
 export interface ConfirmationClaims {
   readonly 'x5t#S256'?: string
   readonly jkt?: string
@@ -4609,6 +4778,9 @@ export interface ConfirmationClaims {
   readonly [claim: string]: JsonValue | undefined
 }
 
+/**
+ * A parsed successful OAuth 2.0 Token Introspection response.
+ */
 export interface IntrospectionResponse {
   readonly active: boolean
   readonly client_id?: string
@@ -4630,6 +4802,8 @@ export interface IntrospectionResponse {
 }
 
 /**
+ * Processes a Token Introspection response.
+ *
  * Validates {@link !Response} instance to be one coming from the
  * {@link AuthorizationServer.introspection_endpoint `as.introspection_endpoint`}.
  *
@@ -4723,6 +4897,9 @@ async function jwksRequest(
   })
 }
 
+/**
+ * A JSON Web Key Set.
+ */
 export interface JWKS {
   readonly keys: JWK[]
 }
@@ -4871,6 +5048,9 @@ async function validateJwsSignature(
   }
 }
 
+/**
+ * A function that decrypts a compact JWE and returns its nested JWT string.
+ */
 export type JweDecryptFunction = (jwe: string) => Promise<string>
 
 /**
@@ -4979,7 +5159,7 @@ async function validateJwt(
 }
 
 /**
- * Same as {@link validateAuthResponse} but for signed JARM responses.
+ * Validates a signed JARM authorization response.
  *
  * @param as Authorization Server Metadata.
  * @param client Client Metadata.
@@ -5112,8 +5292,7 @@ async function idTokenHashMatches(
 }
 
 /**
- * Same as {@link validateAuthResponse} but for FAPI 1.0 Advanced Detached Signature authorization
- * responses.
+ * Validates a FAPI 1.0 Advanced detached-signature authorization response.
  *
  * @param as Authorization Server Metadata.
  * @param client Client Metadata.
@@ -5156,7 +5335,7 @@ export async function validateDetachedSignatureResponse(
 }
 
 /**
- * Same as {@link validateAuthResponse} but for `code id_token` authorization responses.
+ * Validates an OpenID Connect `code id_token` authorization response.
  *
  * @param as Authorization Server Metadata.
  * @param client Client Metadata.
@@ -5510,6 +5689,8 @@ function getURLSearchParameter(parameters: URLSearchParams, name: string): strin
 }
 
 /**
+ * Skips the authorization response `state` value check performed by {@link validateAuthResponse}.
+ *
  * > [!WARNING]\
  * > This option has security implications that must be understood, assessed for applicability, and
  * > accepted before use.
@@ -5523,15 +5704,17 @@ function getURLSearchParameter(parameters: URLSearchParams, name: string): strin
 export const skipStateCheck: unique symbol = Symbol()
 
 /**
- * Use this as a value to {@link validateAuthResponse} `expectedState` parameter to indicate no
- * `state` parameter value is expected, i.e. no `state` parameter value was sent with the
- * authorization request.
+ * Indicates that no authorization response `state` parameter is expected.
+ *
+ * Use this as the {@link validateAuthResponse} `expectedState` value when no `state` parameter was
+ * sent with the authorization request.
  */
 export const expectNoState: unique symbol = Symbol()
 
 /**
- * Validates an OAuth 2.0 Authorization Response or Authorization Error Response message returned
- * from the authorization server's
+ * Validates an OAuth 2.0 Authorization Response or Authorization Error Response.
+ *
+ * The message is returned from the authorization server's
  * {@link AuthorizationServer.authorization_endpoint `as.authorization_endpoint`}.
  *
  * @param as Authorization Server Metadata.
@@ -5665,13 +5848,18 @@ async function importJwk(alg: string, jwk: JWK) {
   return crypto.subtle.importKey('jwk', key, algToSubtle(alg), true, ['verify'])
 }
 
+/**
+ * Options for an OAuth 2.0 Device Authorization Request.
+ */
 export interface DeviceAuthorizationRequestOptions extends HttpRequestOptions<
   'POST',
   URLSearchParams
 > {}
 
 /**
- * Performs a Device Authorization Request at the
+ * Performs a Device Authorization Request.
+ *
+ * The request is sent to the
  * {@link AuthorizationServer.device_authorization_endpoint `as.device_authorization_endpoint`}.
  *
  * @param as Authorization Server Metadata.
@@ -5712,6 +5900,9 @@ export async function deviceAuthorizationRequest(
   return authenticatedRequest(as, client, clientAuthentication, url, body, headers, options)
 }
 
+/**
+ * A parsed successful OAuth 2.0 Device Authorization Response.
+ */
 export interface DeviceAuthorizationResponse {
   /**
    * The device verification code
@@ -5745,6 +5936,8 @@ export interface DeviceAuthorizationResponse {
 }
 
 /**
+ * Processes a Device Authorization Response.
+ *
  * Validates {@link !Response} instance to be one coming from the
  * {@link AuthorizationServer.device_authorization_endpoint `as.device_authorization_endpoint`}.
  *
@@ -5816,8 +6009,9 @@ export async function processDeviceAuthorizationResponse(
 }
 
 /**
- * Performs a Device Authorization Grant request at the
- * {@link AuthorizationServer.token_endpoint `as.token_endpoint`}.
+ * Performs a Device Authorization Grant request.
+ *
+ * The request is sent to the {@link AuthorizationServer.token_endpoint `as.token_endpoint`}.
  *
  * @param as Authorization Server Metadata.
  * @param client Client Metadata.
@@ -5858,6 +6052,8 @@ export async function deviceCodeGrantRequest(
 }
 
 /**
+ * Processes a Device Authorization Grant token response.
+ *
  * Validates Device Authorization Grant {@link !Response} instance to be one coming from the
  * {@link AuthorizationServer.token_endpoint `as.token_endpoint`}.
  *
@@ -5889,6 +6085,9 @@ export async function processDeviceCodeResponse(
   )
 }
 
+/**
+ * Options for generating an asymmetric signing key pair.
+ */
 export interface GenerateKeyPairOptions {
   /**
    * Indicates whether or not the private key may be exported. Default is `false`.
@@ -5902,7 +6101,7 @@ export interface GenerateKeyPairOptions {
 }
 
 /**
- * Generates a {@link CryptoKeyPair} for a given JWS `alg` Algorithm identifier.
+ * Generates a {@link CryptoKeyPair} for a supported JWS `alg` identifier.
  *
  * @param alg Supported JWS `alg` Algorithm identifier. Must be a
  *   {@link JWSAlgorithm supported JWS Algorithm}.
@@ -5930,6 +6129,9 @@ export async function generateKeyPair(
   ]) as Promise<CryptoKeyPair>
 }
 
+/**
+ * Claims from a validated JWT access token.
+ */
 export interface JWTAccessTokenClaims extends JWTPayload {
   readonly iss: string
   readonly exp: number
@@ -5944,6 +6146,9 @@ export interface JWTAccessTokenClaims extends JWTPayload {
   readonly [claim: string]: JsonValue | undefined
 }
 
+/**
+ * Options for validating a JWT access token at a protected resource.
+ */
 export interface ValidateJWTAccessTokenOptions extends HttpRequestOptions<'GET'>, JWKSCacheOptions {
   /**
    * Indicates whether DPoP use is required.
@@ -6094,8 +6299,7 @@ async function validateDPoP(
 }
 
 /**
- * Validates use of JSON Web Token (JWT) OAuth 2.0 Access Tokens for a given {@link !Request} as per
- * RFC 6750, RFC 9068, and RFC 9449.
+ * Validates a resource request's JWT access token according to RFC 6750, RFC 9068, and RFC 9449.
  *
  * The only supported means of sending access tokens is via the Authorization Request Header Field
  * method.
@@ -6242,13 +6446,18 @@ function reassignRSCode(err: unknown): never {
   throw err
 }
 
+/**
+ * Options for a Client-Initiated Backchannel Authentication request.
+ */
 export interface BackchannelAuthenticationRequestOptions extends HttpRequestOptions<
   'POST',
   URLSearchParams
 > {}
 
 /**
- * Performs a Backchannel Authentication Request at the
+ * Performs a Backchannel Authentication Request.
+ *
+ * The request is sent to the
  * {@link AuthorizationServer.backchannel_authentication_endpoint `as.backchannel_authentication_endpoint`}.
  *
  * @param as Authorization Server Metadata.
@@ -6289,6 +6498,9 @@ export async function backchannelAuthenticationRequest(
   return authenticatedRequest(as, client, clientAuthentication, url, body, headers, options)
 }
 
+/**
+ * A parsed successful Client-Initiated Backchannel Authentication response.
+ */
 export interface BackchannelAuthenticationResponse {
   /**
    * Unique identifier to identify the authentication request.
@@ -6308,6 +6520,8 @@ export interface BackchannelAuthenticationResponse {
 }
 
 /**
+ * Processes a CIBA Backchannel Authentication Response.
+ *
  * Validates {@link !Response} instance to be one coming from the
  * {@link AuthorizationServer.backchannel_authentication_endpoint `as.backchannel_authentication_endpoint`}.
  *
@@ -6361,8 +6575,9 @@ export async function processBackchannelAuthenticationResponse(
 }
 
 /**
- * Performs a Backchannel Authentication Grant request at the
- * {@link AuthorizationServer.token_endpoint `as.token_endpoint`}.
+ * Performs a Backchannel Authentication Grant request.
+ *
+ * The request is sent to the {@link AuthorizationServer.token_endpoint `as.token_endpoint`}.
  *
  * @param as Authorization Server Metadata.
  * @param client Client Metadata.
@@ -6404,6 +6619,8 @@ export async function backchannelAuthenticationGrantRequest(
 }
 
 /**
+ * Processes a CIBA Backchannel Authentication Grant token response.
+ *
  * Validates Backchannel Authentication Grant {@link !Response} instance to be one coming from the
  * {@link AuthorizationServer.token_endpoint `as.token_endpoint`}.
  *
@@ -6436,12 +6653,15 @@ export async function processBackchannelAuthenticationGrantResponse(
 }
 
 /**
- * Removes all Symbol properties from a type
+ * Removes symbol-keyed properties from a type.
  */
 export type OmitSymbolProperties<T> = {
   [K in keyof T as K extends symbol ? never : K]: T[K]
 }
 
+/**
+ * Options for an OAuth 2.0 Dynamic Client Registration request.
+ */
 export interface DynamicClientRegistrationRequestOptions
   extends HttpRequestOptions<'POST', string>, DPoPRequestOptions {
   /**
@@ -6452,7 +6672,9 @@ export interface DynamicClientRegistrationRequestOptions
 }
 
 /**
- * Performs a Dynamic Client Registration at the
+ * Performs a Dynamic Client Registration request.
+ *
+ * The request is sent to the
  * {@link AuthorizationServer.registration_endpoint `as.registration_endpoint`} using the provided
  * client metadata.
  *
@@ -6513,6 +6735,8 @@ export async function dynamicClientRegistrationRequest(
 }
 
 /**
+ * Processes a Dynamic Client Registration response.
+ *
  * Validates {@link !Response} instance to be one coming from the
  * {@link AuthorizationServer.registration_endpoint `as.registration_endpoint`}.
  *
@@ -6565,7 +6789,7 @@ export async function processDynamicClientRegistrationResponse(
 }
 
 /**
- * Protected Resource Server Metadata
+ * Metadata describing an OAuth 2.0 protected resource server.
  *
  * @group Resource Server Metadata
  *
@@ -6689,6 +6913,8 @@ export async function resourceDiscoveryRequest(
 }
 
 /**
+ * Processes a protected resource metadata discovery response.
+ *
  * Validates {@link !Response} instance to be one coming from the resource server's well-known
  * discovery endpoint.
  *

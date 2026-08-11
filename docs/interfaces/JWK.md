@@ -6,6 +6,8 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
+A JSON Web Key with recognized and extension parameters.
+
 ## Indexable
 
 > \[`parameter`: `string`\]: [`JsonValue`](../type-aliases/JsonValue.md) \| `undefined`

@@ -8,6 +8,6 @@ Support from the community to continue maintaining and improving this module is 
 
 • `const` **UNSUPPORTED\_OPERATION**: `"OAUTH_UNSUPPORTED_OPERATION"` = `'OAUTH_UNSUPPORTED_OPERATION'`
 
-## See
+Error code for unsupported operations.
 
-[UnsupportedOperationError](../classes/UnsupportedOperationError.md)
+Assigned to [UnsupportedOperationError.code](../classes/UnsupportedOperationError.md#code).

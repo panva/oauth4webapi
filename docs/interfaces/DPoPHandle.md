@@ -6,7 +6,7 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
-DPoP handle, obtained from [DPoP](../functions/DPoP.md)
+A DPoP proof-generation and nonce-management handle returned by [DPoP](../functions/DPoP.md).
 
 ## Methods
 

@@ -8,6 +8,8 @@ Support from the community to continue maintaining and improving this module is 
 
 ▸ **processDiscoveryResponse**(`expectedIssuerIdentifier`, `response`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`AuthorizationServer`](../interfaces/AuthorizationServer.md)\>
 
+Processes an authorization server metadata discovery response.
+
 Validates [Response](https://developer.mozilla.org/docs/Web/API/Response) instance to be one coming from the authorization server's well-known
 discovery endpoint.
 

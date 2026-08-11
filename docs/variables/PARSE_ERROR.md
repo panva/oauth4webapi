@@ -8,7 +8,11 @@ Support from the community to continue maintaining and improving this module is 
 
 • `const` **PARSE\_ERROR**: `"OAUTH_PARSE_ERROR"` = `'OAUTH_PARSE_ERROR'`
 
-Assigned as [OperationProcessingError.code](../classes/OperationProcessingError.md#code) when the following fails to parse as JSON
+Error code for JSON parsing failures.
+
+Assigned to [OperationProcessingError.code](../classes/OperationProcessingError.md#code).
+
+This includes:
 
 - JWS/JWE Headers
 - JSON response bodies

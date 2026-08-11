@@ -8,6 +8,8 @@ Support from the community to continue maintaining and improving this module is 
 
 • `const` **skipSubjectCheck**: unique `symbol`
 
+Skips the UserInfo `sub` claim value check performed by [processUserInfoResponse](../functions/processUserInfoResponse.md).
+
 > [!WARNING]\
 > This option has security implications that must be understood, assessed for applicability, and
 > accepted before use.

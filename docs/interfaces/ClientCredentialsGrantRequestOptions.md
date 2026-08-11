@@ -6,6 +6,8 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
+Options for a Client Credentials Grant token request.
+
 ## Properties
 
 ### ~~\[allowInsecureRequests\]?~~

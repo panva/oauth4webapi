@@ -6,6 +6,8 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
+Options for validating a JWT access token at a protected resource.
+
 ## Properties
 
 ### ~~\[allowInsecureRequests\]?~~

@@ -8,4 +8,6 @@ Support from the community to continue maintaining and improving this module is 
 
 • `const` **INVALID\_SERVER\_METADATA**: `"OAUTH_INVALID_SERVER_METADATA"` = `'OAUTH_INVALID_SERVER_METADATA'`
 
-Assigned as [OperationProcessingError.code](../classes/OperationProcessingError.md#code) when the AS configuration has invalid metadata.
+Error code for invalid authorization server metadata.
+
+Assigned to [OperationProcessingError.code](../classes/OperationProcessingError.md#code).

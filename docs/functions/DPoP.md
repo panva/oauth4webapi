@@ -8,9 +8,8 @@ Support from the community to continue maintaining and improving this module is 
 
 ▸ **DPoP**(`client`, `keyPair`, `options?`): [`DPoPHandle`](../interfaces/DPoPHandle.md)
 
-Returns a wrapper / handle around a [CryptoKeyPair](../interfaces/CryptoKeyPair.md) that is used for negotiating and proving
-proof-of-possession to sender-constrain OAuth 2.0 tokens via DPoP at the Authorization Server and
-Resource Server.
+Creates a DPoP handle that signs sender-constraining proofs with a [CryptoKeyPair](../interfaces/CryptoKeyPair.md) and
+tracks server-issued nonces.
 
 This wrapper / handle also keeps track of server-issued nonces, allowing requests to be retried
 with a fresh nonce when the server indicates the need to use one. [isDPoPNonceError](isDPoPNonceError.md) can be

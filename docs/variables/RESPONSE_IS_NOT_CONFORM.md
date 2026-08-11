@@ -8,5 +8,6 @@ Support from the community to continue maintaining and improving this module is 
 
 • `const` **RESPONSE\_IS\_NOT\_CONFORM**: `"OAUTH_RESPONSE_IS_NOT_CONFORM"` = `'OAUTH_RESPONSE_IS_NOT_CONFORM'`
 
-Assigned as [OperationProcessingError.code](../classes/OperationProcessingError.md#code) when a [Response](https://developer.mozilla.org/docs/Web/API/Response) does not have the
-expected success HTTP Status Code as defined by its specification.
+Error code for responses with an unexpected HTTP status code.
+
+Assigned to [OperationProcessingError.code](../classes/OperationProcessingError.md#code).

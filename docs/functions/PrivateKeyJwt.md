@@ -8,9 +8,8 @@ Support from the community to continue maintaining and improving this module is 
 
 ▸ **PrivateKeyJwt**(`clientPrivateKey`, `options?`): [`ClientAuth`](../type-aliases/ClientAuth.md)
 
-**`private_key_jwt`** uses the HTTP request body to send `client_id`, `client_assertion_type`,
-and `client_assertion` as `application/x-www-form-urlencoded` body parameters. Digital signature
-is used for the assertion's authenticity and integrity.
+**`private_key_jwt`** authenticates the client with a digitally signed JWT assertion sent in the
+form-encoded request body.
 
 ## Parameters
 

@@ -8,7 +8,9 @@ Support from the community to continue maintaining and improving this module is 
 
 ▸ **backchannelAuthenticationRequest**(`as`, `client`, `clientAuthentication`, `parameters`, `options?`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Response`](https://developer.mozilla.org/docs/Web/API/Response)\>
 
-Performs a Backchannel Authentication Request at the
+Performs a Backchannel Authentication Request.
+
+The request is sent to the
 [`as.backchannel\_authentication\_endpoint`](../interfaces/AuthorizationServer.md#backchannel_authentication_endpoint).
 
 ## Parameters

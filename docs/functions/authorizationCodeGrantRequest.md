@@ -8,8 +8,9 @@ Support from the community to continue maintaining and improving this module is 
 
 ▸ **authorizationCodeGrantRequest**(`as`, `client`, `clientAuthentication`, `callbackParameters`, `redirectUri`, `codeVerifier`, `options?`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Response`](https://developer.mozilla.org/docs/Web/API/Response)\>
 
-Performs an Authorization Code grant request at the
-[`as.token\_endpoint`](../interfaces/AuthorizationServer.md#token_endpoint).
+Performs an Authorization Code Grant request.
+
+The request is sent to the [`as.token\_endpoint`](../interfaces/AuthorizationServer.md#token_endpoint).
 
 ## Parameters
 

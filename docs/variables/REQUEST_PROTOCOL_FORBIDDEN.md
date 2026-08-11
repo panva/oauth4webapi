@@ -8,5 +8,6 @@ Support from the community to continue maintaining and improving this module is 
 
 • `const` **REQUEST\_PROTOCOL\_FORBIDDEN**: `"OAUTH_REQUEST_PROTOCOL_FORBIDDEN"` = `'OAUTH_REQUEST_PROTOCOL_FORBIDDEN'`
 
-Assigned as [OperationProcessingError.code](../classes/OperationProcessingError.md#code) when a request is about to made to a non-HTTP(S)
-endpoint.
+Error code for requests targeting a non-HTTP(S) endpoint.
+
+Assigned to [OperationProcessingError.code](../classes/OperationProcessingError.md#code).

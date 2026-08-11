@@ -8,4 +8,6 @@ Support from the community to continue maintaining and improving this module is 
 
 • `const` **MISSING\_SERVER\_METADATA**: `"OAUTH_MISSING_SERVER_METADATA"` = `'OAUTH_MISSING_SERVER_METADATA'`
 
-Assigned as [OperationProcessingError.code](../classes/OperationProcessingError.md#code) when the AS configuration is missing metadata.
+Error code for missing authorization server metadata.
+
+Assigned to [OperationProcessingError.code](../classes/OperationProcessingError.md#code).

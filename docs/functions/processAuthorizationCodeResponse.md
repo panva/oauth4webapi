@@ -8,6 +8,8 @@ Support from the community to continue maintaining and improving this module is 
 
 ▸ **processAuthorizationCodeResponse**(`as`, `client`, `response`, `options?`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`TokenEndpointResponse`](../interfaces/TokenEndpointResponse.md)\>
 
+Processes an Authorization Code Grant token response.
+
 Validates Authorization Code Grant [Response](https://developer.mozilla.org/docs/Web/API/Response) instance to be one coming from the
 [`as.token\_endpoint`](../interfaces/AuthorizationServer.md#token_endpoint).
 

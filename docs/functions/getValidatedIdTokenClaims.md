@@ -8,9 +8,8 @@ Support from the community to continue maintaining and improving this module is 
 
 ▸ **getValidatedIdTokenClaims**(`ref`): [`IDToken`](../interfaces/IDToken.md) \| `undefined`
 
-Returns ID Token Claims Set from a [TokenEndpointResponse](../interfaces/TokenEndpointResponse.md) processed by e.g.
-[processAuthorizationCodeResponse](processAuthorizationCodeResponse.md). To optionally validate the ID Token Signature use
-[validateApplicationLevelSignature](validateApplicationLevelSignature.md).
+Returns validated ID Token claims from a processed [TokenEndpointResponse](../interfaces/TokenEndpointResponse.md), or `undefined`
+when it contains no ID Token.
 
 ## Parameters
 

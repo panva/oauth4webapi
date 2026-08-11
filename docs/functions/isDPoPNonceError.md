@@ -8,8 +8,7 @@ Support from the community to continue maintaining and improving this module is 
 
 ▸ **isDPoPNonceError**(`err`): `boolean`
 
-Used to determine if a rejected error indicates the need to retry the request due to an
-expired/missing nonce.
+Returns whether an error requires retrying the request with a fresh DPoP nonce.
 
 ## Parameters
 

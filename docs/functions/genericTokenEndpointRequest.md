@@ -8,9 +8,10 @@ Support from the community to continue maintaining and improving this module is 
 
 ▸ **genericTokenEndpointRequest**(`as`, `client`, `clientAuthentication`, `grantType`, `parameters`, `options?`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Response`](https://developer.mozilla.org/docs/Web/API/Response)\>
 
-Performs any Grant request at the [`as.token\_endpoint`](../interfaces/AuthorizationServer.md#token_endpoint).
-The purpose is to be able to execute grant requests such as Token Exchange Grant Type, JWT Bearer
-Token Grant Type, or SAML 2.0 Bearer Assertion Grant Type.
+Performs an arbitrary OAuth grant request.
+
+The request is sent to the [`as.token\_endpoint`](../interfaces/AuthorizationServer.md#token_endpoint) and can
+be used for token exchange and JWT or SAML bearer grants.
 
 ## Parameters
 

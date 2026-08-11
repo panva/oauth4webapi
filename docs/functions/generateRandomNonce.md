@@ -8,7 +8,7 @@ Support from the community to continue maintaining and improving this module is 
 
 ▸ **generateRandomNonce**(): `string`
 
-Generate random `nonce` value.
+Generates a random `nonce` value.
 
 ## Returns
 

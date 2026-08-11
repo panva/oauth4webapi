@@ -8,8 +8,9 @@ Support from the community to continue maintaining and improving this module is 
 
 • `const` **JWT\_CLAIM\_COMPARISON**: `"OAUTH_JWT_CLAIM_COMPARISON_FAILED"` = `'OAUTH_JWT_CLAIM_COMPARISON_FAILED'`
 
-Assigned as [OperationProcessingError.code](../classes/OperationProcessingError.md#code) when a JWT claim is not of a given expected
-value.
+Error code for unexpected JWT claim values.
+
+Assigned to [OperationProcessingError.code](../classes/OperationProcessingError.md#code).
 
 ## See
 

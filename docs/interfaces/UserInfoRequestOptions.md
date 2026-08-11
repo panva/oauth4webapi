@@ -6,6 +6,8 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
+Options for an OpenID Connect UserInfo request.
+
 ## Properties
 
 ### ~~\[allowInsecureRequests\]?~~

@@ -8,8 +8,9 @@ Support from the community to continue maintaining and improving this module is 
 
 • `const` **JWT\_TIMESTAMP\_CHECK**: `"OAUTH_JWT_TIMESTAMP_CHECK_FAILED"` = `'OAUTH_JWT_TIMESTAMP_CHECK_FAILED'`
 
-Assigned as [OperationProcessingError.code](../classes/OperationProcessingError.md#code) when a JWT NumericDate comparison with the
-current timestamp fails.
+Error code for failed JWT NumericDate comparisons with the current timestamp.
+
+Assigned to [OperationProcessingError.code](../classes/OperationProcessingError.md#code).
 
 ## See
 

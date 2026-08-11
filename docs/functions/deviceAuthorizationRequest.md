@@ -8,7 +8,9 @@ Support from the community to continue maintaining and improving this module is 
 
 ▸ **deviceAuthorizationRequest**(`as`, `client`, `clientAuthentication`, `parameters`, `options?`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Response`](https://developer.mozilla.org/docs/Web/API/Response)\>
 
-Performs a Device Authorization Request at the
+Performs a Device Authorization Request.
+
+The request is sent to the
 [`as.device\_authorization\_endpoint`](../interfaces/AuthorizationServer.md#device_authorization_endpoint).
 
 ## Parameters

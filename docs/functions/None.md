@@ -8,8 +8,7 @@ Support from the community to continue maintaining and improving this module is 
 
 ▸ **None**(): [`ClientAuth`](../type-aliases/ClientAuth.md)
 
-**`none`** (public client) uses the HTTP request body to send only `client_id` as
-`application/x-www-form-urlencoded` body parameter.
+**`none`** sends only `client_id` in the form-encoded request body for a public client.
 
 ```ts
 let clientAuth = oauth.None()

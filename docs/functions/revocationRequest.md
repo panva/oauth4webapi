@@ -8,7 +8,9 @@ Support from the community to continue maintaining and improving this module is 
 
 ▸ **revocationRequest**(`as`, `client`, `clientAuthentication`, `token`, `options?`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Response`](https://developer.mozilla.org/docs/Web/API/Response)\>
 
-Performs a Revocation Request at the
+Performs a Revocation Request.
+
+The request is sent to the
 [`as.revocation\_endpoint`](../interfaces/AuthorizationServer.md#revocation_endpoint).
 
 ## Parameters

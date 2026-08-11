@@ -8,6 +8,8 @@ Support from the community to continue maintaining and improving this module is 
 
 ▸ **processDynamicClientRegistrationResponse**(`response`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`OmitSymbolProperties`](../type-aliases/OmitSymbolProperties.md)\<[`Client`](../interfaces/Client.md)\>\>
 
+Processes a Dynamic Client Registration response.
+
 Validates [Response](https://developer.mozilla.org/docs/Web/API/Response) instance to be one coming from the
 [`as.registration\_endpoint`](../interfaces/AuthorizationServer.md#registration_endpoint).
 

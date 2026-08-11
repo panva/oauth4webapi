@@ -6,6 +6,8 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
+Options for an OAuth 2.0 Device Authorization Request.
+
 ## Properties
 
 ### ~~\[allowInsecureRequests\]?~~

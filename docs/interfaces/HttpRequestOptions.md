@@ -6,6 +6,8 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
+Shared transport options for HTTP requests made by this module.
+
 ## Type Parameters
 
 | Type Parameter | Default type |

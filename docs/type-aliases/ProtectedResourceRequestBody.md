@@ -7,3 +7,5 @@ Support from the community to continue maintaining and improving this module is 
 ***
 
 • **ProtectedResourceRequestBody** = [`ArrayBuffer`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer) \| `null` \| [`ReadableStream`](https://developer.mozilla.org/docs/Web/API/ReadableStream) \| `string` \| [`Uint8Array`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array) \| `undefined` \| [`URLSearchParams`](https://developer.mozilla.org/docs/Web/API/URLSearchParams)
+
+An HTTP request body accepted by [protectedResourceRequest](../functions/protectedResourceRequest.md).

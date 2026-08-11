@@ -8,8 +8,9 @@ Support from the community to continue maintaining and improving this module is 
 
 ▸ **userInfoRequest**(`as`, `client`, `accessToken`, `options?`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Response`](https://developer.mozilla.org/docs/Web/API/Response)\>
 
-Performs a UserInfo Request at the
-[`as.userinfo\_endpoint`](../interfaces/AuthorizationServer.md#userinfo_endpoint).
+Performs a UserInfo Request.
+
+The request is sent to the [`as.userinfo\_endpoint`](../interfaces/AuthorizationServer.md#userinfo_endpoint).
 
 Authorization Header is used to transmit the Access Token value.
 

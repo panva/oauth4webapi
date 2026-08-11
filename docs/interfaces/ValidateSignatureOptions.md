@@ -6,6 +6,8 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
+Options for validating a JWT signature with the authorization server's JSON Web Key Set.
+
 ## Properties
 
 ### ~~\[allowInsecureRequests\]?~~

@@ -6,6 +6,8 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
+Options for processing an Authorization Code Grant token response.
+
 ## Properties
 
 ### \[jweDecrypt\]?

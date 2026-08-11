@@ -6,6 +6,8 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
+Fetch-style request options passed to a custom fetch implementation.
+
 ## Type Parameters
 
 | Type Parameter | Default type |

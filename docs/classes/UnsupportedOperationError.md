@@ -6,6 +6,8 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
+Thrown when an attempted operation is not supported.
+
 ## Properties
 
 ### code

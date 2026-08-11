@@ -8,7 +8,7 @@ Support from the community to continue maintaining and improving this module is 
 
 ▸ **validateJwtAuthResponse**(`as`, `client`, `parameters`, `expectedState?`, `options?`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`URLSearchParams`](https://developer.mozilla.org/docs/Web/API/URLSearchParams)\>
 
-Same as [validateAuthResponse](validateAuthResponse.md) but for signed JARM responses.
+Validates a signed JARM authorization response.
 
 ## Parameters
 

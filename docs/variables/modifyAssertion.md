@@ -8,9 +8,10 @@ Support from the community to continue maintaining and improving this module is 
 
 • `const` **modifyAssertion**: unique `symbol`
 
-Use to mutate JWT header and payload before they are signed. Its intended use is working around
-non-conform server behaviours, such as modifying JWT "aud" (audience) claims, or otherwise
-changing fixed claims used by this library.
+Provides a hook for mutating a JWT header and payload immediately before signing.
+
+Its intended use is working around non-conforming server behavior, such as modifying JWT `aud`
+(audience) claims or otherwise changing fixed claims used by this module.
 
 ## Example
 

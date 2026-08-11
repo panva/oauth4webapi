@@ -8,5 +8,6 @@ Support from the community to continue maintaining and improving this module is 
 
 • `const` **RESPONSE\_IS\_NOT\_JSON**: `"OAUTH_RESPONSE_IS_NOT_JSON"` = `'OAUTH_RESPONSE_IS_NOT_JSON'`
 
-Assigned as [OperationProcessingError.code](../classes/OperationProcessingError.md#code) when a [Response](https://developer.mozilla.org/docs/Web/API/Response) does not have the
-expected `application/json` response-type HTTP Header.
+Error code for responses with an unexpected media type.
+
+Assigned to [OperationProcessingError.code](../classes/OperationProcessingError.md#code).

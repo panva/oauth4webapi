@@ -6,7 +6,7 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
-Protected Resource Server Metadata
+Metadata describing an OAuth 2.0 protected resource server.
 
 ## See
 

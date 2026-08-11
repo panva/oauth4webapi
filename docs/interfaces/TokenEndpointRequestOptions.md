@@ -6,6 +6,8 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
+Shared options for OAuth 2.0 token endpoint requests.
+
 ## Properties
 
 ### ~~\[allowInsecureRequests\]?~~

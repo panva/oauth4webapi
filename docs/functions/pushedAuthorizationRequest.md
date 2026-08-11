@@ -8,7 +8,9 @@ Support from the community to continue maintaining and improving this module is 
 
 ▸ **pushedAuthorizationRequest**(`as`, `client`, `clientAuthentication`, `parameters`, `options?`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Response`](https://developer.mozilla.org/docs/Web/API/Response)\>
 
-Performs a Pushed Authorization Request at the
+Performs a Pushed Authorization Request.
+
+The request is sent to the
 [`as.pushed\_authorization\_request\_endpoint`](../interfaces/AuthorizationServer.md#pushed_authorization_request_endpoint).
 
 ## Parameters

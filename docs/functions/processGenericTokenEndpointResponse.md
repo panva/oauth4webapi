@@ -8,6 +8,8 @@ Support from the community to continue maintaining and improving this module is 
 
 ▸ **processGenericTokenEndpointResponse**(`as`, `client`, `response`, `options?`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`TokenEndpointResponse`](../interfaces/TokenEndpointResponse.md)\>
 
+Processes a token response for an arbitrary OAuth grant.
+
 Validates Token Endpoint [Response](https://developer.mozilla.org/docs/Web/API/Response) instance to be one coming from the
 [`as.token\_endpoint`](../interfaces/AuthorizationServer.md#token_endpoint).
 

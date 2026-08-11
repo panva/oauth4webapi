@@ -8,9 +8,8 @@ Support from the community to continue maintaining and improving this module is 
 
 ▸ **TlsClientAuth**(): [`ClientAuth`](../type-aliases/ClientAuth.md)
 
-**`tls_client_auth`** uses the HTTP request body to send only `client_id` as
-`application/x-www-form-urlencoded` body parameter and the mTLS key and certificate is configured
-through [customFetch](../variables/customFetch.md).
+**`tls_client_auth`** sends `client_id` in the form-encoded request body while mTLS credentials
+are configured through [customFetch](../variables/customFetch.md).
 
 ```ts
 let clientAuth = oauth.TlsClientAuth()

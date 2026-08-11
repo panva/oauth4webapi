@@ -8,8 +8,9 @@ Support from the community to continue maintaining and improving this module is 
 
 ▸ **validateAuthResponse**(`as`, `client`, `parameters`, `expectedState?`): [`URLSearchParams`](https://developer.mozilla.org/docs/Web/API/URLSearchParams)
 
-Validates an OAuth 2.0 Authorization Response or Authorization Error Response message returned
-from the authorization server's
+Validates an OAuth 2.0 Authorization Response or Authorization Error Response.
+
+The message is returned from the authorization server's
 [`as.authorization\_endpoint`](../interfaces/AuthorizationServer.md#authorization_endpoint).
 
 ## Parameters

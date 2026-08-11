@@ -8,5 +8,6 @@ Support from the community to continue maintaining and improving this module is 
 
 • `const` **HTTP\_REQUEST\_FORBIDDEN**: `"OAUTH_HTTP_REQUEST_FORBIDDEN"` = `'OAUTH_HTTP_REQUEST_FORBIDDEN'`
 
-Assigned as [OperationProcessingError.code](../classes/OperationProcessingError.md#code) when a request is about to made to a non-TLS
-secured HTTP endpoint and [allowInsecureRequests](allowInsecureRequests.md) is not provided.
+Error code for requests targeting a non-TLS HTTP endpoint when insecure requests are disabled.
+
+Assigned to [OperationProcessingError.code](../classes/OperationProcessingError.md#code).

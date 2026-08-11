@@ -6,6 +6,8 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
+Shared options for processing OAuth 2.0 token endpoint responses.
+
 ## Properties
 
 ### \[jweDecrypt\]?

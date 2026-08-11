@@ -6,6 +6,8 @@ Support from the community to continue maintaining and improving this module is 
 
 ***
 
+Thrown when an OAuth or OpenID Connect operation cannot be processed.
+
 ## Properties
 
 ### code?

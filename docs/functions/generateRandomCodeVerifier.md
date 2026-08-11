@@ -8,7 +8,7 @@ Support from the community to continue maintaining and improving this module is 
 
 ▸ **generateRandomCodeVerifier**(): `string`
 
-Generate random `code_verifier` value.
+Generates a random `code_verifier` value.
 
 ## Returns
 

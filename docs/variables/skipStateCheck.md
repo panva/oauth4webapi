@@ -8,6 +8,8 @@ Support from the community to continue maintaining and improving this module is 
 
 • `const` **skipStateCheck**: unique `symbol`
 
+Skips the authorization response `state` value check performed by [validateAuthResponse](../functions/validateAuthResponse.md).
+
 > [!WARNING]\
 > This option has security implications that must be understood, assessed for applicability, and
 > accepted before use.

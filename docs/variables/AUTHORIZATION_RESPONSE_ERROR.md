@@ -8,6 +8,6 @@ Support from the community to continue maintaining and improving this module is 
 
 • `const` **AUTHORIZATION\_RESPONSE\_ERROR**: `"OAUTH_AUTHORIZATION_RESPONSE_ERROR"` = `'OAUTH_AUTHORIZATION_RESPONSE_ERROR'`
 
-## See
+Error code for OAuth 2.0 Authorization Error Responses.
 
-[AuthorizationResponseError](../classes/AuthorizationResponseError.md)
+Assigned to [AuthorizationResponseError.code](../classes/AuthorizationResponseError.md#code).

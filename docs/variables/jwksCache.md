@@ -8,6 +8,9 @@ Support from the community to continue maintaining and improving this module is 
 
 • `const` **jwksCache**: unique `symbol`
 
+Provides an externally managed JSON Web Key Set cache for runtimes without persistent in-memory
+state.
+
 > [!WARNING]\
 > This option has security implications that must be understood, assessed for applicability, and
 > accepted before use. It is critical that the JSON Web Key Set cache only be writable by your own

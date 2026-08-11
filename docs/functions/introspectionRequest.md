@@ -8,7 +8,9 @@ Support from the community to continue maintaining and improving this module is 
 
 ▸ **introspectionRequest**(`as`, `client`, `clientAuthentication`, `token`, `options?`): [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)\<[`Response`](https://developer.mozilla.org/docs/Web/API/Response)\>
 
-Performs an Introspection Request at the
+Performs an Introspection Request.
+
+The request is sent to the
 [`as.introspection\_endpoint`](../interfaces/AuthorizationServer.md#introspection_endpoint).
 
 ## Parameters
