@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [3.8.7](https://github.com/panva/oauth4webapi/compare/v3.8.6...v3.8.7) (2026-08-11)
+
+### Fixes
+
+* **types:** expose custom fetch duplex option ([0dcd746](https://github.com/panva/oauth4webapi/commit/0dcd746f3a9d7e927e5be845e16731170b69ba60))
+* **types:** make CryptoKey declarations portable ([1c85396](https://github.com/panva/oauth4webapi/commit/1c85396ae9905160472d8f95803aa90440182953))
+* **types:** make JWK declarations interoperable ([ff804a8](https://github.com/panva/oauth4webapi/commit/ff804a8fd2cd0dcd911a2dede4d65a1816deae9d))
+
+### Documentation
+
+* improve API index tables ([2c4b025](https://github.com/panva/oauth4webapi/commit/2c4b025a5cd79097cca4f72b7c15b9b71b7dca07))
 ## [3.8.6](https://github.com/panva/oauth4webapi/compare/v3.8.5...v3.8.6) (2026-04-27)
 
 
