@@ -1,5 +1,7 @@
 import * as fs from 'node:fs/promises'
 
+import { assertSafeIdentifier } from './report.js'
+
 const { SUITE_BASE_URL = 'https://www.certification.openid.net', SUITE_ACCESS_TOKEN } = process.env
 
 export interface ModulePrescription {
@@ -66,7 +68,7 @@ export async function getTestPlanInfo(plan: Plan) {
     headers: headers(),
   })
 
-  if (response.status !== 200) {
+  if (!response.ok) {
     throw new Error(await response.text())
   }
 
@@ -124,11 +126,16 @@ async function getModuleInfo(module: Test) {
 }
 
 export async function downloadArtifact(plan: Plan) {
-  const response = await fetch(url(`/api/plan/exporthtml/${plan.id}`), {
+  const planId = assertSafeIdentifier(plan.id, 'plan.id')
+  const response = await fetch(url(`/api/plan/exporthtml/${planId}`), {
     headers: headers(),
   })
 
-  await fs.writeFile(`${plan.id}.zip`, new Uint8Array(await response.arrayBuffer()), { flag: 'w' })
+  if (response.status !== 200) {
+    throw new Error(await response.text())
+  }
+
+  await fs.writeFile(`${planId}.zip`, new Uint8Array(await response.arrayBuffer()), { flag: 'w' })
 }
 
 export async function waitForState(
