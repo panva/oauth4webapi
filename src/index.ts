@@ -6,13 +6,21 @@ if (typeof navigator === 'undefined' || !navigator.userAgent?.startsWith?.('Mozi
   USER_AGENT = `${NAME}/${VERSION}`
 }
 
+interface CryptoKeyStructuralFallback {
+  readonly algorithm: { name: string }
+  readonly extractable: boolean
+  readonly type: string
+  readonly usages: string[]
+}
+
 /**
  * @ignore
  */
-export type CryptoKey = Extract<
-  Awaited<ReturnType<typeof crypto.subtle.generateKey>>,
-  { type: string }
->
+export type CryptoKey = typeof globalThis extends {
+  crypto: { subtle: { generateKey(...args: any[]): Promise<infer R> } }
+}
+  ? Extract<R, { type: string }>
+  : CryptoKeyStructuralFallback
 
 export interface CryptoKeyPair {
   privateKey: CryptoKey
