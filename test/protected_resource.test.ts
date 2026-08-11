@@ -45,3 +45,24 @@ test('protectedResource() w/ POST and ReadableStream body', async (t) => {
   const response = await lib.protectedResourceRequest('token', 'POST', url, undefined, body)
   t.true(response instanceof lib.Response)
 })
+
+test('protectedResource() exposes duplex to custom fetch for ReadableStream bodies', async (t) => {
+  const body = new ReadableStream()
+
+  const response = await lib.protectedResourceRequest(
+    'token',
+    'POST',
+    new URL('https://rs.example.com/resource'),
+    undefined,
+    body,
+    {
+      [lib.customFetch]: async (_url, options) => {
+        t.is(options.body, body)
+        t.is(options.duplex, 'half')
+        return new lib.Response()
+      },
+    },
+  )
+
+  t.true(response instanceof lib.Response)
+})

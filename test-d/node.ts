@@ -13,6 +13,14 @@ type Equals<A, B> = [A] extends [B] ? ([B] extends [A] ? true : never) : never
   const _noCatchAll: Equals<string extends keyof oauth.JWK ? true : false, false> = true
 }
 
+/* Node's RequestInit declares duplex as the literal "half". This assignment rejects a future
+ * widening to string while the equality assertion also rejects accidentally dropping the member. */
+{
+  type Options = oauth.CustomFetchOptions<'POST', URLSearchParams>
+  const _duplex: Equals<Options['duplex'], 'half' | undefined> = true
+  const _requestInit: RequestInit = {} as Options
+}
+
 const _isHostCryptoKey: Equals<oauth.CryptoKey, webcrypto.CryptoKey> = true
 
 // @ts-expect-error `any` would accept this

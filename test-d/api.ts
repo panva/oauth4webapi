@@ -25,6 +25,14 @@ type Equals<A, B> = [A] extends [B] ? ([B] extends [A] ? true : never) : never
   const _noCatchAll: oauth.JWK = { extension_parameter: true }
 }
 
+/* Custom fetch options expose the RequestInit extension used for ReadableStream request bodies and
+ * remain assignable to the DOM RequestInit shape, which does not declare duplex itself. */
+{
+  type Options = oauth.CustomFetchOptions<'POST', URLSearchParams>
+  const _duplex: Equals<Options['duplex'], 'half' | undefined> = true
+  const _requestInit: RequestInit = {} as Options
+}
+
 /* CryptoKey must alias the host runtime's CryptoKey, never a competing nominal type, and must not
  * silently degrade to `any` - `any` would make both assertions vacuously pass, so pin it. */
 {

@@ -1295,6 +1295,10 @@ export interface CustomFetchOptions<Method, BodyType = undefined> {
    */
   redirect: 'manual'
   /**
+   * Request streaming mode. Set to `"half"` when {@link body} is a {@link !ReadableStream}.
+   */
+  duplex?: 'half'
+  /**
    * Depending on whether {@link HttpRequestOptions.signal} was used, if so, it is the value passed,
    * otherwise undefined
    */
@@ -3056,7 +3060,6 @@ async function resourceRequest(
   headers.set('authorization', `${headers.has('dpop') ? 'DPoP' : 'Bearer'} ${accessToken}`)
 
   const response = await (options?.[customFetch] || fetch)(url.href, {
-    // @ts-ignore
     duplex: looseInstanceOf(body, ReadableStream) ? 'half' : undefined,
     // @ts-ignore
     body,
