@@ -17,6 +17,7 @@ export const algs = [
 export const fails: string[] = []
 
 if (
+  env.isBun ||
   env.isDeno ||
   (env.isNode && env.isNodeVersionAtLeast(24, 7)) ||
   (env.isElectron && env.isNodeVersionAtLeast(24, 18))
