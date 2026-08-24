@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file. See [commit
 ### Documentation
 
 * improve API index tables ([2c4b025](https://github.com/panva/oauth4webapi/commit/2c4b025a5cd79097cca4f72b7c15b9b71b7dca07))
+
 ## [3.8.6](https://github.com/panva/oauth4webapi/compare/v3.8.5...v3.8.6) (2026-04-27)
 
 
