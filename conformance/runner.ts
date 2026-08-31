@@ -337,7 +337,7 @@ export const flow = (options?: MacroOptions) => {
             } as oauth.TokenEndpointRequestOptions as oauth.TokenEndpointRequestOptions
           case 'par':
             return {
-              [oauth.customFetch]: mtlsAuth ? mtlsFetch : undefined,
+              [oauth.customFetch]: mtlsAuth || mtlsConstrain ? mtlsFetch : undefined,
             } as oauth.PushedAuthorizationRequestOptions as oauth.PushedAuthorizationRequestOptions
           case 'userinfo':
             return {
