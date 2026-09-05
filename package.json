@@ -61,7 +61,7 @@
     "_format": "find src test test-d tap examples conformance tools -type f -name '*.ts' -o -name '*.js' -o -name '*.mjs' -o -name '*.cjs' | xargs prettier",
     "build": "npm run generate-build && tsc -p test && tsc -p examples && tsc -p conformance && tsc -p tap && npx --yes jsr publish --dry-run --allow-dirty",
     "check:packaging": "publint --strict && node tools/attw-check.js",
-    "conformance": "bash -c 'source .node_flags.sh && ava --config conformance/ava.config.ts'",
+    "conformance": "bash -c 'source .node_flags.sh && ava --config conformance/ava.config.ts \"$@\"' --",
     "docs": "patch-package && typedoc",
     "docs-check": "./check-examples.sh",
     "format": "npm run _format -- --check --write",
@@ -73,7 +73,7 @@
     "tap:electron": "./tap/.electron.sh",
     "tap:node": "bash -c './tap/.node.sh'",
     "tap:workerd": "./tap/.workerd.sh",
-    "test": "bash -c 'source .node_flags.sh && ava'",
+    "test": "bash -c 'source .node_flags.sh && ava \"$@\"' --",
     "test:dist": "node tools/test-dist.js",
     "typecheck:dist": "./tools/typecheck-dist.sh",
     "typecheck:types": "tsc -p test-d && tsc -p test-d/tsconfig.node.json && tsc -p test-d/tsconfig.fallback.json && tsc -p test-d/tsconfig.fallback.const.json && tsc -p test-d/tsconfig.fallback.let.json"
