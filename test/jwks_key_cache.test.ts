@@ -109,7 +109,11 @@ test('failed JWK imports are not cached', async (testContext) => {
     jwks: { keys: [jwk] },
   }
 
-  await testContext.throwsAsync(context.validate(token, cache))
+  await testContext.throwsAsync(context.validate(token, cache), {
+    any: true,
+    instanceOf: DOMException,
+    name: 'DataError',
+  })
   jwk.x = context.jwks.keys[0].x!
   await testContext.notThrowsAsync(context.validate(token, cache))
   testContext.is(context.requests(), 0)
