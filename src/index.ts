@@ -3208,6 +3208,7 @@ interface PendingJWKSRequest {
 }
 
 let jwksRequests: WeakMap<AuthorizationServer, Set<PendingJWKSRequest>>
+let jwksKeys: WeakMap<JWK, Map<string, Promise<CryptoKey>>>
 
 /**
  * A JSON Web Key Set cache value suitable for external persistence.
@@ -3379,7 +3380,22 @@ async function getPublicSigKeyFromIssuerJwksUri(
     )
   }
 
-  return importJwk(alg, jwk)
+  jwksKeys ||= new WeakMap()
+  let keys = jwksKeys.get(jwk)
+  if (!keys) {
+    keys = new Map()
+    jwksKeys.set(jwk, keys)
+  }
+
+  let key = keys.get(alg)
+  if (!key) {
+    key = importJwk(alg, jwk).catch((cause: unknown) => {
+      keys.delete(alg)
+      throw cause
+    })
+    keys.set(alg, key)
+  }
+  return key
 }
 
 /**
