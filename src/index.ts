@@ -4276,6 +4276,7 @@ export async function processAuthorizationCodeResponse(
     as,
     client,
     response,
+    options?.maxAge,
     options?.[jweDecrypt],
     options?.recognizedTokenTypes,
   )
@@ -4364,6 +4365,7 @@ async function processAuthorizationCodeOAuth2Response(
   as: AuthorizationServer,
   client: Client,
   response: Response,
+  maxAge: number | typeof skipAuthTimeCheck | undefined,
   decryptFn: JweDecryptFunction | undefined,
   recognizedTokenTypes: RecognizedTokenTypes | undefined,
 ): Promise<TokenEndpointResponse> {
@@ -4378,7 +4380,7 @@ async function processAuthorizationCodeOAuth2Response(
 
   const claims = getValidatedIdTokenClaims(result)
   if (claims) {
-    if (client.default_max_age !== undefined) {
+    if (client.default_max_age !== undefined && maxAge !== skipAuthTimeCheck) {
       assertNumber(client.default_max_age, true, '"client.default_max_age"')
       const now = epochTime() + getClockSkew(client)
       const tolerance = getClockTolerance(client)
@@ -5609,9 +5611,9 @@ async function validateHybridResponse(
     requiredClaims.push('s_hash')
   }
 
-  if (maxAge !== undefined) {
+  if (maxAge !== undefined && maxAge !== skipAuthTimeCheck) {
     assertNumber(maxAge, true, '"maxAge" argument')
-  } else if (client.default_max_age !== undefined) {
+  } else if (maxAge === undefined && client.default_max_age !== undefined) {
     assertNumber(client.default_max_age, true, '"client.default_max_age"')
   }
 
