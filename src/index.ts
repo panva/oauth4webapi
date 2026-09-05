@@ -2521,9 +2521,8 @@ class DPoPHandler implements DPoPHandle {
  */
 export function isDPoPNonceError(err: unknown): boolean {
   if (err instanceof WWWAuthenticateChallengeError) {
-    const { 0: challenge, length } = err.cause
-    return (
-      length === 1 && challenge.scheme === 'dpop' && challenge.parameters.error === 'use_dpop_nonce'
+    return err.cause.some(
+      (challenge) => challenge.scheme === 'dpop' && challenge.parameters.error === 'use_dpop_nonce',
     )
   }
 

@@ -107,3 +107,72 @@ test('externally formed dpop headers', async (t) => {
   )
   t.true(response instanceof lib.Response)
 })
+
+for (const challenge of [
+  'DPoP error="use_dpop_nonce"',
+  'Bearer, DPoP error="use_dpop_nonce"',
+  'DPoP error="use_dpop_nonce", Bearer',
+]) {
+  test(`isDPoPNonceError() retries ${challenge}`, async (testContext) => {
+    const DPoP = lib.DPoP(client, await lib.generateKeyPair('ES256'))
+    const url = new URL('https://rs.example.com/nonce')
+    let requests = 0
+    const request = () =>
+      lib.protectedResourceRequest('token', 'GET', url, undefined, undefined, {
+        DPoP,
+        [lib.customFetch]: async (_url, init) => {
+          const proof = new Headers(init.headers).get('dpop')!
+          const { nonce } = jose.decodeJwt(proof)
+          if (++requests === 1) {
+            testContext.is(nonce, undefined)
+            return new Response(null, {
+              status: 401,
+              headers: {
+                'www-authenticate': challenge,
+                'dpop-nonce': 'server-nonce',
+              },
+            })
+          }
+          testContext.is(nonce, 'server-nonce')
+          return new Response()
+        },
+      })
+
+    const response = await request().catch((error) => {
+      if (lib.isDPoPNonceError(error)) {
+        return request()
+      }
+      throw error
+    })
+
+    testContext.is(response.status, 200)
+    testContext.is(requests, 2)
+  })
+}
+
+for (const challenge of [
+  'Bearer error="use_dpop_nonce"',
+  'Bearer, DPoP error="invalid_dpop_proof"',
+]) {
+  test(`isDPoPNonceError() ignores ${challenge}`, async (testContext) => {
+    const error = await testContext.throwsAsync(
+      lib.protectedResourceRequest(
+        'token',
+        'GET',
+        new URL('https://rs.example.com/nonce'),
+        undefined,
+        undefined,
+        {
+          [lib.customFetch]: async () =>
+            new Response(null, {
+              status: 401,
+              headers: { 'www-authenticate': challenge },
+            }),
+        },
+      ),
+      { instanceOf: lib.WWWAuthenticateChallengeError },
+    )
+
+    testContext.false(lib.isDPoPNonceError(error))
+  })
+}
