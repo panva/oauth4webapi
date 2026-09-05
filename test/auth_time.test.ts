@@ -106,6 +106,23 @@ for (const [name, validate] of [
   ['code id_token', lib.validateCodeIdTokenResponse],
   ['detached signature', lib.validateDetachedSignatureResponse],
 ] as const) {
+  test(`${name} rejects invalid maxAge values`, async (testContext) => {
+    const token = await idToken(testContext.context.ES256.privateKey, {
+      nonce: 'nonce',
+      c_hash: 'hash',
+    })
+    const parameters = new URLSearchParams({ code: 'code', id_token: token })
+    for (const maxAge of [null, '60', -1, NaN, Infinity]) {
+      await testContext.throwsAsync(
+        validate(as, ageClient, parameters, 'nonce', undefined, maxAge as number),
+        {
+          instanceOf: TypeError,
+          message: /"maxAge" argument must be (?:a number|a non-negative number)/,
+        },
+      )
+    }
+  })
+
   test(`${name} auth_time defaults and explicit skip`, async (testContext) => {
     const code = 'code'
     const token = await idToken(testContext.context.ES256.privateKey, {

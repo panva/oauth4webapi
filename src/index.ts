@@ -3818,7 +3818,7 @@ async function processGenericAccessTokenResponse(
       body: json,
     })
 
-    const requiredClaims: (keyof typeof jwtClaimNames)[] = ['aud', 'exp', 'iat', 'iss', 'sub']
+    const requiredClaims: (keyof typeof jwtClaimNames)[] = []
 
     if (client.require_auth_time === true) {
       requiredClaims.push('auth_time')
@@ -3833,49 +3833,16 @@ async function processGenericAccessTokenResponse(
       requiredClaims.push(...additionalRequiredIdTokenClaims)
     }
 
-    const { claims, jwt } = await validateJwt(
+    const { claims, jwt } = await validateIdTokenClaims(
+      as,
+      client,
       json.id_token,
-      checkSigningAlgorithm.bind(
-        undefined,
-        client.id_token_signed_response_alg,
-        as.id_token_signing_alg_values_supported,
-        'RS256',
-      ),
-      getClockSkew(client),
-      getClockTolerance(client),
+      requiredClaims,
       decryptFn,
     )
-      .then(validatePresence.bind(undefined, requiredClaims))
-      .then(validateIssuer.bind(undefined, as))
-      .then(validateAudience.bind(undefined, client.client_id))
-      .then(validateStringClaim.bind(undefined, 'sub'))
 
-    if (Array.isArray(claims.aud) && claims.aud.length !== 1) {
-      if (claims.azp === undefined) {
-        throw OPE(
-          'ID Token "aud" (audience) claim includes additional untrusted audiences',
-          JWT_CLAIM_COMPARISON,
-          { claims, claim: 'aud' },
-        )
-      }
-      if (claims.azp !== client.client_id) {
-        throw OPE(
-          'unexpected ID Token "azp" (authorized party) claim value',
-          JWT_CLAIM_COMPARISON,
-          { expected: client.client_id, claims, claim: 'azp' },
-        )
-      }
-    }
-
-    if (claims.auth_time !== undefined) {
-      assertNumber(
-        claims.auth_time,
-        true,
-        'ID Token "auth_time" (authentication time)',
-        INVALID_RESPONSE,
-        { claims },
-      )
-    }
+    validateIdTokenAuthorizedParty(client, claims)
+    validateIdTokenAuthTimeClaim(claims)
 
     jwtRefs.set(response, jwt)
     idTokenClaims.set(json, claims as IDToken)
@@ -4170,6 +4137,110 @@ function validateStringClaim(
   return result
 }
 
+function validateIdTokenClaims(
+  as: AuthorizationServer,
+  client: Client,
+  idToken: string,
+  requiredClaims: (keyof typeof jwtClaimNames)[],
+  decryptFn: JweDecryptFunction | undefined,
+) {
+  return validateJwt(
+    idToken,
+    checkSigningAlgorithm.bind(
+      undefined,
+      client.id_token_signed_response_alg,
+      as.id_token_signing_alg_values_supported,
+      'RS256',
+    ),
+    getClockSkew(client),
+    getClockTolerance(client),
+    decryptFn,
+  )
+    .then(validatePresence.bind(undefined, ['aud', 'exp', 'iat', 'iss', 'sub', ...requiredClaims]))
+    .then(validateIssuer.bind(undefined, as))
+    .then(validateAudience.bind(undefined, client.client_id))
+    .then(validateStringClaim.bind(undefined, 'sub'))
+}
+
+function resolveIdTokenMaxAge(
+  client: Client,
+  maxAge: number | typeof skipAuthTimeCheck | undefined,
+): number | typeof skipAuthTimeCheck {
+  if (maxAge === skipAuthTimeCheck) {
+    return maxAge
+  }
+  const fromClient = maxAge === undefined
+  if (fromClient) {
+    maxAge = client.default_max_age
+  }
+  if (maxAge === undefined) {
+    return skipAuthTimeCheck
+  }
+  assertNumber(maxAge, true, fromClient ? '"client.default_max_age"' : '"maxAge" argument')
+  return maxAge
+}
+
+function validateIdTokenAuthTimeClaim(claims: JWTPayload) {
+  if (claims.auth_time !== undefined) {
+    assertNumber(
+      claims.auth_time,
+      true,
+      'ID Token "auth_time" (authentication time)',
+      INVALID_RESPONSE,
+      { claims },
+    )
+  }
+}
+
+function validateIdTokenAuthTime(
+  client: Client,
+  claims: JWTPayload,
+  maxAge: number | typeof skipAuthTimeCheck,
+) {
+  if (maxAge === skipAuthTimeCheck) {
+    return
+  }
+  const now = epochTime() + getClockSkew(client)
+  const tolerance = getClockTolerance(client)
+  if ((claims as IDToken).auth_time! + maxAge < now - tolerance) {
+    throw OPE(
+      'too much time has elapsed since the last End-User authentication',
+      JWT_TIMESTAMP_CHECK,
+      { claims, now, tolerance, claim: 'auth_time' },
+    )
+  }
+}
+
+function validateIdTokenNonce(claims: JWTPayload, expectedNonce: string | typeof expectNoNonce) {
+  const expected = expectedNonce === expectNoNonce ? undefined : expectedNonce
+  if (claims.nonce !== expected) {
+    throw OPE('unexpected ID Token "nonce" claim value', JWT_CLAIM_COMPARISON, {
+      expected,
+      claims,
+      claim: 'nonce',
+    })
+  }
+}
+
+function validateIdTokenAuthorizedParty(client: Client, claims: JWTPayload) {
+  if (Array.isArray(claims.aud) && claims.aud.length !== 1) {
+    if (claims.azp === undefined) {
+      throw OPE(
+        'ID Token "aud" (audience) claim includes additional untrusted audiences',
+        JWT_CLAIM_COMPARISON,
+        { claims, claim: 'aud' },
+      )
+    }
+    if (claims.azp !== client.client_id) {
+      throw OPE('unexpected ID Token "azp" (authorized party) claim value', JWT_CLAIM_COMPARISON, {
+        expected: client.client_id,
+        claims,
+        claim: 'azp',
+      })
+    }
+  }
+}
+
 /**
  * An entry in an OAuth 2.0 Rich Authorization Requests `authorization_details` array.
  */
@@ -4315,16 +4386,9 @@ async function processAuthorizationCodeOpenIDResponse(
       additionalRequiredClaims.push('nonce')
   }
 
-  maxAge ??= client.default_max_age
-  switch (maxAge) {
-    case undefined:
-      maxAge = skipAuthTimeCheck
-      break
-    case skipAuthTimeCheck:
-      break
-    default:
-      assertNumber(maxAge, true, '"maxAge" argument')
-      additionalRequiredClaims.push('auth_time')
+  maxAge = resolveIdTokenMaxAge(client, maxAge)
+  if (maxAge !== skipAuthTimeCheck) {
+    additionalRequiredClaims.push('auth_time')
   }
 
   const result = await processGenericAccessTokenResponse(
@@ -4341,33 +4405,8 @@ async function processAuthorizationCodeOpenIDResponse(
   })
 
   const claims = getValidatedIdTokenClaims(result)!
-  if (maxAge !== skipAuthTimeCheck) {
-    const now = epochTime() + getClockSkew(client)
-    const tolerance = getClockTolerance(client)
-    if (claims.auth_time! + maxAge < now - tolerance) {
-      throw OPE(
-        'too much time has elapsed since the last End-User authentication',
-        JWT_TIMESTAMP_CHECK,
-        { claims, now, tolerance, claim: 'auth_time' },
-      )
-    }
-  }
-
-  if (expectedNonce === expectNoNonce) {
-    if (claims.nonce !== undefined) {
-      throw OPE('unexpected ID Token "nonce" claim value', JWT_CLAIM_COMPARISON, {
-        expected: undefined,
-        claims,
-        claim: 'nonce',
-      })
-    }
-  } else if (claims.nonce !== expectedNonce) {
-    throw OPE('unexpected ID Token "nonce" claim value', JWT_CLAIM_COMPARISON, {
-      expected: expectedNonce,
-      claims,
-      claim: 'nonce',
-    })
-  }
+  validateIdTokenAuthTime(client, claims, maxAge)
+  validateIdTokenNonce(claims, expectedNonce)
 
   return result
 }
@@ -4391,26 +4430,8 @@ async function processAuthorizationCodeOAuth2Response(
 
   const claims = getValidatedIdTokenClaims(result)
   if (claims) {
-    if (client.default_max_age !== undefined && maxAge !== skipAuthTimeCheck) {
-      assertNumber(client.default_max_age, true, '"client.default_max_age"')
-      const now = epochTime() + getClockSkew(client)
-      const tolerance = getClockTolerance(client)
-      if (claims.auth_time! + client.default_max_age < now - tolerance) {
-        throw OPE(
-          'too much time has elapsed since the last End-User authentication',
-          JWT_TIMESTAMP_CHECK,
-          { claims, now, tolerance, claim: 'auth_time' },
-        )
-      }
-    }
-
-    if (claims.nonce !== undefined) {
-      throw OPE('unexpected ID Token "nonce" claim value', JWT_CLAIM_COMPARISON, {
-        expected: undefined,
-        claims,
-        claim: 'nonce',
-      })
-    }
+    validateIdTokenAuthTime(client, claims, resolveIdTokenMaxAge(client, maxAge))
+    validateIdTokenNonce(claims, expectNoNonce)
   }
 
   return result
@@ -5607,48 +5628,25 @@ async function validateHybridResponse(
     throw OPE('"parameters" does not contain an Authorization Code', INVALID_RESPONSE)
   }
 
-  const requiredClaims: (keyof typeof jwtClaimNames)[] = [
-    'aud',
-    'exp',
-    'iat',
-    'iss',
-    'sub',
-    'nonce',
-    'c_hash',
-  ]
+  const requiredClaims: (keyof typeof jwtClaimNames)[] = ['nonce', 'c_hash']
 
   const state = parameters.get('state')
   if (fapi && (typeof expectedState === 'string' || state !== null)) {
     requiredClaims.push('s_hash')
   }
 
-  if (maxAge !== undefined && maxAge !== skipAuthTimeCheck) {
-    assertNumber(maxAge, true, '"maxAge" argument')
-  } else if (maxAge === undefined && client.default_max_age !== undefined) {
-    assertNumber(client.default_max_age, true, '"client.default_max_age"')
-  }
-
-  maxAge ??= client.default_max_age ?? skipAuthTimeCheck
+  maxAge = resolveIdTokenMaxAge(client, maxAge)
   if (client.require_auth_time || maxAge !== skipAuthTimeCheck) {
     requiredClaims.push('auth_time')
   }
 
-  const { claims, header, jwt } = await validateJwt(
+  const { claims, header, jwt } = await validateIdTokenClaims(
+    as,
+    client,
     id_token,
-    checkSigningAlgorithm.bind(
-      undefined,
-      client.id_token_signed_response_alg,
-      as.id_token_signing_alg_values_supported,
-      'RS256',
-    ),
-    getClockSkew(client),
-    getClockTolerance(client),
+    requiredClaims,
     options?.[jweDecrypt],
   )
-    .then(validatePresence.bind(undefined, requiredClaims))
-    .then(validateIssuer.bind(undefined, as))
-    .then(validateAudience.bind(undefined, client.client_id))
-    .then(validateStringClaim.bind(undefined, 'sub'))
 
   const clockSkew = getClockSkew(client)
   const now = epochTime() + clockSkew
@@ -5664,54 +5662,13 @@ async function validateHybridResponse(
     claims,
   })
 
-  if (claims.auth_time !== undefined) {
-    assertNumber(
-      claims.auth_time,
-      true,
-      'ID Token "auth_time" (authentication time)',
-      INVALID_RESPONSE,
-      { claims },
-    )
-  }
-
-  if (maxAge !== skipAuthTimeCheck) {
-    const now = epochTime() + getClockSkew(client)
-    const tolerance = getClockTolerance(client)
-    if ((claims as IDToken).auth_time! + maxAge < now - tolerance) {
-      throw OPE(
-        'too much time has elapsed since the last End-User authentication',
-        JWT_TIMESTAMP_CHECK,
-        { claims, now, tolerance, claim: 'auth_time' },
-      )
-    }
-  }
+  validateIdTokenAuthTimeClaim(claims)
+  validateIdTokenAuthTime(client, claims, maxAge)
 
   assertString(expectedNonce, '"expectedNonce" argument')
 
-  if (claims.nonce !== expectedNonce) {
-    throw OPE('unexpected ID Token "nonce" claim value', JWT_CLAIM_COMPARISON, {
-      expected: expectedNonce,
-      claims,
-      claim: 'nonce',
-    })
-  }
-
-  if (Array.isArray(claims.aud) && claims.aud.length !== 1) {
-    if (claims.azp === undefined) {
-      throw OPE(
-        'ID Token "aud" (audience) claim includes additional untrusted audiences',
-        JWT_CLAIM_COMPARISON,
-        { claims, claim: 'aud' },
-      )
-    }
-    if (claims.azp !== client.client_id) {
-      throw OPE('unexpected ID Token "azp" (authorized party) claim value', JWT_CLAIM_COMPARISON, {
-        expected: client.client_id,
-        claims,
-        claim: 'azp',
-      })
-    }
-  }
+  validateIdTokenNonce(claims, expectedNonce)
+  validateIdTokenAuthorizedParty(client, claims)
 
   const { 0: protectedHeader, 1: payload, 2: encodedSignature } = jwt.split('.')
 
