@@ -112,6 +112,7 @@ for (const challenge of [
   'DPoP error="use_dpop_nonce"',
   'Bearer, DPoP error="use_dpop_nonce"',
   'DPoP error="use_dpop_nonce", Bearer',
+  String.raw`DPoP error="use_dpop_non\ce"`,
 ]) {
   test(`isDPoPNonceError() retries ${challenge}`, async (testContext) => {
     const DPoP = lib.DPoP(client, await lib.generateKeyPair('ES256'))

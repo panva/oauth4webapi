@@ -130,6 +130,31 @@ const vectors = [
     expected: [{ scheme: 'scheme', parameters: { realm: '"foo"' } }],
   },
   {
+    description: 'quoted-pair escapes of ordinary characters',
+    header: String.raw`Scheme realm="\f\o\o"`,
+    expected: [{ scheme: 'scheme', parameters: { realm: 'foo' } }],
+  },
+  {
+    description: 'quoted-pair escapes are not JSON control escapes',
+    header: String.raw`Scheme realm="a\nb"`,
+    expected: [{ scheme: 'scheme', parameters: { realm: 'anb' } }],
+  },
+  {
+    description: 'quoted-pair escapes are not JSON unicode escapes',
+    header: String.raw`Scheme realm="\u0041"`,
+    expected: [{ scheme: 'scheme', parameters: { realm: 'u0041' } }],
+  },
+  {
+    description: 'quoted-pair escape of a horizontal tab',
+    header: 'Scheme realm="left\\' + '\t' + 'right"',
+    expected: [{ scheme: 'scheme', parameters: { realm: 'left\tright' } }],
+  },
+  {
+    description: 'quoted-pair escape of obs-text',
+    header: 'Scheme realm="caf\\' + '\xE9' + '"',
+    expected: [{ scheme: 'scheme', parameters: { realm: 'caf\xE9' } }],
+  },
+  {
     description: 'with additional auth-params',
     header: 'Scheme realm="foo", bar="xyz",, a=b,,,c=d',
     expected: [{ scheme: 'scheme', parameters: { realm: 'foo', bar: 'xyz', a: 'b', c: 'd' } }],

@@ -2884,9 +2884,7 @@ function parseWwwAuthenticateChallenges(
         if ((match = rest.match(quotedParamRE))) {
           ;[, key, value, rest] = match
           if (value.includes('\\')) {
-            try {
-              value = JSON.parse(`"${value}"`)
-            } catch {}
+            value = value.replace(/\\([\s\S])/g, '$1')
           }
           // @ts-expect-error
           parameters[key.toLowerCase() as Lowercase<string>] = value
