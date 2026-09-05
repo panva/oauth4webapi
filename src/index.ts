@@ -3199,6 +3199,16 @@ export interface UserInfoResponse {
 
 let jwksMap: WeakMap<AuthorizationServer, ExportedJWKSCache & { age: number }>
 
+interface PendingJWKSRequest {
+  url: string
+  headers: string
+  fetch: NonNullable<HttpRequestOptions<'GET'>[typeof customFetch]> | typeof fetch
+  signal: AbortSignal | undefined
+  promise: Promise<ExportedJWKSCache>
+}
+
+let jwksRequests: WeakMap<AuthorizationServer, Set<PendingJWKSRequest>>
+
 /**
  * A JSON Web Key Set cache value suitable for external persistence.
  */
@@ -3282,9 +3292,10 @@ async function getPublicSigKeyFromIssuerJwksUri(
       return getPublicSigKeyFromIssuerJwksUri(as, options, header)
     }
   } else {
-    jwks = await jwksRequest(as, options).then(processJwksResponse)
-    age = 0
-    setJwksCache(as, jwks, epochTime(), options?.[jwksCache])
+    const downloaded = await jwksRequest(as, options)
+    jwks = downloaded.jwks
+    age = epochTime() - downloaded.uat
+    setJwksCache(as, jwks, downloaded.uat, options?.[jwksCache])
   }
 
   let kty: string
@@ -5027,7 +5038,7 @@ export async function processIntrospectionResponse(
 async function jwksRequest(
   as: AuthorizationServer,
   options?: HttpRequestOptions<'GET'>,
-): Promise<Response> {
+): Promise<ExportedJWKSCache> {
   assertAs(as)
 
   const url = resolveEndpoint(as, 'jwks_uri', false, options?.[allowInsecureRequests] !== true)
@@ -5036,13 +5047,55 @@ async function jwksRequest(
   headers.set('accept', 'application/json')
   headers.append('accept', 'application/jwk-set+json')
 
-  return (options?.[customFetch] || fetch)(url.href, {
-    body: undefined,
-    headers: Object.fromEntries(headers.entries()),
-    method: 'GET',
-    redirect: 'manual',
-    signal: signal(url, options?.signal),
-  })
+  const requestHeaders = Object.fromEntries(headers.entries())
+  const headersKey = JSON.stringify(requestHeaders)
+  const fetcher = options?.[customFetch] || fetch
+  const requestSignal = signal(url, options?.signal)
+
+  jwksRequests ||= new WeakMap()
+  const requests = jwksRequests.get(as) ?? new Set<PendingJWKSRequest>()
+  for (const pending of requests) {
+    if (
+      pending.url === url.href &&
+      pending.headers === headersKey &&
+      pending.fetch === fetcher &&
+      pending.signal === requestSignal
+    ) {
+      return pending.promise
+    }
+  }
+
+  const pending: PendingJWKSRequest = {
+    url: url.href,
+    headers: headersKey,
+    fetch: fetcher,
+    signal: requestSignal,
+    promise: Promise.resolve()
+      .then(() =>
+        fetcher(url.href, {
+          body: undefined,
+          headers: requestHeaders,
+          method: 'GET',
+          redirect: 'manual',
+          signal: requestSignal,
+        }),
+      )
+      .then(processJwksResponse)
+      .then((jwks) => {
+        const uat = epochTime()
+        setJwksCache(as, jwks, uat)
+        return { jwks, uat }
+      })
+      .finally(() => {
+        requests.delete(pending)
+        if (!requests.size) {
+          jwksRequests.delete(as)
+        }
+      }),
+  }
+  requests.add(pending)
+  jwksRequests.set(as, requests)
+  return pending.promise
 }
 
 /**
