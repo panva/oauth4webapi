@@ -64,3 +64,70 @@ test('validateJwtAccessToken() rejects DPoP proofs missing jwk', async (t) => {
 
   t.is(err?.code, lib.INVALID_RESPONSE)
 })
+
+for (const scheme of ['Bearer', 'DPoP']) {
+  test(`validateJwtAccessToken() ${scheme} Authorization whitespace`, async (testContext) => {
+    const asKey = await lib.generateKeyPair('ES256', { extractable: true })
+    const proofKey = await lib.generateKeyPair('ES256')
+    const publicJwk = await jose.exportJWK(asKey.publicKey)
+    const proofJwk = await jose.exportJWK(proofKey.publicKey)
+    const now = Math.floor(Date.now() / 1000)
+    const as: lib.AuthorizationServer = {
+      issuer: 'https://as.example.com',
+      jwks_uri: 'https://as.example.com/jwks',
+    }
+    const accessToken = await new jose.SignJWT({
+      iss: as.issuer,
+      exp: now + 300,
+      aud: 'https://rs.example.com',
+      sub: 'sub',
+      iat: now,
+      jti: 'jti',
+      client_id: 'client_id',
+      cnf: scheme === 'DPoP' ? { jkt: await jose.calculateJwkThumbprint(proofJwk) } : undefined,
+    })
+      .setProtectedHeader({ alg: 'ES256', typ: 'at+jwt' })
+      .sign(asKey.privateKey)
+    const proof = await new jose.SignJWT({
+      iat: now,
+      jti: 'proof',
+      htm: 'GET',
+      htu: 'https://rs.example.com/resource',
+      ath: await accessTokenHash(accessToken),
+    })
+      .setProtectedHeader({ alg: 'ES256', typ: 'dpop+jwt', jwk: proofJwk })
+      .sign(proofKey.privateKey)
+
+    const validate = (authorization: string) => {
+      const headers = new Headers({ authorization })
+      if (scheme === 'DPoP') {
+        headers.set('dpop', proof)
+      }
+      return lib.validateJwtAccessToken(
+        as,
+        new Request('https://rs.example.com/resource', { headers }),
+        'https://rs.example.com',
+        {
+          [lib.customFetch]: async () =>
+            new Response(JSON.stringify({ keys: [publicJwk] }), {
+              headers: { 'content-type': 'application/json' },
+            }),
+        },
+      )
+    }
+
+    for (const separator of [' ', '  ', '   ']) {
+      const claims = await validate(`${scheme}${separator}${accessToken}`)
+      testContext.is(claims.sub, 'sub')
+    }
+    await testContext.throwsAsync(validate(`${scheme}\t${accessToken}`), {
+      message: 'unsupported Authorization HTTP Header scheme',
+    })
+    await testContext.throwsAsync(validate(`${scheme} \t ${accessToken}`), {
+      message: 'invalid Authorization HTTP Header format',
+    })
+    await testContext.throwsAsync(validate(`${scheme} ${accessToken} extra`), {
+      message: 'invalid Authorization HTTP Header format',
+    })
+  })
+}

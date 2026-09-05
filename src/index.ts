@@ -6464,7 +6464,7 @@ export async function validateJwtAccessToken(
       headers: request.headers,
     })
   }
-  let { 0: scheme, 1: accessToken, length } = authorization.split(' ')
+  let { 0: scheme, 1: accessToken, length } = authorization.split(/ +/)
   scheme = scheme.toLowerCase()
   switch (scheme) {
     case 'dpop':
