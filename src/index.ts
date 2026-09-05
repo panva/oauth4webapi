@@ -3848,6 +3848,7 @@ async function processGenericAccessTokenResponse(
       .then(validatePresence.bind(undefined, requiredClaims))
       .then(validateIssuer.bind(undefined, as))
       .then(validateAudience.bind(undefined, client.client_id))
+      .then(validateStringClaim.bind(undefined, 'sub'))
 
     if (Array.isArray(claims.aud) && claims.aud.length !== 1) {
       if (claims.azp === undefined) {
@@ -4153,6 +4154,18 @@ function validatePresence(
         claims: result.claims,
       })
     }
+  }
+  return result
+}
+
+function validateStringClaim(
+  claim: 'sub' | 'jti',
+  result: Awaited<ReturnType<typeof validateJwt>>,
+) {
+  if (typeof result.claims[claim] !== 'string') {
+    throw OPE(`unexpected JWT "${claim}" (${jwtClaimNames[claim]}) claim type`, INVALID_RESPONSE, {
+      claims: result.claims,
+    })
   }
   return result
 }
@@ -5635,6 +5648,7 @@ async function validateHybridResponse(
     .then(validatePresence.bind(undefined, requiredClaims))
     .then(validateIssuer.bind(undefined, as))
     .then(validateAudience.bind(undefined, client.client_id))
+    .then(validateStringClaim.bind(undefined, 'sub'))
 
   const clockSkew = getClockSkew(client)
   const now = epochTime() + clockSkew
@@ -6337,6 +6351,7 @@ async function validateDPoP(
   )
     .then(checkJwtType.bind(undefined, 'dpop+jwt'))
     .then(validatePresence.bind(undefined, ['iat', 'jti', 'ath', 'htm', 'htu']))
+    .then(validateStringClaim.bind(undefined, 'jti'))
 
   const now = epochTime() + clockSkew
   const diff = Math.abs(now - proof.claims.iat!)
