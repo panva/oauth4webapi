@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [3.8.8](https://github.com/panva/oauth4webapi/compare/v3.8.7...v3.8.8) (2026-09-05)
+
+### Fixes
+
+* accept space runs in Bearer and DPoP credentials ([3414db5](https://github.com/panva/oauth4webapi/commit/3414db594bab28cee1ddd295c7682010db7e6e52))
+* decode HTTP authentication quoted pairs correctly ([bd7fcb0](https://github.com/panva/oauth4webapi/commit/bd7fcb0908180cb142a9d4f29acffd0d873df8a4))
+* forward arguments to AVA test runners ([b898ba5](https://github.com/panva/oauth4webapi/commit/b898ba5df9738e8dc070c89a41f3100fc60e53a7))
+* honor explicit auth-time skips in authorization responses ([656d762](https://github.com/panva/oauth4webapi/commit/656d762fb06f98762136f26eef391afde7cd8bf2))
+* recognize DPoP nonce errors among multiple challenges ([70bd8a1](https://github.com/panva/oauth4webapi/commit/70bd8a119e238c8a76202a1a327264aa6e56e006))
+* **release:** separate changelog sections ([a827c39](https://github.com/panva/oauth4webapi/commit/a827c39d250109b50d9f15a80222c4ea24aeef84))
+* validate ID Token subjects and DPoP identifiers as strings ([edbebeb](https://github.com/panva/oauth4webapi/commit/edbebebc7842dd61ed956c20ac01a14ff7d5fe52))
+
+### Refactor
+
+* consolidate ID Token validation policy ([53900cc](https://github.com/panva/oauth4webapi/commit/53900cc28503229e0da3f96b09b78aebf4c3fe75))
+
+### Performance
+
+* cache imported issuer verification keys by algorithm ([fbe6c02](https://github.com/panva/oauth4webapi/commit/fbe6c021d82864d9110cc4bbe479db05a6330aa7))
+* coalesce compatible in-flight JWKS requests ([e64849e](https://github.com/panva/oauth4webapi/commit/e64849e1e23b7bf8ebe825b46bf6ba62fa4cb11a))
+
 ## [3.8.7](https://github.com/panva/oauth4webapi/compare/v3.8.6...v3.8.7) (2026-08-11)
 
 ### Fixes
