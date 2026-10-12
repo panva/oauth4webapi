@@ -365,6 +365,15 @@ export const flow = (options?: MacroOptions) => {
           ? oauth.generateRandomState()
           : oauth.expectNoState
 
+      let DPoPKeyPair!: oauth.CryptoKeyPair
+      let DPoP!: oauth.DPoPRequestOptions['DPoP']
+      let dpop_jkt: string | undefined
+      if (usesDpop(variant)) {
+        DPoPKeyPair = await oauth.generateKeyPair(ALG)
+        DPoP = oauth.DPoP(client, DPoPKeyPair)
+        dpop_jkt = await DPoP.calculateThumbprint()
+      }
+
       let authorizationUrl = new URL(as.authorization_endpoint!)
       if (!usesRequestObject(plan.name, variant)) {
         authorizationUrl.searchParams.set('client_id', client.client_id)
@@ -378,6 +387,9 @@ export const flow = (options?: MacroOptions) => {
         }
         if (typeof state === 'string') {
           authorizationUrl.searchParams.set('state', state)
+        }
+        if (dpop_jkt) {
+          authorizationUrl.searchParams.set('dpop_jkt', dpop_jkt)
         }
       } else {
         authorizationUrl.searchParams.set('client_id', client.client_id)
@@ -393,6 +405,9 @@ export const flow = (options?: MacroOptions) => {
         if (typeof state === 'string') {
           params.set('state', state)
         }
+        if (dpop_jkt) {
+          params.set('dpop_jkt', dpop_jkt)
+        }
 
         const [jwk] = configuration.client.jwks.keys
         const privateKey = await importPrivateKey(ALG, jwk)
@@ -401,16 +416,10 @@ export const flow = (options?: MacroOptions) => {
           'request',
           await oauth.issueRequestObject(as, client, params, { kid: jwk.kid, key: privateKey }),
         )
-        authorizationUrl.searchParams.set('scope', scope)
-        authorizationUrl.searchParams.set('response_type', response_type)
-      }
-
-      let DPoPKeyPair!: oauth.CryptoKeyPair
-      let DPoP!: oauth.DPoPRequestOptions['DPoP']
-      if (usesDpop(variant)) {
-        DPoPKeyPair = await oauth.generateKeyPair(ALG)
-        DPoP = oauth.DPoP(client, DPoPKeyPair)
-        authorizationUrl.searchParams.set('dpop_jkt', await DPoP.calculateThumbprint())
+        if (!usesPar(plan)) {
+          authorizationUrl.searchParams.set('scope', scope)
+          authorizationUrl.searchParams.set('response_type', response_type)
+        }
       }
 
       if (usesPar(plan)) {
