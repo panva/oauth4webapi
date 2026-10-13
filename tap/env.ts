@@ -20,7 +20,7 @@ export const isBrowser =
 
 const BOWSER = 'https://cdn.jsdelivr.net/npm/bowser@2.11.0/src/bowser.js'
 
-let parsedUserAgent
+let parsedUserAgent: any
 async function parseUserAgent() {
   const { default: Bowser } = await import(BOWSER)
   parsedUserAgent ||= Bowser.parse(window.navigator.userAgent)
@@ -30,6 +30,11 @@ async function parseUserAgent() {
 async function isEngine(engine: string) {
   const userAgentData = await parseUserAgent()
   return userAgentData.engine.name === engine
+}
+
+export function isBrowserVersionAtLeast(version: number) {
+  if (!parsedUserAgent) throw new Error()
+  return parseInt(parsedUserAgent.browser.version.split('.')[0], 10) >= version
 }
 
 export const isBlink = isBrowser && (await isEngine('Blink'))
