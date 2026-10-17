@@ -6603,13 +6603,7 @@ export async function validateJwtIdToken(
   assertAs(as)
   assertString(idToken, '"idToken"')
 
-  const { claims, header, jwt } = await validateIdTokenClaims(
-    as,
-    client,
-    idToken,
-    [],
-    undefined,
-  )
+  const { claims, header, jwt } = await validateIdTokenClaims(as, client, idToken, [], undefined)
 
   validateIdTokenAuthorizedParty(client, claims)
   validateIdTokenAuthTimeClaim(claims)
