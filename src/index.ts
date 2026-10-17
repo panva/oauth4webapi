@@ -3835,7 +3835,8 @@ async function processGenericAccessTokenResponse(
     })
   }
 
-  // allows empty
+  // allows empty and string arrays
+  if (Array.isArray(json.scope) && json.scope.every(item => typeof item === 'string')) json.scope = json.scope.join(" ")
   if (json.scope !== undefined && typeof json.scope !== 'string') {
     throw OPE('"response" body "scope" property must be a string', INVALID_RESPONSE, { body: json })
   }
