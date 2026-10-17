@@ -6594,6 +6594,34 @@ export async function validateJwtAccessToken(
   return claims as JWTAccessTokenClaims
 }
 
+export async function validateJwtIdToken(
+  as: AuthorizationServer,
+  client: Client,
+  idToken: string,
+  options: HttpRequestOptions<'GET'> & JWKSCacheOptions,
+): Promise<IDToken> {
+  assertAs(as)
+  assertString(idToken, '"idToken"')
+
+  const { claims, header, jwt } = await validateIdTokenClaims(
+    as,
+    client,
+    idToken,
+    [],
+    undefined,
+  )
+
+  validateIdTokenAuthorizedParty(client, claims)
+  validateIdTokenAuthTimeClaim(claims)
+
+  const { 0: protectedHeader, 1: payload, 2: encodedSignature } = jwt.split('.')
+  const signature = b64u(encodedSignature)
+  const key = await getPublicSigKeyFromIssuerJwksUri(as, options, header)
+  await validateJwsSignature(protectedHeader, payload, key, signature)
+
+  return claims as IDToken
+}
+
 function reassignRSCode(err: unknown): never {
   if (err instanceof OperationProcessingError && err?.code === INVALID_REQUEST) {
     err.code = INVALID_RESPONSE
