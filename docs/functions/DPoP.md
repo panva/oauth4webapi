@@ -8,8 +8,8 @@ Support from the community to continue maintaining and improving this module is 
 
 ▸ **DPoP**(`client`, `keyPair`, `options?`): [`DPoPHandle`](../interfaces/DPoPHandle.md)
 
-Creates a DPoP handle that signs sender-constraining proofs with a [CryptoKeyPair](../interfaces/CryptoKeyPair.md) and
-tracks server-issued nonces.
+Creates a DPoP handle that signs sender-constraining proofs with a [CryptoKeyPair](../interfaces/CryptoKeyPair.md) or an
+external [DPoPSigner](../interfaces/DPoPSigner.md) and tracks server-issued nonces.
 
 This wrapper / handle also keeps track of server-issued nonces, allowing requests to be retried
 with a fresh nonce when the server indicates the need to use one. [isDPoPNonceError](isDPoPNonceError.md) can be
@@ -21,20 +21,30 @@ expired/missing nonce.
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
 | `client` | [`Pick`](https://www.typescriptlang.org/docs/handbook/utility-types.html#picktype-keys)\<[`Client`](../interfaces/Client.md), *typeof* [`clockSkew`](../variables/clockSkew.md)\> | - |
-| `keyPair` | [`CryptoKeyPair`](../interfaces/CryptoKeyPair.md) | Public/private key pair to sign the DPoP Proof JWT with |
+| `keyPair` | [`CryptoKeyPair`](../interfaces/CryptoKeyPair.md) \| [`DPoPSigner`](../interfaces/DPoPSigner.md) | Public/private key pair or external signer to sign the DPoP Proof JWT with |
 | `options?` | [`ModifyAssertionOptions`](../interfaces/ModifyAssertionOptions.md) | - |
 
 ## Returns
 
 [`DPoPHandle`](../interfaces/DPoPHandle.md)
 
-## Example
+## Examples
 
 ```ts
 let client!: oauth.Client
 let keyPair!: oauth.CryptoKeyPair
 
 let DPoP = oauth.DPoP(client, keyPair)
+```
+
+Using a private key managed outside Web Crypto:
+
+```ts
+let client!: oauth.Client
+let publicKey!: oauth.CryptoKey
+let sign!: oauth.DPoPSigner['sign']
+
+let DPoP = oauth.DPoP(client, { publicKey, sign })
 ```
 
 ## See

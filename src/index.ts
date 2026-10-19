@@ -2112,9 +2112,9 @@ export function TlsClientAuth(): ClientAuth {
 async function signJwt(
   header: CompactJWSHeaderParameters,
   payload: Record<string, unknown>,
-  key: CryptoKey,
+  key: CryptoKey | DPoPSigner['sign'],
 ) {
-  if (!key.usages.includes('sign')) {
+  if (typeof key !== 'function' && !key.usages.includes('sign')) {
     throw CodedTypeError(
       'CryptoKey instances used for signing assertions must include "sign" in their "usages"',
       ERR_INVALID_ARG_VALUE,
@@ -2122,7 +2122,9 @@ async function signJwt(
   }
   const input = `${b64u(buf(JSON.stringify(header)))}.${b64u(buf(JSON.stringify(payload)))}`
   const signature = b64u(
-    await crypto.subtle.sign(keyToSubtle(key), key, buf(input) as Uint8Array<ArrayBuffer>),
+    typeof key === 'function'
+      ? await key(buf(input))
+      : await crypto.subtle.sign(keyToSubtle(key), key, buf(input)),
   )
   return `${input}.${signature}`
 }
@@ -2421,9 +2423,29 @@ export interface DPoPHandle {
   calculateThumbprint(): Promise<string>
 }
 
+/**
+ * A DPoP signing key managed outside Web Crypto, such as a hardware-backed key.
+ *
+ * @group DPoP
+ */
+export interface DPoPSigner {
+  /**
+   * Extractable public key corresponding to the signing key. Its algorithm determines the JWS
+   * algorithm used for the proof.
+   */
+  publicKey: CryptoKey
+  /**
+   * Signs the exact JWS Signing Input bytes with the corresponding private key and algorithm. The
+   * input is not pre-hashed. Return the raw JWS signature, not its base64url encoding. ECDSA
+   * signatures must use the IEEE P1363 (r || s) format, not ASN.1 DER. Throwing or rejecting
+   * prevents the request from being sent.
+   */
+  sign(input: Uint8Array<ArrayBuffer>): Promise<Uint8Array | ArrayBuffer>
+}
+
 class DPoPHandler implements DPoPHandle {
   #header?: CompactJWSHeaderParameters
-  #privateKey: CryptoKey
+  #signingKey: CryptoKey | DPoPSigner['sign']
   #publicKey: CryptoKey
   #clockSkew: number
   #modifyAssertion?: ModifyAssertionFunction
@@ -2432,10 +2454,18 @@ class DPoPHandler implements DPoPHandle {
 
   constructor(
     client: Pick<Client, typeof clockSkew>,
-    keyPair: CryptoKeyPair,
+    keyPair: CryptoKeyPair | DPoPSigner,
     options?: ModifyAssertionOptions,
   ) {
-    assertPrivateKey(keyPair?.privateKey, '"DPoP.privateKey"')
+    if (keyPair && 'sign' in keyPair) {
+      if (typeof keyPair.sign !== 'function') {
+        throw CodedTypeError('"DPoP.sign" must be a function', ERR_INVALID_ARG_TYPE)
+      }
+      this.#signingKey = keyPair.sign.bind(keyPair)
+    } else {
+      assertPrivateKey(keyPair?.privateKey, '"DPoP.privateKey"')
+      this.#signingKey = keyPair.privateKey
+    }
     assertPublicKey(keyPair?.publicKey, '"DPoP.publicKey"')
 
     if (!keyPair.publicKey.extractable) {
@@ -2444,7 +2474,6 @@ class DPoPHandler implements DPoPHandle {
 
     this.#modifyAssertion = options?.[modifyAssertion]
     this.#clockSkew = getClockSkew(client)
-    this.#privateKey = keyPair.privateKey
     this.#publicKey = keyPair.publicKey
     branded.add(this)
   }
@@ -2478,7 +2507,9 @@ class DPoPHandler implements DPoPHandle {
   }
 
   async addProof(url: URL, headers: Headers, htm: string, accessToken?: string): Promise<void> {
-    const alg = keyToJws(this.#privateKey)
+    const alg = keyToJws(
+      typeof this.#signingKey === 'function' ? this.#publicKey : this.#signingKey,
+    )
     this.#header ||= {
       alg,
       typ: 'dpop+jwt',
@@ -2501,7 +2532,7 @@ class DPoPHandler implements DPoPHandle {
 
     this.#modifyAssertion?.(this.#header, payload)
 
-    headers.set('dpop', await signJwt(this.#header, payload, this.#privateKey))
+    headers.set('dpop', await signJwt(this.#header, payload, this.#signingKey))
   }
 
   cacheNonce(response: Response, url: URL): void {
@@ -2534,8 +2565,8 @@ export function isDPoPNonceError(err: unknown): boolean {
 }
 
 /**
- * Creates a DPoP handle that signs sender-constraining proofs with a {@link CryptoKeyPair} and
- * tracks server-issued nonces.
+ * Creates a DPoP handle that signs sender-constraining proofs with a {@link CryptoKeyPair} or an
+ * external {@link DPoPSigner} and tracks server-issued nonces.
  *
  * This wrapper / handle also keeps track of server-issued nonces, allowing requests to be retried
  * with a fresh nonce when the server indicates the need to use one. {@link isDPoPNonceError} can be
@@ -2551,7 +2582,19 @@ export function isDPoPNonceError(err: unknown): boolean {
  * let DPoP = oauth.DPoP(client, keyPair)
  * ```
  *
- * @param keyPair Public/private key pair to sign the DPoP Proof JWT with
+ * @example
+ *
+ * Using a private key managed outside Web Crypto:
+ *
+ * ```ts
+ * let client!: oauth.Client
+ * let publicKey!: oauth.CryptoKey
+ * let sign!: oauth.DPoPSigner['sign']
+ *
+ * let DPoP = oauth.DPoP(client, { publicKey, sign })
+ * ```
+ *
+ * @param keyPair Public/private key pair or external signer to sign the DPoP Proof JWT with
  *
  * @group DPoP
  *
@@ -2559,7 +2602,7 @@ export function isDPoPNonceError(err: unknown): boolean {
  */
 export function DPoP(
   client: Pick<Client, typeof clockSkew>,
-  keyPair: CryptoKeyPair,
+  keyPair: CryptoKeyPair | DPoPSigner,
   options?: ModifyAssertionOptions,
 ): DPoPHandle {
   return new DPoPHandler(client, keyPair, options)
