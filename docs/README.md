@@ -79,9 +79,10 @@ Support from the community to continue maintaining and improving this module is 
 
 ## DPoP
 
-| Function | Description |
+| Name | Description |
 | ------ | ------ |
-| [DPoP](functions/DPoP.md) | Creates a DPoP handle that signs sender-constraining proofs with a [CryptoKeyPair](interfaces/CryptoKeyPair.md) and tracks server-issued nonces. |
+| [DPoPSigner](interfaces/DPoPSigner.md) | A DPoP signing key managed outside Web Crypto, such as a hardware-backed key. |
+| [DPoP](functions/DPoP.md) | Creates a DPoP handle that signs sender-constraining proofs with a [CryptoKeyPair](interfaces/CryptoKeyPair.md) or an external [DPoPSigner](interfaces/DPoPSigner.md) and tracks server-issued nonces. |
 | [isDPoPNonceError](functions/isDPoPNonceError.md) | Returns whether an error requires retrying the request with a fresh DPoP nonce. |
 
 ## Device Authorization Grant

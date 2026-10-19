@@ -45,3 +45,16 @@ declare const pair: oauth.CryptoKeyPair
 
 const _privateKey: CryptoKey = pair.privateKey
 const _publicKey: CryptoKey = pair.publicKey
+
+/* External DPoP signing accepts bytes and never requires a Web Crypto private key. */
+{
+  const _signer: oauth.DPoPSigner = {
+    publicKey: pair.publicKey,
+    sign: async (input) => input,
+  }
+  const _dpopKey: Parameters<typeof oauth.DPoP>[1] = _signer
+  const _webCryptoKey: Parameters<typeof oauth.DPoP>[1] = pair
+  const _input: Equals<Parameters<oauth.DPoPSigner['sign']>[0], Uint8Array<ArrayBuffer>> = true
+  // @ts-expect-error a JWS signature must be bytes, not an encoded string
+  const _invalidSign: oauth.DPoPSigner['sign'] = async () => 'signature'
+}

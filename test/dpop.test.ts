@@ -177,3 +177,110 @@ for (const challenge of [
     testContext.false(lib.isDPoPNonceError(error))
   })
 }
+
+test('external DPoP signer preserves proof binding and nonce retries', async (t) => {
+  const keys = crypto.generateKeyPairSync('ec', { namedCurve: 'prime256v1' })
+  const publicKey = await jose.importSPKI(
+    keys.publicKey.export({ format: 'pem', type: 'spki' }).toString(),
+    'ES256',
+  )
+  const DPoP = lib.DPoP(
+    client,
+    {
+      publicKey,
+      sign: async (input) =>
+        crypto.sign('sha256', input, { key: keys.privateKey, dsaEncoding: 'ieee-p1363' }),
+    },
+    {
+      [lib.modifyAssertion]: (_header, payload) => {
+        payload.custom = 'value'
+      },
+    },
+  )
+  const proofs: string[] = []
+  const request = () =>
+    lib.protectedResourceRequest(
+      'token',
+      'GET',
+      new URL('https://rs.example.com/resource?query#fragment'),
+      undefined,
+      undefined,
+      {
+        DPoP,
+        [lib.customFetch]: async (_url, init) => {
+          proofs.push(new Headers(init.headers).get('dpop')!)
+          return proofs.length === 1
+            ? new Response(null, {
+                status: 401,
+                headers: {
+                  'www-authenticate': 'DPoP error="use_dpop_nonce"',
+                  'dpop-nonce': 'server-nonce',
+                },
+              })
+            : new Response()
+        },
+      },
+    )
+
+  const error = await t.throwsAsync(request(), { instanceOf: lib.WWWAuthenticateChallengeError })
+  t.true(lib.isDPoPNonceError(error))
+  t.is((await request()).status, 200)
+
+  const first = await jose.jwtVerify(proofs[0], publicKey)
+  const second = await jose.jwtVerify(proofs[1], publicKey)
+  t.deepEqual(second.protectedHeader, {
+    typ: 'dpop+jwt',
+    alg: 'ES256',
+    jwk: keys.publicKey.export({ format: 'jwk' }),
+  })
+  const { jti, iat, ...claims } = second.payload
+  t.deepEqual(claims, {
+    htu: 'https://rs.example.com/resource',
+    htm: 'GET',
+    nonce: 'server-nonce',
+    custom: 'value',
+    ath: crypto.createHash('sha256').update('token').digest('base64url'),
+  })
+  t.is(typeof iat, 'number')
+  t.is(typeof jti, 'string')
+  t.not(jti, first.payload.jti)
+  t.is(first.payload.nonce, undefined)
+  t.is(
+    await DPoP.calculateThumbprint(),
+    await jose.calculateJwkThumbprint(second.protectedHeader.jwk!),
+  )
+})
+
+for (const failure of ['throw', 'reject']) {
+  test(`external DPoP signer ${failure} prevents sending a request`, async (t) => {
+    const { publicKey } = await lib.generateKeyPair('ES256')
+    const error = new Error('signing unavailable')
+    const DPoP = lib.DPoP(client, {
+      publicKey,
+      sign: () => {
+        if (failure === 'throw') throw error
+        return Promise.reject(error)
+      },
+    })
+    let sent = false
+
+    await t.throwsAsync(
+      lib.protectedResourceRequest(
+        'token',
+        'GET',
+        new URL('https://rs.example.com/resource'),
+        undefined,
+        undefined,
+        {
+          DPoP,
+          [lib.customFetch]: async () => {
+            sent = true
+            return new Response()
+          },
+        },
+      ),
+      { is: error },
+    )
+    t.false(sent)
+  })
+}
