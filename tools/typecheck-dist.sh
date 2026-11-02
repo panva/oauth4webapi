@@ -5,7 +5,7 @@
 set -e
 
 TSC="./node_modules/.bin/tsc"
-BASE="--noEmit --ignoreConfig --strict --skipLibCheck false --target esnext"
+BASE="--noEmit --ignoreConfig --strict --exactOptionalPropertyTypes --skipLibCheck false --target esnext"
 ENTRY="build/index.d.ts"
 
 if [ ! -f "$ENTRY" ]; then
