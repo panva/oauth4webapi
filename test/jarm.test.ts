@@ -1,4 +1,6 @@
-import anyTest, { type TestFn } from 'ava'
+import test, { before, after } from 'node:test'
+import assert from 'node:assert/strict'
+
 import setup, {
   client,
   endpoint,
@@ -11,27 +13,27 @@ import * as jose from 'jose'
 import * as lib from './_lib.js'
 import * as tools from './_tools.js'
 
-const test = anyTest as TestFn<ContextWithAlgs>
+const context = {} as ContextWithAlgs
 
-test.before(setup())
-test.after(teardown)
-test.before(setupJwks)
+before(() => setup(context))
+after(() => teardown(context))
+before(() => setupJwks(context))
 
-test('validateJwtAuthResponse() error conditions', async (t) => {
-  await t.throwsAsync(() => lib.validateJwtAuthResponse(issuer, client, null as any), {
+test('validateJwtAuthResponse() error conditions', async () => {
+  await assert.rejects(() => lib.validateJwtAuthResponse(issuer, client, null as any), {
     message: '"parameters" must be an instance of URLSearchParams, or URL',
   })
-  await t.throwsAsync(() => lib.validateJwtAuthResponse(issuer, client, new URLSearchParams()), {
+  await assert.rejects(() => lib.validateJwtAuthResponse(issuer, client, new URLSearchParams()), {
     message: '"parameters" does not contain a JARM response',
   })
 })
 
-test('validateJwtAuthResponse()', async (t) => {
+test('validateJwtAuthResponse()', async () => {
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
     jwks_uri: endpoint('jwks'),
   }
-  const kp = t.context.RS256
+  const kp = context.RS256
 
   const response = await new jose.SignJWT({
     iss: issuer.issuer,
@@ -42,19 +44,19 @@ test('validateJwtAuthResponse()', async (t) => {
     .setProtectedHeader({ alg: 'RS256' })
     .sign(kp.privateKey)
   const params = new URLSearchParams({ response })
-  await t.notThrowsAsync(async () => {
+  await assert.doesNotReject(async () => {
     const result = await lib.validateJwtAuthResponse(tIssuer, client, params, lib.expectNoState)
-    t.true(result instanceof URLSearchParams)
-    t.deepEqual([...result.keys()], ['iss', 'code'])
+    assert.strictEqual(result instanceof URLSearchParams, true)
+    assert.deepStrictEqual([...result.keys()], ['iss', 'code'])
   })
 })
 
-test('validateJwtAuthResponse() as URL', async (t) => {
+test('validateJwtAuthResponse() as URL', async () => {
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
     jwks_uri: endpoint('jwks'),
   }
-  const kp = t.context.RS256
+  const kp = context.RS256
 
   const response = await new jose.SignJWT({
     iss: issuer.issuer,
@@ -65,19 +67,19 @@ test('validateJwtAuthResponse() as URL', async (t) => {
     .setProtectedHeader({ alg: 'RS256' })
     .sign(kp.privateKey)
   const params = new URL(`https://rp.example.com/cb?response=${response}`)
-  await t.notThrowsAsync(async () => {
+  await assert.doesNotReject(async () => {
     const result = await lib.validateJwtAuthResponse(tIssuer, client, params, lib.expectNoState)
-    t.true(result instanceof URLSearchParams)
-    t.deepEqual([...result.keys()], ['iss', 'code'])
+    assert.strictEqual(result instanceof URLSearchParams, true)
+    assert.deepStrictEqual([...result.keys()], ['iss', 'code'])
   })
 })
 
-test('validateJwtAuthResponse() - state value', async (t) => {
+test('validateJwtAuthResponse() - state value', async () => {
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
     jwks_uri: endpoint('jwks'),
   }
-  const kp = t.context.RS256
+  const kp = context.RS256
 
   const response = await new jose.SignJWT({
     iss: issuer.issuer,
@@ -88,15 +90,15 @@ test('validateJwtAuthResponse() - state value', async (t) => {
     .setProtectedHeader({ alg: 'RS256' })
     .sign(kp.privateKey)
   const params = new URLSearchParams({ response })
-  await t.notThrowsAsync(lib.validateJwtAuthResponse(tIssuer, client, params, 'state'))
+  await assert.doesNotReject(lib.validateJwtAuthResponse(tIssuer, client, params, 'state'))
 })
 
-test('validateJwtAuthResponse() - state not present', async (t) => {
+test('validateJwtAuthResponse() - state not present', async () => {
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
     jwks_uri: endpoint('jwks'),
   }
-  const kp = t.context.RS256
+  const kp = context.RS256
 
   const response = await new jose.SignJWT({
     iss: issuer.issuer,
@@ -106,15 +108,17 @@ test('validateJwtAuthResponse() - state not present', async (t) => {
     .setProtectedHeader({ alg: 'RS256' })
     .sign(kp.privateKey)
   const params = new URLSearchParams({ response })
-  await t.notThrowsAsync(lib.validateJwtAuthResponse(tIssuer, client, params, lib.expectNoState))
+  await assert.doesNotReject(
+    lib.validateJwtAuthResponse(tIssuer, client, params, lib.expectNoState),
+  )
 })
 
-test('validateJwtAuthResponse() - state ignored', async (t) => {
+test('validateJwtAuthResponse() - state ignored', async () => {
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
     jwks_uri: endpoint('jwks'),
   }
-  const kp = t.context.RS256
+  const kp = context.RS256
 
   const response = await new jose.SignJWT({
     iss: issuer.issuer,
@@ -125,16 +129,18 @@ test('validateJwtAuthResponse() - state ignored', async (t) => {
     .setProtectedHeader({ alg: 'RS256' })
     .sign(kp.privateKey)
   const params = new URLSearchParams({ response })
-  await t.notThrowsAsync(lib.validateJwtAuthResponse(tIssuer, client, params, lib.skipStateCheck))
+  await assert.doesNotReject(
+    lib.validateJwtAuthResponse(tIssuer, client, params, lib.skipStateCheck),
+  )
 })
 
-test('validateJwtAuthResponse() - invalid signature', async (t) => {
+test('validateJwtAuthResponse() - invalid signature', async () => {
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
     jwks_uri: endpoint('jwks'),
     authorization_signing_alg_values_supported: ['ES256'],
   }
-  const kp = t.context.ES256
+  const kp = context.ES256
 
   const response = tools.mangleJwtSignature(
     await new jose.SignJWT({
@@ -146,10 +152,10 @@ test('validateJwtAuthResponse() - invalid signature', async (t) => {
       .sign(kp.privateKey),
   )
   const params = new URLSearchParams({ response })
-  await t.throwsAsync(lib.validateJwtAuthResponse(tIssuer, client, params, lib.expectNoState), {
+  await assert.rejects(lib.validateJwtAuthResponse(tIssuer, client, params, lib.expectNoState), {
     message: 'JWT signature verification failed',
   })
-  await t.throwsAsync(
+  await assert.rejects(
     lib.validateJwtAuthResponse(tIssuer, client, params, lib.expectNoState, {
       // @ts-expect-error
       skipJwtSignatureCheck: true,
@@ -160,13 +166,13 @@ test('validateJwtAuthResponse() - invalid signature', async (t) => {
   )
 })
 
-test('validateJwtAuthResponse() - alg signalled', async (t) => {
+test('validateJwtAuthResponse() - alg signalled', async () => {
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
     jwks_uri: endpoint('jwks'),
     authorization_signing_alg_values_supported: ['ES256'],
   }
-  const kp = t.context.ES256
+  const kp = context.ES256
 
   const response = await new jose.SignJWT({
     iss: issuer.issuer,
@@ -176,15 +182,17 @@ test('validateJwtAuthResponse() - alg signalled', async (t) => {
     .setProtectedHeader({ alg: 'ES256' })
     .sign(kp.privateKey)
   const params = new URLSearchParams({ response })
-  await t.notThrowsAsync(lib.validateJwtAuthResponse(tIssuer, client, params, lib.expectNoState))
+  await assert.doesNotReject(
+    lib.validateJwtAuthResponse(tIssuer, client, params, lib.expectNoState),
+  )
 })
 
-test('validateJwtAuthResponse() - alg defined', async (t) => {
+test('validateJwtAuthResponse() - alg defined', async () => {
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
     jwks_uri: endpoint('jwks'),
   }
-  const kp = t.context.ES256
+  const kp = context.ES256
 
   const response = await new jose.SignJWT({
     iss: issuer.issuer,
@@ -194,7 +202,7 @@ test('validateJwtAuthResponse() - alg defined', async (t) => {
     .setProtectedHeader({ alg: 'ES256' })
     .sign(kp.privateKey)
   const params = new URLSearchParams({ response })
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.validateJwtAuthResponse(
       tIssuer,
       { ...client, authorization_signed_response_alg: 'ES256' },
@@ -204,12 +212,12 @@ test('validateJwtAuthResponse() - alg defined', async (t) => {
   )
 })
 
-test('validateJwtAuthResponse() - alg default', async (t) => {
+test('validateJwtAuthResponse() - alg default', async () => {
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
     jwks_uri: endpoint('jwks'),
   }
-  const kp = t.context.RS256
+  const kp = context.RS256
 
   const response = await new jose.SignJWT({
     iss: issuer.issuer,
@@ -219,10 +227,12 @@ test('validateJwtAuthResponse() - alg default', async (t) => {
     .setProtectedHeader({ alg: 'RS256' })
     .sign(kp.privateKey)
   const params = new URLSearchParams({ response })
-  await t.notThrowsAsync(lib.validateJwtAuthResponse(tIssuer, client, params, lib.expectNoState))
+  await assert.doesNotReject(
+    lib.validateJwtAuthResponse(tIssuer, client, params, lib.expectNoState),
+  )
 })
 
-test('validateJwtAuthResponse() - alg mismatches', async (t) => {
+test('validateJwtAuthResponse() - alg mismatches', async () => {
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
     jwks_uri: endpoint('jwks'),
@@ -235,9 +245,9 @@ test('validateJwtAuthResponse() - alg mismatches', async (t) => {
     })
       .setExpirationTime('30s')
       .setProtectedHeader({ alg: 'ES256' })
-      .sign(t.context.ES256.privateKey)
+      .sign(context.ES256.privateKey)
     const params = new URLSearchParams({ response })
-    await t.throwsAsync(lib.validateJwtAuthResponse(tIssuer, client, params, lib.expectNoState), {
+    await assert.rejects(lib.validateJwtAuthResponse(tIssuer, client, params, lib.expectNoState), {
       message: 'unexpected JWT "alg" header parameter',
     })
   }
@@ -249,9 +259,9 @@ test('validateJwtAuthResponse() - alg mismatches', async (t) => {
     })
       .setExpirationTime('30s')
       .setProtectedHeader({ alg: 'ES256' })
-      .sign(t.context.ES256.privateKey)
+      .sign(context.ES256.privateKey)
     const params = new URLSearchParams({ response })
-    await t.throwsAsync(
+    await assert.rejects(
       lib.validateJwtAuthResponse(
         {
           ...tIssuer,
@@ -274,9 +284,9 @@ test('validateJwtAuthResponse() - alg mismatches', async (t) => {
     })
       .setExpirationTime('30s')
       .setProtectedHeader({ alg: 'ES256' })
-      .sign(t.context.ES256.privateKey)
+      .sign(context.ES256.privateKey)
     const params = new URLSearchParams({ response })
-    await t.throwsAsync(
+    await assert.rejects(
       lib.validateJwtAuthResponse(
         tIssuer,
         { ...client, authorization_signed_response_alg: 'RS256' },

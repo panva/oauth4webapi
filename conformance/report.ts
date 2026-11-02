@@ -4,19 +4,12 @@ import { join } from 'node:path'
 
 const SAFE_IDENTIFIER = /^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/
 const ACTION_ENVIRONMENT_NAME = /^[A-Za-z_][A-Za-z0-9_]*$/
-const AFTER_EACH_TITLE_PREFIX = 'afterEach.always hook for '
 
 export function assertSafeIdentifier(value: string, label = 'identifier') {
   if (!SAFE_IDENTIFIER.test(value)) {
     throw new TypeError(`${label} is not a safe identifier`)
   }
   return value
-}
-
-export function normalizeAvaTestTitle(title: string) {
-  return title.startsWith(AFTER_EACH_TITLE_PREFIX)
-    ? title.slice(AFTER_EACH_TITLE_PREFIX.length)
-    : title
 }
 
 export function getReportStatusPath(planId: string) {

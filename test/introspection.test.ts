@@ -1,4 +1,7 @@
-import anyTest, { type TestFn } from 'ava'
+import test, { before, after } from 'node:test'
+import assert from 'node:assert/strict'
+import { captureRejection } from './_errors.js'
+
 import setup, {
   client,
   endpoint,
@@ -13,20 +16,20 @@ import * as jose from 'jose'
 import * as lib from './_lib.js'
 import * as tools from './_tools.js'
 
-const test = anyTest as TestFn<ContextWithAlgs>
+const context = {} as ContextWithAlgs
 
-test.before(setup())
-test.after(teardown)
-test.before(setupJwks)
+before(() => setup(context))
+after(() => teardown(context))
+before(() => setupJwks(context))
 
 const tClient: lib.Client = { ...client, client_secret: 'foo' }
 
-test('introspectionRequest()', async (t) => {
-  await t.throwsAsync(lib.introspectionRequest(issuer, tClient, lib.None(), 'token'), {
+test('introspectionRequest()', async () => {
+  await assert.rejects(lib.introspectionRequest(issuer, tClient, lib.None(), 'token'), {
     message: 'authorization server metadata does not contain a valid "as.introspection_endpoint"',
   })
 
-  await t.throwsAsync(lib.introspectionRequest(issuer, tClient, lib.None(), null as any), {
+  await assert.rejects(lib.introspectionRequest(issuer, tClient, lib.None(), null as any), {
     message: '"token" must be a string',
   })
 
@@ -35,7 +38,7 @@ test('introspectionRequest()', async (t) => {
     introspection_endpoint: endpoint('introspect-1'),
   }
 
-  t.context
+  context
     .intercept({
       path: '/introspect-1',
       method: 'POST',
@@ -49,16 +52,16 @@ test('introspectionRequest()', async (t) => {
     })
     .reply(200, { active: false })
 
-  await t.notThrowsAsync(lib.introspectionRequest(tIssuer, tClient, lib.None(), 'token'))
+  await assert.doesNotReject(lib.introspectionRequest(tIssuer, tClient, lib.None(), 'token'))
 })
 
-test('introspectionRequest() w/ Extra Parameters', async (t) => {
+test('introspectionRequest() w/ Extra Parameters', async () => {
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
     introspection_endpoint: endpoint('introspect-2'),
   }
 
-  t.context
+  context
     .intercept({
       path: '/introspect-2',
       method: 'POST',
@@ -69,13 +72,13 @@ test('introspectionRequest() w/ Extra Parameters', async (t) => {
     .reply(200, { access_token: 'token', token_type: 'Bearer' })
     .times(3)
 
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.introspectionRequest(tIssuer, tClient, lib.None(), 'token', {
       additionalParameters: new URLSearchParams('token_type_hint=access_token'),
     }),
   )
 
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.introspectionRequest(tIssuer, tClient, lib.None(), 'token', {
       additionalParameters: {
         token_type_hint: 'access_token',
@@ -83,20 +86,20 @@ test('introspectionRequest() w/ Extra Parameters', async (t) => {
     }),
   )
 
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.introspectionRequest(tIssuer, tClient, lib.None(), 'token', {
       additionalParameters: [['token_type_hint', 'access_token']],
     }),
   )
 })
 
-test('introspectionRequest() w/ Custom Headers', async (t) => {
+test('introspectionRequest() w/ Custom Headers', async () => {
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
     introspection_endpoint: endpoint('introspect-headers'),
   }
 
-  t.context
+  context
     .intercept({
       path: '/introspect-headers',
       method: 'POST',
@@ -119,19 +122,19 @@ test('introspectionRequest() w/ Custom Headers', async (t) => {
     Object.fromEntries(entries),
     new Headers(Object.fromEntries(entries)),
   ]) {
-    await t.notThrowsAsync(
+    await assert.doesNotReject(
       lib.introspectionRequest(tIssuer, tClient, lib.None(), 'token', { headers }),
     )
   }
 })
 
-test('introspectionRequest() forced jwt', async (t) => {
+test('introspectionRequest() forced jwt', async () => {
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
     introspection_endpoint: endpoint('introspect-3'),
   }
 
-  t.context
+  context
     .intercept({
       path: '/introspect-3',
       method: 'POST',
@@ -144,18 +147,18 @@ test('introspectionRequest() forced jwt', async (t) => {
     })
     .reply(200, { active: false })
 
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.introspectionRequest(tIssuer, tClient, lib.None(), 'token', { requestJwtResponse: true }),
   )
 })
 
-test('introspectionRequest() jwt through client metadata', async (t) => {
+test('introspectionRequest() jwt through client metadata', async () => {
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
     introspection_endpoint: endpoint('introspect-3'),
   }
 
-  t.context
+  context
     .intercept({
       path: '/introspect-3',
       method: 'POST',
@@ -168,7 +171,7 @@ test('introspectionRequest() jwt through client metadata', async (t) => {
     })
     .reply(200, { active: false })
 
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.introspectionRequest(
       tIssuer,
       { ...tClient, introspection_signed_response_alg: 'ES256' },
@@ -178,13 +181,13 @@ test('introspectionRequest() jwt through client metadata', async (t) => {
   )
 })
 
-test('introspectionRequest() forced json', async (t) => {
+test('introspectionRequest() forced json', async () => {
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
     introspection_endpoint: endpoint('introspect-4'),
   }
 
-  t.context
+  context
     .intercept({
       path: '/introspect-4',
       method: 'POST',
@@ -197,7 +200,7 @@ test('introspectionRequest() forced json', async (t) => {
     })
     .reply(200, { active: false })
 
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.introspectionRequest(
       tIssuer,
       { ...tClient, introspection_signed_response_alg: 'ES256' },
@@ -208,28 +211,28 @@ test('introspectionRequest() forced json', async (t) => {
   )
 })
 
-test('processIntrospectionResponse()', async (t) => {
-  await t.throwsAsync(lib.processIntrospectionResponse(issuer, client, null as any), {
+test('processIntrospectionResponse()', async () => {
+  await assert.rejects(lib.processIntrospectionResponse(issuer, client, null as any), {
     message: '"response" must be an instance of Response',
   })
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processIntrospectionResponse(issuer, client, getResponse('', { status: 404 })),
     {
       message:
         '"response" is not a conform Introspection Endpoint response (unexpected HTTP status code)',
     },
   )
-  await t.throwsAsync(lib.processIntrospectionResponse(issuer, client, getResponse('{"')), {
+  await assert.rejects(lib.processIntrospectionResponse(issuer, client, getResponse('{"')), {
     message: 'failed to parse "response" body as JSON',
   })
-  await t.throwsAsync(lib.processIntrospectionResponse(issuer, client, getResponse('null')), {
+  await assert.rejects(lib.processIntrospectionResponse(issuer, client, getResponse('null')), {
     message: '"response" body must be a top level object',
   })
-  await t.throwsAsync(lib.processIntrospectionResponse(issuer, client, getResponse('[]')), {
+  await assert.rejects(lib.processIntrospectionResponse(issuer, client, getResponse('[]')), {
     message: '"response" body must be a top level object',
   })
 
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processIntrospectionResponse(
       issuer,
       client,
@@ -240,7 +243,7 @@ test('processIntrospectionResponse()', async (t) => {
     },
   )
 
-  t.deepEqual(
+  assert.deepStrictEqual(
     await lib.processIntrospectionResponse(
       issuer,
       client,
@@ -251,19 +254,21 @@ test('processIntrospectionResponse()', async (t) => {
     },
   )
 
-  const err = await t.throwsAsync(
+  const err = await captureRejection(
     lib.processIntrospectionResponse(
       issuer,
       client,
       getResponse(JSON.stringify({ error: 'invalid_client' }), { status: 401 }),
     ),
+    Error,
   )
 
-  t.true(
+  assert.strictEqual(
     err instanceof lib.ResponseBodyError &&
       err.error === 'invalid_client' &&
       err.status === 401 &&
       err.response.bodyUsed === true,
+    true,
   )
 
   await lib.processIntrospectionResponse(
@@ -273,8 +278,8 @@ test('processIntrospectionResponse()', async (t) => {
   )
 })
 
-test('processIntrospectionResponse() - ignores signatures', async (t) => {
-  await t.notThrowsAsync(
+test('processIntrospectionResponse() - ignores signatures', async () => {
+  await assert.doesNotReject(
     lib.processIntrospectionResponse(
       { ...issuer, introspection_signing_alg_values_supported: ['ES256'] },
       client,
@@ -285,7 +290,7 @@ test('processIntrospectionResponse() - ignores signatures', async (t) => {
             .setIssuer(issuer.issuer)
             .setAudience(client.client_id)
             .setIssuedAt()
-            .sign(t.context.ES256.privateKey),
+            .sign(context.ES256.privateKey),
         ),
         {
           headers: new Headers({
@@ -297,14 +302,14 @@ test('processIntrospectionResponse() - ignores signatures', async (t) => {
   )
 })
 
-test('processIntrospectionResponse() - alg signalled', async (t) => {
+test('processIntrospectionResponse() - alg signalled', async () => {
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
     jwks_uri: endpoint('jwks'),
     introspection_signing_alg_values_supported: ['ES256'],
   }
 
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.processIntrospectionResponse(
       tIssuer,
       client,
@@ -314,7 +319,7 @@ test('processIntrospectionResponse() - alg signalled', async (t) => {
           .setIssuer(issuer.issuer)
           .setAudience(client.client_id)
           .setIssuedAt()
-          .sign(t.context.ES256.privateKey),
+          .sign(context.ES256.privateKey),
         {
           headers: new Headers({
             'content-type': 'application/token-introspection+jwt',
@@ -325,13 +330,13 @@ test('processIntrospectionResponse() - alg signalled', async (t) => {
   )
 })
 
-test('processIntrospectionResponse() - alg defined', async (t) => {
+test('processIntrospectionResponse() - alg defined', async () => {
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
     jwks_uri: endpoint('jwks'),
   }
 
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.processIntrospectionResponse(
       tIssuer,
       { ...client, introspection_signed_response_alg: 'ES256' },
@@ -341,7 +346,7 @@ test('processIntrospectionResponse() - alg defined', async (t) => {
           .setIssuer(issuer.issuer)
           .setAudience(client.client_id)
           .setIssuedAt()
-          .sign(t.context.ES256.privateKey),
+          .sign(context.ES256.privateKey),
         {
           headers: new Headers({
             'content-type': 'application/token-introspection+jwt',
@@ -352,13 +357,13 @@ test('processIntrospectionResponse() - alg defined', async (t) => {
   )
 })
 
-test('processIntrospectionResponse() - alg default', async (t) => {
+test('processIntrospectionResponse() - alg default', async () => {
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
     jwks_uri: endpoint('jwks'),
   }
 
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.processIntrospectionResponse(
       tIssuer,
       client,
@@ -368,7 +373,7 @@ test('processIntrospectionResponse() - alg default', async (t) => {
           .setIssuer(issuer.issuer)
           .setAudience(client.client_id)
           .setIssuedAt()
-          .sign(t.context.RS256.privateKey),
+          .sign(context.RS256.privateKey),
         {
           headers: new Headers({
             'content-type': 'application/token-introspection+jwt',
@@ -379,13 +384,13 @@ test('processIntrospectionResponse() - alg default', async (t) => {
   )
 })
 
-test('processIntrospectionResponse() - alg mismatches', async (t) => {
+test('processIntrospectionResponse() - alg mismatches', async () => {
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
     jwks_uri: endpoint('jwks'),
   }
 
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processIntrospectionResponse(
       tIssuer,
       client,
@@ -395,7 +400,7 @@ test('processIntrospectionResponse() - alg mismatches', async (t) => {
           .setIssuer(issuer.issuer)
           .setAudience(client.client_id)
           .setIssuedAt()
-          .sign(t.context.ES256.privateKey),
+          .sign(context.ES256.privateKey),
         {
           headers: new Headers({
             'content-type': 'application/token-introspection+jwt',
@@ -406,7 +411,7 @@ test('processIntrospectionResponse() - alg mismatches', async (t) => {
     { message: 'unexpected JWT "alg" header parameter' },
   )
 
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processIntrospectionResponse(
       {
         ...tIssuer,
@@ -419,7 +424,7 @@ test('processIntrospectionResponse() - alg mismatches', async (t) => {
           .setIssuer(issuer.issuer)
           .setAudience(client.client_id)
           .setIssuedAt()
-          .sign(t.context.ES256.privateKey),
+          .sign(context.ES256.privateKey),
         {
           headers: new Headers({
             'content-type': 'application/token-introspection+jwt',
@@ -430,7 +435,7 @@ test('processIntrospectionResponse() - alg mismatches', async (t) => {
     { message: 'unexpected JWT "alg" header parameter' },
   )
 
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processIntrospectionResponse(
       tIssuer,
       {
@@ -443,7 +448,7 @@ test('processIntrospectionResponse() - alg mismatches', async (t) => {
           .setIssuer(issuer.issuer)
           .setAudience(client.client_id)
           .setIssuedAt()
-          .sign(t.context.ES256.privateKey),
+          .sign(context.ES256.privateKey),
         {
           headers: new Headers({
             'content-type': 'application/token-introspection+jwt',
@@ -455,13 +460,13 @@ test('processIntrospectionResponse() - alg mismatches', async (t) => {
   )
 })
 
-test('processIntrospectionResponse() - typ w/ application/ prefix', async (t) => {
+test('processIntrospectionResponse() - typ w/ application/ prefix', async () => {
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
     jwks_uri: endpoint('jwks'),
   }
 
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.processIntrospectionResponse(
       tIssuer,
       client,
@@ -471,7 +476,7 @@ test('processIntrospectionResponse() - typ w/ application/ prefix', async (t) =>
           .setIssuer(issuer.issuer)
           .setAudience(client.client_id)
           .setIssuedAt()
-          .sign(t.context.RS256.privateKey),
+          .sign(context.RS256.privateKey),
         {
           headers: new Headers({
             'content-type': 'application/token-introspection+jwt',

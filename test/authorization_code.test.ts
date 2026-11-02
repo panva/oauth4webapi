@@ -1,4 +1,7 @@
-import anyTest, { type TestFn } from 'ava'
+import test, { before, after } from 'node:test'
+import assert from 'node:assert/strict'
+import { captureRejection } from './_errors.js'
+
 import * as querystring from 'node:querystring'
 import setup, {
   client,
@@ -14,11 +17,11 @@ import * as jose from 'jose'
 import * as lib from './_lib.js'
 import * as tools from './_tools.js'
 
-const test = anyTest as TestFn<ContextWithAlgs>
+const context = {} as ContextWithAlgs
 
-test.before(setup())
-test.after(teardown)
-test.before(setupJwks)
+before(() => setup(context))
+after(() => teardown(context))
+before(() => setupJwks(context))
 
 const tClient: lib.Client = { ...client, client_secret: 'foo' }
 
@@ -44,8 +47,8 @@ function cb(params: string) {
   return callbackParameters
 }
 
-test('authorizationCodeGrantRequest()', async (t) => {
-  await t.throwsAsync(
+test('authorizationCodeGrantRequest()', async () => {
+  await assert.rejects(
     lib.authorizationCodeGrantRequest(
       issuer,
       tClient,
@@ -59,7 +62,7 @@ test('authorizationCodeGrantRequest()', async (t) => {
     },
   )
 
-  await t.throwsAsync(
+  await assert.rejects(
     lib.authorizationCodeGrantRequest(
       issuer,
       tClient,
@@ -74,7 +77,7 @@ test('authorizationCodeGrantRequest()', async (t) => {
     },
   )
 
-  await t.throwsAsync(
+  await assert.rejects(
     lib.authorizationCodeGrantRequest(
       issuer,
       tClient,
@@ -93,7 +96,7 @@ test('authorizationCodeGrantRequest()', async (t) => {
     token_endpoint: endpoint('token-1'),
   }
 
-  t.context
+  context
     .intercept({
       path: '/token-1',
       method: 'POST',
@@ -113,7 +116,7 @@ test('authorizationCodeGrantRequest()', async (t) => {
     })
     .reply(200, { access_token: 'token', token_type: 'Bearer' })
 
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.authorizationCodeGrantRequest(
       tIssuer,
       tClient,
@@ -125,13 +128,13 @@ test('authorizationCodeGrantRequest()', async (t) => {
   )
 })
 
-test('authorizationCodeGrantRequest() w/ Extra Parameters', async (t) => {
+test('authorizationCodeGrantRequest() w/ Extra Parameters', async () => {
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
     token_endpoint: endpoint('token-2'),
   }
 
-  t.context
+  context
     .intercept({
       path: '/token-2',
       method: 'POST',
@@ -142,7 +145,7 @@ test('authorizationCodeGrantRequest() w/ Extra Parameters', async (t) => {
     .reply(200, { access_token: 'token', token_type: 'Bearer' })
     .times(3)
 
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.authorizationCodeGrantRequest(
       tIssuer,
       tClient,
@@ -156,7 +159,7 @@ test('authorizationCodeGrantRequest() w/ Extra Parameters', async (t) => {
     ),
   )
 
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.authorizationCodeGrantRequest(
       tIssuer,
       tClient,
@@ -172,7 +175,7 @@ test('authorizationCodeGrantRequest() w/ Extra Parameters', async (t) => {
     ),
   )
 
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.authorizationCodeGrantRequest(
       tIssuer,
       tClient,
@@ -187,13 +190,13 @@ test('authorizationCodeGrantRequest() w/ Extra Parameters', async (t) => {
   )
 })
 
-test('authorizationCodeGrantRequest() w/ Custom Headers', async (t) => {
+test('authorizationCodeGrantRequest() w/ Custom Headers', async () => {
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
     token_endpoint: endpoint('token-headers'),
   }
 
-  t.context
+  context
     .intercept({
       path: '/token-headers',
       method: 'POST',
@@ -216,7 +219,7 @@ test('authorizationCodeGrantRequest() w/ Custom Headers', async (t) => {
     Object.fromEntries(entries),
     new Headers(Object.fromEntries(entries)),
   ]) {
-    await t.notThrowsAsync(
+    await assert.doesNotReject(
       lib.authorizationCodeGrantRequest(
         tIssuer,
         tClient,
@@ -230,13 +233,13 @@ test('authorizationCodeGrantRequest() w/ Custom Headers', async (t) => {
   }
 })
 
-test('authorizationCodeGrantRequest() w/ DPoP', async (t) => {
+test('authorizationCodeGrantRequest() w/ DPoP', async () => {
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
     token_endpoint: endpoint('token-3'),
   }
 
-  t.context
+  context
     .intercept({
       path: '/token-3',
       method: 'POST',
@@ -247,7 +250,7 @@ test('authorizationCodeGrantRequest() w/ DPoP', async (t) => {
     .reply(200, { access_token: 'token', token_type: 'DPoP' })
 
   const DPoP = lib.DPoP(tClient, await lib.generateKeyPair('ES256'))
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.authorizationCodeGrantRequest(
       tIssuer,
       tClient,
@@ -260,26 +263,26 @@ test('authorizationCodeGrantRequest() w/ DPoP', async (t) => {
   )
 })
 
-test('processAuthorizationCodeResponse()', async (t) => {
-  await t.throwsAsync(lib.processAuthorizationCodeResponse(issuer, client, null as any), {
+test('processAuthorizationCodeResponse()', async () => {
+  await assert.rejects(lib.processAuthorizationCodeResponse(issuer, client, null as any), {
     message: '"response" must be an instance of Response',
   })
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processAuthorizationCodeResponse(issuer, client, getResponse('', { status: 404 })),
     {
       message: '"response" is not a conform Token Endpoint response (unexpected HTTP status code)',
     },
   )
-  await t.throwsAsync(lib.processAuthorizationCodeResponse(issuer, client, getResponse('{"')), {
+  await assert.rejects(lib.processAuthorizationCodeResponse(issuer, client, getResponse('{"')), {
     message: 'failed to parse "response" body as JSON',
   })
-  await t.throwsAsync(lib.processAuthorizationCodeResponse(issuer, client, getResponse('null')), {
+  await assert.rejects(lib.processAuthorizationCodeResponse(issuer, client, getResponse('null')), {
     message: '"response" body must be a top level object',
   })
-  await t.throwsAsync(lib.processAuthorizationCodeResponse(issuer, client, getResponse('[]')), {
+  await assert.rejects(lib.processAuthorizationCodeResponse(issuer, client, getResponse('[]')), {
     message: '"response" body must be a top level object',
   })
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processAuthorizationCodeResponse(
       issuer,
       client,
@@ -289,7 +292,7 @@ test('processAuthorizationCodeResponse()', async (t) => {
       message: '"response" body "access_token" property must be a string',
     },
   )
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processAuthorizationCodeResponse(
       issuer,
       client,
@@ -299,7 +302,7 @@ test('processAuthorizationCodeResponse()', async (t) => {
       message: '"response" body "token_type" property must be a string',
     },
   )
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processAuthorizationCodeResponse(
       issuer,
       client,
@@ -315,7 +318,7 @@ test('processAuthorizationCodeResponse()', async (t) => {
       message: '"response" body "expires_in" property must be a number',
     },
   )
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processAuthorizationCodeResponse(
       issuer,
       client,
@@ -330,7 +333,7 @@ test('processAuthorizationCodeResponse()', async (t) => {
       message: 'unsupported `token_type` value',
     },
   )
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processAuthorizationCodeResponse(
       issuer,
       client,
@@ -340,7 +343,7 @@ test('processAuthorizationCodeResponse()', async (t) => {
       message: '"response" body "scope" property must be a string',
     },
   )
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processAuthorizationCodeResponse(
       issuer,
       client,
@@ -352,7 +355,7 @@ test('processAuthorizationCodeResponse()', async (t) => {
       message: '"response" body "refresh_token" property must be a string',
     },
   )
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processAuthorizationCodeResponse(
       issuer,
       client,
@@ -369,7 +372,7 @@ test('processAuthorizationCodeResponse()', async (t) => {
     },
   )
 
-  t.deepEqual(
+  assert.deepStrictEqual(
     await lib.processAuthorizationCodeResponse(
       issuer,
       client,
@@ -392,23 +395,24 @@ test('processAuthorizationCodeResponse()', async (t) => {
     },
   )
 
-  let err = await t.throwsAsync(
+  let err = await captureRejection(
     lib.processAuthorizationCodeResponse(
       issuer,
       client,
       getResponse(JSON.stringify({ error: 'invalid_grant' }), { status: 400 }),
     ),
+    Error,
   )
 
   if (err instanceof lib.ResponseBodyError) {
-    t.is(err.error, 'invalid_grant')
+    assert.strictEqual(err.error, 'invalid_grant')
   } else {
-    t.fail()
+    assert.fail()
   }
 })
 
-test('processAuthorizationCodeResponse() - ignores signatures', async (t) => {
-  await t.notThrowsAsync(
+test('processAuthorizationCodeResponse() - ignores signatures', async () => {
+  await assert.doesNotReject(
     lib
       .processAuthorizationCodeResponse(
         { ...issuer, id_token_signing_alg_values_supported: ['ES256'] },
@@ -425,20 +429,20 @@ test('processAuthorizationCodeResponse() - ignores signatures', async (t) => {
                 .setAudience(client.client_id)
                 .setExpirationTime('5m')
                 .setIssuedAt()
-                .sign(t.context.ES256.privateKey),
+                .sign(context.ES256.privateKey),
             ),
           }),
         ),
       )
       .then(async (result) => {
-        t.assert(lib.getValidatedIdTokenClaims(result))
+        assert.ok(lib.getValidatedIdTokenClaims(result))
       }),
   )
 })
 
-test('processAuthorizationCodeResponse() with an ID Token (alg signalled)', async (t) => {
+test('processAuthorizationCodeResponse() with an ID Token (alg signalled)', async () => {
   const tIssuer: lib.AuthorizationServer = { ...issuer, jwks_uri: endpoint('jwks') }
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib
       .processAuthorizationCodeResponse(
         { ...tIssuer, id_token_signing_alg_values_supported: ['ES256'] },
@@ -454,13 +458,13 @@ test('processAuthorizationCodeResponse() with an ID Token (alg signalled)', asyn
               .setAudience(client.client_id)
               .setExpirationTime('5m')
               .setIssuedAt()
-              .sign(t.context.ES256.privateKey),
+              .sign(context.ES256.privateKey),
           }),
         ),
       )
       .then(async (result) => {
-        t.assert(lib.getValidatedIdTokenClaims(result))
-        t.throws(() => lib.getValidatedIdTokenClaims({ ...result }), {
+        assert.ok(lib.getValidatedIdTokenClaims(result))
+        assert.throws(() => lib.getValidatedIdTokenClaims({ ...result }), {
           name: 'TypeError',
           message: '"ref" was already garbage collected or did not resolve from the proper sources',
         })
@@ -468,10 +472,10 @@ test('processAuthorizationCodeResponse() with an ID Token (alg signalled)', asyn
   )
 })
 
-test('processAuthorizationCodeResponse() with an ID Token (alg specified)', async (t) => {
+test('processAuthorizationCodeResponse() with an ID Token (alg specified)', async () => {
   const tIssuer: lib.AuthorizationServer = { ...issuer, jwks_uri: endpoint('jwks') }
 
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.processAuthorizationCodeResponse(
       tIssuer,
       { ...client, id_token_signed_response_alg: 'ES256' },
@@ -486,17 +490,17 @@ test('processAuthorizationCodeResponse() with an ID Token (alg specified)', asyn
             .setAudience(client.client_id)
             .setExpirationTime('5m')
             .setIssuedAt()
-            .sign(t.context.ES256.privateKey),
+            .sign(context.ES256.privateKey),
         }),
       ),
     ),
   )
 })
 
-test('processAuthorizationCodeResponse() with an ID Token (alg default)', async (t) => {
+test('processAuthorizationCodeResponse() with an ID Token (alg default)', async () => {
   const tIssuer: lib.AuthorizationServer = { ...issuer, jwks_uri: endpoint('jwks') }
 
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.processAuthorizationCodeResponse(
       tIssuer,
       client,
@@ -511,17 +515,17 @@ test('processAuthorizationCodeResponse() with an ID Token (alg default)', async 
             .setAudience(client.client_id)
             .setExpirationTime('5m')
             .setIssuedAt()
-            .sign(t.context.RS256.privateKey),
+            .sign(context.RS256.privateKey),
         }),
       ),
     ),
   )
 })
 
-test('processAuthorizationCodeResponse() with an ID Token (alg mismatches)', async (t) => {
+test('processAuthorizationCodeResponse() with an ID Token (alg mismatches)', async () => {
   const tIssuer: lib.AuthorizationServer = { ...issuer, jwks_uri: endpoint('jwks') }
 
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processAuthorizationCodeResponse(
       tIssuer,
       client,
@@ -536,14 +540,14 @@ test('processAuthorizationCodeResponse() with an ID Token (alg mismatches)', asy
             .setAudience(client.client_id)
             .setExpirationTime('5m')
             .setIssuedAt()
-            .sign(t.context.ES256.privateKey),
+            .sign(context.ES256.privateKey),
         }),
       ),
     ),
     { message: 'unexpected JWT "alg" header parameter' },
   )
 
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processAuthorizationCodeResponse(
       {
         ...tIssuer,
@@ -561,14 +565,14 @@ test('processAuthorizationCodeResponse() with an ID Token (alg mismatches)', asy
             .setAudience(client.client_id)
             .setExpirationTime('5m')
             .setIssuedAt()
-            .sign(t.context.ES256.privateKey),
+            .sign(context.ES256.privateKey),
         }),
       ),
     ),
     { message: 'unexpected JWT "alg" header parameter' },
   )
 
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processAuthorizationCodeResponse(
       tIssuer,
       { ...client, id_token_signed_response_alg: 'RS256' },
@@ -583,7 +587,7 @@ test('processAuthorizationCodeResponse() with an ID Token (alg mismatches)', asy
             .setAudience(client.client_id)
             .setExpirationTime('5m')
             .setIssuedAt()
-            .sign(t.context.ES256.privateKey),
+            .sign(context.ES256.privateKey),
         }),
       ),
     ),
@@ -591,10 +595,10 @@ test('processAuthorizationCodeResponse() with an ID Token (alg mismatches)', asy
   )
 })
 
-test('processAuthorizationCodeResponse() with an ID Token typ: "JWT"', async (t) => {
+test('processAuthorizationCodeResponse() with an ID Token typ: "JWT"', async () => {
   const tIssuer: lib.AuthorizationServer = { ...issuer, jwks_uri: endpoint('jwks') }
 
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.processAuthorizationCodeResponse(
       tIssuer,
       client,
@@ -609,17 +613,17 @@ test('processAuthorizationCodeResponse() with an ID Token typ: "JWT"', async (t)
             .setAudience(client.client_id)
             .setExpirationTime('5m')
             .setIssuedAt()
-            .sign(t.context.RS256.privateKey),
+            .sign(context.RS256.privateKey),
         }),
       ),
     ),
   )
 })
 
-test('processAuthorizationCodeResponse() with an ID Token typ: "application/jwt"', async (t) => {
+test('processAuthorizationCodeResponse() with an ID Token typ: "application/jwt"', async () => {
   const tIssuer: lib.AuthorizationServer = { ...issuer, jwks_uri: endpoint('jwks') }
 
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.processAuthorizationCodeResponse(
       tIssuer,
       client,
@@ -634,21 +638,21 @@ test('processAuthorizationCodeResponse() with an ID Token typ: "application/jwt"
             .setAudience(client.client_id)
             .setExpirationTime('5m')
             .setIssuedAt()
-            .sign(t.context.RS256.privateKey),
+            .sign(context.RS256.privateKey),
         }),
       ),
     ),
   )
 })
 
-test(`processAuthorizationCodeResponse() with an ID Token`, async (t) => {
+test(`processAuthorizationCodeResponse() with an ID Token`, async () => {
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
     id_token_signing_alg_values_supported: ['ES256'],
     jwks_uri: endpoint('jwks'),
   }
 
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.processAuthorizationCodeResponse(
       tIssuer,
       client,
@@ -664,17 +668,17 @@ test(`processAuthorizationCodeResponse() with an ID Token`, async (t) => {
             .setAudience(client.client_id)
             .setExpirationTime('5m')
             .setIssuedAt()
-            .sign(t.context.ES256.privateKey),
+            .sign(context.ES256.privateKey),
         }),
       ),
     ),
   )
 })
 
-test('processAuthorizationCodeResponse() nonce checks', async (t) => {
+test('processAuthorizationCodeResponse() nonce checks', async () => {
   const tIssuer: lib.AuthorizationServer = { ...issuer, jwks_uri: endpoint('jwks') }
 
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processAuthorizationCodeResponse(
       tIssuer,
       client,
@@ -691,14 +695,14 @@ test('processAuthorizationCodeResponse() nonce checks', async (t) => {
             .setAudience(client.client_id)
             .setExpirationTime('5m')
             .setIssuedAt()
-            .sign(t.context.RS256.privateKey),
+            .sign(context.RS256.privateKey),
         }),
       ),
     ),
     { message: 'unexpected ID Token "nonce" claim value' },
   )
 
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processAuthorizationCodeResponse(
       tIssuer,
       client,
@@ -715,7 +719,7 @@ test('processAuthorizationCodeResponse() nonce checks', async (t) => {
             .setAudience(client.client_id)
             .setExpirationTime('5m')
             .setIssuedAt()
-            .sign(t.context.RS256.privateKey),
+            .sign(context.RS256.privateKey),
         }),
       ),
       { expectedNonce: 'anotherrandom-value' },
@@ -723,7 +727,7 @@ test('processAuthorizationCodeResponse() nonce checks', async (t) => {
     { message: 'unexpected ID Token "nonce" claim value' },
   )
 
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processAuthorizationCodeResponse(
       tIssuer,
       client,
@@ -738,7 +742,7 @@ test('processAuthorizationCodeResponse() nonce checks', async (t) => {
             .setAudience(client.client_id)
             .setExpirationTime('5m')
             .setIssuedAt()
-            .sign(t.context.RS256.privateKey),
+            .sign(context.RS256.privateKey),
         }),
       ),
       {
@@ -748,7 +752,7 @@ test('processAuthorizationCodeResponse() nonce checks', async (t) => {
     { message: 'JWT "nonce" (nonce) claim missing' },
   )
 
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.processAuthorizationCodeResponse(
       tIssuer,
       client,
@@ -763,7 +767,7 @@ test('processAuthorizationCodeResponse() nonce checks', async (t) => {
             .setAudience(client.client_id)
             .setExpirationTime('5m')
             .setIssuedAt()
-            .sign(t.context.RS256.privateKey),
+            .sign(context.RS256.privateKey),
         }),
       ),
       {
@@ -773,11 +777,11 @@ test('processAuthorizationCodeResponse() nonce checks', async (t) => {
   )
 })
 
-test('processAuthorizationCodeResponse() auth_time checks', async (t) => {
+test('processAuthorizationCodeResponse() auth_time checks', async () => {
   const tIssuer: lib.AuthorizationServer = { ...issuer, jwks_uri: endpoint('jwks') }
 
   for (const auth_time of [-1, null, '1', [], {}, true]) {
-    await t.throwsAsync(
+    await assert.rejects(
       lib.processAuthorizationCodeResponse(
         tIssuer,
         client,
@@ -792,7 +796,7 @@ test('processAuthorizationCodeResponse() auth_time checks', async (t) => {
               .setAudience(client.client_id)
               .setExpirationTime('5m')
               .setIssuedAt()
-              .sign(t.context.RS256.privateKey),
+              .sign(context.RS256.privateKey),
           }),
         ),
       ),
@@ -804,10 +808,10 @@ test('processAuthorizationCodeResponse() auth_time checks', async (t) => {
   }
 })
 
-test('processAuthorizationCodeResponse() azp checks', async (t) => {
+test('processAuthorizationCodeResponse() azp checks', async () => {
   const tIssuer: lib.AuthorizationServer = { ...issuer, jwks_uri: endpoint('jwks') }
 
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processAuthorizationCodeResponse(
       tIssuer,
       client,
@@ -822,14 +826,14 @@ test('processAuthorizationCodeResponse() azp checks', async (t) => {
             .setAudience([client.client_id, 'other-aud'])
             .setExpirationTime('5m')
             .setIssuedAt()
-            .sign(t.context.RS256.privateKey),
+            .sign(context.RS256.privateKey),
         }),
       ),
     ),
     { message: 'ID Token "aud" (audience) claim includes additional untrusted audiences' },
   )
 
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processAuthorizationCodeResponse(
       tIssuer,
       client,
@@ -844,14 +848,14 @@ test('processAuthorizationCodeResponse() azp checks', async (t) => {
             .setAudience([client.client_id, 'other-aud'])
             .setExpirationTime('5m')
             .setIssuedAt()
-            .sign(t.context.RS256.privateKey),
+            .sign(context.RS256.privateKey),
         }),
       ),
     ),
     { message: 'unexpected ID Token "azp" (authorized party) claim value' },
   )
 
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.processAuthorizationCodeResponse(
       tIssuer,
       client,
@@ -868,7 +872,7 @@ test('processAuthorizationCodeResponse() azp checks', async (t) => {
             .setAudience([client.client_id, 'other-aud'])
             .setExpirationTime('5m')
             .setIssuedAt()
-            .sign(t.context.RS256.privateKey),
+            .sign(context.RS256.privateKey),
         }),
       ),
     ),

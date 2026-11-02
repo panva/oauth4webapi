@@ -1,18 +1,9 @@
-import {
-  test,
-  skippable,
-  rejects,
-  flow,
-  modules,
-  nonRepudiation,
-  plan,
-  variant,
-} from '../runner.js'
+import { run, skippable, rejects, flow, modules, nonRepudiation, plan, variant } from '../runner.js'
 
 for (const module of modules(import.meta.url)) {
   if (nonRepudiation(plan, variant)) {
-    test.serial(rejects(flow()), module, 'JWT signature verification failed')
+    run(rejects(flow()), module, 'JWT signature verification failed')
   } else {
-    test.serial(skippable(flow()), module)
+    run(skippable(flow()), module)
   }
 }

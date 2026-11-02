@@ -1,4 +1,7 @@
-import anyTest, { type TestFn } from 'ava'
+import test, { before, after } from 'node:test'
+import assert from 'node:assert/strict'
+import { captureRejection } from './_errors.js'
+
 import setup, {
   type Context,
   teardown,
@@ -10,20 +13,20 @@ import setup, {
 } from './_setup.js'
 import * as lib from './_lib.js'
 
-const test = anyTest as TestFn<Context>
+const context = {} as Context
 
-test.before(setup())
-test.after(teardown)
+before(() => setup(context))
+after(() => teardown(context))
 
 const tClient: lib.Client = { ...client }
 const auth = lib.None()
 
-test('revocationRequest()', async (t) => {
-  await t.throwsAsync(lib.revocationRequest(issuer, tClient, auth, 'token'), {
+test('revocationRequest()', async () => {
+  await assert.rejects(lib.revocationRequest(issuer, tClient, auth, 'token'), {
     message: 'authorization server metadata does not contain a valid "as.revocation_endpoint"',
   })
 
-  await t.throwsAsync(lib.revocationRequest(issuer, tClient, auth, null as any), {
+  await assert.rejects(lib.revocationRequest(issuer, tClient, auth, null as any), {
     message: '"token" must be a string',
   })
 
@@ -32,7 +35,7 @@ test('revocationRequest()', async (t) => {
     revocation_endpoint: endpoint('revoke-1'),
   }
 
-  t.context
+  context
     .intercept({
       path: '/revoke-1',
       method: 'POST',
@@ -46,16 +49,16 @@ test('revocationRequest()', async (t) => {
     })
     .reply(200, { access_token: 'token', token_type: 'Bearer' })
 
-  await t.notThrowsAsync(lib.revocationRequest(tIssuer, tClient, auth, 'token'))
+  await assert.doesNotReject(lib.revocationRequest(tIssuer, tClient, auth, 'token'))
 })
 
-test('revocationRequest() w/ Extra Parameters', async (t) => {
+test('revocationRequest() w/ Extra Parameters', async () => {
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
     revocation_endpoint: endpoint('revoke-2'),
   }
 
-  t.context
+  context
     .intercept({
       path: '/revoke-2',
       method: 'POST',
@@ -66,13 +69,13 @@ test('revocationRequest() w/ Extra Parameters', async (t) => {
     .reply(200, { access_token: 'token', token_type: 'Bearer' })
     .times(3)
 
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.revocationRequest(tIssuer, tClient, auth, 'token', {
       additionalParameters: new URLSearchParams('token_type_hint=access_token'),
     }),
   )
 
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.revocationRequest(tIssuer, tClient, auth, 'token', {
       additionalParameters: {
         token_type_hint: 'access_token',
@@ -80,27 +83,27 @@ test('revocationRequest() w/ Extra Parameters', async (t) => {
     }),
   )
 
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.revocationRequest(tIssuer, tClient, auth, 'token', {
       additionalParameters: [['token_type_hint', 'access_token']],
     }),
   )
 })
 
-test('revocationRequest() w/ Custom Headers', async (t) => {
+test('revocationRequest() w/ Custom Headers', async () => {
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
     revocation_endpoint: endpoint('revoke-headers'),
   }
 
-  t.context
+  context
     .intercept({
       path: '/revoke-headers',
       method: 'POST',
       headers(headers) {
-        t.is(headers['user-agent'], 'foo')
-        t.is(headers.foo, 'bar')
-        t.is(headers.accept, '*/*')
+        assert.strictEqual(headers['user-agent'], 'foo')
+        assert.strictEqual(headers.foo, 'bar')
+        assert.strictEqual(headers.accept, '*/*')
         return true
       },
     })
@@ -117,31 +120,33 @@ test('revocationRequest() w/ Custom Headers', async (t) => {
     Object.fromEntries(entries),
     new Headers(Object.fromEntries(entries)),
   ]) {
-    await t.notThrowsAsync(lib.revocationRequest(tIssuer, tClient, auth, 'token', { headers }))
+    await assert.doesNotReject(lib.revocationRequest(tIssuer, tClient, auth, 'token', { headers }))
   }
 })
 
-test('processRevocationResponse()', async (t) => {
-  await t.throwsAsync(lib.processRevocationResponse(null as any), {
+test('processRevocationResponse()', async () => {
+  await assert.rejects(lib.processRevocationResponse(null as any), {
     message: '"response" must be an instance of Response',
   })
-  await t.throwsAsync(lib.processRevocationResponse(getResponse('', { status: 404 })), {
+  await assert.rejects(lib.processRevocationResponse(getResponse('', { status: 404 })), {
     message:
       '"response" is not a conform Revocation Endpoint response (unexpected HTTP status code)',
   })
 
-  t.is(await lib.processRevocationResponse(getResponse('')), undefined)
+  assert.strictEqual(await lib.processRevocationResponse(getResponse('')), undefined)
 
-  const err = await t.throwsAsync(
+  const err = await captureRejection(
     lib.processRevocationResponse(
       getResponse(JSON.stringify({ error: 'invalid_client' }), { status: 401 }),
     ),
+    Error,
   )
 
-  t.true(
+  assert.strictEqual(
     err instanceof lib.ResponseBodyError &&
       err.error === 'invalid_client' &&
       err.status === 401 &&
       err.response.bodyUsed === true,
+    true,
   )
 })

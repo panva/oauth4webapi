@@ -1,23 +1,25 @@
-import anyTest, { type TestFn } from 'ava'
+import test, { before, after } from 'node:test'
+import assert from 'node:assert/strict'
+
 import setup, { type Context, teardown, issuer, endpoint, client } from './_setup.js'
 import * as lib from './_lib.js'
 import * as jose from 'jose'
 import timekeeper from 'timekeeper'
 
-const test = anyTest as TestFn<Context>
+const context = {} as Context
 
-test.before(setup())
-test.after(teardown)
+before(() => setup(context))
+after(() => teardown(context))
 
 let cache: lib.JWKSCacheInput = {}
 let key: CryptoKeyPair
 const now = Date.now()
 
-test.serial('cache is empty at first and set after', async (t) => {
+test('cache is empty at first and set after', async () => {
   key = await lib.generateKeyPair('ES256')
   timekeeper.freeze(now)
 
-  t.context
+  context
     .intercept({
       path: '/jwks-force-refetch-with-cache',
       method: 'GET',
@@ -52,13 +54,13 @@ test.serial('cache is empty at first and set after', async (t) => {
     [lib.jwksCache]: cache,
   })
 
-  t.truthy(cache.uat)
-  t.truthy(cache.jwks)
+  assert.ok(cache.uat)
+  assert.ok(cache.jwks)
 })
 
-test.serial('cache is set and not updated', async (t) => {
+test('cache is set and not updated', async () => {
   const before = structuredClone(cache)
-  t.notDeepEqual(before, {})
+  assert.notDeepStrictEqual(before, {})
 
   const as: lib.AuthorizationServer = {
     ...issuer,
@@ -82,15 +84,15 @@ test.serial('cache is set and not updated', async (t) => {
     [lib.jwksCache]: cache,
   })
 
-  t.deepEqual(before, cache)
+  assert.deepStrictEqual(before, cache)
 })
 
-test.serial('cache is set and updated', async (t) => {
+test('cache is set and updated', async () => {
   timekeeper.freeze(now + 300 * 1000)
   const before = structuredClone(cache)
-  t.notDeepEqual(before, {})
+  assert.notDeepStrictEqual(before, {})
 
-  t.context
+  context
     .intercept({
       path: '/jwks-force-refetch-with-cache',
       method: 'GET',
@@ -125,6 +127,6 @@ test.serial('cache is set and updated', async (t) => {
     [lib.jwksCache]: cache,
   })
 
-  t.deepEqual(before.jwks, cache.jwks)
-  t.not(before.uat, cache.uat)
+  assert.deepStrictEqual(before.jwks, cache.jwks)
+  assert.notStrictEqual(before.uat, cache.uat)
 })

@@ -254,7 +254,6 @@ export default async () => {
   clearReportRequest(reportStatusPath)
 
   return {
-    cache: false,
     environmentVariables: {
       CONFORMANCE: JSON.stringify({
         configuration,
@@ -266,15 +265,7 @@ export default async () => {
         unhandledModules: [...unhandledModules.values()],
       }),
     },
-    concurrency: 1,
-    failFast: false,
-    extensions: {
-      ts: 'module',
-      mjs: true,
-    },
-    files: [...new Set([...files].sort()), './conformance/download_archive.ts'],
-    workerThreads: false,
-    nodeArguments: ['--enable-source-maps'],
-    sortTestFiles: sortConformanceTestFiles,
+    files: [...files, './conformance/download_archive.ts'].sort(sortConformanceTestFiles),
+    reportStatusPath,
   }
 }

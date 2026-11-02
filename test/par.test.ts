@@ -1,4 +1,7 @@
-import anyTest, { type TestFn } from 'ava'
+import test, { before, after } from 'node:test'
+import assert from 'node:assert/strict'
+import { captureRejection } from './_errors.js'
+
 import setup, {
   client,
   endpoint,
@@ -10,15 +13,15 @@ import setup, {
 } from './_setup.js'
 import * as lib from './_lib.js'
 
-const test = anyTest as TestFn<ContextWithAlgs>
+const context = {} as ContextWithAlgs
 
-test.before(setup())
-test.after(teardown)
+before(() => setup(context))
+after(() => teardown(context))
 
 const tClient: lib.Client = { ...client, client_secret: 'foo' }
 
-test('pushedAuthorizationRequest()', async (t) => {
-  await t.throwsAsync(
+test('pushedAuthorizationRequest()', async () => {
+  await assert.rejects(
     lib.pushedAuthorizationRequest(issuer, tClient, lib.None(), new URLSearchParams()),
     {
       message:
@@ -31,7 +34,7 @@ test('pushedAuthorizationRequest()', async (t) => {
     pushed_authorization_request_endpoint: endpoint('par-1'),
   }
 
-  t.context
+  context
     .intercept({
       path: '/par-1',
       method: 'POST',
@@ -49,7 +52,7 @@ test('pushedAuthorizationRequest()', async (t) => {
     .reply(200, { request_uri: 'urn:example:uri', expires_in: 60 })
     .times(3)
 
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.pushedAuthorizationRequest(
       tIssuer,
       tClient,
@@ -57,21 +60,21 @@ test('pushedAuthorizationRequest()', async (t) => {
       new URLSearchParams({ response_type: 'code' }),
     ),
   )
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.pushedAuthorizationRequest(tIssuer, tClient, lib.None(), { response_type: 'code' }),
   )
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.pushedAuthorizationRequest(tIssuer, tClient, lib.None(), [['response_type', 'code']]),
   )
 })
 
-test('pushedAuthorizationRequest() w/ Custom Headers', async (t) => {
+test('pushedAuthorizationRequest() w/ Custom Headers', async () => {
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
     pushed_authorization_request_endpoint: endpoint('par-headers'),
   }
 
-  t.context
+  context
     .intercept({
       path: '/par-headers',
       method: 'POST',
@@ -93,7 +96,7 @@ test('pushedAuthorizationRequest() w/ Custom Headers', async (t) => {
     Object.fromEntries(entries),
     new Headers(Object.fromEntries(entries)),
   ]) {
-    await t.notThrowsAsync(
+    await assert.doesNotReject(
       lib.pushedAuthorizationRequest(tIssuer, tClient, lib.None(), new URLSearchParams(), {
         headers,
       }),
@@ -101,13 +104,13 @@ test('pushedAuthorizationRequest() w/ Custom Headers', async (t) => {
   }
 })
 
-test('pushedAuthorizationRequest() w/ DPoP', async (t) => {
+test('pushedAuthorizationRequest() w/ DPoP', async () => {
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
     pushed_authorization_request_endpoint: endpoint('par-2'),
   }
 
-  t.context
+  context
     .intercept({
       path: '/par-2',
       method: 'POST',
@@ -119,18 +122,18 @@ test('pushedAuthorizationRequest() w/ DPoP', async (t) => {
     .reply(200, { request_uri: 'urn:example:uri', expires_in: 60 })
 
   const DPoP = lib.DPoP(tClient, await lib.generateKeyPair('ES256'))
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.pushedAuthorizationRequest(tIssuer, tClient, lib.None(), new URLSearchParams(), { DPoP }),
   )
 })
 
-test('pushedAuthorizationRequest() w/ Request Object', async (t) => {
+test('pushedAuthorizationRequest() w/ Request Object', async () => {
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
     pushed_authorization_request_endpoint: endpoint('par-3'),
   }
 
-  t.context
+  context
     .intercept({
       path: '/par-3',
       method: 'POST',
@@ -149,42 +152,42 @@ test('pushedAuthorizationRequest() w/ Request Object', async (t) => {
     key: sign.privateKey,
   })
 
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.pushedAuthorizationRequest(tIssuer, tClient, lib.None(), new URLSearchParams({ request })),
   )
 })
 
-test('processPushedAuthorizationResponse()', async (t) => {
-  await t.throwsAsync(lib.processPushedAuthorizationResponse(issuer, client, null as any), {
+test('processPushedAuthorizationResponse()', async () => {
+  await assert.rejects(lib.processPushedAuthorizationResponse(issuer, client, null as any), {
     message: '"response" must be an instance of Response',
   })
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processPushedAuthorizationResponse(issuer, client, getResponse('', { status: 404 })),
     {
       message:
         '"response" is not a conform Pushed Authorization Request Endpoint response (unexpected HTTP status code)',
     },
   )
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processPushedAuthorizationResponse(issuer, client, getResponse('{"', { status: 201 })),
     {
       message: 'failed to parse "response" body as JSON',
     },
   )
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processPushedAuthorizationResponse(issuer, client, getResponse('null', { status: 201 })),
     {
       message: '"response" body must be a top level object',
     },
   )
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processPushedAuthorizationResponse(issuer, client, getResponse('[]', { status: 201 })),
     {
       message: '"response" body must be a top level object',
     },
   )
 
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processPushedAuthorizationResponse(
       issuer,
       client,
@@ -195,7 +198,7 @@ test('processPushedAuthorizationResponse()', async (t) => {
     },
   )
 
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processPushedAuthorizationResponse(
       issuer,
       client,
@@ -208,7 +211,7 @@ test('processPushedAuthorizationResponse()', async (t) => {
     },
   )
 
-  t.deepEqual(
+  assert.deepStrictEqual(
     await lib.processPushedAuthorizationResponse(
       issuer,
       client,
@@ -219,19 +222,21 @@ test('processPushedAuthorizationResponse()', async (t) => {
     { request_uri: 'urn:example:uri', expires_in: 60 },
   )
 
-  const err = await t.throwsAsync(
+  const err = await captureRejection(
     lib.processPushedAuthorizationResponse(
       issuer,
       client,
       getResponse(JSON.stringify({ error: 'invalid_client' }), { status: 401 }),
     ),
+    Error,
   )
 
-  t.true(
+  assert.strictEqual(
     err instanceof lib.ResponseBodyError &&
       err.error === 'invalid_client' &&
       err.status === 401 &&
       err.response.bodyUsed === true,
+    true,
   )
 
   await lib.processPushedAuthorizationResponse(

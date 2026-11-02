@@ -1,5 +1,7 @@
+import test, { before, after } from 'node:test'
+import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
-import anyTest, { type TestFn } from 'ava'
+
 import * as jose from 'jose'
 import setup, {
   client,
@@ -13,11 +15,11 @@ import setup, {
 import * as lib from './_lib.js'
 import { mangleJwtSignature } from './_tools.js'
 
-const test = anyTest as TestFn<ContextWithAlgs>
+const context = {} as ContextWithAlgs
 
-test.before(setup())
-test.before(setupJwks)
-test.after(teardown)
+before(() => setup(context))
+before(() => setupJwks(context))
+after(() => teardown(context))
 
 const as: lib.AuthorizationServer = { ...issuer, jwks_uri: endpoint('jwks') }
 const jwtClient: lib.Client = { ...client, id_token_signed_response_alg: 'ES256' }
@@ -57,10 +59,10 @@ for (const process of [
   lib.processClientCredentialsResponse,
   lib.processGenericTokenEndpointResponse,
 ]) {
-  test(`${process.name}() validates required ID Token claims`, async (testContext) => {
+  test(`${process.name}() validates required ID Token claims`, async () => {
     for (const subject of invalidStrings) {
-      const token = await idToken(testContext.context.ES256.privateKey, subject)
-      await testContext.throwsAsync(process(as, jwtClient, tokenResponse(token)), {
+      const token = await idToken(context.ES256.privateKey, subject)
+      await assert.rejects(process(as, jwtClient, tokenResponse(token)), {
         code: lib.INVALID_RESPONSE,
         message:
           subject === undefined
@@ -70,18 +72,18 @@ for (const process of [
     }
 
     for (const claim of ['aud', 'exp', 'iat', 'iss', 'sub']) {
-      const token = await idToken(testContext.context.ES256.privateKey, 'subject', false, {
+      const token = await idToken(context.ES256.privateKey, 'subject', false, {
         [claim]: undefined,
       })
-      await testContext.throwsAsync(process(as, jwtClient, tokenResponse(token)), {
+      await assert.rejects(process(as, jwtClient, tokenResponse(token)), {
         code: lib.INVALID_RESPONSE,
         message: new RegExp(`^JWT "${claim}" .* claim missing$`),
       })
     }
 
-    const token = await idToken(testContext.context.ES256.privateKey, 'subject')
+    const token = await idToken(context.ES256.privateKey, 'subject')
     const result = await process(as, jwtClient, tokenResponse(token))
-    testContext.is(lib.getValidatedIdTokenClaims(result)?.sub, 'subject')
+    assert.strictEqual(lib.getValidatedIdTokenClaims(result)?.sub, 'subject')
   })
 }
 
@@ -89,10 +91,10 @@ for (const [name, validate] of [
   ['code id_token', lib.validateCodeIdTokenResponse],
   ['detached signature', lib.validateDetachedSignatureResponse],
 ] as const) {
-  test(`${name} validates required ID Token claims`, async (testContext) => {
+  test(`${name} validates required ID Token claims`, async () => {
     for (const subject of invalidStrings) {
-      const token = await idToken(testContext.context.ES256.privateKey, subject, true)
-      await testContext.throwsAsync(
+      const token = await idToken(context.ES256.privateKey, subject, true)
+      await assert.rejects(
         validate(as, jwtClient, new URLSearchParams({ code: 'code', id_token: token }), 'nonce'),
         {
           code: lib.INVALID_RESPONSE,
@@ -105,10 +107,10 @@ for (const [name, validate] of [
     }
 
     for (const claim of ['aud', 'exp', 'iat', 'iss', 'sub', 'nonce', 'c_hash']) {
-      const token = await idToken(testContext.context.ES256.privateKey, 'subject', true, {
+      const token = await idToken(context.ES256.privateKey, 'subject', true, {
         [claim]: undefined,
       })
-      await testContext.throwsAsync(
+      await assert.rejects(
         validate(as, jwtClient, new URLSearchParams({ code: 'code', id_token: token }), 'nonce'),
         {
           code: lib.INVALID_RESPONSE,
@@ -117,18 +119,18 @@ for (const [name, validate] of [
       )
     }
 
-    const token = await idToken(testContext.context.ES256.privateKey, 'subject', true)
+    const token = await idToken(context.ES256.privateKey, 'subject', true)
     const result = await validate(
       as,
       jwtClient,
       new URLSearchParams({ code: 'code', id_token: token }),
       'nonce',
     )
-    testContext.is(result.get('code'), 'code')
+    assert.strictEqual(result.get('code'), 'code')
   })
 
-  test(`${name} ID Token policy checks`, async (testContext) => {
-    const privateKey = testContext.context.ES256.privateKey
+  test(`${name} ID Token policy checks`, async () => {
+    const privateKey = context.ES256.privateKey
     const validateClaims = async (claims: jose.JWTPayload) => {
       const token = await idToken(privateKey, 'subject', true, claims)
       return validate(
@@ -139,22 +141,21 @@ for (const [name, validate] of [
       )
     }
 
-    await testContext.throwsAsync(validateClaims({ nonce: 'other' }), {
+    await assert.rejects(validateClaims({ nonce: 'other' }), {
       message: 'unexpected ID Token "nonce" claim value',
     })
-    await testContext.throwsAsync(validateClaims({ auth_time: 'invalid' }), {
+    await assert.rejects(validateClaims({ auth_time: 'invalid' }), {
       message: 'ID Token "auth_time" (authentication time) must be a number',
     })
-    await testContext.throwsAsync(
-      validateClaims({ aud: [client.client_id, 'other'], azp: 'other' }),
-      { message: 'unexpected ID Token "azp" (authorized party) claim value' },
-    )
-    await testContext.notThrowsAsync(
+    await assert.rejects(validateClaims({ aud: [client.client_id, 'other'], azp: 'other' }), {
+      message: 'unexpected ID Token "azp" (authorized party) claim value',
+    })
+    await assert.doesNotReject(
       validateClaims({ aud: [client.client_id, 'other'], azp: client.client_id }),
     )
 
     const token = await idToken(privateKey, 'subject', true)
-    await testContext.throwsAsync(
+    await assert.rejects(
       validate(
         as,
         jwtClient,
@@ -164,7 +165,7 @@ for (const [name, validate] of [
       { message: 'JWT signature verification failed' },
     )
     if (validate === lib.validateDetachedSignatureResponse) {
-      await testContext.throwsAsync(
+      await assert.rejects(
         validate(
           as,
           jwtClient,
@@ -178,7 +179,7 @@ for (const [name, validate] of [
   })
 }
 
-test('DPoP proofs require string jti claims', async (testContext) => {
+test('DPoP proofs require string jti claims', async () => {
   const proofKey = await lib.generateKeyPair('ES256')
   const proofJwk = await jose.exportJWK(proofKey.publicKey)
   const now = Math.floor(Date.now() / 1000)
@@ -193,7 +194,7 @@ test('DPoP proofs require string jti claims', async (testContext) => {
     cnf: { jkt: await jose.calculateJwkThumbprint(proofJwk) },
   })
     .setProtectedHeader({ alg: 'ES256', typ: 'at+jwt' })
-    .sign(testContext.context.ES256.privateKey)
+    .sign(context.ES256.privateKey)
 
   const validate = async (jti: unknown) => {
     const proof = await new jose.SignJWT({
@@ -216,7 +217,7 @@ test('DPoP proofs require string jti claims', async (testContext) => {
   }
 
   for (const jti of invalidStrings) {
-    await testContext.throwsAsync(validate(jti), {
+    await assert.rejects(validate(jti), {
       code: lib.INVALID_RESPONSE,
       message:
         jti === undefined
@@ -224,5 +225,5 @@ test('DPoP proofs require string jti claims', async (testContext) => {
           : 'unexpected JWT "jti" (jwt id) claim type',
     })
   }
-  testContext.is((await validate('proof')).sub, 'subject')
+  assert.strictEqual((await validate('proof')).sub, 'subject')
 })

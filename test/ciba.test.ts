@@ -1,4 +1,7 @@
-import anyTest, { type TestFn } from 'ava'
+import test, { before, after } from 'node:test'
+import assert from 'node:assert/strict'
+import { captureRejection } from './_errors.js'
+
 import setup, {
   client,
   endpoint,
@@ -13,16 +16,16 @@ import * as jose from 'jose'
 import * as lib from './_lib.js'
 import * as tools from './_tools.js'
 
-const test = anyTest as TestFn<ContextWithAlgs>
+const context = {} as ContextWithAlgs
 
-test.before(setup())
-test.after(teardown)
-test.before(setupJwks)
+before(() => setup(context))
+after(() => teardown(context))
+before(() => setupJwks(context))
 
 const tClient: lib.Client = { ...client, token_endpoint_auth_method: 'none' }
 
-test('backchannelAuthenticationRequest()', async (t) => {
-  await t.throwsAsync(
+test('backchannelAuthenticationRequest()', async () => {
+  await assert.rejects(
     lib.backchannelAuthenticationRequest(issuer, tClient, lib.None(), new URLSearchParams()),
     {
       message:
@@ -35,7 +38,7 @@ test('backchannelAuthenticationRequest()', async (t) => {
     backchannel_authentication_endpoint: endpoint('ciba-1'),
   }
 
-  t.context
+  context
     .intercept({
       path: '/ciba-1',
       method: 'POST',
@@ -54,7 +57,7 @@ test('backchannelAuthenticationRequest()', async (t) => {
     .reply(200, '')
     .times(3)
 
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.backchannelAuthenticationRequest(
       tIssuer,
       tClient,
@@ -62,25 +65,25 @@ test('backchannelAuthenticationRequest()', async (t) => {
       new URLSearchParams({ resource: 'urn:example:resource' }),
     ),
   )
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.backchannelAuthenticationRequest(tIssuer, tClient, lib.None(), {
       resource: 'urn:example:resource',
     }),
   )
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.backchannelAuthenticationRequest(tIssuer, tClient, lib.None(), [
       ['resource', 'urn:example:resource'],
     ]),
   )
 })
 
-test('backchannelAuthenticationRequest() w/ Custom Headers', async (t) => {
+test('backchannelAuthenticationRequest() w/ Custom Headers', async () => {
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
     backchannel_authentication_endpoint: endpoint('ciba-headers'),
   }
 
-  t.context
+  context
     .intercept({
       path: '/ciba-headers',
       method: 'POST',
@@ -103,7 +106,7 @@ test('backchannelAuthenticationRequest() w/ Custom Headers', async (t) => {
     Object.fromEntries(entries),
     new Headers(Object.fromEntries(entries)),
   ]) {
-    await t.notThrowsAsync(
+    await assert.doesNotReject(
       lib.backchannelAuthenticationRequest(tIssuer, tClient, lib.None(), new URLSearchParams(), {
         headers,
       }),
@@ -111,18 +114,18 @@ test('backchannelAuthenticationRequest() w/ Custom Headers', async (t) => {
   }
 })
 
-test('processBackchannelAuthenticationResponse()', async (t) => {
-  await t.throwsAsync(lib.processBackchannelAuthenticationResponse(issuer, client, null as any), {
+test('processBackchannelAuthenticationResponse()', async () => {
+  await assert.rejects(lib.processBackchannelAuthenticationResponse(issuer, client, null as any), {
     message: '"response" must be an instance of Response',
   })
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processBackchannelAuthenticationResponse(issuer, client, getResponse('', { status: 404 })),
     {
       message:
         '"response" is not a conform Backchannel Authentication Endpoint response (unexpected HTTP status code)',
     },
   )
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processBackchannelAuthenticationResponse(
       issuer,
       client,
@@ -132,7 +135,7 @@ test('processBackchannelAuthenticationResponse()', async (t) => {
       message: 'failed to parse "response" body as JSON',
     },
   )
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processBackchannelAuthenticationResponse(
       issuer,
       client,
@@ -142,7 +145,7 @@ test('processBackchannelAuthenticationResponse()', async (t) => {
       message: '"response" body must be a top level object',
     },
   )
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processBackchannelAuthenticationResponse(
       issuer,
       client,
@@ -159,7 +162,7 @@ test('processBackchannelAuthenticationResponse()', async (t) => {
     interval: 5,
   }
 
-  t.deepEqual(
+  assert.deepStrictEqual(
     await lib.processBackchannelAuthenticationResponse(
       issuer,
       client,
@@ -168,7 +171,7 @@ test('processBackchannelAuthenticationResponse()', async (t) => {
     validResponse,
   )
 
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.processBackchannelAuthenticationResponse(
       issuer,
       client,
@@ -178,7 +181,7 @@ test('processBackchannelAuthenticationResponse()', async (t) => {
     ),
   )
 
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.processBackchannelAuthenticationResponse(
       issuer,
       client,
@@ -186,7 +189,7 @@ test('processBackchannelAuthenticationResponse()', async (t) => {
     ),
   )
 
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processBackchannelAuthenticationResponse(
       issuer,
       client,
@@ -197,7 +200,7 @@ test('processBackchannelAuthenticationResponse()', async (t) => {
     },
   )
 
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processBackchannelAuthenticationResponse(
       issuer,
       client,
@@ -208,7 +211,7 @@ test('processBackchannelAuthenticationResponse()', async (t) => {
     },
   )
 
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processBackchannelAuthenticationResponse(
       issuer,
       client,
@@ -220,15 +223,15 @@ test('processBackchannelAuthenticationResponse()', async (t) => {
   )
 })
 
-test('backchannelAuthenticationGrantRequest()', async (t) => {
-  await t.throwsAsync(
+test('backchannelAuthenticationGrantRequest()', async () => {
+  await assert.rejects(
     lib.backchannelAuthenticationGrantRequest(issuer, tClient, lib.None(), 'auth_req_id'),
     {
       message: 'authorization server metadata does not contain a valid "as.token_endpoint"',
     },
   )
 
-  await t.throwsAsync(
+  await assert.rejects(
     lib.backchannelAuthenticationGrantRequest(issuer, tClient, lib.None(), null as any),
     {
       message: '"authReqId" must be a string',
@@ -240,7 +243,7 @@ test('backchannelAuthenticationGrantRequest()', async (t) => {
     token_endpoint: endpoint('token-1'),
   }
 
-  t.context
+  context
     .intercept({
       path: '/token-1',
       method: 'POST',
@@ -257,18 +260,18 @@ test('backchannelAuthenticationGrantRequest()', async (t) => {
     })
     .reply(200, { access_token: 'token', token_type: 'Bearer' })
 
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.backchannelAuthenticationGrantRequest(tIssuer, tClient, lib.None(), 'auth_req_id'),
   )
 })
 
-test('backchannelAuthenticationGrantRequest() w/ Extra Parameters', async (t) => {
+test('backchannelAuthenticationGrantRequest() w/ Extra Parameters', async () => {
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
     token_endpoint: endpoint('token-2'),
   }
 
-  t.context
+  context
     .intercept({
       path: '/token-2',
       method: 'POST',
@@ -280,13 +283,13 @@ test('backchannelAuthenticationGrantRequest() w/ Extra Parameters', async (t) =>
     .reply(200, { access_token: 'token', token_type: 'Bearer' })
     .times(3)
 
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.backchannelAuthenticationGrantRequest(tIssuer, tClient, lib.None(), 'auth_req_id', {
       additionalParameters: new URLSearchParams('resource=urn:example:resource'),
     }),
   )
 
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.backchannelAuthenticationGrantRequest(tIssuer, tClient, lib.None(), 'auth_req_id', {
       additionalParameters: {
         resource: 'urn:example:resource',
@@ -294,20 +297,20 @@ test('backchannelAuthenticationGrantRequest() w/ Extra Parameters', async (t) =>
     }),
   )
 
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.backchannelAuthenticationGrantRequest(tIssuer, tClient, lib.None(), 'auth_req_id', {
       additionalParameters: [['resource', 'urn:example:resource']],
     }),
   )
 })
 
-test('backchannelAuthenticationGrantRequest() w/ Custom Headers', async (t) => {
+test('backchannelAuthenticationGrantRequest() w/ Custom Headers', async () => {
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
     token_endpoint: endpoint('token-headers'),
   }
 
-  t.context
+  context
     .intercept({
       path: '/token-headers',
       method: 'POST',
@@ -330,7 +333,7 @@ test('backchannelAuthenticationGrantRequest() w/ Custom Headers', async (t) => {
     Object.fromEntries(entries),
     new Headers(Object.fromEntries(entries)),
   ]) {
-    await t.notThrowsAsync(
+    await assert.doesNotReject(
       lib.backchannelAuthenticationGrantRequest(tIssuer, tClient, lib.None(), 'auth_req_id', {
         headers,
       }),
@@ -338,13 +341,13 @@ test('backchannelAuthenticationGrantRequest() w/ Custom Headers', async (t) => {
   }
 })
 
-test('backchannelAuthenticationGrantRequest() w/ DPoP', async (t) => {
+test('backchannelAuthenticationGrantRequest() w/ DPoP', async () => {
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
     token_endpoint: endpoint('token-3'),
   }
 
-  t.context
+  context
     .intercept({
       path: '/token-3',
       method: 'POST',
@@ -355,21 +358,21 @@ test('backchannelAuthenticationGrantRequest() w/ DPoP', async (t) => {
     .reply(200, { access_token: 'token', token_type: 'DPoP' })
 
   const DPoP = lib.DPoP(tClient, await lib.generateKeyPair('ES256'))
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.backchannelAuthenticationGrantRequest(tIssuer, tClient, lib.None(), 'auth_req_id', {
       DPoP,
     }),
   )
 })
 
-test('processBackchannelAuthenticationGrantResponse() without ID Tokens', async (t) => {
-  await t.throwsAsync(
+test('processBackchannelAuthenticationGrantResponse() without ID Tokens', async () => {
+  await assert.rejects(
     lib.processBackchannelAuthenticationGrantResponse(issuer, client, null as any),
     {
       message: '"response" must be an instance of Response',
     },
   )
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processBackchannelAuthenticationGrantResponse(
       issuer,
       client,
@@ -379,25 +382,25 @@ test('processBackchannelAuthenticationGrantResponse() without ID Tokens', async 
       message: '"response" is not a conform Token Endpoint response (unexpected HTTP status code)',
     },
   )
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processBackchannelAuthenticationGrantResponse(issuer, client, getResponse('{"')),
     {
       message: 'failed to parse "response" body as JSON',
     },
   )
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processBackchannelAuthenticationGrantResponse(issuer, client, getResponse('null')),
     {
       message: '"response" body must be a top level object',
     },
   )
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processBackchannelAuthenticationGrantResponse(issuer, client, getResponse('[]')),
     {
       message: '"response" body must be a top level object',
     },
   )
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processBackchannelAuthenticationGrantResponse(
       issuer,
       client,
@@ -407,7 +410,7 @@ test('processBackchannelAuthenticationGrantResponse() without ID Tokens', async 
       message: '"response" body "access_token" property must be a string',
     },
   )
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processBackchannelAuthenticationGrantResponse(
       issuer,
       client,
@@ -417,7 +420,7 @@ test('processBackchannelAuthenticationGrantResponse() without ID Tokens', async 
       message: '"response" body "token_type" property must be a string',
     },
   )
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processBackchannelAuthenticationGrantResponse(
       issuer,
       client,
@@ -433,7 +436,7 @@ test('processBackchannelAuthenticationGrantResponse() without ID Tokens', async 
       message: '"response" body "expires_in" property must be a number',
     },
   )
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processBackchannelAuthenticationGrantResponse(
       issuer,
       client,
@@ -443,7 +446,7 @@ test('processBackchannelAuthenticationGrantResponse() without ID Tokens', async 
       message: '"response" body "scope" property must be a string',
     },
   )
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processBackchannelAuthenticationGrantResponse(
       issuer,
       client,
@@ -455,7 +458,7 @@ test('processBackchannelAuthenticationGrantResponse() without ID Tokens', async 
       message: '"response" body "refresh_token" property must be a string',
     },
   )
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processBackchannelAuthenticationGrantResponse(
       issuer,
       client,
@@ -480,7 +483,7 @@ test('processBackchannelAuthenticationGrantResponse() without ID Tokens', async 
     ),
   )
 
-  t.deepEqual(response, {
+  assert.deepStrictEqual(response, {
     access_token: 'token',
     token_type: 'bearer',
     expires_in: 60,
@@ -488,21 +491,23 @@ test('processBackchannelAuthenticationGrantResponse() without ID Tokens', async 
     refresh_token: 'refresh_token',
   })
 
-  t.is(lib.getValidatedIdTokenClaims(response), undefined)
+  assert.strictEqual(lib.getValidatedIdTokenClaims(response), undefined)
 
-  const err = await t.throwsAsync(
+  const err = await captureRejection(
     lib.processBackchannelAuthenticationGrantResponse(
       issuer,
       client,
       getResponse(JSON.stringify({ error: 'invalid_grant' }), { status: 400 }),
     ),
+    Error,
   )
 
-  t.true(
+  assert.strictEqual(
     err instanceof lib.ResponseBodyError &&
       err.error === 'invalid_grant' &&
       err.status === 400 &&
       err.response.bodyUsed === true,
+    true,
   )
 
   await lib.processBackchannelAuthenticationGrantResponse(
@@ -512,8 +517,8 @@ test('processBackchannelAuthenticationGrantResponse() without ID Tokens', async 
   )
 })
 
-test('processBackchannelAuthenticationGrantResponse() - ignores signatures', async (t) => {
-  await t.notThrowsAsync(
+test('processBackchannelAuthenticationGrantResponse() - ignores signatures', async () => {
+  await assert.doesNotReject(
     lib
       .processBackchannelAuthenticationGrantResponse(
         { ...issuer, id_token_signing_alg_values_supported: ['ES256'] },
@@ -530,21 +535,21 @@ test('processBackchannelAuthenticationGrantResponse() - ignores signatures', asy
                 .setAudience(client.client_id)
                 .setExpirationTime('5m')
                 .setIssuedAt()
-                .sign(t.context.ES256.privateKey),
+                .sign(context.ES256.privateKey),
             ),
           }),
         ),
       )
       .then(async (result) => {
-        t.assert(lib.getValidatedIdTokenClaims(result))
+        assert.ok(lib.getValidatedIdTokenClaims(result))
       }),
   )
 })
 
-test('processBackchannelAuthenticationGrantResponse() with an ID Token (alg signalled)', async (t) => {
+test('processBackchannelAuthenticationGrantResponse() with an ID Token (alg signalled)', async () => {
   const tIssuer: lib.AuthorizationServer = { ...issuer, jwks_uri: endpoint('jwks') }
 
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib
       .processBackchannelAuthenticationGrantResponse(
         { ...tIssuer, id_token_signing_alg_values_supported: ['ES256'] },
@@ -560,13 +565,13 @@ test('processBackchannelAuthenticationGrantResponse() with an ID Token (alg sign
               .setAudience(client.client_id)
               .setExpirationTime('5m')
               .setIssuedAt()
-              .sign(t.context.ES256.privateKey),
+              .sign(context.ES256.privateKey),
           }),
         ),
       )
       .then(async (result) => {
-        t.assert(lib.getValidatedIdTokenClaims(result))
-        t.throws(() => lib.getValidatedIdTokenClaims({ ...result }), {
+        assert.ok(lib.getValidatedIdTokenClaims(result))
+        assert.throws(() => lib.getValidatedIdTokenClaims({ ...result }), {
           name: 'TypeError',
           message: '"ref" was already garbage collected or did not resolve from the proper sources',
         })
@@ -574,10 +579,10 @@ test('processBackchannelAuthenticationGrantResponse() with an ID Token (alg sign
   )
 })
 
-test('processBackchannelAuthenticationGrantResponse() with an ID Token (alg specified)', async (t) => {
+test('processBackchannelAuthenticationGrantResponse() with an ID Token (alg specified)', async () => {
   const tIssuer: lib.AuthorizationServer = { ...issuer, jwks_uri: endpoint('jwks') }
 
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.processBackchannelAuthenticationGrantResponse(
       tIssuer,
       { ...client, id_token_signed_response_alg: 'ES256' },
@@ -592,17 +597,17 @@ test('processBackchannelAuthenticationGrantResponse() with an ID Token (alg spec
             .setAudience(client.client_id)
             .setExpirationTime('5m')
             .setIssuedAt()
-            .sign(t.context.ES256.privateKey),
+            .sign(context.ES256.privateKey),
         }),
       ),
     ),
   )
 })
 
-test('processBackchannelAuthenticationGrantResponse() with an ID Token (alg default)', async (t) => {
+test('processBackchannelAuthenticationGrantResponse() with an ID Token (alg default)', async () => {
   const tIssuer: lib.AuthorizationServer = { ...issuer, jwks_uri: endpoint('jwks') }
 
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.processBackchannelAuthenticationGrantResponse(
       tIssuer,
       client,
@@ -617,17 +622,17 @@ test('processBackchannelAuthenticationGrantResponse() with an ID Token (alg defa
             .setAudience(client.client_id)
             .setExpirationTime('5m')
             .setIssuedAt()
-            .sign(t.context.RS256.privateKey),
+            .sign(context.RS256.privateKey),
         }),
       ),
     ),
   )
 })
 
-test('processBackchannelAuthenticationGrantResponse() with an ID Token (alg mismatches)', async (t) => {
+test('processBackchannelAuthenticationGrantResponse() with an ID Token (alg mismatches)', async () => {
   const tIssuer: lib.AuthorizationServer = { ...issuer, jwks_uri: endpoint('jwks') }
 
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processBackchannelAuthenticationGrantResponse(
       tIssuer,
       client,
@@ -642,14 +647,14 @@ test('processBackchannelAuthenticationGrantResponse() with an ID Token (alg mism
             .setAudience(client.client_id)
             .setExpirationTime('5m')
             .setIssuedAt()
-            .sign(t.context.ES256.privateKey),
+            .sign(context.ES256.privateKey),
         }),
       ),
     ),
     { message: 'unexpected JWT "alg" header parameter' },
   )
 
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processBackchannelAuthenticationGrantResponse(
       {
         ...tIssuer,
@@ -667,14 +672,14 @@ test('processBackchannelAuthenticationGrantResponse() with an ID Token (alg mism
             .setAudience(client.client_id)
             .setExpirationTime('5m')
             .setIssuedAt()
-            .sign(t.context.ES256.privateKey),
+            .sign(context.ES256.privateKey),
         }),
       ),
     ),
     { message: 'unexpected JWT "alg" header parameter' },
   )
 
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processBackchannelAuthenticationGrantResponse(
       tIssuer,
       {
@@ -692,7 +697,7 @@ test('processBackchannelAuthenticationGrantResponse() with an ID Token (alg mism
             .setAudience(client.client_id)
             .setExpirationTime('5m')
             .setIssuedAt()
-            .sign(t.context.ES256.privateKey),
+            .sign(context.ES256.privateKey),
         }),
       ),
     ),

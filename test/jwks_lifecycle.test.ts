@@ -1,21 +1,23 @@
-import anyTest, { type TestFn } from 'ava'
+import test, { before, after } from 'node:test'
+import assert from 'node:assert/strict'
+
 import setup, { type Context, teardown, issuer, endpoint, client } from './_setup.js'
 import * as lib from './_lib.js'
 import * as jose from 'jose'
 import timekeeper from 'timekeeper'
 
-const test = anyTest as TestFn<Context>
+const context = {} as Context
 
-test.before(setup())
-test.after(teardown)
+before(() => setup(context))
+after(() => teardown(context))
 
-test.serial('jwks_uri force refetch', async (t) => {
+test('jwks_uri force refetch', async () => {
   const now = Date.now()
   timekeeper.freeze(now)
 
   let key = await lib.generateKeyPair('ES256')
 
-  t.context
+  context
     .intercept({
       path: '/jwks-force-refetch',
       method: 'GET',
@@ -54,16 +56,16 @@ test.serial('jwks_uri force refetch', async (t) => {
   timekeeper.travel(now + 300 * 1000)
 
   // re-fetch forced
-  await t.throwsAsync(() => lib.validateJwtAuthResponse(as, c, params))
+  await assert.rejects(() => lib.validateJwtAuthResponse(as, c, params), Error)
 })
 
-test.serial('jwks_uri refetch if off cooldown and needed', async (t) => {
+test('jwks_uri refetch if off cooldown and needed', async () => {
   const now = Date.now()
   timekeeper.freeze(now)
 
   let key = await lib.generateKeyPair('ES256')
 
-  t.context
+  context
     .intercept({
       path: '/jwks-refetch-off-cooldown',
       method: 'GET',
@@ -110,7 +112,7 @@ test.serial('jwks_uri refetch if off cooldown and needed', async (t) => {
 
   params = new URLSearchParams({ response: jwt })
 
-  t.context
+  context
     .intercept({
       path: '/jwks-refetch-off-cooldown',
       method: 'GET',
@@ -129,15 +131,15 @@ test.serial('jwks_uri refetch if off cooldown and needed', async (t) => {
     )
 
   // re-fetch not allowed yet
-  await t.throwsAsync(() => lib.validateJwtAuthResponse(as, c, params), {
+  await assert.rejects(() => lib.validateJwtAuthResponse(as, c, params), {
     message: 'error when selecting a JWT verification key, no applicable keys found',
   })
   timekeeper.travel(now + 59 * 1000)
-  await t.throwsAsync(() => lib.validateJwtAuthResponse(as, c, params), {
+  await assert.rejects(() => lib.validateJwtAuthResponse(as, c, params), {
     message: 'error when selecting a JWT verification key, no applicable keys found',
   })
 
   timekeeper.travel(now + 60 * 1000)
 
-  await t.notThrowsAsync(() => lib.validateJwtAuthResponse(as, c, params))
+  await assert.doesNotReject(() => lib.validateJwtAuthResponse(as, c, params))
 })

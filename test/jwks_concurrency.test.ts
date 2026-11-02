@@ -1,12 +1,14 @@
-import anyTest, { type TestFn } from 'ava'
+import test, { before, after } from 'node:test'
+import assert from 'node:assert/strict'
+
 import * as jose from 'jose'
 import setup, { client, endpoint, getResponse, issuer, teardown, type Context } from './_setup.js'
 import * as lib from './_lib.js'
 
-const test = anyTest as TestFn<Context>
+const context = {} as Context
 
-test.before(setup())
-test.after(teardown)
+before(() => setup(context))
+after(() => teardown(context))
 
 function deferred() {
   let resolve!: () => void
@@ -42,7 +44,7 @@ async function fixture(jwksUri = endpoint('jwks-concurrent')) {
 }
 
 for (const withSignal of [false, true]) {
-  test(`concurrent JWKS requests share a fetch (signal: ${withSignal})`, async (testContext) => {
+  test(`concurrent JWKS requests share a fetch (signal: ${withSignal})`, async () => {
     const context = await fixture()
     const signal = withSignal ? new AbortController().signal : undefined
     const caches: lib.JWKSCacheInput[] = Array.from({ length: 8 }, () => ({}))
@@ -53,8 +55,8 @@ for (const withSignal of [false, true]) {
       init,
     ) => {
       requests++
-      testContext.is(init.signal, signal)
-      testContext.is(init.headers['x-cache-test'], 'value')
+      assert.strictEqual(init.signal, signal)
+      assert.strictEqual(init.headers['x-cache-test'], 'value')
       return context.response()
     }
 
@@ -68,7 +70,7 @@ for (const withSignal of [false, true]) {
           signal: signal
             ? (url) => {
                 signalCalls++
-                testContext.is(url, context.as.jwks_uri!)
+                assert.strictEqual(url, context.as.jwks_uri!)
                 return signal
               }
             : undefined,
@@ -78,20 +80,20 @@ for (const withSignal of [false, true]) {
       ),
     )
 
-    testContext.is(requests, 1)
-    testContext.is(signalCalls, withSignal ? 8 : 0)
+    assert.strictEqual(requests, 1)
+    assert.strictEqual(signalCalls, withSignal ? 8 : 0)
     for (const result of results) {
-      testContext.is(result.get('code'), 'code')
+      assert.strictEqual(result.get('code'), 'code')
     }
     for (const cache of caches) {
-      testContext.deepEqual(cache.jwks, context.jwks)
-      testContext.true(Number.isFinite(cache.uat))
-      testContext.is(cache.uat, caches[0].uat)
+      assert.deepStrictEqual(cache.jwks, context.jwks)
+      assert.strictEqual(Number.isFinite(cache.uat), true)
+      assert.strictEqual(cache.uat, caches[0].uat)
     }
-    testContext.not(caches[0].jwks, caches[1].jwks)
-    testContext.not(caches[0].jwks?.keys, caches[1].jwks?.keys)
+    assert.notStrictEqual(caches[0].jwks, caches[1].jwks)
+    assert.notStrictEqual(caches[0].jwks?.keys, caches[1].jwks?.keys)
 
-    await testContext.notThrowsAsync(
+    await assert.doesNotReject(
       context.validate({
         [lib.customFetch]: async () => {
           throw new Error('unexpected warm-cache fetch')
@@ -102,7 +104,7 @@ for (const withSignal of [false, true]) {
 }
 
 for (const difference of ['headers', 'fetch', 'metadata']) {
-  test(`JWKS requests with different ${difference} stay independent`, async (testContext) => {
+  test(`JWKS requests with different ${difference} stay independent`, async () => {
     const context = await fixture()
     let requests = 0
     const makeFetch = () => async () => {
@@ -131,14 +133,14 @@ for (const difference of ['headers', 'fetch', 'metadata']) {
       context.validate(firstOptions),
     ])
 
-    testContext.is(requests, 2)
+    assert.strictEqual(requests, 2)
     for (const result of results) {
-      testContext.is(result.get('code'), 'code')
+      assert.strictEqual(result.get('code'), 'code')
     }
   })
 }
 
-test('separate abort signals do not cancel other JWKS callers', async (testContext) => {
+test('separate abort signals do not cancel other JWKS callers', async () => {
   const context = await fixture()
   const started = deferred()
   const release = deferred()
@@ -166,18 +168,18 @@ test('separate abort signals do not cancel other JWKS callers', async (testConte
   release.resolve()
   const [first, second] = await pending
 
-  testContext.is(requests, 2)
-  testContext.is(first.status, 'rejected')
-  testContext.is(second.status, 'fulfilled')
+  assert.strictEqual(requests, 2)
+  assert.strictEqual(first.status, 'rejected')
+  assert.strictEqual(second.status, 'fulfilled')
   if (first.status === 'rejected') {
-    testContext.is(first.reason, reason)
+    assert.strictEqual(first.reason, reason)
   }
   if (second.status === 'fulfilled') {
-    testContext.is(second.value.get('code'), 'code')
+    assert.strictEqual(second.value.get('code'), 'code')
   }
 })
 
-test('aborted shared JWKS requests allow a fresh request', async (testContext) => {
+test('aborted shared JWKS requests allow a fresh request', async () => {
   const context = await fixture()
   const started = deferred()
   const release = deferred()
@@ -205,20 +207,20 @@ test('aborted shared JWKS requests allow a fresh request', async (testContext) =
   release.resolve()
   const results = await pending
 
-  testContext.is(requests, 1)
+  assert.strictEqual(requests, 1)
   for (const result of results) {
-    testContext.is(result.status, 'rejected')
+    assert.strictEqual(result.status, 'rejected')
     if (result.status === 'rejected') {
-      testContext.is(result.reason, reason)
+      assert.strictEqual(result.reason, reason)
     }
   }
-  await testContext.notThrowsAsync(
+  await assert.doesNotReject(
     context.validate({ signal: new AbortController().signal, [lib.customFetch]: fetcher }),
   )
-  testContext.is(requests, 2)
+  assert.strictEqual(requests, 2)
 })
 
-test('joining a JWKS request still enforces HTTPS', async (testContext) => {
+test('joining a JWKS request still enforces HTTPS', async () => {
   const context = await fixture('http://op.example.com/jwks-concurrent')
   const started = deferred()
   const release = deferred()
@@ -238,16 +240,16 @@ test('joining a JWKS request still enforces HTTPS', async (testContext) => {
   release.resolve()
   const [allowed, forbidden] = await pending
 
-  testContext.is(requests, 1)
-  testContext.is(allowed.status, 'fulfilled')
-  testContext.is(forbidden.status, 'rejected')
+  assert.strictEqual(requests, 1)
+  assert.strictEqual(allowed.status, 'fulfilled')
+  assert.strictEqual(forbidden.status, 'rejected')
   if (forbidden.status === 'rejected') {
-    testContext.is(forbidden.reason.code, lib.HTTP_REQUEST_FORBIDDEN)
+    assert.strictEqual(forbidden.reason.code, lib.HTTP_REQUEST_FORBIDDEN)
   }
 })
 
 for (const failureMode of ['network', 'synchronous', 'jwks']) {
-  test(`failed shared JWKS ${failureMode} requests can be retried`, async (testContext) => {
+  test(`failed shared JWKS ${failureMode} requests can be retried`, async () => {
     const context = await fixture()
     const failure = new Error('fetch failed')
     let fail = true
@@ -271,20 +273,20 @@ for (const failureMode of ['network', 'synchronous', 'jwks']) {
     const results = await Promise.allSettled(
       Array.from({ length: 8 }, () => context.validate(options)),
     )
-    testContext.is(requests, 1)
+    assert.strictEqual(requests, 1)
     for (const result of results) {
-      testContext.is(result.status, 'rejected')
+      assert.strictEqual(result.status, 'rejected')
       if (result.status === 'rejected') {
         if (failureMode !== 'jwks') {
-          testContext.is(result.reason, failure)
+          assert.strictEqual(result.reason, failure)
         } else {
-          testContext.is(result.reason.code, lib.INVALID_RESPONSE)
+          assert.strictEqual(result.reason.code, lib.INVALID_RESPONSE)
         }
       }
     }
 
     fail = false
-    testContext.is((await context.validate(options)).get('code'), 'code')
-    testContext.is(requests, 2)
+    assert.strictEqual((await context.validate(options)).get('code'), 'code')
+    assert.strictEqual(requests, 2)
   })
 }

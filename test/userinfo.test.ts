@@ -1,4 +1,6 @@
-import anyTest, { type TestFn } from 'ava'
+import test, { before, after } from 'node:test'
+import assert from 'node:assert/strict'
+
 import setup, {
   client,
   endpoint,
@@ -13,15 +15,15 @@ import * as lib from './_lib.js'
 import * as jose from 'jose'
 import * as tools from './_tools.js'
 
-const test = anyTest as TestFn<ContextWithAlgs>
+const context = {} as ContextWithAlgs
 
-test.before(setup())
-test.after(teardown)
-test.before(setupJwks)
+before(() => setup(context))
+after(() => teardown(context))
+before(() => setupJwks(context))
 
-test('userInfoRequest()', async (t) => {
+test('userInfoRequest()', async () => {
   const data = { sub: 'urn:example:subject' }
-  t.context
+  context
     .intercept({
       path: '/userinfo',
       method: 'GET',
@@ -35,12 +37,12 @@ test('userInfoRequest()', async (t) => {
   const tIssuer: lib.AuthorizationServer = { ...issuer, userinfo_endpoint: endpoint('userinfo') }
   const tClient: lib.Client = { ...client }
   const response = await lib.userInfoRequest(tIssuer, tClient, 'token')
-  t.true(response instanceof lib.Response)
+  assert.strictEqual(response instanceof lib.Response, true)
 })
 
-test('userInfoRequest() w/ Custom Headers', async (t) => {
+test('userInfoRequest() w/ Custom Headers', async () => {
   const data = { sub: 'urn:example:subject' }
-  t.context
+  context
     .intercept({
       path: '/userinfo-headers',
       method: 'GET',
@@ -69,13 +71,13 @@ test('userInfoRequest() w/ Custom Headers', async (t) => {
     new Headers(Object.fromEntries(entries)),
   ]) {
     const response = await lib.userInfoRequest(tIssuer, tClient, 'token', { headers })
-    t.true(response instanceof lib.Response)
+    assert.strictEqual(response instanceof lib.Response, true)
   }
 })
 
-test('userInfoRequest() w/ jwt signal', async (t) => {
+test('userInfoRequest() w/ jwt signal', async () => {
   const data = { sub: 'urn:example:subject' }
-  t.context
+  context
     .intercept({
       path: '/userinfo-2',
       method: 'GET',
@@ -88,24 +90,23 @@ test('userInfoRequest() w/ jwt signal', async (t) => {
   const tIssuer: lib.AuthorizationServer = { ...issuer, userinfo_endpoint: endpoint('userinfo-2') }
   const tClient: lib.Client = { ...client, userinfo_signed_response_alg: 'ES256' }
   await lib.userInfoRequest(tIssuer, tClient, 'token')
-  t.pass()
 })
 
-test('userInfoRequest() requires userinfo_endpoint', async (t) => {
-  await t.throwsAsync(lib.userInfoRequest(issuer, client, 'token'), {
+test('userInfoRequest() requires userinfo_endpoint', async () => {
+  await assert.rejects(lib.userInfoRequest(issuer, client, 'token'), {
     message: 'authorization server metadata does not contain a valid "as.userinfo_endpoint"',
   })
 })
 
-test('processUserInfoResponse() - json', async (t) => {
+test('processUserInfoResponse() - json', async () => {
   const tIssuer: lib.AuthorizationServer = { ...issuer, userinfo_endpoint: endpoint('userinfo') }
-  await t.throwsAsync(lib.processUserInfoResponse(tIssuer, client, 'sub', null as any), {
+  await assert.rejects(lib.processUserInfoResponse(tIssuer, client, 'sub', null as any), {
     message: '"response" must be an instance of Response',
   })
-  await t.throwsAsync(lib.processUserInfoResponse(tIssuer, client, 'sub', getResponse('{"')), {
+  await assert.rejects(lib.processUserInfoResponse(tIssuer, client, 'sub', getResponse('{"')), {
     message: 'failed to parse "response" body as JSON',
   })
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processUserInfoResponse(
       tIssuer,
       client,
@@ -117,13 +118,13 @@ test('processUserInfoResponse() - json', async (t) => {
         '"response" is not a conform UserInfo Endpoint response (unexpected HTTP status code)',
     },
   )
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processUserInfoResponse(tIssuer, client, 'sub', getResponse(JSON.stringify([]))),
     {
       message: '"response" body must be a top level object',
     },
   )
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processUserInfoResponse(
       tIssuer,
       client,
@@ -134,29 +135,29 @@ test('processUserInfoResponse() - json', async (t) => {
       message: '"response" body "sub" property must be a string',
     },
   )
-  await t.notThrowsAsync(async () => {
+  await assert.doesNotReject(async () => {
     const response = getResponse(JSON.stringify({ sub: 'urn:example:subject' }))
     await lib.processUserInfoResponse(tIssuer, client, 'urn:example:subject', response)
   })
-  await t.notThrowsAsync(async () => {
+  await assert.doesNotReject(async () => {
     const response = getResponse(JSON.stringify({ sub: 'urn:example:subject' }))
     await lib.processUserInfoResponse(tIssuer, client, lib.skipSubjectCheck, response)
   })
-  await t.throwsAsync(
+  await assert.rejects(
     async () => {
       const response = getResponse(JSON.stringify({ sub: 'urn:example:subject' }))
       await lib.processUserInfoResponse(tIssuer, client, null as any, response)
     },
     { message: '"expectedSubject" must be a string' },
   )
-  await t.throwsAsync(
+  await assert.rejects(
     async () => {
       const response = getResponse(JSON.stringify({ sub: 'urn:example:different-subject' }))
       await lib.processUserInfoResponse(tIssuer, client, 'urn:example:subject', response)
     },
     { message: 'unexpected "response" body "sub" property value' },
   )
-  await t.throwsAsync(
+  await assert.rejects(
     async () => {
       const response = getResponse(JSON.stringify({ sub: 'urn:example:subject' }))
       await lib.processUserInfoResponse(
@@ -170,10 +171,10 @@ test('processUserInfoResponse() - json', async (t) => {
   )
 })
 
-test('processUserInfoResponse() - ignores signatures', async (t) => {
-  const kp = t.context.ES256
+test('processUserInfoResponse() - ignores signatures', async () => {
+  const kp = context.ES256
 
-  await t.notThrowsAsync(async () => {
+  await assert.doesNotReject(async () => {
     const response = getResponse(
       tools.mangleJwtSignature(
         await new jose.SignJWT({ sub: 'urn:example:subject' })
@@ -191,15 +192,15 @@ test('processUserInfoResponse() - ignores signatures', async (t) => {
   })
 })
 
-test('processUserInfoResponse() - jwt (alg signalled)', async (t) => {
+test('processUserInfoResponse() - jwt (alg signalled)', async () => {
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
     jwks_uri: endpoint('jwks'),
     userinfo_signing_alg_values_supported: ['ES256'],
   }
-  const kp = t.context.ES256
+  const kp = context.ES256
 
-  await t.notThrowsAsync(async () => {
+  await assert.doesNotReject(async () => {
     const response = getResponse(
       await new jose.SignJWT({ sub: 'urn:example:subject' })
         .setProtectedHeader({ alg: 'ES256' })
@@ -210,14 +211,14 @@ test('processUserInfoResponse() - jwt (alg signalled)', async (t) => {
   })
 })
 
-test('processUserInfoResponse() - jwt (alg defined)', async (t) => {
+test('processUserInfoResponse() - jwt (alg defined)', async () => {
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
     jwks_uri: endpoint('jwks'),
   }
-  const kp = t.context.ES256
+  const kp = context.ES256
 
-  await t.notThrowsAsync(async () => {
+  await assert.doesNotReject(async () => {
     const response = getResponse(
       await new jose.SignJWT({ sub: 'urn:example:subject' })
         .setProtectedHeader({ alg: 'ES256' })
@@ -233,14 +234,14 @@ test('processUserInfoResponse() - jwt (alg defined)', async (t) => {
   })
 })
 
-test('processUserInfoResponse() - jwt (alg default)', async (t) => {
+test('processUserInfoResponse() - jwt (alg default)', async () => {
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
     jwks_uri: endpoint('jwks'),
   }
-  const kp = t.context.RS256
+  const kp = context.RS256
 
-  await t.throwsAsync(
+  await assert.rejects(
     async () => {
       const response = getResponse(
         await new jose.SignJWT({ sub: 'urn:example:subject' })
@@ -256,18 +257,18 @@ test('processUserInfoResponse() - jwt (alg default)', async (t) => {
   )
 })
 
-test('processUserInfoResponse() - alg mismatches', async (t) => {
+test('processUserInfoResponse() - alg mismatches', async () => {
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
     jwks_uri: endpoint('jwks'),
   }
 
-  await t.throwsAsync(
+  await assert.rejects(
     async () => {
       const response = getResponse(
         await new jose.SignJWT({ sub: 'urn:example:subject' })
           .setProtectedHeader({ alg: 'ES256' })
-          .sign(t.context.ES256.privateKey),
+          .sign(context.ES256.privateKey),
         { headers: new Headers({ 'content-type': 'application/jwt' }) },
       )
       await lib.processUserInfoResponse(
@@ -280,12 +281,12 @@ test('processUserInfoResponse() - alg mismatches', async (t) => {
     { message: 'unexpected JWT "alg" header parameter' },
   )
 
-  await t.throwsAsync(
+  await assert.rejects(
     async () => {
       const response = getResponse(
         await new jose.SignJWT({ sub: 'urn:example:subject' })
           .setProtectedHeader({ alg: 'ES256' })
-          .sign(t.context.ES256.privateKey),
+          .sign(context.ES256.privateKey),
         { headers: new Headers({ 'content-type': 'application/jwt' }) },
       )
       await lib.processUserInfoResponse(
@@ -301,12 +302,12 @@ test('processUserInfoResponse() - alg mismatches', async (t) => {
     { message: 'unexpected JWT "alg" header parameter' },
   )
 
-  await t.throwsAsync(
+  await assert.rejects(
     async () => {
       const response = getResponse(
         await new jose.SignJWT({ sub: 'urn:example:subject' })
           .setProtectedHeader({ alg: 'ES256' })
-          .sign(t.context.ES256.privateKey),
+          .sign(context.ES256.privateKey),
         { headers: new Headers({ 'content-type': 'application/jwt' }) },
       )
       await lib.processUserInfoResponse(

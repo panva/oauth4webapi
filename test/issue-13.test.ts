@@ -1,3 +1,5 @@
+import test, { before, after } from 'node:test'
+import assert from 'node:assert/strict'
 // see https://github.com/panva/oauth4webapi/issues/13
 // All browser navigator user-agent strings start with Mozilla/5.0
 // It is unlikely to ever change too
@@ -7,26 +9,21 @@ delete globalThis.navigator
 globalThis.navigator = { userAgent: 'Mozilla/5.0 foo' }
 const lib = await import('./_lib.js')
 
-import anyTest, { type TestFn } from 'ava'
 import setup, { type Context, teardown, issuer, UA } from './_setup.js'
 
-const test = anyTest as TestFn<Context>
+const context = {} as Context
 
-test.before(setup())
-test.after(teardown)
+before(() => setup(context))
+after(() => teardown(context))
 
-test('when in browser does not set custom user-agent', async (t) => {
+test('when in browser does not set custom user-agent', async () => {
   const data = { ...issuer }
-  t.context
+  context
     .intercept({
       path: '/.well-known/openid-configuration',
       method: 'GET',
       headers(headers) {
-        if (UA.test(headers['user-agent'])) {
-          t.fail()
-        } else {
-          t.pass()
-        }
+        assert.strictEqual(UA.test(headers['user-agent']), false)
         return true
       },
     })

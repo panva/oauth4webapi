@@ -1,5 +1,5 @@
-import { test, rejects, flow, modules } from '../runner.js'
+import { run, rejects, flow, modules } from '../runner.js'
 
 for (const module of modules(import.meta.url)) {
-  test.serial(rejects(flow()), module, 'JWT "aud" (audience) claim missing')
+  run(rejects(flow()), module, 'JWT "aud" (audience) claim missing')
 }

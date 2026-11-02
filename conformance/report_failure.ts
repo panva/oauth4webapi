@@ -10,7 +10,7 @@ writeStepSummary(
   formatReportSummary(
     { id: CONFORMANCE_PLAN_ID, name: CONFORMANCE_PLAN_NAME },
     JSON.parse(CONFORMANCE_PLAN_VARIANT),
-    [{ type: 'failure', detail: 'AVA runner failure (test details unavailable)' }],
+    [{ type: 'failure', detail: 'Node.js test runner failure (test details unavailable)' }],
   ),
 )
 setActionEnvironment('CONFORMANCE_REPORT', 'true')

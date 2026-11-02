@@ -1,19 +1,22 @@
-import anyTest, { type TestFn } from 'ava'
+import test, { before, after } from 'node:test'
+import assert from 'node:assert/strict'
+import { captureRejection } from './_errors.js'
+
 import * as crypto from 'crypto'
 import setup, { type Context, teardown, client } from './_setup.js'
 import * as jose from 'jose'
 import * as lib from './_lib.js'
 
-const test = anyTest as TestFn<Context>
+const context = {} as Context
 
-test.before(setup())
-test.after(teardown)
+before(() => setup(context))
+after(() => teardown(context))
 
-test('dpop()', async (t) => {
+test('dpop()', async () => {
   const kp = await lib.generateKeyPair('ES256')
   const publicJwk = await jose.exportJWK(kp.publicKey)
 
-  t.context.mock
+  context.mock
     .get('https://rs.example.com')
     .intercept({
       path: '/resource?foo',
@@ -23,12 +26,12 @@ test('dpop()', async (t) => {
         dpop(dpop) {
           const { jwk, ...protectedHeader } = jose.decodeProtectedHeader(dpop)
           const { iat, jti, ath, ...claims } = jose.decodeJwt(dpop)
-          t.deepEqual(protectedHeader, { alg: 'ES256', typ: 'dpop+jwt' })
-          t.deepEqual(jwk, publicJwk)
-          t.deepEqual(claims, { htu: 'https://rs.example.com/resource', htm: 'GET' })
-          t.is(typeof iat, 'number')
-          t.is(typeof jti, 'string')
-          t.is(ath, crypto.createHash('sha256').update('token').digest('base64url'))
+          assert.deepStrictEqual(protectedHeader, { alg: 'ES256', typ: 'dpop+jwt' })
+          assert.deepStrictEqual(jwk, publicJwk)
+          assert.deepStrictEqual(claims, { htu: 'https://rs.example.com/resource', htm: 'GET' })
+          assert.strictEqual(typeof iat, 'number')
+          assert.strictEqual(typeof jti, 'string')
+          assert.strictEqual(ath, crypto.createHash('sha256').update('token').digest('base64url'))
           return true
         },
       },
@@ -40,11 +43,11 @@ test('dpop()', async (t) => {
   const response = await lib.protectedResourceRequest('token', 'GET', url, undefined, undefined, {
     DPoP: sign,
   })
-  t.true(response instanceof lib.Response)
+  assert.strictEqual(response instanceof lib.Response, true)
 })
 
-test('dpop() w/ a nonce', async (t) => {
-  t.context.mock
+test('dpop() w/ a nonce', async () => {
+  context.mock
     .get('https://rs2.example.com')
     .intercept({
       path: '/resource?foo',
@@ -52,7 +55,7 @@ test('dpop() w/ a nonce', async (t) => {
       headers: {
         dpop(dpop) {
           const { nonce } = jose.decodeJwt(dpop)
-          t.is(nonce, undefined)
+          assert.strictEqual(nonce, undefined)
           return true
         },
       },
@@ -65,7 +68,7 @@ test('dpop() w/ a nonce', async (t) => {
     DPoP: sign,
   })
 
-  t.context.mock
+  context.mock
     .get('https://rs2.example.com')
     .intercept({
       path: '/resource?foo',
@@ -73,7 +76,7 @@ test('dpop() w/ a nonce', async (t) => {
       headers: {
         dpop(dpop) {
           const { nonce } = jose.decodeJwt(dpop)
-          t.is(nonce, 'foo')
+          assert.strictEqual(nonce, 'foo')
           return true
         },
       },
@@ -85,15 +88,21 @@ test('dpop() w/ a nonce', async (t) => {
   })
 })
 
-test('externally formed dpop headers', async (t) => {
-  t.context.mock
+test('externally formed dpop headers', async () => {
+  context.mock
     .get('https://rs.example.com')
     .intercept({
       path: '/resource',
       method: 'GET',
       headers: {
-        authorization: (actual) => t.is(actual, 'DPoP token'),
-        dpop: (actual) => t.is(actual, 'foo'),
+        authorization: (actual) => {
+          assert.strictEqual(actual, 'DPoP token')
+          return true
+        },
+        dpop: (actual) => {
+          assert.strictEqual(actual, 'foo')
+          return true
+        },
       },
     })
     .reply(200, '')
@@ -105,7 +114,7 @@ test('externally formed dpop headers', async (t) => {
     url,
     new Headers({ dpop: 'foo' }),
   )
-  t.true(response instanceof lib.Response)
+  assert.strictEqual(response instanceof lib.Response, true)
 })
 
 for (const challenge of [
@@ -114,7 +123,7 @@ for (const challenge of [
   'DPoP error="use_dpop_nonce", Bearer',
   String.raw`DPoP error="use_dpop_non\ce"`,
 ]) {
-  test(`isDPoPNonceError() retries ${challenge}`, async (testContext) => {
+  test(`isDPoPNonceError() retries ${challenge}`, async () => {
     const DPoP = lib.DPoP(client, await lib.generateKeyPair('ES256'))
     const url = new URL('https://rs.example.com/nonce')
     let requests = 0
@@ -125,7 +134,7 @@ for (const challenge of [
           const proof = new Headers(init.headers).get('dpop')!
           const { nonce } = jose.decodeJwt(proof)
           if (++requests === 1) {
-            testContext.is(nonce, undefined)
+            assert.strictEqual(nonce, undefined)
             return new Response(null, {
               status: 401,
               headers: {
@@ -134,7 +143,7 @@ for (const challenge of [
               },
             })
           }
-          testContext.is(nonce, 'server-nonce')
+          assert.strictEqual(nonce, 'server-nonce')
           return new Response()
         },
       })
@@ -146,8 +155,8 @@ for (const challenge of [
       throw error
     })
 
-    testContext.is(response.status, 200)
-    testContext.is(requests, 2)
+    assert.strictEqual(response.status, 200)
+    assert.strictEqual(requests, 2)
   })
 }
 
@@ -155,8 +164,8 @@ for (const challenge of [
   'Bearer error="use_dpop_nonce"',
   'Bearer, DPoP error="invalid_dpop_proof"',
 ]) {
-  test(`isDPoPNonceError() ignores ${challenge}`, async (testContext) => {
-    const error = await testContext.throwsAsync(
+  test(`isDPoPNonceError() ignores ${challenge}`, async () => {
+    const error = await captureRejection(
       lib.protectedResourceRequest(
         'token',
         'GET',
@@ -171,9 +180,12 @@ for (const challenge of [
             }),
         },
       ),
-      { instanceOf: lib.WWWAuthenticateChallengeError },
+      (error) => {
+        assert.ok(error instanceof lib.WWWAuthenticateChallengeError)
+        return true
+      },
     )
 
-    testContext.false(lib.isDPoPNonceError(error))
+    assert.strictEqual(lib.isDPoPNonceError(error), false)
   })
 }

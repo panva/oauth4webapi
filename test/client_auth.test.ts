@@ -1,4 +1,6 @@
-import anyTest, { type TestFn } from 'ava'
+import test, { before, after } from 'node:test'
+import assert from 'node:assert/strict'
+
 import setup, {
   client,
   endpoint,
@@ -10,14 +12,14 @@ import setup, {
 import * as jose from 'jose'
 import * as lib from './_lib.js'
 
-const test = anyTest as TestFn<ContextWithAlgs>
+const context = {} as ContextWithAlgs
 
-test.before(setup())
-test.after(teardown)
-test.before(setupContextKeys)
+before(() => setup(context))
+after(() => teardown(context))
+before(() => setupContextKeys(context))
 
-test('client_secret_basic', async (t) => {
-  t.context
+test('client_secret_basic', async () => {
+  context
     .intercept({
       path: '/test-basic',
       method: 'POST',
@@ -37,11 +39,10 @@ test('client_secret_basic', async (t) => {
     lib.ClientSecretBasic('foo'),
     'token',
   )
-  t.pass()
 })
 
-test('client_secret_basic (appendix b)', async (t) => {
-  t.context
+test('client_secret_basic (appendix b)', async () => {
+  context
     .intercept({
       path: '/test-basic-encoding',
       method: 'POST',
@@ -49,8 +50,8 @@ test('client_secret_basic (appendix b)', async (t) => {
         authorization(authorization) {
           const [, auth] = authorization.split(' ')
           for (const token of atob(auth).split(':')) {
-            t.false(/[^a-zA-Z0-9%+]/.test(token))
-            t.deepEqual(token, 'client+%25%26%2B%2D%5F%2E%21%7E%2A%27%28%29')
+            assert.strictEqual(/[^a-zA-Z0-9%+]/.test(token), false)
+            assert.deepStrictEqual(token, 'client+%25%26%2B%2D%5F%2E%21%7E%2A%27%28%29')
           }
           return true
         },
@@ -71,11 +72,10 @@ test('client_secret_basic (appendix b)', async (t) => {
     lib.ClientSecretBasic("client %&+-_.!~*'()"),
     'token',
   )
-  t.pass()
 })
 
-test('client_secret_post', async (t) => {
-  t.context
+test('client_secret_post', async () => {
+  context
     .intercept({
       path: '/test-post',
       method: 'POST',
@@ -95,17 +95,16 @@ test('client_secret_post', async (t) => {
     lib.ClientSecretPost('foo'),
     'token',
   )
-  t.pass()
 })
 
-test('private_key_jwt', async (t) => {
+test('private_key_jwt', async () => {
   const tIssuer = {
     ...issuer,
     revocation_endpoint: endpoint('test-pkjwt-1'),
     token_endpoint: endpoint('token'),
   }
 
-  t.context
+  context
     .intercept({
       path: '/test-pkjwt-1',
       method: 'POST',
@@ -114,24 +113,24 @@ test('private_key_jwt', async (t) => {
       },
       body(body) {
         const params = new URLSearchParams(body)
-        t.false(params.has('client_secret'))
-        t.true(params.has('client_assertion'))
-        t.is(params.get('client_id'), client.client_id)
-        t.is(
+        assert.strictEqual(params.has('client_secret'), false)
+        assert.strictEqual(params.has('client_assertion'), true)
+        assert.strictEqual(params.get('client_id'), client.client_id)
+        assert.strictEqual(
           params.get('client_assertion_type'),
           'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
         )
 
         const assertion = jose.decodeJwt(params.get('client_assertion')!)
-        t.is(assertion.aud, tIssuer.issuer)
-        t.is(assertion.iss, client.client_id)
-        t.is(assertion.sub, client.client_id)
-        t.is(typeof assertion.exp, 'number')
-        t.is(typeof assertion.iat, 'number')
-        t.is(typeof assertion.nbf, 'number')
-        t.is(typeof assertion.jti, 'string')
+        assert.strictEqual(assertion.aud, tIssuer.issuer)
+        assert.strictEqual(assertion.iss, client.client_id)
+        assert.strictEqual(assertion.sub, client.client_id)
+        assert.strictEqual(typeof assertion.exp, 'number')
+        assert.strictEqual(typeof assertion.iat, 'number')
+        assert.strictEqual(typeof assertion.nbf, 'number')
+        assert.strictEqual(typeof assertion.jti, 'string')
         const header = jose.decodeProtectedHeader(params.get('client_assertion')!)
-        t.is(header.kid, undefined)
+        assert.strictEqual(header.kid, undefined)
 
         return true
       },
@@ -142,32 +141,26 @@ test('private_key_jwt', async (t) => {
   await lib.revocationRequest(
     tIssuer,
     client,
-    lib.PrivateKeyJwt({ key: t.context.ES256.privateKey }),
+    lib.PrivateKeyJwt({ key: context.ES256.privateKey }),
     'token',
   )
-  await lib.revocationRequest(
-    tIssuer,
-    client,
-    lib.PrivateKeyJwt(t.context.ES256.privateKey),
-    'token',
-  )
-  t.throws(() => lib.PrivateKeyJwt({ key: t.context.ES256.publicKey }), {
+  await lib.revocationRequest(tIssuer, client, lib.PrivateKeyJwt(context.ES256.privateKey), 'token')
+  assert.throws(() => lib.PrivateKeyJwt({ key: context.ES256.publicKey }), {
     message: '"clientPrivateKey.key" must be a private CryptoKey',
   })
-  t.throws(() => lib.PrivateKeyJwt({ key: null as any }), {
+  assert.throws(() => lib.PrivateKeyJwt({ key: null as any }), {
     message: '"clientPrivateKey.key" must be a CryptoKey',
   })
-  t.pass()
 })
 
-test('private_key_jwt ({ key: CryptoKey, kid: string })', async (t) => {
+test('private_key_jwt ({ key: CryptoKey, kid: string })', async () => {
   const tIssuer = {
     ...issuer,
     revocation_endpoint: endpoint('test-pkjwt-2'),
     token_endpoint: endpoint('token'),
   }
 
-  t.context
+  context
     .intercept({
       path: '/test-pkjwt-2',
       method: 'POST',
@@ -176,24 +169,24 @@ test('private_key_jwt ({ key: CryptoKey, kid: string })', async (t) => {
       },
       body(body) {
         const params = new URLSearchParams(body)
-        t.false(params.has('client_secret'))
-        t.true(params.has('client_assertion'))
-        t.is(params.get('client_id'), client.client_id)
-        t.is(
+        assert.strictEqual(params.has('client_secret'), false)
+        assert.strictEqual(params.has('client_assertion'), true)
+        assert.strictEqual(params.get('client_id'), client.client_id)
+        assert.strictEqual(
           params.get('client_assertion_type'),
           'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
         )
 
         const assertion = jose.decodeJwt(params.get('client_assertion')!)
-        t.is(assertion.aud, tIssuer.issuer)
-        t.is(assertion.iss, client.client_id)
-        t.is(assertion.sub, client.client_id)
-        t.is(typeof assertion.exp, 'number')
-        t.is(typeof assertion.iat, 'number')
-        t.is(typeof assertion.nbf, 'number')
-        t.is(typeof assertion.jti, 'string')
+        assert.strictEqual(assertion.aud, tIssuer.issuer)
+        assert.strictEqual(assertion.iss, client.client_id)
+        assert.strictEqual(assertion.sub, client.client_id)
+        assert.strictEqual(typeof assertion.exp, 'number')
+        assert.strictEqual(typeof assertion.iat, 'number')
+        assert.strictEqual(typeof assertion.nbf, 'number')
+        assert.strictEqual(typeof assertion.jti, 'string')
         const header = jose.decodeProtectedHeader(params.get('client_assertion')!)
-        t.is(header.kid, 'keyId')
+        assert.strictEqual(header.kid, 'keyId')
 
         return true
       },
@@ -203,20 +196,19 @@ test('private_key_jwt ({ key: CryptoKey, kid: string })', async (t) => {
   await lib.revocationRequest(
     tIssuer,
     client,
-    lib.PrivateKeyJwt({ key: t.context.ES256.privateKey, kid: 'keyId' }),
+    lib.PrivateKeyJwt({ key: context.ES256.privateKey, kid: 'keyId' }),
     'token',
   )
-  t.throws(() => lib.PrivateKeyJwt({ key: t.context.ES256.publicKey, kid: 'keyId' }), {
+  assert.throws(() => lib.PrivateKeyJwt({ key: context.ES256.publicKey, kid: 'keyId' }), {
     message: '"clientPrivateKey.key" must be a private CryptoKey',
   })
-  t.throws(() => lib.PrivateKeyJwt({ key: t.context.ES256.publicKey, kid: 123 as any }), {
+  assert.throws(() => lib.PrivateKeyJwt({ key: context.ES256.publicKey, kid: 123 as any }), {
     message: '"kid" must be a string',
   })
-  t.pass()
 })
 
-test('none', async (t) => {
-  t.context
+test('none', async () => {
+  context
     .intercept({
       path: '/test-none',
       method: 'POST',
@@ -236,17 +228,16 @@ test('none', async (t) => {
     lib.None(),
     'token',
   )
-  t.pass()
 })
 
-test('client_secret_jwt', async (t) => {
+test('client_secret_jwt', async () => {
   const tIssuer = {
     ...issuer,
     revocation_endpoint: endpoint('test-csjwt-1'),
     token_endpoint: endpoint('token'),
   }
 
-  t.context
+  context
     .intercept({
       path: '/test-csjwt-1',
       method: 'POST',
@@ -255,25 +246,25 @@ test('client_secret_jwt', async (t) => {
       },
       body(body) {
         const params = new URLSearchParams(body)
-        t.false(params.has('client_secret'))
-        t.true(params.has('client_assertion'))
-        t.is(params.get('client_id'), client.client_id)
-        t.is(
+        assert.strictEqual(params.has('client_secret'), false)
+        assert.strictEqual(params.has('client_assertion'), true)
+        assert.strictEqual(params.get('client_id'), client.client_id)
+        assert.strictEqual(
           params.get('client_assertion_type'),
           'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
         )
 
         const assertion = jose.decodeJwt(params.get('client_assertion')!)
-        t.is(assertion.aud, tIssuer.issuer)
-        t.is(assertion.iss, client.client_id)
-        t.is(assertion.sub, client.client_id)
-        t.is(typeof assertion.exp, 'number')
-        t.is(typeof assertion.iat, 'number')
-        t.is(typeof assertion.nbf, 'number')
-        t.is(typeof assertion.jti, 'string')
+        assert.strictEqual(assertion.aud, tIssuer.issuer)
+        assert.strictEqual(assertion.iss, client.client_id)
+        assert.strictEqual(assertion.sub, client.client_id)
+        assert.strictEqual(typeof assertion.exp, 'number')
+        assert.strictEqual(typeof assertion.iat, 'number')
+        assert.strictEqual(typeof assertion.nbf, 'number')
+        assert.strictEqual(typeof assertion.jti, 'string')
         const header = jose.decodeProtectedHeader(params.get('client_assertion')!)
-        t.is(header.kid, undefined)
-        t.is(header.alg, 'HS256')
+        assert.strictEqual(header.kid, undefined)
+        assert.strictEqual(header.alg, 'HS256')
 
         return true
       },
@@ -281,5 +272,4 @@ test('client_secret_jwt', async (t) => {
     .reply(200, '')
 
   await lib.revocationRequest(tIssuer, client, lib.ClientSecretJwt('client_secret'), 'token')
-  t.pass()
 })

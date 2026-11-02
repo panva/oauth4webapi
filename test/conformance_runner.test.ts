@@ -1,8 +1,10 @@
-import { mkdtempSync, readFileSync, rmSync } from 'node:fs'
+import test from 'node:test'
+import assert from 'node:assert/strict'
+import { execFile } from 'node:child_process'
+import { promisify } from 'node:util'
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-
-import test from 'ava'
 
 import { downloadArtifact } from '../conformance/api.js'
 import {
@@ -18,35 +20,65 @@ import {
   formatReportSummary,
   getReportStatusPath,
   missingHandlerMessage,
-  normalizeAvaTestTitle,
   reportIssues,
   reportRequested,
   requestReport,
   setActionEnvironment,
 } from '../conformance/report.js'
 
-test('AVA afterEach hook titles identify the affected test', (t) => {
-  t.is(
-    normalizeAvaTestTitle(
-      'afterEach.always hook for missing conformance handler: newly-exposed-test',
-    ),
-    'missing conformance handler: newly-exposed-test',
+test('conformance failures are recorded before the final archive test', async (t) => {
+  const directory = mkdtempSync(join(tmpdir(), 'oauth4webapi-native-report-test-'))
+  t.after(() => rmSync(directory, { recursive: true, force: true }))
+  const failedModule = join(directory, 'failed-module.mjs')
+  const archive = join(directory, 'archive.mjs')
+  const launcher = join(directory, 'launcher.mjs')
+  const status = join(directory, 'status')
+  const archivedStatus = join(directory, 'archived-status')
+  const title = 'missing conformance handler: newly-exposed-test'
+
+  writeFileSync(
+    failedModule,
+    `import test from 'node:test'
+test(${JSON.stringify(title)}, () => { throw new Error('missing handler') })`,
   )
-  t.is(normalizeAvaTestTitle('ordinary test title'), 'ordinary test title')
+  writeFileSync(
+    archive,
+    `import test from 'node:test'
+import { readFileSync, writeFileSync } from 'node:fs'
+test('archive', () => {
+  writeFileSync(${JSON.stringify(archivedStatus)}, readFileSync(${JSON.stringify(status)}))
+})`,
+  )
+
+  writeFileSync(
+    launcher,
+    `import { runTests } from ${JSON.stringify(new URL('../conformance/execute.js', import.meta.url).href)}
+for await (const event of runTests(${JSON.stringify([failedModule, archive])}, ${JSON.stringify(status)})) {}`,
+  )
+  const env = { ...process.env }
+  delete env.NODE_TEST_CONTEXT
+  await promisify(execFile)(process.execPath, [launcher], { env })
+  assert.ok(
+    reportIssues(status).some((issue) => issue.type === 'failure' && issue.detail === title),
+  )
+  assert.match(readFileSync(archivedStatus, 'utf8'), /newly-exposed-test/)
 })
 
-test('conformance module response type filtering', (t) => {
-  t.false(isRunnableModule({ variant: { response_type: 'code token' } }))
-  t.false(isRunnableModule({ variant: { response_type: 'code id_token token' } }))
-  t.true(isRunnableModule({ variant: { response_type: 'code' } }))
-  t.true(isRunnableModule({ variant: null }))
+test('conformance module response type filtering', () => {
+  assert.strictEqual(isRunnableModule({ variant: { response_type: 'code token' } }), false)
+  assert.strictEqual(isRunnableModule({ variant: { response_type: 'code id_token token' } }), false)
+  assert.strictEqual(isRunnableModule({ variant: { response_type: 'code' } }), true)
+  assert.strictEqual(isRunnableModule({ variant: null }), true)
 
   const excluded = { variant: { response_type: 'code token' } }
-  t.false(isDiscoverableModule('oidcc-client-test-plan', excluded))
-  t.true(isDiscoverableModule('fapi2-security-profile-final-client-test-plan', excluded))
+  assert.strictEqual(isDiscoverableModule('oidcc-client-test-plan', excluded), false)
+  assert.strictEqual(
+    isDiscoverableModule('fapi2-security-profile-final-client-test-plan', excluded),
+    true,
+  )
 })
 
-test('known unsupported OIDC conformance modules are skipped', (t) => {
+test('known unsupported OIDC conformance modules are skipped', () => {
   for (const name of [
     'aggregated-claims',
     'discovery-jwks-uri-keys',
@@ -58,45 +90,57 @@ test('known unsupported OIDC conformance modules are skipped', (t) => {
     'signing-key-rotation-just-before-signing',
     'userinfo-bearer-body',
   ]) {
-    t.true(isSkippedUnhandledModule('oidcc-client-test-plan', name), name)
-    t.false(isSkippedUnhandledModule('fapi2-security-profile-final-client-test-plan', name), name)
+    assert.strictEqual(isSkippedUnhandledModule('oidcc-client-test-plan', name), true, name)
+    assert.strictEqual(
+      isSkippedUnhandledModule('fapi2-security-profile-final-client-test-plan', name),
+      false,
+      name,
+    )
   }
-  t.false(isSkippedUnhandledModule('oidcc-client-test-plan', 'newly-exposed-test'))
-  t.false(isSkippedUnhandledModule('oidcc-client-test-plan', 'discovery-issuer-mismatch'))
-  t.false(
+  assert.strictEqual(
+    isSkippedUnhandledModule('oidcc-client-test-plan', 'newly-exposed-test'),
+    false,
+  )
+  assert.strictEqual(
+    isSkippedUnhandledModule('oidcc-client-test-plan', 'discovery-issuer-mismatch'),
+    false,
+  )
+  assert.strictEqual(
     isSkippedUnhandledModule(
       'fapi2-security-profile-final-client-test-plan',
       'rs-dpop-auth-scheme-case-insensitivity',
     ),
+    false,
   )
 })
 
-test('conformance diagnostics file is always sorted last', (t) => {
+test('conformance diagnostics file is always sorted last', () => {
   const files = [
     '/repo/conformance/z-last-handler.ts',
     '/repo/conformance/download_archive.ts',
     '/repo/conformance/a-first-handler.ts',
   ]
-  t.deepEqual(files.sort(sortConformanceTestFiles), [
+  assert.deepStrictEqual(files.sort(sortConformanceTestFiles), [
     '/repo/conformance/a-first-handler.ts',
     '/repo/conformance/z-last-handler.ts',
     '/repo/conformance/download_archive.ts',
   ])
 
-  t.true(
+  assert.strictEqual(
     sortConformanceTestFiles(
       'C:\\repo\\conformance\\download_archive.ts',
       'C:\\repo\\conformance\\handler.ts',
     ) > 0,
+    true,
   )
 })
 
-test('conformance module handlers', (t) => {
-  t.deepEqual(getModuleHandler('oidcc-client-test-new-test'), {
+test('conformance module handlers', () => {
+  assert.deepStrictEqual(getModuleHandler('oidcc-client-test-new-test'), {
     name: 'new-test',
     path: './conformance/modules/new-test.ts',
   })
-  t.deepEqual(getModuleHandler('fapi2-message-signing-final-client-test-new-test'), {
+  assert.deepStrictEqual(getModuleHandler('fapi2-message-signing-final-client-test-new-test'), {
     name: 'new-test',
     path: './conformance/modules/new-test.ts',
   })
@@ -104,53 +148,56 @@ test('conformance module handlers', (t) => {
     name: 'discovery-issuer-mismatch',
     path: './conformance/modules/discovery-issuer-mismatch.ts',
   }
-  t.deepEqual(
+  assert.deepStrictEqual(
     getModuleHandler('oidcc-client-test-discovery-issuer-mismatch'),
     discoveryIssuerMismatch,
   )
-  t.deepEqual(
+  assert.deepStrictEqual(
     getModuleHandler('fapi2-security-profile-final-client-test-discovery-issuer-mismatch'),
     discoveryIssuerMismatch,
   )
-  t.throws(() => getModuleHandler('oidcc-client-test-../../malicious'), {
+  assert.throws(() => getModuleHandler('oidcc-client-test-../../malicious'), {
     message: 'unsafe conformance module handler name: ../../malicious',
   })
-  t.throws(() => getModuleHandler('oidcc-client-test-.hidden'), {
+  assert.throws(() => getModuleHandler('oidcc-client-test-.hidden'), {
     message: 'unsafe conformance module handler name: .hidden',
   })
 })
 
-test('conformance identifiers', (t) => {
-  t.is(assertSafeIdentifier('abc-123_DEF'), 'abc-123_DEF')
-  t.true(getReportStatusPath('abc-123').endsWith('oauth4webapi-conformance-abc-123.report'))
+test('conformance identifiers', () => {
+  assert.strictEqual(assertSafeIdentifier('abc-123_DEF'), 'abc-123_DEF')
+  assert.strictEqual(
+    getReportStatusPath('abc-123').endsWith('oauth4webapi-conformance-abc-123.report'),
+    true,
+  )
   for (const value of ['', '../plan', 'plan.id', 'plan/child', `plan\nnext`]) {
-    t.throws(() => assertSafeIdentifier(value, 'plan.id'), {
+    assert.throws(() => assertSafeIdentifier(value, 'plan.id'), {
       message: 'plan.id is not a safe identifier',
     })
   }
 })
 
-test('artifact download rejects unsafe plan identifiers before fetching', async (t) => {
-  await t.throwsAsync(downloadArtifact({ id: '../plan', name: 'plan-name', modules: [] }), {
+test('artifact download rejects unsafe plan identifiers before fetching', async () => {
+  await assert.rejects(downloadArtifact({ id: '../plan', name: 'plan-name', modules: [] }), {
     message: 'plan.id is not a safe identifier',
   })
 })
 
-test('missing conformance module handler message', (t) => {
-  t.is(
+test('missing conformance module handler message', () => {
+  assert.strictEqual(
     missingHandlerMessage('new-test', './conformance/modules/new-test.ts'),
     'The conformance suite exposed a new test module named "new-test", but no handler exists at ./conformance/modules/new-test.ts',
   )
 })
 
-test.serial('artifact download rejects an unsuccessful response before writing', async (t) => {
+test('artifact download rejects an unsuccessful response before writing', async (t) => {
   const originalFetch = globalThis.fetch
   globalThis.fetch = async () => new Response('download failed', { status: 500 })
-  t.teardown(() => {
+  t.after(() => {
     globalThis.fetch = originalFetch
   })
 
-  await t.throwsAsync(downloadArtifact({ id: 'plan-id', name: 'plan-name', modules: [] }), {
+  await assert.rejects(downloadArtifact({ id: 'plan-id', name: 'plan-name', modules: [] }), {
     message: 'download failed',
   })
 })
@@ -158,15 +205,15 @@ test.serial('artifact download rejects an unsuccessful response before writing',
 test('conformance issue report', (t) => {
   const directory = mkdtempSync(join(tmpdir(), 'oauth4webapi-conformance-test-'))
   const path = join(directory, 'report')
-  t.teardown(() => rmSync(directory, { recursive: true, force: true }))
+  t.after(() => rmSync(directory, { recursive: true, force: true }))
 
   requestReport(path, { type: 'warning', detail: 'warning-test' })
   requestReport(path, { type: 'failure', detail: 'failure-test' })
   requestReport(path, { type: 'failure', detail: 'failure-test' })
 
-  t.true(reportRequested(path))
+  assert.strictEqual(reportRequested(path), true)
   const issues = reportIssues(path)
-  t.deepEqual(issues, [
+  assert.deepStrictEqual(issues, [
     { type: 'warning', detail: 'warning-test' },
     { type: 'failure', detail: 'failure-test' },
   ])
@@ -176,34 +223,37 @@ test('conformance issue report', (t) => {
     { response_type: 'code' },
     issues,
   )
-  t.true(summary.startsWith('## ❌ Conformance failure'))
-  t.true(summary.includes('- Plan: `plan-name`'))
-  t.true(summary.includes('- Plan ID: `plan-id`'))
-  t.true(summary.includes('<summary>Variant</summary>'))
-  t.true(summary.includes('"response_type": "code"'))
-  t.true(summary.endsWith('### Affected tests\n\n- `warning-test`\n- `failure-test`'))
+  assert.strictEqual(summary.startsWith('## ❌ Conformance failure'), true)
+  assert.strictEqual(summary.includes('- Plan: `plan-name`'), true)
+  assert.strictEqual(summary.includes('- Plan ID: `plan-id`'), true)
+  assert.strictEqual(summary.includes('<summary>Variant</summary>'), true)
+  assert.strictEqual(summary.includes('"response_type": "code"'), true)
+  assert.strictEqual(
+    summary.endsWith('### Affected tests\n\n- `warning-test`\n- `failure-test`'),
+    true,
+  )
 
   clearReportRequest(path)
-  t.false(reportRequested(path))
+  assert.strictEqual(reportRequested(path), false)
 })
 
-test('warning-only conformance report', (t) => {
+test('warning-only conformance report', () => {
   const summary = formatReportSummary({ id: 'plan`id\r', name: 'plan`name\nnext' }, {}, [
     { type: 'warning', detail: 'warning`test\r\nnext-line' },
   ])
-  t.true(summary.startsWith('## ⚠️ Conformance warning'))
-  t.true(summary.includes("- Plan: `plan'name next`"))
-  t.true(summary.includes("- Plan ID: `plan'id `"))
-  t.true(summary.endsWith("### Affected tests\n\n- `warning'test next-line`"))
-  t.false(summary.includes('\r'))
+  assert.strictEqual(summary.startsWith('## ⚠️ Conformance warning'), true)
+  assert.strictEqual(summary.includes("- Plan: `plan'name next`"), true)
+  assert.strictEqual(summary.includes("- Plan ID: `plan'id `"), true)
+  assert.strictEqual(summary.endsWith("### Affected tests\n\n- `warning'test next-line`"), true)
+  assert.strictEqual(summary.includes('\r'), false)
 })
 
-test.serial('GitHub Actions environment values', (t) => {
+test('GitHub Actions environment values', (t) => {
   const directory = mkdtempSync(join(tmpdir(), 'oauth4webapi-actions-test-'))
   const path = join(directory, 'environment')
   const previous = process.env.GITHUB_ENV
   process.env.GITHUB_ENV = path
-  t.teardown(() => {
+  t.after(() => {
     if (previous === undefined) {
       delete process.env.GITHUB_ENV
     } else {
@@ -213,12 +263,12 @@ test.serial('GitHub Actions environment values', (t) => {
   })
 
   setActionEnvironment('VALID_NAME', 'single-line')
-  t.is(readFileSync(path, 'utf8'), 'VALID_NAME=single-line\n')
-  t.throws(() => setActionEnvironment('INVALID-NAME', 'value'), {
+  assert.strictEqual(readFileSync(path, 'utf8'), 'VALID_NAME=single-line\n')
+  assert.throws(() => setActionEnvironment('INVALID-NAME', 'value'), {
     message: 'invalid GitHub Actions environment variable name',
   })
   for (const value of ['line\nnext', 'line\rnext']) {
-    t.throws(() => setActionEnvironment('VALID_NAME', value), {
+    assert.throws(() => setActionEnvironment('VALID_NAME', value), {
       message: 'GitHub Actions environment variable value must be single-line',
     })
   }

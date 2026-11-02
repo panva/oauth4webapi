@@ -1,4 +1,3 @@
-import type { ExecutionContext } from 'ava'
 import * as undici from 'undici'
 import * as jose from 'jose'
 
@@ -14,23 +13,22 @@ export interface Context {
   intercept: InstanceType<typeof undici.MockPool>['intercept']
 }
 
-export default (origin: string = identifier) =>
-  (t: ExecutionContext<Context>) => {
-    const mockAgent = new undici.MockAgent()
-    mockAgent.disableNetConnect()
-    undici.setGlobalDispatcher(mockAgent)
-    const pool = mockAgent.get(origin)
+export default (context: Context, origin: string = identifier) => {
+  const mockAgent = new undici.MockAgent()
+  mockAgent.disableNetConnect()
+  undici.setGlobalDispatcher(mockAgent)
+  const pool = mockAgent.get(origin)
 
-    t.context.mock ||= mockAgent
-    t.context.intercept ||= undici.MockPool.prototype.intercept.bind(pool)
-  }
+  context.mock ||= mockAgent
+  context.intercept ||= undici.MockPool.prototype.intercept.bind(pool)
+}
 
-export async function setupContextKeys(t: ExecutionContext<ContextWithAlgs>) {
-  t.context.ES256 = await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, [
+export async function setupContextKeys(context: ContextWithAlgs) {
+  context.ES256 = await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, [
     'sign',
     'verify',
   ])
-  t.context.RS256 = await crypto.subtle.generateKey(
+  context.RS256 = await crypto.subtle.generateKey(
     {
       name: 'RSASSA-PKCS1-v1_5',
       hash: 'SHA-256',
@@ -44,10 +42,10 @@ export async function setupContextKeys(t: ExecutionContext<ContextWithAlgs>) {
 
 const coinflip = () => !Math.floor(Math.random() * 2)
 
-export async function setupJwks(t: ExecutionContext<ContextWithAlgs>) {
-  await setupContextKeys(t)
+export async function setupJwks(context: ContextWithAlgs) {
+  await setupContextKeys(context)
 
-  t.context
+  context
     .intercept({
       path: '/jwks',
       method: 'GET',
@@ -56,8 +54,8 @@ export async function setupJwks(t: ExecutionContext<ContextWithAlgs>) {
       200,
       {
         keys: [
-          await jose.exportJWK(t.context.ES256.publicKey).then((jwk) => ({ ...jwk, alg: 'ES256' })),
-          await jose.exportJWK(t.context.RS256.publicKey).then((jwk) => ({ ...jwk, alg: 'RS256' })),
+          await jose.exportJWK(context.ES256.publicKey).then((jwk) => ({ ...jwk, alg: 'ES256' })),
+          await jose.exportJWK(context.RS256.publicKey).then((jwk) => ({ ...jwk, alg: 'RS256' })),
         ],
       },
       {
@@ -67,12 +65,12 @@ export async function setupJwks(t: ExecutionContext<ContextWithAlgs>) {
     .persist()
 }
 
-export async function teardown(t: ExecutionContext<Context>) {
-  const pending = t.context.mock.pendingInterceptors()
+export async function teardown(context: Context) {
+  const pending = context.mock.pendingInterceptors()
   if (!(pending.length === 1 && pending[0].persist === true)) {
-    t.context.mock.assertNoPendingInterceptors()
+    context.mock.assertNoPendingInterceptors()
   }
-  await t.context.mock.close()
+  await context.mock.close()
 }
 
 const identifier = 'https://op.example.com'

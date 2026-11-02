@@ -1,4 +1,7 @@
-import anyTest, { type TestFn } from 'ava'
+import test, { before, after } from 'node:test'
+import assert from 'node:assert/strict'
+import { captureRejection } from './_errors.js'
+
 import setup, {
   type Context,
   teardown,
@@ -10,15 +13,15 @@ import setup, {
 } from './_setup.js'
 import * as lib from './_lib.js'
 
-const test = anyTest as TestFn<Context>
+const context = {} as Context
 
-test.before(setup())
-test.after(teardown)
+before(() => setup(context))
+after(() => teardown(context))
 
 const tClient: lib.Client = { ...client, client_secret: 'foo' }
 
-test('clientCredentialsGrantRequest()', async (t) => {
-  await t.throwsAsync(
+test('clientCredentialsGrantRequest()', async () => {
+  await assert.rejects(
     lib.clientCredentialsGrantRequest(issuer, tClient, lib.None(), new URLSearchParams()),
     {
       message: 'authorization server metadata does not contain a valid "as.token_endpoint"',
@@ -26,7 +29,7 @@ test('clientCredentialsGrantRequest()', async (t) => {
     },
   )
 
-  await t.throwsAsync(
+  await assert.rejects(
     lib.clientCredentialsGrantRequest(
       { ...issuer, token_endpoint: '' },
       tClient,
@@ -44,7 +47,7 @@ test('clientCredentialsGrantRequest()', async (t) => {
     token_endpoint: endpoint('token-1'),
   }
 
-  t.context
+  context
     .intercept({
       path: '/token-1',
       method: 'POST',
@@ -63,7 +66,7 @@ test('clientCredentialsGrantRequest()', async (t) => {
     .reply(200, { access_token: 'token', token_type: 'Bearer' })
     .times(3)
 
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.clientCredentialsGrantRequest(
       tIssuer,
       tClient,
@@ -71,25 +74,25 @@ test('clientCredentialsGrantRequest()', async (t) => {
       new URLSearchParams({ resource: 'urn:example:resource' }),
     ),
   )
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.clientCredentialsGrantRequest(tIssuer, tClient, lib.None(), {
       resource: 'urn:example:resource',
     }),
   )
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.clientCredentialsGrantRequest(tIssuer, tClient, lib.None(), [
       ['resource', 'urn:example:resource'],
     ]),
   )
 })
 
-test('clientCredentialsGrantRequest() w/ Extra Parameters', async (t) => {
+test('clientCredentialsGrantRequest() w/ Extra Parameters', async () => {
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
     token_endpoint: endpoint('token-2'),
   }
 
-  t.context
+  context
     .intercept({
       path: '/token-2',
       method: 'POST',
@@ -100,7 +103,7 @@ test('clientCredentialsGrantRequest() w/ Extra Parameters', async (t) => {
     })
     .reply(200, { access_token: 'token', token_type: 'Bearer' })
 
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.clientCredentialsGrantRequest(
       tIssuer,
       tClient,
@@ -110,13 +113,13 @@ test('clientCredentialsGrantRequest() w/ Extra Parameters', async (t) => {
   )
 })
 
-test('clientCredentialsGrantRequest() w/ Custom Headers', async (t) => {
+test('clientCredentialsGrantRequest() w/ Custom Headers', async () => {
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
     token_endpoint: endpoint('token-headers'),
   }
 
-  t.context
+  context
     .intercept({
       path: '/token-headers',
       method: 'POST',
@@ -139,7 +142,7 @@ test('clientCredentialsGrantRequest() w/ Custom Headers', async (t) => {
     Object.fromEntries(entries),
     new Headers(Object.fromEntries(entries)),
   ]) {
-    await t.notThrowsAsync(
+    await assert.doesNotReject(
       lib.clientCredentialsGrantRequest(tIssuer, tClient, lib.None(), new URLSearchParams(), {
         headers,
       }),
@@ -147,13 +150,13 @@ test('clientCredentialsGrantRequest() w/ Custom Headers', async (t) => {
   }
 })
 
-test('clientCredentialsGrantRequest() w/ DPoP', async (t) => {
+test('clientCredentialsGrantRequest() w/ DPoP', async () => {
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
     token_endpoint: endpoint('token-3'),
   }
 
-  t.context
+  context
     .intercept({
       path: '/token-3',
       method: 'POST',
@@ -164,33 +167,33 @@ test('clientCredentialsGrantRequest() w/ DPoP', async (t) => {
     .reply(200, { access_token: 'token', token_type: 'DPoP' })
 
   const DPoP = lib.DPoP(tClient, await lib.generateKeyPair('ES256'))
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.clientCredentialsGrantRequest(tIssuer, tClient, lib.None(), new URLSearchParams(), {
       DPoP,
     }),
   )
 })
 
-test('processClientCredentialsResponse()', async (t) => {
-  await t.throwsAsync(lib.processClientCredentialsResponse(issuer, client, null as any), {
+test('processClientCredentialsResponse()', async () => {
+  await assert.rejects(lib.processClientCredentialsResponse(issuer, client, null as any), {
     message: '"response" must be an instance of Response',
   })
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processClientCredentialsResponse(issuer, client, getResponse('', { status: 404 })),
     {
       message: '"response" is not a conform Token Endpoint response (unexpected HTTP status code)',
     },
   )
-  await t.throwsAsync(lib.processClientCredentialsResponse(issuer, client, getResponse('{"')), {
+  await assert.rejects(lib.processClientCredentialsResponse(issuer, client, getResponse('{"')), {
     message: 'failed to parse "response" body as JSON',
   })
-  await t.throwsAsync(lib.processClientCredentialsResponse(issuer, client, getResponse('null')), {
+  await assert.rejects(lib.processClientCredentialsResponse(issuer, client, getResponse('null')), {
     message: '"response" body must be a top level object',
   })
-  await t.throwsAsync(lib.processClientCredentialsResponse(issuer, client, getResponse('[]')), {
+  await assert.rejects(lib.processClientCredentialsResponse(issuer, client, getResponse('[]')), {
     message: '"response" body must be a top level object',
   })
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processClientCredentialsResponse(
       issuer,
       client,
@@ -200,7 +203,7 @@ test('processClientCredentialsResponse()', async (t) => {
       message: '"response" body "access_token" property must be a string',
     },
   )
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processClientCredentialsResponse(
       issuer,
       client,
@@ -210,7 +213,7 @@ test('processClientCredentialsResponse()', async (t) => {
       message: '"response" body "token_type" property must be a string',
     },
   )
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processClientCredentialsResponse(
       issuer,
       client,
@@ -227,7 +230,7 @@ test('processClientCredentialsResponse()', async (t) => {
     },
   )
 
-  t.deepEqual(
+  assert.deepStrictEqual(
     await lib.processClientCredentialsResponse(
       issuer,
       client,
@@ -240,19 +243,21 @@ test('processClientCredentialsResponse()', async (t) => {
     },
   )
 
-  const err = await t.throwsAsync(
+  const err = await captureRejection(
     lib.processClientCredentialsResponse(
       issuer,
       client,
       getResponse(JSON.stringify({ error: 'invalid_grant' }), { status: 400 }),
     ),
+    Error,
   )
 
-  t.true(
+  assert.strictEqual(
     err instanceof lib.ResponseBodyError &&
       err.error === 'invalid_grant' &&
       err.status === 400 &&
       err.response.bodyUsed === true,
+    true,
   )
 
   await lib.processClientCredentialsResponse(

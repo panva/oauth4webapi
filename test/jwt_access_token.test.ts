@@ -1,4 +1,7 @@
-import test from 'ava'
+import test from 'node:test'
+import assert from 'node:assert/strict'
+import { captureRejection } from './_errors.js'
+
 import * as jose from 'jose'
 import * as lib from './_lib.js'
 
@@ -9,7 +12,7 @@ async function accessTokenHash(accessToken: string): Promise<string> {
   return Buffer.from(digest).toString('base64url')
 }
 
-test('validateJwtAccessToken() rejects DPoP proofs missing jwk', async (t) => {
+test('validateJwtAccessToken() rejects DPoP proofs missing jwk', async () => {
   const asKey = await lib.generateKeyPair('ES256', { extractable: true })
   const proofKey = await lib.generateKeyPair('ES256')
   const now = Math.floor(Date.now() / 1000)
@@ -49,24 +52,25 @@ test('validateJwtAccessToken() rejects DPoP proofs missing jwk', async (t) => {
     },
   })
 
-  const err = await t.throwsAsync(
+  const err = await captureRejection(
     lib.validateJwtAccessToken(as, request, 'https://rs.example.com', {
       [lib.customFetch]: async () =>
         new Response(JSON.stringify({ keys: [{ ...publicJwk, alg: 'ES256' }] }), {
           headers: { 'content-type': 'application/json' },
         }),
     }),
-    {
-      instanceOf: lib.OperationProcessingError,
-      message: 'DPoP Proof jwk header parameter must be a JSON object',
+    (error) => {
+      assert.ok(error instanceof lib.OperationProcessingError)
+      assert.strictEqual(error.message, 'DPoP Proof jwk header parameter must be a JSON object')
+      return true
     },
   )
 
-  t.is(err?.code, lib.INVALID_RESPONSE)
+  assert.strictEqual(err?.code, lib.INVALID_RESPONSE)
 })
 
 for (const scheme of ['Bearer', 'DPoP']) {
-  test(`validateJwtAccessToken() ${scheme} Authorization whitespace`, async (testContext) => {
+  test(`validateJwtAccessToken() ${scheme} Authorization whitespace`, async () => {
     const asKey = await lib.generateKeyPair('ES256', { extractable: true })
     const proofKey = await lib.generateKeyPair('ES256')
     const publicJwk = await jose.exportJWK(asKey.publicKey)
@@ -118,15 +122,15 @@ for (const scheme of ['Bearer', 'DPoP']) {
 
     for (const separator of [' ', '  ', '   ']) {
       const claims = await validate(`${scheme}${separator}${accessToken}`)
-      testContext.is(claims.sub, 'sub')
+      assert.strictEqual(claims.sub, 'sub')
     }
-    await testContext.throwsAsync(validate(`${scheme}\t${accessToken}`), {
+    await assert.rejects(validate(`${scheme}\t${accessToken}`), {
       message: 'unsupported Authorization HTTP Header scheme',
     })
-    await testContext.throwsAsync(validate(`${scheme} \t ${accessToken}`), {
+    await assert.rejects(validate(`${scheme} \t ${accessToken}`), {
       message: 'invalid Authorization HTTP Header format',
     })
-    await testContext.throwsAsync(validate(`${scheme} ${accessToken} extra`), {
+    await assert.rejects(validate(`${scheme} ${accessToken} extra`), {
       message: 'invalid Authorization HTTP Header format',
     })
   })

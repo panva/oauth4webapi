@@ -1,12 +1,10 @@
-import anyTest from 'ava'
-import type { Macro, TestFn } from 'ava'
+import assert from 'node:assert/strict'
+import nativeTest, { type TestContext } from 'node:test'
 import { importJWK, type JWK, compactDecrypt } from 'jose'
 import * as undici from 'undici'
-import { inspect } from 'node:util'
+import { inspect, formatWithOptions } from 'node:util'
 
-export const test = anyTest as TestFn<{ instance: Test }>
-
-import { getScope, makePublicJwks } from './ava.config.js'
+import { getScope, makePublicJwks } from './config.js'
 import * as oauth from '../src/index.js'
 import {
   createTestFromPlan,
@@ -17,7 +15,7 @@ import {
   type Test,
 } from './api.js'
 import { isRunnableModule } from './modules.js'
-import { normalizeAvaTestTitle, requestReport } from './report.js'
+import { requestReport } from './report.js'
 
 const conformance = JSON.parse(process.env.CONFORMANCE!)
 
@@ -45,14 +43,28 @@ export const mtls: { key: string; cert: string } = conformance.mtls || {}
 export const reportStatusPath: string = conformance.reportStatusPath
 export const unhandledModules: Array<{ name: string; path: string }> = conformance.unhandledModules
 
-test.afterEach.always((t) => {
-  if (!t.passed) {
-    requestReport(reportStatusPath, {
-      type: 'failure',
-      detail: normalizeAvaTestTitle(t.title),
-    })
-  }
-})
+interface FlowState {
+  instance?: Test
+}
+
+interface ConformanceFlow<Args extends unknown[] = []> {
+  exec(t: TestContext, state: FlowState, module: ModulePrescription, ...args: Args): Promise<void>
+  title(module: ModulePrescription): string
+}
+
+function diagnostic(t: TestContext, ...values: unknown[]) {
+  t.diagnostic(formatWithOptions({ depth: Infinity }, ...values))
+}
+
+export function run<Args extends unknown[]>(
+  flow: ConformanceFlow<Args>,
+  module: ModulePrescription,
+  ...args: Args
+) {
+  nativeTest(flow.title(module), { timeout: 15000, concurrency: false }, (t) =>
+    flow.exec(t, {}, module, ...args),
+  )
+}
 
 let prefix = ''
 
@@ -161,27 +173,25 @@ function responseType(planName: string, variant: Record<string, string>) {
   return variant.fapi_response_mode === 'jarm' ? 'code' : 'code id_token'
 }
 
-interface MacroOptions {
+export interface FlowOptions {
   useNonce?: boolean
   useState?: boolean
 }
 
-export const flow = (options?: MacroOptions) => {
-  return test.macro({
-    async exec(t, module: ModulePrescription) {
-      t.timeout(15000)
-
+export const flow = (options?: FlowOptions): ConformanceFlow => {
+  return {
+    async exec(t, context, module) {
       const instance = await createTestFromPlan(plan, module)
-      t.context.instance = instance
+      context.instance = instance
 
-      t.log('Test ID', instance.id)
-      t.log('Test Name', instance.name)
+      diagnostic(t, 'Test ID', instance.id)
+      diagnostic(t, 'Test Name', instance.name)
 
       const variant: Record<string, string> = {
         ...conformance.variant,
         ...module.variant,
       }
-      t.log('variant', variant)
+      diagnostic(t, 'variant', variant)
 
       const { issuer: issuerIdentifier, accounts_endpoint } = await getTestExposed(instance)
 
@@ -195,7 +205,7 @@ export const flow = (options?: MacroOptions) => {
         .discoveryRequest(issuer)
         .then((response) => oauth.processDiscoveryResponse(issuer, response))
 
-      t.log('AS Metadata discovered for', as.issuer)
+      diagnostic(t, 'AS Metadata discovered for', as.issuer)
 
       const response_type = responseType(plan.name, variant)
       let client!: oauth.Client
@@ -423,7 +433,11 @@ export const flow = (options?: MacroOptions) => {
       }
 
       if (usesPar(plan)) {
-        t.log('PAR request with', Object.fromEntries(authorizationUrl.searchParams.entries()))
+        diagnostic(
+          t,
+          'PAR request with',
+          Object.fromEntries(authorizationUrl.searchParams.entries()),
+        )
         const request = () =>
           oauth.pushedAuthorizationRequest(as, client, clientAuth, authorizationUrl.searchParams, {
             ...clientAuthOptions('par'),
@@ -436,8 +450,8 @@ export const flow = (options?: MacroOptions) => {
           result = await oauth.processPushedAuthorizationResponse(as, client, par)
         } catch (err) {
           if (DPoPKeyPair && oauth.isDPoPNonceError(err)) {
-            t.log('error', inspect(err, { depth: Infinity }))
-            t.log('retrying with a newly obtained dpop nonce')
+            diagnostic(t, 'error', inspect(err, { depth: Infinity }))
+            diagnostic(t, 'retrying with a newly obtained dpop nonce')
             par = await request()
             result = await oauth.processPushedAuthorizationResponse(as, client, par)
           } else {
@@ -445,7 +459,7 @@ export const flow = (options?: MacroOptions) => {
           }
         }
 
-        t.log('PAR response', { ...result })
+        diagnostic(t, 'PAR response', { ...result })
         authorizationUrl = new URL(as.authorization_endpoint!)
         authorizationUrl.searchParams.set('client_id', client.client_id)
         authorizationUrl.searchParams.set('request_uri', result.request_uri)
@@ -453,7 +467,7 @@ export const flow = (options?: MacroOptions) => {
 
       await Promise.allSettled([fetch(authorizationUrl.href, { redirect: 'manual' })])
 
-      t.log('redirect with', Object.fromEntries(authorizationUrl.searchParams.entries()))
+      diagnostic(t, 'redirect with', Object.fromEntries(authorizationUrl.searchParams.entries()))
 
       const { authorization_endpoint_response_redirect } = await getTestExposed(instance)
       if (!authorization_endpoint_response_redirect) {
@@ -515,7 +529,7 @@ export const flow = (options?: MacroOptions) => {
           )
         }
 
-        t.log('parsed callback parameters', Object.fromEntries(params.entries()))
+        diagnostic(t, 'parsed callback parameters', Object.fromEntries(params.entries()))
 
         const request = () =>
           oauth.authorizationCodeGrantRequest(
@@ -542,8 +556,8 @@ export const flow = (options?: MacroOptions) => {
           })
         } catch (err) {
           if (DPoPKeyPair && oauth.isDPoPNonceError(err)) {
-            t.log('error', inspect(err, { depth: Infinity }))
-            t.log('retrying with a newly obtained dpop nonce')
+            diagnostic(t, 'error', inspect(err, { depth: Infinity }))
+            diagnostic(t, 'retrying with a newly obtained dpop nonce')
             response = await request()
             result = await oauth.processAuthorizationCodeResponse(as, client, response, {
               [oauth.jweDecrypt]: decrypt,
@@ -559,11 +573,11 @@ export const flow = (options?: MacroOptions) => {
           await oauth.validateApplicationLevelSignature(as, response)
         }
 
-        t.log('token endpoint response body', { ...result })
+        diagnostic(t, 'token endpoint response body', { ...result })
         ;({ access_token } = result)
         const claims = oauth.getValidatedIdTokenClaims(result)
         if (claims) {
-          t.log('ID Token Claims', claims)
+          diagnostic(t, 'ID Token Claims', claims)
           ;({ sub } = claims)
         }
       }
@@ -571,7 +585,7 @@ export const flow = (options?: MacroOptions) => {
       if (!plan.name.startsWith('fapi1') && scope.includes('openid') && as.userinfo_endpoint) {
         // fetch userinfo response
         const request = () => {
-          t.log('fetching', as.userinfo_endpoint)
+          diagnostic(t, 'fetching', as.userinfo_endpoint)
           return oauth.userInfoRequest(as, client, access_token, {
             ...clientAuthOptions('userinfo'),
             DPoP,
@@ -583,16 +597,16 @@ export const flow = (options?: MacroOptions) => {
           result = await oauth.processUserInfoResponse(as, client, sub!, response, {
             [oauth.jweDecrypt]: decrypt,
           })
-          t.log('userinfo endpoint response', { ...result })
+          diagnostic(t, 'userinfo endpoint response', { ...result })
         } catch (err) {
-          t.log('error', inspect(err, { depth: Infinity }))
+          diagnostic(t, 'error', inspect(err, { depth: Infinity }))
           if (DPoPKeyPair && oauth.isDPoPNonceError(err)) {
-            t.log('retrying with a newly obtained dpop nonce')
+            diagnostic(t, 'retrying with a newly obtained dpop nonce')
             response = await request()
             result = await oauth.processUserInfoResponse(as, client, sub!, response, {
               [oauth.jweDecrypt]: decrypt,
             })
-            t.log('userinfo endpoint response', { ...result })
+            diagnostic(t, 'userinfo endpoint response', { ...result })
           } else {
             throw err
           }
@@ -601,7 +615,7 @@ export const flow = (options?: MacroOptions) => {
 
       if (accounts_endpoint) {
         const request = () => {
-          t.log('fetching', accounts_endpoint)
+          diagnostic(t, 'fetching', accounts_endpoint)
           return oauth.protectedResourceRequest(
             access_token,
             'GET',
@@ -620,9 +634,9 @@ export const flow = (options?: MacroOptions) => {
         try {
           accounts = await request()
         } catch (err) {
-          t.log('error', inspect(err, { depth: Infinity }))
+          diagnostic(t, 'error', inspect(err, { depth: Infinity }))
           if (DPoPKeyPair && oauth.isDPoPNonceError(err)) {
-            t.log('retrying with a newly obtained dpop nonce')
+            diagnostic(t, 'retrying with a newly obtained dpop nonce')
             accounts = await request()
           } else {
             throw err
@@ -631,65 +645,63 @@ export const flow = (options?: MacroOptions) => {
 
         const result = await accounts.text()
         try {
-          t.log('accounts endpoint response', JSON.parse(result))
+          diagnostic(t, 'accounts endpoint response', JSON.parse(result))
         } catch {
-          t.log('accounts endpoint response body', result)
+          diagnostic(t, 'accounts endpoint response body', result)
         }
       }
 
       await waitForResult(instance)
       if (module.skipLogTestFinished !== true) {
-        t.log('Test Finished')
+        diagnostic(t, 'Test Finished')
       }
-      t.pass()
     },
-    title(providedTitle = '', module: ModulePrescription) {
+    title(module) {
       if (module.variant) {
-        return `${providedTitle}${plan.name} (${plan.id}) - ${module.testModule} - ${JSON.stringify(
+        return `${plan.name} (${plan.id}) - ${module.testModule} - ${JSON.stringify(
           module.variant,
         )}`
       }
-      return `${providedTitle}${plan.name} (${plan.id}) - ${module.testModule}`
+      return `${plan.name} (${plan.id}) - ${module.testModule}`
     },
-  })
+  }
 }
 
-export const rejects = (macro: Macro<[module: ModulePrescription], { instance: Test }>) => {
-  return test.macro({
-    async exec(
-      t,
-      module: ModulePrescription,
-      expectedMessage?: string | RegExp,
-      expectedErrorName: string = 'OperationProcessingError',
-    ) {
-      await t
-        .throwsAsync(() => macro.exec(t, { ...module, skipLogTestFinished: true }) as any, {
-          message: expectedMessage,
-          name: expectedErrorName,
-        })
-        .then((err) => {
-          if (err) {
-            t.log('rejected with', inspect(err, { depth: Infinity }))
+export const rejects = (
+  flow: ConformanceFlow,
+): ConformanceFlow<[expectedMessage?: string | RegExp, expectedErrorName?: string]> => ({
+  async exec(t, context, module, expectedMessage, expectedErrorName = 'OperationProcessingError') {
+    await assert.rejects(
+      () => flow.exec(t, context, { ...module, skipLogTestFinished: true }),
+      (error: unknown) => {
+        assert.ok(error instanceof Error, 'expected an Error instance')
+        assert.strictEqual(error.name, expectedErrorName)
+        if (expectedMessage !== undefined) {
+          if (typeof expectedMessage === 'string') {
+            assert.strictEqual(error.message, expectedMessage)
+          } else {
+            assert.match(error.message, expectedMessage)
           }
-        })
+        }
+        diagnostic(t, 'rejected with', inspect(error, { depth: Infinity }))
+        return true
+      },
+    )
 
-      await waitForResult(t.context.instance)
-      t.log('Test Finished')
-      t.pass()
-    },
-    title: macro.title as any,
-  })
-}
+    assert.ok(context.instance, 'expected a conformance test instance')
+    await waitForResult(context.instance)
+    diagnostic(t, 'Test Finished')
+  },
+  title: flow.title,
+})
 
-export const skippable = (macro: Macro<[module: ModulePrescription], { instance: Test }>) => {
-  return test.macro({
-    async exec(t, module: ModulePrescription) {
-      await Promise.allSettled([macro.exec(t, { ...module, skipLogTestFinished: true })])
+export const skippable = (flow: ConformanceFlow): ConformanceFlow => ({
+  async exec(t, context, module) {
+    await Promise.allSettled([flow.exec(t, context, { ...module, skipLogTestFinished: true })])
 
-      await waitForResult(t.context.instance, { results: new Set(['SKIPPED', 'PASSED']) })
-      t.log('Test Finished')
-      t.pass()
-    },
-    title: macro.title as any,
-  })
-}
+    assert.ok(context.instance, 'expected a conformance test instance')
+    await waitForResult(context.instance, { results: new Set(['SKIPPED', 'PASSED']) })
+    diagnostic(t, 'Test Finished')
+  },
+  title: flow.title,
+})

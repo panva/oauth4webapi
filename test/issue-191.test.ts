@@ -1,6 +1,7 @@
+import test from 'node:test'
+import assert from 'node:assert/strict'
 // see https://github.com/panva/oauth4webapi/issues/191
 
-import test from 'ava'
 import { issuer, client, getResponse } from './_setup.js'
 import * as lib from './_lib.js'
 
@@ -21,14 +22,14 @@ const errorResponse = () =>
     status: 400,
   })
 
-test('only checks www-authenticate when the status code is invalid', async (t) => {
+test('only checks www-authenticate when the status code is invalid', async () => {
   for (const req of [
     lib.processAuthorizationCodeResponse(issuer, client, questionableResponse()),
     lib.processDeviceCodeResponse(issuer, client, questionableResponse()),
     lib.processClientCredentialsResponse(issuer, client, questionableResponse()),
     lib.processRefreshTokenResponse(issuer, client, questionableResponse()),
   ]) {
-    await t.notThrowsAsync(() => req)
+    await assert.doesNotReject(() => req)
   }
 
   for (const req of [
@@ -37,6 +38,6 @@ test('only checks www-authenticate when the status code is invalid', async (t) =
     lib.processClientCredentialsResponse(issuer, client, errorResponse()),
     lib.processRefreshTokenResponse(issuer, client, errorResponse()),
   ]) {
-    await t.throwsAsync(() => req, { code: 'OAUTH_WWW_AUTHENTICATE_CHALLENGE' })
+    await assert.rejects(() => req, { code: 'OAUTH_WWW_AUTHENTICATE_CHALLENGE' })
   }
 })

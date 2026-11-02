@@ -1,15 +1,17 @@
-import anyTest, { type TestFn } from 'ava'
+import test, { before, after } from 'node:test'
+import assert from 'node:assert/strict'
+
 import setup, { type Context, teardown, issuer, getResponse, UA } from './_setup.js'
 import * as lib from './_lib.js'
 
-const test = anyTest as TestFn<Context>
+const context = {} as Context
 
-test.before(setup())
-test.after(teardown)
+before(() => setup(context))
+after(() => teardown(context))
 
-test('discoveryRequest()', async (t) => {
+test('discoveryRequest()', async () => {
   const data = { ...issuer }
-  t.context
+  context
     .intercept({
       path: '/.well-known/openid-configuration',
       method: 'GET',
@@ -21,12 +23,12 @@ test('discoveryRequest()', async (t) => {
     .reply(200, data)
 
   const response = await lib.discoveryRequest(new URL(issuer.issuer))
-  t.true(response instanceof lib.Response)
+  assert.strictEqual(response instanceof lib.Response, true)
 })
 
-test('discoveryRequest() w/ Custom Headers', async (t) => {
+test('discoveryRequest() w/ Custom Headers', async () => {
   const data = { ...issuer }
-  t.context
+  context
     .intercept({
       path: '/.well-known/openid-configuration',
       method: 'GET',
@@ -50,13 +52,13 @@ test('discoveryRequest() w/ Custom Headers', async (t) => {
     new Headers(Object.fromEntries(entries)),
   ]) {
     const response = await lib.discoveryRequest(new URL(issuer.issuer), { headers })
-    t.true(response instanceof lib.Response)
+    assert.strictEqual(response instanceof lib.Response, true)
   }
 })
 
-test('discoveryRequest() - oidc with a pathname', async (t) => {
+test('discoveryRequest() - oidc with a pathname', async () => {
   const data = { issuer: 'https://op.example.com/path' }
-  t.context
+  context
     .intercept({
       path: '/path/.well-known/openid-configuration',
       method: 'GET',
@@ -65,12 +67,11 @@ test('discoveryRequest() - oidc with a pathname', async (t) => {
 
   const url = new URL(data.issuer)
   await lib.discoveryRequest(url, { algorithm: 'oidc' })
-  t.pass()
 })
 
-test('discoveryRequest() - oauth2', async (t) => {
+test('discoveryRequest() - oauth2', async () => {
   const data = { ...issuer }
-  t.context
+  context
     .intercept({
       path: '/.well-known/oauth-authorization-server',
       method: 'GET',
@@ -79,12 +80,11 @@ test('discoveryRequest() - oauth2', async (t) => {
 
   const url = new URL(issuer.issuer)
   await lib.discoveryRequest(url, { algorithm: 'oauth2' })
-  t.pass()
 })
 
-test('discoveryRequest() - oauth2 with a pathname', async (t) => {
+test('discoveryRequest() - oauth2 with a pathname', async () => {
   const data = { issuer: 'https://op.example.com/path' }
-  t.context
+  context
     .intercept({
       path: '/.well-known/oauth-authorization-server/path',
       method: 'GET',
@@ -93,12 +93,11 @@ test('discoveryRequest() - oauth2 with a pathname', async (t) => {
 
   const url = new URL(data.issuer)
   await lib.discoveryRequest(url, { algorithm: 'oauth2' })
-  t.pass()
 })
 
-test('discoveryRequest() - oauth2 with a pathname and issuer terminating "/"', async (t) => {
+test('discoveryRequest() - oauth2 with a pathname and issuer terminating "/"', async () => {
   const data = { issuer: 'https://op.example.com/path/' }
-  t.context
+  context
     .intercept({
       path: '/.well-known/oauth-authorization-server/path',
       method: 'GET',
@@ -107,40 +106,39 @@ test('discoveryRequest() - oauth2 with a pathname and issuer terminating "/"', a
 
   const url = new URL(data.issuer)
   await lib.discoveryRequest(url, { algorithm: 'oauth2' })
-  t.pass()
 })
 
-test('processDiscoveryResponse()', async (t) => {
+test('processDiscoveryResponse()', async () => {
   const expected = new URL('https://op.example.com')
 
-  await t.throwsAsync(lib.processDiscoveryResponse(expected, null as any), {
+  await assert.rejects(lib.processDiscoveryResponse(expected, null as any), {
     message: '"response" must be an instance of Response',
   })
-  await t.throwsAsync(lib.processDiscoveryResponse(null as any, new Response()), {
+  await assert.rejects(lib.processDiscoveryResponse(null as any, new Response()), {
     message: '"expectedIssuerIdentifier" must be an instance of URL',
   })
-  await t.throwsAsync(lib.processDiscoveryResponse(expected, getResponse('', { status: 404 })), {
+  await assert.rejects(lib.processDiscoveryResponse(expected, getResponse('', { status: 404 })), {
     message:
       '"response" is not a conform Authorization Server Metadata response (unexpected HTTP status code)',
   })
-  await t.throwsAsync(lib.processDiscoveryResponse(expected, getResponse('{"')), {
+  await assert.rejects(lib.processDiscoveryResponse(expected, getResponse('{"')), {
     message: 'failed to parse "response" body as JSON',
   })
-  await t.throwsAsync(lib.processDiscoveryResponse(expected, getResponse('null')), {
+  await assert.rejects(lib.processDiscoveryResponse(expected, getResponse('null')), {
     message: '"response" body must be a top level object',
   })
-  await t.throwsAsync(lib.processDiscoveryResponse(expected, getResponse('[]')), {
+  await assert.rejects(lib.processDiscoveryResponse(expected, getResponse('[]')), {
     message: '"response" body must be a top level object',
   })
 
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processDiscoveryResponse(expected, getResponse(JSON.stringify({ issuer: null }))),
     {
       message: '"response" body "issuer" property must be a string',
     },
   )
 
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processDiscoveryResponse(
       expected,
       getResponse(JSON.stringify({ issuer: 'https://another-op.example.com' })),
@@ -148,7 +146,7 @@ test('processDiscoveryResponse()', async (t) => {
     { message: '"response" body "issuer" property does not match the expected value' },
   )
 
-  t.deepEqual(
+  assert.deepStrictEqual(
     await lib.processDiscoveryResponse(
       expected,
       getResponse(JSON.stringify({ issuer: 'https://op.example.com' })),

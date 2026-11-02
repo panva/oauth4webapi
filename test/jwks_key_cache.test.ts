@@ -1,14 +1,16 @@
-import anyTest, { type TestFn } from 'ava'
+import test, { before, after } from 'node:test'
+import assert from 'node:assert/strict'
+
 import * as jose from 'jose'
 import timekeeper from 'timekeeper'
 import setup, { client, endpoint, getResponse, issuer, teardown, type Context } from './_setup.js'
 import * as lib from './_lib.js'
 import { mangleJwtSignature } from './_tools.js'
 
-const test = anyTest as TestFn<Context>
+const context = {} as Context
 
-test.before(setup())
-test.after(teardown)
+before(() => setup(context))
+after(() => teardown(context))
 
 async function fixture(alg = 'ES256') {
   const keyPair = await lib.generateKeyPair(alg, { extractable: true })
@@ -59,7 +61,7 @@ async function verificationKey(verify: () => Promise<unknown>): Promise<lib.Cryp
   throw new Error('expected signature verification to fail')
 }
 
-test('issuer verification keys are shared across concurrent and repeated validations', async (testContext) => {
+test('issuer verification keys are shared across concurrent and repeated validations', async () => {
   const context = await fixture()
   const token = await context.sign()
   const invalid = mangleJwtSignature(token)
@@ -68,18 +70,18 @@ test('issuer verification keys are shared across concurrent and repeated validat
     Array.from({ length: 8 }, () => verificationKey(() => context.validate(invalid, cache))),
   )
 
-  testContext.is(context.requests(), 1)
-  testContext.is(keys[0].type, 'public')
+  assert.strictEqual(context.requests(), 1)
+  assert.strictEqual(keys[0].type, 'public')
   for (const key of keys) {
-    testContext.is(key, keys[0])
+    assert.strictEqual(key, keys[0])
   }
-  testContext.is(await verificationKey(() => context.validate(invalid)), keys[0])
-  testContext.is((await context.validate(token)).get('code'), 'code')
-  testContext.deepEqual(cache.jwks, context.jwks)
-  testContext.deepEqual(JSON.parse(JSON.stringify(cache)), cache)
+  assert.strictEqual(await verificationKey(() => context.validate(invalid)), keys[0])
+  assert.strictEqual((await context.validate(token)).get('code'), 'code')
+  assert.deepStrictEqual(cache.jwks, context.jwks)
+  assert.deepStrictEqual(JSON.parse(JSON.stringify(cache)), cache)
 })
 
-test('the same RSA JWK is cached separately for each signing algorithm', async (testContext) => {
+test('the same RSA JWK is cached separately for each signing algorithm', async () => {
   const context = await fixture('RS256')
   const privateJwk = await jose.exportJWK(context.keyPair.privateKey)
   const pssKey = await jose.importJWK(privateJwk, 'PS256')
@@ -90,17 +92,17 @@ test('the same RSA JWK is cached separately for each signing algorithm', async (
   const rsaPublic = await verificationKey(() => context.validate(rsaInvalid))
   const pssPublic = await verificationKey(() => context.validate(pssInvalid))
 
-  testContext.not(rsaPublic, pssPublic)
-  testContext.is(rsaPublic.algorithm.name, 'RSASSA-PKCS1-v1_5')
-  testContext.is(pssPublic.algorithm.name, 'RSA-PSS')
-  testContext.is(await verificationKey(() => context.validate(rsaInvalid)), rsaPublic)
-  testContext.is(await verificationKey(() => context.validate(pssInvalid)), pssPublic)
-  await testContext.notThrowsAsync(context.validate(rsaToken))
-  await testContext.notThrowsAsync(context.validate(pssToken))
-  testContext.is(context.requests(), 1)
+  assert.notStrictEqual(rsaPublic, pssPublic)
+  assert.strictEqual(rsaPublic.algorithm.name, 'RSASSA-PKCS1-v1_5')
+  assert.strictEqual(pssPublic.algorithm.name, 'RSA-PSS')
+  assert.strictEqual(await verificationKey(() => context.validate(rsaInvalid)), rsaPublic)
+  assert.strictEqual(await verificationKey(() => context.validate(pssInvalid)), pssPublic)
+  await assert.doesNotReject(context.validate(rsaToken))
+  await assert.doesNotReject(context.validate(pssToken))
+  assert.strictEqual(context.requests(), 1)
 })
 
-test('failed JWK imports are not cached', async (testContext) => {
+test('failed JWK imports are not cached', async () => {
   const context = await fixture()
   const token = await context.sign()
   const jwk = { ...context.jwks.keys[0], x: 'invalid' }
@@ -109,20 +111,20 @@ test('failed JWK imports are not cached', async (testContext) => {
     jwks: { keys: [jwk] },
   }
 
-  await testContext.throwsAsync(context.validate(token, cache), {
-    any: true,
-    instanceOf: DOMException,
-    name: 'DataError',
+  await assert.rejects(context.validate(token, cache), (error) => {
+    assert.ok(error instanceof DOMException)
+    assert.strictEqual(error.name, 'DataError')
+    return true
   })
   jwk.x = context.jwks.keys[0].x!
-  await testContext.notThrowsAsync(context.validate(token, cache))
-  testContext.is(context.requests(), 0)
+  await assert.doesNotReject(context.validate(token, cache))
+  assert.strictEqual(context.requests(), 0)
 })
 
-test.serial('refreshing JWKS replaces cached verification keys', async (testContext) => {
+test('refreshing JWKS replaces cached verification keys', async (testContext) => {
   const now = Date.now()
   timekeeper.freeze(now)
-  testContext.teardown(() => timekeeper.reset())
+  testContext.after(() => timekeeper.reset())
   const context = await fixture()
   const originalToken = await context.sign()
   const originalKey = await verificationKey(() =>
@@ -135,10 +137,10 @@ test.serial('refreshing JWKS replaces cached verification keys', async (testCont
   const rotatedToken = await context.sign(rotated.privateKey)
   const rotatedKey = await verificationKey(() => context.validate(mangleJwtSignature(rotatedToken)))
 
-  testContext.not(rotatedKey, originalKey)
-  testContext.is(context.requests(), 2)
-  await testContext.notThrowsAsync(context.validate(rotatedToken))
-  await testContext.throwsAsync(context.validate(originalToken), {
+  assert.notStrictEqual(rotatedKey, originalKey)
+  assert.strictEqual(context.requests(), 2)
+  await assert.doesNotReject(context.validate(rotatedToken))
+  await assert.rejects(context.validate(originalToken), {
     message: 'JWT signature verification failed',
   })
 })

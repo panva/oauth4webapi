@@ -1,4 +1,7 @@
-import anyTest, { type TestFn } from 'ava'
+import test, { before, after } from 'node:test'
+import assert from 'node:assert/strict'
+import { captureRejection } from './_errors.js'
+
 import setup, {
   client,
   endpoint,
@@ -13,20 +16,20 @@ import * as jose from 'jose'
 import * as lib from './_lib.js'
 import * as tools from './_tools.js'
 
-const test = anyTest as TestFn<ContextWithAlgs>
+const context = {} as ContextWithAlgs
 
-test.before(setup())
-test.after(teardown)
-test.before(setupJwks)
+before(() => setup(context))
+after(() => teardown(context))
+before(() => setupJwks(context))
 
 const tClient: lib.Client = { ...client }
 
-test('refreshTokenGrantRequest()', async (t) => {
-  await t.throwsAsync(lib.refreshTokenGrantRequest(issuer, tClient, lib.None(), 'refresh_token'), {
+test('refreshTokenGrantRequest()', async () => {
+  await assert.rejects(lib.refreshTokenGrantRequest(issuer, tClient, lib.None(), 'refresh_token'), {
     message: 'authorization server metadata does not contain a valid "as.token_endpoint"',
   })
 
-  await t.throwsAsync(lib.refreshTokenGrantRequest(issuer, tClient, lib.None(), null as any), {
+  await assert.rejects(lib.refreshTokenGrantRequest(issuer, tClient, lib.None(), null as any), {
     message: '"refreshToken" must be a string',
   })
 
@@ -35,7 +38,7 @@ test('refreshTokenGrantRequest()', async (t) => {
     token_endpoint: endpoint('token-1'),
   }
 
-  t.context
+  context
     .intercept({
       path: '/token-1',
       method: 'POST',
@@ -53,18 +56,18 @@ test('refreshTokenGrantRequest()', async (t) => {
     })
     .reply(200, { access_token: 'token', token_type: 'Bearer' })
 
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.refreshTokenGrantRequest(tIssuer, tClient, lib.None(), 'refresh_token'),
   )
 })
 
-test('refreshTokenGrantRequest() w/ Extra Parameters', async (t) => {
+test('refreshTokenGrantRequest() w/ Extra Parameters', async () => {
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
     token_endpoint: endpoint('token-2'),
   }
 
-  t.context
+  context
     .intercept({
       path: '/token-2',
       method: 'POST',
@@ -76,13 +79,13 @@ test('refreshTokenGrantRequest() w/ Extra Parameters', async (t) => {
     .reply(200, { access_token: 'token', token_type: 'Bearer' })
     .times(3)
 
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.refreshTokenGrantRequest(tIssuer, tClient, lib.None(), 'refresh_token', {
       additionalParameters: new URLSearchParams('resource=urn:example:resource'),
     }),
   )
 
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.refreshTokenGrantRequest(tIssuer, tClient, lib.None(), 'refresh_token', {
       additionalParameters: {
         resource: 'urn:example:resource',
@@ -90,20 +93,20 @@ test('refreshTokenGrantRequest() w/ Extra Parameters', async (t) => {
     }),
   )
 
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.refreshTokenGrantRequest(tIssuer, tClient, lib.None(), 'refresh_token', {
       additionalParameters: [['resource', 'urn:example:resource']],
     }),
   )
 })
 
-test('refreshTokenGrantRequest() w/ Custom Headers', async (t) => {
+test('refreshTokenGrantRequest() w/ Custom Headers', async () => {
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
     token_endpoint: endpoint('token-headers'),
   }
 
-  t.context
+  context
     .intercept({
       path: '/token-headers',
       method: 'POST',
@@ -127,19 +130,19 @@ test('refreshTokenGrantRequest() w/ Custom Headers', async (t) => {
     Object.fromEntries(entries),
     new Headers(Object.fromEntries(entries)),
   ]) {
-    await t.notThrowsAsync(
+    await assert.doesNotReject(
       lib.refreshTokenGrantRequest(tIssuer, tClient, lib.None(), 'refresh_token', { headers }),
     )
   }
 })
 
-test('refreshTokenGrantRequest() w/ DPoP', async (t) => {
+test('refreshTokenGrantRequest() w/ DPoP', async () => {
   const tIssuer: lib.AuthorizationServer = {
     ...issuer,
     token_endpoint: endpoint('token-3'),
   }
 
-  t.context
+  context
     .intercept({
       path: '/token-3',
       method: 'POST',
@@ -150,31 +153,31 @@ test('refreshTokenGrantRequest() w/ DPoP', async (t) => {
     .reply(200, { access_token: 'token', token_type: 'DPoP' })
 
   const DPoP = lib.DPoP(tClient, await lib.generateKeyPair('ES256'))
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.refreshTokenGrantRequest(tIssuer, tClient, lib.None(), 'refresh_token', { DPoP }),
   )
 })
 
-test('processRefreshTokenResponse() without ID Tokens', async (t) => {
-  await t.throwsAsync(lib.processRefreshTokenResponse(issuer, client, null as any), {
+test('processRefreshTokenResponse() without ID Tokens', async () => {
+  await assert.rejects(lib.processRefreshTokenResponse(issuer, client, null as any), {
     message: '"response" must be an instance of Response',
   })
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processRefreshTokenResponse(issuer, client, getResponse('', { status: 404 })),
     {
       message: '"response" is not a conform Token Endpoint response (unexpected HTTP status code)',
     },
   )
-  await t.throwsAsync(lib.processRefreshTokenResponse(issuer, client, getResponse('{"')), {
+  await assert.rejects(lib.processRefreshTokenResponse(issuer, client, getResponse('{"')), {
     message: 'failed to parse "response" body as JSON',
   })
-  await t.throwsAsync(lib.processRefreshTokenResponse(issuer, client, getResponse('null')), {
+  await assert.rejects(lib.processRefreshTokenResponse(issuer, client, getResponse('null')), {
     message: '"response" body must be a top level object',
   })
-  await t.throwsAsync(lib.processRefreshTokenResponse(issuer, client, getResponse('[]')), {
+  await assert.rejects(lib.processRefreshTokenResponse(issuer, client, getResponse('[]')), {
     message: '"response" body must be a top level object',
   })
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processRefreshTokenResponse(
       issuer,
       client,
@@ -184,7 +187,7 @@ test('processRefreshTokenResponse() without ID Tokens', async (t) => {
       message: '"response" body "access_token" property must be a string',
     },
   )
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processRefreshTokenResponse(
       issuer,
       client,
@@ -194,7 +197,7 @@ test('processRefreshTokenResponse() without ID Tokens', async (t) => {
       message: '"response" body "token_type" property must be a string',
     },
   )
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processRefreshTokenResponse(
       issuer,
       client,
@@ -210,7 +213,7 @@ test('processRefreshTokenResponse() without ID Tokens', async (t) => {
       message: '"response" body "expires_in" property must be a number',
     },
   )
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processRefreshTokenResponse(
       issuer,
       client,
@@ -220,7 +223,7 @@ test('processRefreshTokenResponse() without ID Tokens', async (t) => {
       message: '"response" body "scope" property must be a string',
     },
   )
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processRefreshTokenResponse(
       issuer,
       client,
@@ -232,7 +235,7 @@ test('processRefreshTokenResponse() without ID Tokens', async (t) => {
       message: '"response" body "refresh_token" property must be a string',
     },
   )
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processRefreshTokenResponse(
       issuer,
       client,
@@ -257,7 +260,7 @@ test('processRefreshTokenResponse() without ID Tokens', async (t) => {
     ),
   )
 
-  t.deepEqual(response, {
+  assert.deepStrictEqual(response, {
     access_token: 'token',
     token_type: 'bearer',
     expires_in: 60,
@@ -265,21 +268,23 @@ test('processRefreshTokenResponse() without ID Tokens', async (t) => {
     refresh_token: 'refresh_token',
   })
 
-  t.is(lib.getValidatedIdTokenClaims(response), undefined)
+  assert.strictEqual(lib.getValidatedIdTokenClaims(response), undefined)
 
-  const err = await t.throwsAsync(
+  const err = await captureRejection(
     lib.processRefreshTokenResponse(
       issuer,
       client,
       getResponse(JSON.stringify({ error: 'invalid_grant' }), { status: 400 }),
     ),
+    Error,
   )
 
-  t.true(
+  assert.strictEqual(
     err instanceof lib.ResponseBodyError &&
       err.error === 'invalid_grant' &&
       err.status === 400 &&
       err.response.bodyUsed === true,
+    true,
   )
 
   await lib.processRefreshTokenResponse(
@@ -289,8 +294,8 @@ test('processRefreshTokenResponse() without ID Tokens', async (t) => {
   )
 })
 
-test('processRefreshTokenResponse() - ignores signatures', async (t) => {
-  await t.notThrowsAsync(
+test('processRefreshTokenResponse() - ignores signatures', async () => {
+  await assert.doesNotReject(
     lib
       .processRefreshTokenResponse(
         { ...issuer, id_token_signing_alg_values_supported: ['ES256'] },
@@ -307,21 +312,21 @@ test('processRefreshTokenResponse() - ignores signatures', async (t) => {
                 .setAudience(client.client_id)
                 .setExpirationTime('5m')
                 .setIssuedAt()
-                .sign(t.context.ES256.privateKey),
+                .sign(context.ES256.privateKey),
             ),
           }),
         ),
       )
       .then(async (result) => {
-        t.assert(lib.getValidatedIdTokenClaims(result))
+        assert.ok(lib.getValidatedIdTokenClaims(result))
       }),
   )
 })
 
-test('processRefreshTokenResponse() with an ID Token (alg signalled)', async (t) => {
+test('processRefreshTokenResponse() with an ID Token (alg signalled)', async () => {
   const tIssuer: lib.AuthorizationServer = { ...issuer, jwks_uri: endpoint('jwks') }
 
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib
       .processRefreshTokenResponse(
         { ...tIssuer, id_token_signing_alg_values_supported: ['ES256'] },
@@ -337,13 +342,13 @@ test('processRefreshTokenResponse() with an ID Token (alg signalled)', async (t)
               .setAudience(client.client_id)
               .setExpirationTime('5m')
               .setIssuedAt()
-              .sign(t.context.ES256.privateKey),
+              .sign(context.ES256.privateKey),
           }),
         ),
       )
       .then(async (result) => {
-        t.assert(lib.getValidatedIdTokenClaims(result))
-        t.throws(() => lib.getValidatedIdTokenClaims({ ...result }), {
+        assert.ok(lib.getValidatedIdTokenClaims(result))
+        assert.throws(() => lib.getValidatedIdTokenClaims({ ...result }), {
           name: 'TypeError',
           message: '"ref" was already garbage collected or did not resolve from the proper sources',
         })
@@ -351,10 +356,10 @@ test('processRefreshTokenResponse() with an ID Token (alg signalled)', async (t)
   )
 })
 
-test('processRefreshTokenResponse() with an ID Token (alg specified)', async (t) => {
+test('processRefreshTokenResponse() with an ID Token (alg specified)', async () => {
   const tIssuer: lib.AuthorizationServer = { ...issuer, jwks_uri: endpoint('jwks') }
 
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.processRefreshTokenResponse(
       tIssuer,
       { ...client, id_token_signed_response_alg: 'ES256' },
@@ -369,17 +374,17 @@ test('processRefreshTokenResponse() with an ID Token (alg specified)', async (t)
             .setAudience(client.client_id)
             .setExpirationTime('5m')
             .setIssuedAt()
-            .sign(t.context.ES256.privateKey),
+            .sign(context.ES256.privateKey),
         }),
       ),
     ),
   )
 })
 
-test('processRefreshTokenResponse() with an ID Token (alg default)', async (t) => {
+test('processRefreshTokenResponse() with an ID Token (alg default)', async () => {
   const tIssuer: lib.AuthorizationServer = { ...issuer, jwks_uri: endpoint('jwks') }
 
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.processRefreshTokenResponse(
       tIssuer,
       client,
@@ -394,17 +399,17 @@ test('processRefreshTokenResponse() with an ID Token (alg default)', async (t) =
             .setAudience(client.client_id)
             .setExpirationTime('5m')
             .setIssuedAt()
-            .sign(t.context.RS256.privateKey),
+            .sign(context.RS256.privateKey),
         }),
       ),
     ),
   )
 })
 
-test('processRefreshTokenResponse() with an ID Token (alg mismatches)', async (t) => {
+test('processRefreshTokenResponse() with an ID Token (alg mismatches)', async () => {
   const tIssuer: lib.AuthorizationServer = { ...issuer, jwks_uri: endpoint('jwks') }
 
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processRefreshTokenResponse(
       tIssuer,
       client,
@@ -419,7 +424,7 @@ test('processRefreshTokenResponse() with an ID Token (alg mismatches)', async (t
             .setAudience(client.client_id)
             .setExpirationTime('5m')
             .setIssuedAt()
-            .sign(t.context.ES256.privateKey),
+            .sign(context.ES256.privateKey),
         }),
       ),
     ),
@@ -428,7 +433,7 @@ test('processRefreshTokenResponse() with an ID Token (alg mismatches)', async (t
     },
   )
 
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processRefreshTokenResponse(
       {
         ...tIssuer,
@@ -446,7 +451,7 @@ test('processRefreshTokenResponse() with an ID Token (alg mismatches)', async (t
             .setAudience(client.client_id)
             .setExpirationTime('5m')
             .setIssuedAt()
-            .sign(t.context.ES256.privateKey),
+            .sign(context.ES256.privateKey),
         }),
       ),
     ),
@@ -455,7 +460,7 @@ test('processRefreshTokenResponse() with an ID Token (alg mismatches)', async (t
     },
   )
 
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processRefreshTokenResponse(
       tIssuer,
       {
@@ -473,7 +478,7 @@ test('processRefreshTokenResponse() with an ID Token (alg mismatches)', async (t
             .setAudience(client.client_id)
             .setExpirationTime('5m')
             .setIssuedAt()
-            .sign(t.context.ES256.privateKey),
+            .sign(context.ES256.privateKey),
         }),
       ),
     ),

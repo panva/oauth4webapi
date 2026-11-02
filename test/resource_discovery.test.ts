@@ -1,17 +1,19 @@
-import anyTest, { type TestFn } from 'ava'
+import test, { before, after } from 'node:test'
+import assert from 'node:assert/strict'
+
 import setup, { type Context, teardown, getResponse, UA } from './_setup.js'
 import * as lib from './_lib.js'
 
-const test = anyTest as TestFn<Context>
+const context = {} as Context
 
 const resource = 'https://rs.example.com'
 
-test.before(setup(resource))
-test.after(teardown)
+before(() => setup(context, resource))
+after(() => teardown(context))
 const data = { resource }
 
-test('resourceDiscoveryRequest()', async (t) => {
-  t.context
+test('resourceDiscoveryRequest()', async () => {
+  context
     .intercept({
       path: '/.well-known/oauth-protected-resource',
       method: 'GET',
@@ -23,11 +25,11 @@ test('resourceDiscoveryRequest()', async (t) => {
     .reply(200, data)
 
   const response = await lib.resourceDiscoveryRequest(new URL(resource))
-  t.true(response instanceof lib.Response)
+  assert.strictEqual(response instanceof lib.Response, true)
 })
 
-test('resourceDiscoveryRequest() w/ Custom Headers', async (t) => {
-  t.context
+test('resourceDiscoveryRequest() w/ Custom Headers', async () => {
+  context
     .intercept({
       path: '/.well-known/oauth-protected-resource',
       method: 'GET',
@@ -51,13 +53,13 @@ test('resourceDiscoveryRequest() w/ Custom Headers', async (t) => {
     new Headers(Object.fromEntries(entries)),
   ]) {
     const response = await lib.resourceDiscoveryRequest(new URL(resource), { headers })
-    t.true(response instanceof lib.Response)
+    assert.strictEqual(response instanceof lib.Response, true)
   }
 })
 
-test('resourceDiscoveryRequest() with a pathname', async (t) => {
+test('resourceDiscoveryRequest() with a pathname', async () => {
   const data = { resource: 'https://rs.example.com/path' }
-  t.context
+  context
     .intercept({
       path: '/.well-known/oauth-protected-resource/path',
       method: 'GET',
@@ -66,12 +68,11 @@ test('resourceDiscoveryRequest() with a pathname', async (t) => {
 
   const url = new URL(data.resource)
   await lib.resourceDiscoveryRequest(url)
-  t.pass()
 })
 
-test('resourceDiscoveryRequest() with a pathname and terminating "/"', async (t) => {
+test('resourceDiscoveryRequest() with a pathname and terminating "/"', async () => {
   const data = { resource: 'https://rs.example.com/path/' }
-  t.context
+  context
     .intercept({
       path: '/.well-known/oauth-protected-resource/path/',
       method: 'GET',
@@ -80,54 +81,53 @@ test('resourceDiscoveryRequest() with a pathname and terminating "/"', async (t)
 
   const url = new URL(data.resource)
   await lib.resourceDiscoveryRequest(url)
-  t.pass()
 })
 
-test('ResourceServer array metadata typings', (t) => {
+test('ResourceServer array metadata typings', () => {
   const metadata: lib.ResourceServer = {
     resource,
     authorization_details_types_supported: ['payment_initiation'],
     dpop_signing_alg_values_supported: ['ES256'],
   }
 
-  t.deepEqual(metadata.authorization_details_types_supported, ['payment_initiation'])
-  t.deepEqual(metadata.dpop_signing_alg_values_supported, ['ES256'])
+  assert.deepStrictEqual(metadata.authorization_details_types_supported, ['payment_initiation'])
+  assert.deepStrictEqual(metadata.dpop_signing_alg_values_supported, ['ES256'])
 })
 
-test('processResourceDiscoveryResponse()', async (t) => {
+test('processResourceDiscoveryResponse()', async () => {
   const expected = new URL(resource)
 
-  await t.throwsAsync(lib.processResourceDiscoveryResponse(expected, null as any), {
+  await assert.rejects(lib.processResourceDiscoveryResponse(expected, null as any), {
     message: '"response" must be an instance of Response',
   })
-  await t.throwsAsync(lib.processResourceDiscoveryResponse(null as any, new Response()), {
+  await assert.rejects(lib.processResourceDiscoveryResponse(null as any, new Response()), {
     message: '"expectedResourceIdentifier" must be an instance of URL',
   })
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processResourceDiscoveryResponse(expected, getResponse('', { status: 404 })),
     {
       message:
         '"response" is not a conform Resource Server Metadata response (unexpected HTTP status code)',
     },
   )
-  await t.throwsAsync(lib.processResourceDiscoveryResponse(expected, getResponse('{"')), {
+  await assert.rejects(lib.processResourceDiscoveryResponse(expected, getResponse('{"')), {
     message: 'failed to parse "response" body as JSON',
   })
-  await t.throwsAsync(lib.processResourceDiscoveryResponse(expected, getResponse('null')), {
+  await assert.rejects(lib.processResourceDiscoveryResponse(expected, getResponse('null')), {
     message: '"response" body must be a top level object',
   })
-  await t.throwsAsync(lib.processResourceDiscoveryResponse(expected, getResponse('[]')), {
+  await assert.rejects(lib.processResourceDiscoveryResponse(expected, getResponse('[]')), {
     message: '"response" body must be a top level object',
   })
 
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processResourceDiscoveryResponse(expected, getResponse(JSON.stringify({ resource: null }))),
     {
       message: '"response" body "resource" property must be a string',
     },
   )
 
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processResourceDiscoveryResponse(
       expected,
       getResponse(JSON.stringify({ resource: 'https://another-rs.example.com' })),
@@ -135,7 +135,7 @@ test('processResourceDiscoveryResponse()', async (t) => {
     { message: '"response" body "resource" property does not match the expected value' },
   )
 
-  t.deepEqual(
+  assert.deepStrictEqual(
     await lib.processResourceDiscoveryResponse(
       expected,
       getResponse(JSON.stringify({ resource: 'https://rs.example.com' })),

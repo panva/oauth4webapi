@@ -1,5 +1,6 @@
-import test from 'ava'
-import type { ExecutionContext } from 'ava'
+import test from 'node:test'
+import assert from 'node:assert/strict'
+
 import { getResponse, issuer, client, endpoint } from './_setup.js'
 import * as lib from './_lib.js'
 
@@ -9,7 +10,7 @@ function response(headers: Headers) {
 
 const name = 'www-authenticate'
 
-async function getWWWAuthenticateChallengeError(t: ExecutionContext, response: Response) {
+async function getWWWAuthenticateChallengeError(response: Response) {
   return lib
     .processUserInfoResponse(
       {
@@ -22,11 +23,11 @@ async function getWWWAuthenticateChallengeError(t: ExecutionContext, response: R
     )
     .then(
       () => {
-        t.fail('rejection expected')
+        assert.fail('rejection expected')
       },
       (err) => {
         if (err instanceof lib.WWWAuthenticateChallengeError) {
-          t.false(err.response.bodyUsed)
+          assert.strictEqual(err.response.bodyUsed, false)
           return err.cause
         }
 
@@ -503,13 +504,16 @@ const vectors = [
 ]
 
 for (const vector of vectors) {
-  test(`parseWwwAuthenticateChallenges() ${vector.description}`, async (t) => {
+  test(`parseWwwAuthenticateChallenges() ${vector.description}`, async () => {
     const headers = new Headers()
     headers.append(name, vector.header)
     if (vector.expected) {
-      t.deepEqual(await getWWWAuthenticateChallengeError(t, response(headers)), vector.expected)
+      assert.deepStrictEqual(
+        await getWWWAuthenticateChallengeError(response(headers)),
+        vector.expected,
+      )
     } else {
-      await t.throwsAsync(getWWWAuthenticateChallengeError(t, response(headers)), {
+      await assert.rejects(getWWWAuthenticateChallengeError(response(headers)), {
         code: 'OAUTH_RESPONSE_IS_NOT_CONFORM',
       })
     }

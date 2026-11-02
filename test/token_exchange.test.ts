@@ -1,4 +1,7 @@
-import anyTest, { type TestFn } from 'ava'
+import test, { before, after } from 'node:test'
+import assert from 'node:assert/strict'
+import { captureRejection } from './_errors.js'
+
 import setup, {
   type Context,
   teardown,
@@ -10,15 +13,15 @@ import setup, {
 } from './_setup.js'
 import * as lib from './_lib.js'
 
-const test = anyTest as TestFn<Context>
+const context = {} as Context
 
-test.before(setup())
-test.after(teardown)
+before(() => setup(context))
+after(() => teardown(context))
 
 const tClient: lib.Client = { ...client, client_secret: 'foo' }
 
-test('genericTokenEndpointRequest()', async (t) => {
-  await t.throwsAsync(
+test('genericTokenEndpointRequest()', async () => {
+  await assert.rejects(
     lib.genericTokenEndpointRequest(
       issuer,
       tClient,
@@ -32,7 +35,7 @@ test('genericTokenEndpointRequest()', async (t) => {
     },
   )
 
-  await t.throwsAsync(
+  await assert.rejects(
     lib.genericTokenEndpointRequest(
       { ...issuer, token_endpoint: '' },
       tClient,
@@ -51,7 +54,7 @@ test('genericTokenEndpointRequest()', async (t) => {
     token_endpoint: endpoint('token-1'),
   }
 
-  t.context
+  context
     .intercept({
       path: '/token-1',
       method: 'POST',
@@ -71,7 +74,7 @@ test('genericTokenEndpointRequest()', async (t) => {
     .reply(200, { access_token: 'token', token_type: 'Bearer' })
     .times(1)
 
-  await t.notThrowsAsync(
+  await assert.doesNotReject(
     lib.genericTokenEndpointRequest(
       tIssuer,
       tClient,
@@ -85,29 +88,29 @@ test('genericTokenEndpointRequest()', async (t) => {
   )
 })
 
-test('processGenericTokenEndpointResponse()', async (t) => {
-  await t.throwsAsync(lib.processGenericTokenEndpointResponse(issuer, client, null as any), {
+test('processGenericTokenEndpointResponse()', async () => {
+  await assert.rejects(lib.processGenericTokenEndpointResponse(issuer, client, null as any), {
     message: '"response" must be an instance of Response',
   })
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processGenericTokenEndpointResponse(issuer, client, getResponse('', { status: 404 })),
     {
       message: '"response" is not a conform Token Endpoint response (unexpected HTTP status code)',
     },
   )
-  await t.throwsAsync(lib.processGenericTokenEndpointResponse(issuer, client, getResponse('{"')), {
+  await assert.rejects(lib.processGenericTokenEndpointResponse(issuer, client, getResponse('{"')), {
     message: 'failed to parse "response" body as JSON',
   })
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processGenericTokenEndpointResponse(issuer, client, getResponse('null')),
     {
       message: '"response" body must be a top level object',
     },
   )
-  await t.throwsAsync(lib.processGenericTokenEndpointResponse(issuer, client, getResponse('[]')), {
+  await assert.rejects(lib.processGenericTokenEndpointResponse(issuer, client, getResponse('[]')), {
     message: '"response" body must be a top level object',
   })
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processGenericTokenEndpointResponse(
       issuer,
       client,
@@ -117,7 +120,7 @@ test('processGenericTokenEndpointResponse()', async (t) => {
       message: '"response" body "access_token" property must be a string',
     },
   )
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processGenericTokenEndpointResponse(
       issuer,
       client,
@@ -127,7 +130,7 @@ test('processGenericTokenEndpointResponse()', async (t) => {
       message: '"response" body "token_type" property must be a string',
     },
   )
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processGenericTokenEndpointResponse(
       issuer,
       client,
@@ -144,7 +147,7 @@ test('processGenericTokenEndpointResponse()', async (t) => {
     },
   )
 
-  t.deepEqual(
+  assert.deepStrictEqual(
     await lib.processGenericTokenEndpointResponse(
       issuer,
       client,
@@ -157,19 +160,21 @@ test('processGenericTokenEndpointResponse()', async (t) => {
     },
   )
 
-  const err = await t.throwsAsync(
+  const err = await captureRejection(
     lib.processGenericTokenEndpointResponse(
       issuer,
       client,
       getResponse(JSON.stringify({ error: 'invalid_grant' }), { status: 400 }),
     ),
+    Error,
   )
 
-  t.true(
+  assert.strictEqual(
     err instanceof lib.ResponseBodyError &&
       err.error === 'invalid_grant' &&
       err.status === 400 &&
       err.response.bodyUsed === true,
+    true,
   )
 
   await lib.processGenericTokenEndpointResponse(
@@ -177,7 +182,7 @@ test('processGenericTokenEndpointResponse()', async (t) => {
     client,
     getResponse(JSON.stringify({ access_token: 'token', token_type: 'Bearer' })),
   )
-  await t.throwsAsync(
+  await assert.rejects(
     lib.processGenericTokenEndpointResponse(
       issuer,
       client,
@@ -193,7 +198,7 @@ test('processGenericTokenEndpointResponse()', async (t) => {
     },
   )
 
-  t.deepEqual(
+  assert.deepStrictEqual(
     await lib.processGenericTokenEndpointResponse(
       issuer,
       client,
@@ -206,8 +211,8 @@ test('processGenericTokenEndpointResponse()', async (t) => {
       {
         recognizedTokenTypes: {
           n_a: (response, body) => {
-            t.true(response instanceof Response)
-            t.deepEqual(body, { access_token: 'token', token_type: 'n_a' })
+            assert.strictEqual(response instanceof Response, true)
+            assert.deepStrictEqual(body, { access_token: 'token', token_type: 'n_a' })
           },
         },
       },
