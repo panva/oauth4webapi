@@ -12,8 +12,8 @@ Shared transport options for HTTP requests made by this module.
 
 | Type Parameter | Default type |
 | ------ | ------ |
-| `Method` | - |
-| `BodyType` | `undefined` |
+| <a id="type-parameter-method"></a> `Method` | - |
+| <a id="type-parameter-bodytype"></a> `BodyType` | `undefined` |
 
 ## Properties
 

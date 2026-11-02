@@ -12,8 +12,8 @@ Fetch-style request options passed to a custom fetch implementation.
 
 | Type Parameter | Default type |
 | ------ | ------ |
-| `Method` | - |
-| `BodyType` | `undefined` |
+| <a id="type-parameter-method"></a> `Method` | - |
+| <a id="type-parameter-bodytype"></a> `BodyType` | `undefined` |
 
 ## Properties
 

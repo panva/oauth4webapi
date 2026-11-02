@@ -1,13 +1,13 @@
 import type * as oauth from 'oauth4webapi'
-import type { JsonWebKey, webcrypto } from 'node:crypto'
+import type { JsonWebKeyInput, webcrypto } from 'node:crypto'
 
 type Equals<A, B> = [A] extends [B] ? ([B] extends [A] ? true : never) : never
 
-/* The object type alias supplies Node's implicit unknown-valued index signature without exposing a
- * catch-all index to oauth4webapi consumers. Pin both assignment directions. */
+/* Pin both assignment directions for Node's key input and Web Crypto JWK types without exposing a
+ * catch-all index to oauth4webapi consumers. */
 {
-  const _nodeToOauth: oauth.JWK = {} as JsonWebKey
-  const _oauthToNode: JsonWebKey = {} as oauth.JWK
+  const _nodeToOauth: oauth.JWK = {} as JsonWebKeyInput['key']
+  const _oauthToNode: JsonWebKeyInput['key'] = {} as oauth.JWK
   const _nodeWebToOauth: oauth.JWK = {} as webcrypto.JsonWebKey
   const _oauthToNodeWeb: webcrypto.JsonWebKey = {} as oauth.JWK
   const _noCatchAll: Equals<string extends keyof oauth.JWK ? true : false, false> = true
