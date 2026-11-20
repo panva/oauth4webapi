@@ -1411,26 +1411,18 @@ function signal(url: URL, value: HttpRequestOptions<any>['signal']): AbortSignal
   return undefined
 }
 
-function replaceDoubleSlash(pathname: string) {
-  if (pathname.includes('//')) {
-    return pathname.replace('//', '/')
-  }
-  return pathname
-}
-
 function prependWellKnown(url: URL, wellKnown: string, allowTerminatingSlash = false) {
   if (url.pathname === '/') {
     url.pathname = wellKnown
   } else {
-    url.pathname = replaceDoubleSlash(
-      `${wellKnown}/${allowTerminatingSlash ? url.pathname : url.pathname.replace(/(\/)$/, '')}`,
-    )
+    url.pathname =
+      wellKnown + (allowTerminatingSlash ? url.pathname : url.pathname.replace(/\/$/, ''))
   }
   return url
 }
 
 function appendWellKnown(url: URL, wellKnown: string) {
-  url.pathname = replaceDoubleSlash(`${url.pathname}/${wellKnown}`)
+  url.pathname = `${url.pathname.replace(/\/$/, '')}/${wellKnown}`
   return url
 }
 

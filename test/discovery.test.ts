@@ -69,6 +69,17 @@ test('discoveryRequest() - oidc with a pathname', async () => {
   await lib.discoveryRequest(url, { algorithm: 'oidc' })
 })
 
+test('discoveryRequest() - oidc preserves empty issuer path segments', async () => {
+  context
+    .intercept({ path: '/tenants//blue/.well-known/openid-configuration', method: 'GET' })
+    .reply(200, {})
+    .times(2)
+
+  for (const path of ['/tenants//blue', '/tenants//blue/']) {
+    await lib.discoveryRequest(new URL(path, issuer.issuer))
+  }
+})
+
 test('discoveryRequest() - oauth2', async () => {
   const data = { ...issuer }
   context
