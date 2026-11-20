@@ -519,6 +519,18 @@ test('processDeviceCodeResponse() without ID Tokens', async () => {
   )
 })
 
+test('processDeviceCodeResponse() accepts mixed-case JSON media types', async () => {
+  const response = getResponse(JSON.stringify({ error: 'authorization_pending' }), {
+    status: 400,
+    headers: new Headers({ 'content-type': 'Application/JSON ; charset=utf-8' }),
+  })
+
+  await assert.rejects(lib.processDeviceCodeResponse(issuer, client, response), {
+    name: 'ResponseBodyError',
+    error: 'authorization_pending',
+  })
+})
+
 test('processDeviceCodeResponse() - ignores signatures', async () => {
   await assert.doesNotReject(
     lib

@@ -3422,7 +3422,7 @@ export const skipSubjectCheck: unique symbol = Symbol()
  * @internal
  */
 export function getContentType(input: Response | Request): string | undefined {
-  return input.headers.get('content-type')?.split(';')[0]
+  return input.headers.get('content-type')?.split(';')[0].trim().toLowerCase()
 }
 
 /**
