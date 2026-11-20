@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [3.8.9](https://github.com/panva/oauth4webapi/compare/v3.8.8...v3.8.9) (2026-11-20)
+
+### Fixes
+
+* handle list separators after bare auth schemes ([28f6f82](https://github.com/panva/oauth4webapi/commit/28f6f82a0b2c3ccadb2c2728e94f278eb4e63c52))
+* normalize media types before comparison ([c1f8baf](https://github.com/panva/oauth4webapi/commit/c1f8baf0d1a37c2748b00c7b4a8ff64b9f6b5fc6))
+* preserve empty path segments in OIDC discovery ([d93c090](https://github.com/panva/oauth4webapi/commit/d93c09055e169e2170a75fabb08797dda9ed3dea))
+
 ## [3.8.8](https://github.com/panva/oauth4webapi/compare/v3.8.7...v3.8.8) (2026-09-05)
 
 ### Fixes
