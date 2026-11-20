@@ -517,7 +517,7 @@ export const flow = (options?: FlowOptions): ConformanceFlow => {
             plan.name.startsWith('fapi1')
               ? oauth.validateDetachedSignatureResponse
               : oauth.validateCodeIdTokenResponse
-          )(as, client, currentUrl, nonce as string, state, undefined, {
+          )(as, client, input, nonce as string, state, undefined, {
             [oauth.jweDecrypt]: decrypt,
           })
         } else {
