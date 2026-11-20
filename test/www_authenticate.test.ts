@@ -75,6 +75,31 @@ const vectors = [
     ],
   },
   {
+    description: 'whitespace before the comma following a bare scheme',
+    header: 'Negotiate , DPoP error="use_dpop_nonce"',
+    expected: [
+      { scheme: 'negotiate', parameters: {} },
+      { scheme: 'dpop', parameters: { error: 'use_dpop_nonce' } },
+    ],
+  },
+  {
+    description: 'trailing comma following a bare scheme',
+    header: 'Negotiate,',
+    expected: [{ scheme: 'negotiate', parameters: {} }],
+  },
+  {
+    description: 'trailing empty list elements after multiple challenges',
+    header: 'DPoP error="use_dpop_nonce", Negotiate\t, ,\t,',
+    expected: [
+      { scheme: 'dpop', parameters: { error: 'use_dpop_nonce' } },
+      { scheme: 'negotiate', parameters: {} },
+    ],
+  },
+  {
+    description: 'malformed challenge after a bare scheme and empty list elements',
+    header: 'Negotiate , , ???',
+  },
+  {
     description: 'using token format for a parameter including backslashes',
     header: 'Scheme realm=\\f\\o\\o',
   },
