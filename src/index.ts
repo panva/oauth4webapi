@@ -2852,6 +2852,9 @@ function parseWwwAuthenticateChallenges(
     let match: RegExpMatchArray | null = rest.match(schemeRE)
     const scheme = match?.['1'].toLowerCase() as Lowercase<string>
     if (!scheme) {
+      if (/^[, \t]+$/.test(rest)) {
+        break
+      }
       return undefined
     }
 
@@ -2888,6 +2891,11 @@ function parseWwwAuthenticateChallenges(
           // @ts-expect-error
           parameters[key.toLowerCase() as Lowercase<string>] = value
           continue
+        }
+
+        // A comma before the next scheme can follow a bare scheme and whitespace.
+        if (rest.startsWith(',')) {
+          break
         }
 
         if ((match = rest.match(token68ParamRE))) {
